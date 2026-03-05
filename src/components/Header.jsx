@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 
 const navItems = [
   { label: 'Trang chủ', to: '/' },
@@ -11,16 +11,38 @@ const navItems = [
 function Header({ cartCount }) {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
+  const [currentUser, setCurrentUser] = useState(null)
   const { pathname, hash } = useLocation()
+  const navigate = useNavigate()
 
   useEffect(() => {
     setMobileMenuOpen(false)
     setUserMenuOpen(false)
+
+    const userDataString = localStorage.getItem('restaurant_current_user')
+    if (userDataString) {
+      try {
+        const userData = JSON.parse(userDataString)
+        setCurrentUser(userData)
+      } catch (e) {
+        setCurrentUser(null)
+      }
+    } else {
+      setCurrentUser(null)
+    }
   }, [pathname, hash])
 
   const handleNavLinkClick = () => {
     setMobileMenuOpen(false)
     setUserMenuOpen(false)
+  }
+
+  const handleLogout = () => {
+    localStorage.removeItem('restaurant_current_user')
+    setCurrentUser(null)
+    setUserMenuOpen(false)
+    setMobileMenuOpen(false)
+    navigate('/')
   }
 
   const isActive = (to) => {
@@ -76,12 +98,28 @@ function Header({ cartCount }) {
 
             {userMenuOpen && (
               <div className="user-dropdown" role="menu">
-                <Link to="/login" role="menuitem">
-                  Đăng nhập
-                </Link>
-                <Link to="/orders" role="menuitem">
-                  Lịch sử đơn hàng
-                </Link>
+                {currentUser ? (
+                  <>
+                    <div className="user-greeting">
+                      Xin chào, <strong>{currentUser.name}</strong>
+                    </div>
+                    <Link to="/orders" role="menuitem">
+                      Lịch sử đơn hàng
+                    </Link>
+                    <button className="logout-btn" onClick={handleLogout} role="menuitem">
+                      Đăng xuất
+                    </button>
+                  </>
+                ) : (
+                  <>
+                    <Link to="/login" role="menuitem">
+                      Đăng nhập
+                    </Link>
+                    <Link to="/orders" role="menuitem">
+                      Lịch sử đơn hàng
+                    </Link>
+                  </>
+                )}
               </div>
             )}
           </div>
@@ -106,12 +144,28 @@ function Header({ cartCount }) {
               {item.label}
             </Link>
           ))}
-          <Link to="/login" onClick={handleNavLinkClick}>
-            Đăng nhập
-          </Link>
-          <Link to="/orders" onClick={handleNavLinkClick}>
-            Lịch sử đơn hàng
-          </Link>
+          {currentUser ? (
+            <>
+              <div className="mobile-user-greeting">
+                Xin chào, <strong>{currentUser.name}</strong>
+              </div>
+              <Link to="/orders" onClick={handleNavLinkClick}>
+                Lịch sử đơn hàng
+              </Link>
+              <button className="mobile-logout-btn" onClick={handleLogout}>
+                Đăng xuất
+              </button>
+            </>
+          ) : (
+            <>
+              <Link to="/login" onClick={handleNavLinkClick}>
+                Đăng nhập
+              </Link>
+              <Link to="/orders" onClick={handleNavLinkClick}>
+                Lịch sử đơn hàng
+              </Link>
+            </>
+          )}
         </div>
       )}
     </header>
