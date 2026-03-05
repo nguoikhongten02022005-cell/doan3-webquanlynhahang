@@ -718,4 +718,137 @@ a {
   .section-head p {
     font-size: 0.91rem;
   }
+
+  .auth-card {
+    border-radius: 1.2rem;
+    padding: 1.25rem;
+  }
+}
+
+.auth-page {
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 2.2rem 1rem;
+}
+
+.auth-card {
+  width: 100%;
+  max-width: 430px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 1.5rem;
+  box-shadow: 0 16px 34px rgba(15, 23, 42, 0.08);
+  padding: 1.55rem;
+}
+
+.auth-title {
+  margin: 0;
+  font-family: 'Manrope', sans-serif;
+  font-size: 1.75rem;
+  line-height: 1.2;
+  color: var(--text-primary);
+}
+
+.auth-subtitle {
+  margin: 0.55rem 0 0;
+  color: var(--text-secondary);
+  line-height: 1.6;
+  font-size: 0.93rem;
+}
+
+.auth-form {
+  margin-top: 1.3rem;
+  display: grid;
+  gap: 0.95rem;
+}
+
+.form-group {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.form-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.form-input {
+  width: 100%;
+  height: 2.95rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: #fff;
+  color: var(--text-primary);
+  padding: 0 0.95rem;
+  font-size: 0.95rem;
+  outline: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+.form-input::placeholder {
+  color: #9ca3af;
+}
+
+.form-input:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 3px rgba(234, 88, 12, 0.14);
+}
+
+.form-input-error,
+.form-input-error:focus {
+  border-color: #dc2626;
+  box-shadow: 0 0 0 3px rgba(220, 38, 38, 0.15);
+}
+
+.form-error {
+  margin: -0.2rem 0 0;
+  color: #dc2626;
+  font-size: 0.84rem;
+  line-height: 1.5;
+}
+
+.form-success {
+  margin: 1.1rem 0 0;
+  padding: 0.62rem 0.8rem;
+  border-radius: 0.7rem;
+  border: 1px solid #86efac;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.auth-form .btn {
+  width: 100%;
+  margin-top: 0.2rem;
+}
+
+.auth-form .btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.auth-form .btn:disabled:hover {
+  background: var(--primary);
+  border-color: var(--primary);
+}
+
+.auth-switch-text {
+  margin: 1rem 0 0;
+  text-align: center;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+}
+
+.auth-switch-link {
+  color: var(--primary);
+  font-weight: 700;
+}
+
+.auth-switch-link:hover {
+  text-decoration: underline;
 }
