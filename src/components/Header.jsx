@@ -5,7 +5,7 @@ const navItems = [
   { label: 'Trang chủ', to: '/' },
   { label: 'Thực đơn', to: '/menu' },
   { label: 'Đặt bàn', to: '/booking' },
-  { label: 'Về chúng tôi', to: '/#about' },
+  { label: 'Về chúng tôi', to: '/about' },
 ]
 
 function Header({ cartCount }) {
@@ -46,14 +46,6 @@ function Header({ cartCount }) {
   }
 
   const isActive = (to) => {
-    if (to === '/#about') {
-      return pathname === '/' && hash === '#about'
-    }
-
-    if (to === '/') {
-      return pathname === '/' && hash !== '#about'
-    }
-
     return pathname === to
   }
 
@@ -67,7 +59,12 @@ function Header({ cartCount }) {
 
         <nav className="main-nav" aria-label="Điều hướng chính">
           {navItems.map((item) => (
-            <Link key={item.label} to={item.to} className={isActive(item.to) ? 'active' : ''} onClick={handleNavLinkClick}>
+            <Link
+              key={item.label}
+              to={item.to}
+              className={isActive(item.to) ? 'active' : ''}
+              onClick={handleNavLinkClick}
+            >
               {item.label}
             </Link>
           ))}
@@ -140,7 +137,12 @@ function Header({ cartCount }) {
       {mobileMenuOpen && (
         <div className="mobile-menu container">
           {navItems.map((item) => (
-            <Link key={item.label} to={item.to} className={isActive(item.to) ? 'active' : ''} onClick={handleNavLinkClick}>
+            <Link
+              key={item.label}
+              to={item.to}
+              className={isActive(item.to) ? 'active' : ''}
+              onClick={handleNavLinkClick}
+            >
               {item.label}
             </Link>
           ))}
