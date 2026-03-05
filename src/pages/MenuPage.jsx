@@ -1,9 +1,11 @@
 import { useState } from 'react'
 import FoodCard from '../components/FoodCard'
+import { useCart } from '../context/CartContext'
 
 function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('Tất cả')
+  const { addToCart } = useCart()
 
   const categories = ['Tất cả', 'Món Chính', 'Khai Vị', 'Đồ Uống', 'Tráng Miệng', 'Combo']
 
@@ -180,7 +182,8 @@ function MenuPage() {
   })
 
   const handleAddToCart = (dish) => {
-    console.log('Thêm vào giỏ:', dish)
+    addToCart(dish)
+    alert(`Đã thêm ${dish.name} vào giỏ`)
   }
 
   return (

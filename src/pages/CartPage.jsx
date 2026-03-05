@@ -1,48 +1,16 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
 
 function CartPage() {
   const navigate = useNavigate()
-
-  const [cartItems, setCartItems] = useState([
-    {
-      id: 1,
-      name: 'Phở Bò Đặc Biệt',
-      price: 65000,
-      quantity: 2,
-      image: 'linear-gradient(135deg, #fff1df 0%, #fed7aa 100%)'
-    },
-    {
-      id: 2,
-      name: 'Bún Chả Hà Nội',
-      price: 55000,
-      quantity: 1,
-      image: 'linear-gradient(135deg, #ecfdf5 0%, #bbf7d0 100%)'
-    },
-    {
-      id: 3,
-      name: 'Gỏi Cuốn Tôm Thịt',
-      price: 45000,
-      quantity: 3,
-      image: 'linear-gradient(135deg, #fff1f2 0%, #fecdd3 100%)'
-    }
-  ])
+  const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart()
 
   const [note, setNote] = useState('')
   const [tableNumber, setTableNumber] = useState('')
 
-  const updateQuantity = (id, delta) => {
-    setCartItems(items =>
-      items.map(item =>
-        item.id === id
-          ? { ...item, quantity: Math.max(1, item.quantity + delta) }
-          : item
-      )
-    )
-  }
-
   const removeItem = (id) => {
-    setCartItems(items => items.filter(item => item.id !== id))
+    removeFromCart(id)
   }
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -54,7 +22,46 @@ function CartPage() {
       alert('Giỏ hàng trống!')
       return
     }
-    alert(`Đặt món thành công!\nTổng: ${total.toLocaleString('vi-VN')}₫\nSố bàn: ${tableNumber || 'Chưa chọn'}\nGhi chú: ${note || 'Không có'}`)
+
+    const currentUserString = localStorage.getItem('restaurant_current_user')
+    let currentUser = null
+
+    if (currentUserString) {
+      try {
+        currentUser = JSON.parse(currentUserString)
+      } catch (error) {
+        currentUser = null
+      }
+    }
+
+    const ordersString = localStorage.getItem('restaurant_orders')
+    let existingOrders = []
+
+    if (ordersString) {
+      try {
+        const parsedOrders = JSON.parse(ordersString)
+        existingOrders = Array.isArray(parsedOrders) ? parsedOrders : []
+      } catch (error) {
+        existingOrders = []
+      }
+    }
+
+    const newOrder = {
+      id: Date.now(),
+      items: cartItems,
+      subtotal,
+      serviceFee,
+      total,
+      tableNumber,
+      note,
+      orderDate: new Date().toISOString(),
+      user: currentUser,
+    }
+
+    localStorage.setItem('restaurant_orders', JSON.stringify([newOrder, ...existingOrders]))
+    clearCart()
+    alert('Đặt món thành công! Đơn hàng của bạn đã được lưu.')
+    navigate('/')
   }
 
   return (

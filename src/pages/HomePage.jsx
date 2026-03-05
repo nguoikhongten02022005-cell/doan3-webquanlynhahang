@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import FoodCard from '../components/FoodCard'
+import { useCart } from '../context/CartContext'
 
 const categories = [
   { name: 'Món Chính', icon: '🍲' },
@@ -77,7 +78,12 @@ const signatureDishes = [
 ]
 
 function HomePage() {
-  const handleAddToCart = () => {}
+  const { addToCart } = useCart()
+
+  const handleAddToCart = (dish) => {
+    addToCart(dish)
+    alert(`Đã thêm ${dish.name} vào giỏ`)
+  }
 
   return (
     <div className="home-page">

@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useCart } from '../context/CartContext'
 
 const navItems = [
   { label: 'Trang chủ', to: '/' },
@@ -8,12 +9,14 @@ const navItems = [
   { label: 'Về chúng tôi', to: '/about' },
 ]
 
-function Header({ cartCount }) {
+function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [userMenuOpen, setUserMenuOpen] = useState(false)
   const [currentUser, setCurrentUser] = useState(null)
   const { pathname, hash } = useLocation()
   const navigate = useNavigate()
+  const { cartItems } = useCart()
+  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
 
   useEffect(() => {
     setMobileMenuOpen(false)

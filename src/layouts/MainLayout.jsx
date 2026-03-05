@@ -5,7 +5,7 @@ import Footer from '../components/Footer'
 function MainLayout() {
   return (
     <>
-      <Header cartCount={3} />
+      <Header />
       <main>
         <Outlet />
       </main>
