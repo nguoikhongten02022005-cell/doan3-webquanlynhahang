@@ -5,6 +5,8 @@ import HomePage from './pages/HomePage'
 import MenuPage from './pages/MenuPage'
 import BookingPage from './pages/BookingPage'
 import CartPage from './pages/CartPage'
+import CheckoutPage from './pages/CheckoutPage'
+import ProfilePage from './pages/ProfilePage'
 import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import AboutPage from './pages/AboutPage'
@@ -19,6 +21,8 @@ function App() {
           <Route path="/booking" element={<BookingPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/cart" element={<CartPage />} />
+          <Route path="/checkout" element={<CheckoutPage />} />
+          <Route path="/profile" element={<ProfilePage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>

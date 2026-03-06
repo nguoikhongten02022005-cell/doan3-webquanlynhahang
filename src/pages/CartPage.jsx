@@ -4,10 +4,19 @@ import { useCart } from '../context/CartContext'
 
 function CartPage() {
   const navigate = useNavigate()
-  const { cartItems, updateQuantity, removeFromCart, clearCart } = useCart()
+  const { cartItems, updateQuantity, removeFromCart } = useCart()
 
   const [note, setNote] = useState('')
   const [tableNumber, setTableNumber] = useState('')
+
+  const handleGoToCheckout = () => {
+    if (cartItems.length === 0) {
+      alert('Giỏ hàng trống!')
+      return
+    }
+
+    navigate('/checkout')
+  }
 
   const removeItem = (id) => {
     removeFromCart(id)
@@ -16,53 +25,6 @@ function CartPage() {
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
   const serviceFee = subtotal * 0.05
   const total = subtotal + serviceFee
-
-  const handleConfirmOrder = () => {
-    if (cartItems.length === 0) {
-      alert('Giỏ hàng trống!')
-      return
-    }
-
-    const currentUserString = localStorage.getItem('restaurant_current_user')
-    let currentUser = null
-
-    if (currentUserString) {
-      try {
-        currentUser = JSON.parse(currentUserString)
-      } catch (error) {
-        currentUser = null
-      }
-    }
-
-    const ordersString = localStorage.getItem('restaurant_orders')
-    let existingOrders = []
-
-    if (ordersString) {
-      try {
-        const parsedOrders = JSON.parse(ordersString)
-        existingOrders = Array.isArray(parsedOrders) ? parsedOrders : []
-      } catch (error) {
-        existingOrders = []
-      }
-    }
-
-    const newOrder = {
-      id: Date.now(),
-      items: cartItems,
-      subtotal,
-      serviceFee,
-      total,
-      tableNumber,
-      note,
-      orderDate: new Date().toISOString(),
-      user: currentUser,
-    }
-
-    localStorage.setItem('restaurant_orders', JSON.stringify([newOrder, ...existingOrders]))
-    clearCart()
-    alert('Đặt món thành công! Đơn hàng của bạn đã được lưu.')
-    navigate('/')
-  }
 
   return (
     <div className="cart-page">
@@ -172,10 +134,10 @@ function CartPage() {
 
               <button
                 className="btn btn-primary w-full"
-                onClick={handleConfirmOrder}
+                onClick={handleGoToCheckout}
                 disabled={cartItems.length === 0}
               >
-                Xác nhận đặt món
+                Thanh toán
               </button>
             </div>
           </div>
