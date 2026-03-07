@@ -1,13 +1,120 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import FoodCard from '../components/FoodCard'
 import { useCart } from '../context/CartContext'
 
 function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('Tất cả')
+  const [selectedDish, setSelectedDish] = useState(null)
+  const [isDetailOpen, setIsDetailOpen] = useState(false)
+  const [selectedSize, setSelectedSize] = useState('M')
+  const [selectedToppings, setSelectedToppings] = useState([])
+  const [specialNote, setSpecialNote] = useState('')
   const { addToCart } = useCart()
 
   const categories = ['Tất cả', 'Món Chính', 'Khai Vị', 'Đồ Uống', 'Tráng Miệng', 'Combo']
+  const toppingOptions = ['Thêm phô mai', 'Thêm trứng', 'Sốt đặc biệt']
+  const sizeOptions = [
+    { value: 'M', label: 'Size M', surcharge: 0 },
+    { value: 'L', label: 'Size L', surcharge: 30000 },
+  ]
+
+  const parsePriceToNumber = (price) => {
+    if (typeof price === 'number') {
+      return price
+    }
+
+    if (typeof price === 'string') {
+      const numeric = Number(price.replace(/[^\d]/g, ''))
+      return Number.isNaN(numeric) ? 0 : numeric
+    }
+
+    return 0
+  }
+
+  const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
+
+  useEffect(() => {
+    if (!isDetailOpen) {
+      return
+    }
+
+    const handleEsc = (event) => {
+      if (event.key === 'Escape') {
+        setIsDetailOpen(false)
+      }
+    }
+
+    window.addEventListener('keydown', handleEsc)
+    return () => window.removeEventListener('keydown', handleEsc)
+  }, [isDetailOpen])
+
+  useEffect(() => {
+    if (isDetailOpen) {
+      document.body.style.overflow = 'hidden'
+      return
+    }
+
+    document.body.style.overflow = ''
+
+    return () => {
+      document.body.style.overflow = ''
+    }
+  }, [isDetailOpen])
+
+  const getSurchargeBySize = (size) => {
+    const selected = sizeOptions.find((option) => option.value === size)
+    return selected ? selected.surcharge : 0
+  }
+
+  const openDetailModal = (dish) => {
+    setSelectedDish(dish)
+    setSelectedSize('M')
+    setSelectedToppings([])
+    setSpecialNote('')
+    setIsDetailOpen(true)
+  }
+
+  const closeDetailModal = () => {
+    setIsDetailOpen(false)
+    setSelectedDish(null)
+  }
+
+  const handleToggleTopping = (topping) => {
+    setSelectedToppings((prev) =>
+      prev.includes(topping) ? prev.filter((item) => item !== topping) : [...prev, topping],
+    )
+  }
+
+  const handleAddConfiguredDish = () => {
+    if (!selectedDish) {
+      return
+    }
+
+    const surcharge = getSurchargeBySize(selectedSize)
+    const dishPrice = parsePriceToNumber(selectedDish.price)
+
+    addToCart({
+      ...selectedDish,
+      price: dishPrice + surcharge,
+      selectedSize,
+      selectedToppings,
+      specialNote,
+    })
+
+    alert(`Đã thêm ${selectedDish.name} vào giỏ`)
+    closeDetailModal()
+  }
+
+  const getDetailPrice = () => {
+    if (!selectedDish) {
+      return 0
+    }
+
+    return parsePriceToNumber(selectedDish.price) + getSurchargeBySize(selectedSize)
+  }
+
+  const selectedSurcharge = getSurchargeBySize(selectedSize)
 
   const allMenuDishes = [
     {
@@ -182,9 +289,16 @@ function MenuPage() {
   })
 
   const handleAddToCart = (dish) => {
-    addToCart(dish)
+    addToCart({
+      ...dish,
+      selectedSize: 'M',
+      selectedToppings: [],
+      specialNote: '',
+    })
     alert(`Đã thêm ${dish.name} vào giỏ`)
   }
+
+  const detailTitleId = selectedDish ? `menu-food-detail-title-${selectedDish.id}` : 'menu-food-detail-title'
 
   return (
     <div className="menu-page">
@@ -226,13 +340,94 @@ function MenuPage() {
             ) : (
               <div className="menu-grid">
                 {filteredDishes.map((dish) => (
-                  <FoodCard key={dish.id} dish={dish} onAddToCart={handleAddToCart} />
+                  <FoodCard key={dish.id} dish={dish} onAddToCart={handleAddToCart} onOpenDetail={openDetailModal} />
                 ))}
               </div>
             )}
           </main>
         </div>
       </div>
+
+      {isDetailOpen && selectedDish && (
+        <div className="food-detail-modal-overlay" role="dialog" aria-modal="true" aria-labelledby={detailTitleId} onClick={closeDetailModal}>
+          <div className="food-detail-modal" onClick={(event) => event.stopPropagation()}>
+            <button type="button" className="food-detail-close" onClick={closeDetailModal} aria-label="Đóng chi tiết món">
+              ×
+            </button>
+
+            <div className={`food-detail-hero ${selectedDish.tone}`}>
+              <span className="food-badge">{selectedDish.badge}</span>
+            </div>
+
+            <div className="food-detail-content">
+              <h3 id={detailTitleId}>{selectedDish.name}</h3>
+              <p>{selectedDish.description}</p>
+              <strong className="food-detail-base-price">Giá gốc: {formatCurrency(parsePriceToNumber(selectedDish.price))}</strong>
+
+              <div className="food-detail-group">
+                <p className="food-detail-group-title">Chọn size</p>
+                <div className="food-detail-options two-columns">
+                  {sizeOptions.map((option) => (
+                    <label key={option.value} className="food-detail-option">
+                      <input
+                        type="radio"
+                        name="detail-size-menu"
+                        value={option.value}
+                        checked={selectedSize === option.value}
+                        onChange={(event) => setSelectedSize(event.target.value)}
+                      />
+                      <span>{option.label}</span>
+                      <small>{option.surcharge > 0 ? `+${formatCurrency(option.surcharge)}` : 'Giá gốc'}</small>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="food-detail-group">
+                <p className="food-detail-group-title">Topping thêm</p>
+                <div className="food-detail-options">
+                  {toppingOptions.map((topping) => (
+                    <label key={topping} className="food-detail-option">
+                      <input
+                        type="checkbox"
+                        checked={selectedToppings.includes(topping)}
+                        onChange={() => handleToggleTopping(topping)}
+                      />
+                      <span>{topping}</span>
+                    </label>
+                  ))}
+                </div>
+              </div>
+
+              <div className="food-detail-group">
+                <label className="food-detail-group-title" htmlFor="menu-special-note">
+                  Ghi chú món
+                </label>
+                <textarea
+                  id="menu-special-note"
+                  className="form-textarea food-detail-note"
+                  rows="3"
+                  maxLength="120"
+                  placeholder="Ví dụ: ít cay, không hành..."
+                  value={specialNote}
+                  onChange={(event) => setSpecialNote(event.target.value)}
+                />
+              </div>
+
+              <div className="food-detail-actions">
+                <div className="food-detail-total-wrap">
+                  <span>Tạm tính món</span>
+                  <strong>{formatCurrency(getDetailPrice())}</strong>
+                  {selectedSurcharge > 0 && <small>Đã gồm phụ thu size {formatCurrency(selectedSurcharge)}</small>}
+                </div>
+                <button type="button" className="btn btn-primary" onClick={handleAddConfiguredDish}>
+                  Thêm vào giỏ
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

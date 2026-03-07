@@ -1,13 +1,55 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 
+const VOUCHER_STORAGE_KEY = 'restaurant_applied_voucher'
+
+const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
+
 function CartPage() {
   const navigate = useNavigate()
-  const { cartItems, updateQuantity, removeFromCart } = useCart()
+  const { cartItems, updateQuantity, removeFromCart, getCartItemKey, getItemDisplayOptions } = useCart()
 
   const [note, setNote] = useState('')
   const [tableNumber, setTableNumber] = useState('')
+  const [voucherCodeInput, setVoucherCodeInput] = useState('')
+  const [appliedVoucher, setAppliedVoucher] = useState(null)
+  const [voucherError, setVoucherError] = useState('')
+
+  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const serviceFee = subtotal * 0.05
+  const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal + serviceFee) : 0
+  const total = Math.max(0, subtotal + serviceFee - discountAmount)
+
+  useEffect(() => {
+    const voucherString = localStorage.getItem(VOUCHER_STORAGE_KEY)
+    if (!voucherString) {
+      return
+    }
+
+    try {
+      const parsedVoucher = JSON.parse(voucherString)
+      if (parsedVoucher?.code === 'GIAM20K' && Number(parsedVoucher?.amount) > 0) {
+        setAppliedVoucher({
+          code: parsedVoucher.code,
+          amount: Number(parsedVoucher.amount),
+        })
+        setVoucherCodeInput(parsedVoucher.code)
+      }
+    } catch {
+      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+    }
+  }, [])
+
+  useEffect(() => {
+    if (subtotal > 0 || !appliedVoucher) {
+      return
+    }
+
+    setAppliedVoucher(null)
+    setVoucherError('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
+    localStorage.removeItem(VOUCHER_STORAGE_KEY)
+  }, [subtotal, appliedVoucher])
 
   const handleGoToCheckout = () => {
     if (cartItems.length === 0) {
@@ -15,16 +57,61 @@ function CartPage() {
       return
     }
 
+    if (appliedVoucher) {
+      localStorage.setItem(VOUCHER_STORAGE_KEY, JSON.stringify(appliedVoucher))
+    } else {
+      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+    }
+
     navigate('/checkout')
   }
 
-  const removeItem = (id) => {
-    removeFromCart(id)
+  const handleApplyVoucher = () => {
+    if (subtotal <= 0) {
+      setAppliedVoucher(null)
+      setVoucherError('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
+      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      return
+    }
+
+    const normalizedCode = voucherCodeInput.trim().toUpperCase()
+
+    if (normalizedCode !== 'GIAM20K') {
+      setAppliedVoucher(null)
+      setVoucherError('Mã giảm giá không hợp lệ.')
+      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      return
+    }
+
+    const voucher = { code: 'GIAM20K', amount: 20000 }
+    setAppliedVoucher(voucher)
+    setVoucherCodeInput(voucher.code)
+    setVoucherError('')
+    localStorage.setItem(VOUCHER_STORAGE_KEY, JSON.stringify(voucher))
   }
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const serviceFee = subtotal * 0.05
-  const total = subtotal + serviceFee
+  const handleClearVoucher = () => {
+    setAppliedVoucher(null)
+    setVoucherCodeInput('')
+    setVoucherError('')
+    localStorage.removeItem(VOUCHER_STORAGE_KEY)
+  }
+
+  const renderVoucherMessage = () => {
+    if (voucherError) {
+      return <p className="voucher-message error">{voucherError}</p>
+    }
+
+    if (appliedVoucher) {
+      return (
+        <p className="voucher-message success">
+          Đã áp mã {appliedVoucher.code}: -{formatCurrency(appliedVoucher.amount)}
+        </p>
+      )
+    }
+
+    return null
+  }
 
   return (
     <div className="cart-page">
@@ -44,46 +131,63 @@ function CartPage() {
                 </button>
               </div>
             ) : (
-              cartItems.map(item => (
-                <div key={item.id} className="cart-item">
-                  <div className="cart-item-image" style={{ background: item.image }}></div>
+              cartItems.map((item) => {
+                const itemKey = typeof getCartItemKey === 'function' ? getCartItemKey(item) : item.id
+                const optionLines =
+                  typeof getItemDisplayOptions === 'function' ? getItemDisplayOptions(item) : []
 
-                  <div className="cart-item-info">
-                    <h3>{item.name}</h3>
-                    <p className="cart-item-price">{item.price.toLocaleString('vi-VN')}₫</p>
-                  </div>
+                return (
+                  <div key={itemKey} className="cart-item">
+                    <div className="cart-item-image" style={{ background: item.image }}></div>
 
-                  <div className="cart-item-actions">
-                    <div className="quantity-control">
-                      <button
-                        className="qty-btn"
-                        onClick={() => updateQuantity(item.id, -1)}
-                        aria-label="Giảm số lượng"
-                      >
-                        −
-                      </button>
-                      <span className="qty-value">{item.quantity}</span>
-                      <button
-                        className="qty-btn"
-                        onClick={() => updateQuantity(item.id, 1)}
-                        aria-label="Tăng số lượng"
-                      >
-                        +
-                      </button>
+                    <div className="cart-item-info">
+                      <h3>{item.name}</h3>
+                      <p className="cart-item-price">{formatCurrency(item.price)}</p>
+                      {optionLines.length > 0 && (
+                        <div className="cart-item-options">
+                          {optionLines.map((line) => (
+                            <p key={line}>{line}</p>
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    <button
-                      className="remove-btn"
-                      onClick={() => removeItem(item.id)}
-                      aria-label="Xóa món"
-                    >
-                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                        <path d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z" strokeLinecap="round" strokeLinejoin="round"/>
-                      </svg>
-                    </button>
+                    <div className="cart-item-actions">
+                      <div className="quantity-control">
+                        <button
+                          className="qty-btn"
+                          onClick={() => updateQuantity(itemKey, -1)}
+                          aria-label="Giảm số lượng"
+                        >
+                          −
+                        </button>
+                        <span className="qty-value">{item.quantity}</span>
+                        <button
+                          className="qty-btn"
+                          onClick={() => updateQuantity(itemKey, 1)}
+                          aria-label="Tăng số lượng"
+                        >
+                          +
+                        </button>
+                      </div>
+
+                      <button
+                        className="remove-btn"
+                        onClick={() => removeFromCart(itemKey)}
+                        aria-label="Xóa món"
+                      >
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                          <path
+                            d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   </div>
-                </div>
-              ))
+                )
+              })
             )}
           </div>
 
@@ -91,21 +195,56 @@ function CartPage() {
             <div className="summary-card">
               <h2>Tổng kết đơn</h2>
 
+              <div className="voucher-block">
+                <div className="voucher-header">
+                  <h3>Mã giảm giá</h3>
+                  <p>Nhập GIAM20K để giảm 20.000đ</p>
+                </div>
+                <div className="voucher-controls">
+                  <input
+                    type="text"
+                    className="form-input voucher-input"
+                    placeholder="Nhập mã GIAM20K"
+                    value={voucherCodeInput}
+                    onChange={(event) => {
+                      setVoucherCodeInput(event.target.value)
+                      if (voucherError) {
+                        setVoucherError('')
+                      }
+                    }}
+                  />
+                  <button type="button" className="btn btn-primary voucher-apply-btn" onClick={handleApplyVoucher}>
+                    Áp dụng
+                  </button>
+                  {appliedVoucher && (
+                    <button type="button" className="btn btn-ghost voucher-clear-btn" onClick={handleClearVoucher}>
+                      Bỏ mã
+                    </button>
+                  )}
+                </div>
+                {renderVoucherMessage()}
+              </div>
+
               <div className="summary-row">
                 <span>Tạm tính</span>
-                <span>{subtotal.toLocaleString('vi-VN')}₫</span>
+                <span>{formatCurrency(subtotal)}</span>
               </div>
 
               <div className="summary-row">
                 <span>Phí dịch vụ (5%)</span>
-                <span>{serviceFee.toLocaleString('vi-VN')}₫</span>
+                <span>{formatCurrency(serviceFee)}</span>
+              </div>
+
+              <div className="summary-row summary-discount">
+                <span>Giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
+                <span>-{formatCurrency(discountAmount)}</span>
               </div>
 
               <div className="summary-divider"></div>
 
               <div className="summary-row summary-total">
                 <span>Tổng cộng</span>
-                <strong>{total.toLocaleString('vi-VN')}₫</strong>
+                <strong>{formatCurrency(total)}</strong>
               </div>
 
               <div className="summary-form">
@@ -116,7 +255,7 @@ function CartPage() {
                     className="form-input"
                     placeholder="Nhập số bàn (nếu có)"
                     value={tableNumber}
-                    onChange={(e) => setTableNumber(e.target.value)}
+                    onChange={(event) => setTableNumber(event.target.value)}
                   />
                 </div>
 
@@ -127,7 +266,7 @@ function CartPage() {
                     placeholder="Ví dụ: Không hành, ít cay..."
                     rows="3"
                     value={note}
-                    onChange={(e) => setNote(e.target.value)}
+                    onChange={(event) => setNote(event.target.value)}
                   ></textarea>
                 </div>
               </div>

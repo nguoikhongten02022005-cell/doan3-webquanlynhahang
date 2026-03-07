@@ -1,6 +1,8 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+
+const VOUCHER_STORAGE_KEY = 'restaurant_applied_voucher'
 
 const paymentMethods = [
   {
@@ -17,9 +19,36 @@ const paymentMethods = [
 
 const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
 
+const getAppliedVoucher = () => {
+  const voucherString = localStorage.getItem(VOUCHER_STORAGE_KEY)
+  if (!voucherString) {
+    return null
+  }
+
+  try {
+    const parsedVoucher = JSON.parse(voucherString)
+
+    if (parsedVoucher?.code !== 'GIAM20K') {
+      return null
+    }
+
+    const amount = Number(parsedVoucher?.amount)
+    if (!Number.isFinite(amount) || amount <= 0) {
+      return null
+    }
+
+    return {
+      code: parsedVoucher.code,
+      amount,
+    }
+  } catch {
+    return null
+  }
+}
+
 function CheckoutPage() {
   const navigate = useNavigate()
-  const { cartItems, clearCart } = useCart()
+  const { cartItems, clearCart, getItemDisplayOptions, getCartItemKey } = useCart()
 
   const [formData, setFormData] = useState({
     fullName: '',
@@ -28,6 +57,18 @@ function CheckoutPage() {
     note: '',
     paymentMethod: 'cash',
   })
+  const [appliedVoucher, setAppliedVoucher] = useState(null)
+
+  useEffect(() => {
+    const voucher = getAppliedVoucher()
+
+    if (!voucher) {
+      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      return
+    }
+
+    setAppliedVoucher(voucher)
+  }, [])
 
   const subtotal = useMemo(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -35,7 +76,8 @@ function CheckoutPage() {
   )
 
   const serviceFee = subtotal * 0.05
-  const total = subtotal + serviceFee
+  const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal + serviceFee) : 0
+  const total = Math.max(0, subtotal + serviceFee - discountAmount)
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -76,9 +118,11 @@ function CheckoutPage() {
       items: cartItems,
       subtotal,
       serviceFee,
+      discountAmount,
+      voucherCode: appliedVoucher?.code || '',
       total,
       orderDate: new Date().toISOString(),
-      status: 'Đang giao',
+      status: 'Mới Đặt',
       customer: {
         fullName: formData.fullName,
         phone: formData.phone,
@@ -89,6 +133,7 @@ function CheckoutPage() {
     }
 
     localStorage.setItem('restaurant_orders', JSON.stringify([newOrder, ...existingOrders]))
+    localStorage.removeItem(VOUCHER_STORAGE_KEY)
 
     if (typeof clearCart === 'function') {
       clearCart()
@@ -206,15 +251,33 @@ function CheckoutPage() {
                 <div className="checkout-empty">Chưa có món nào trong giỏ hàng.</div>
               ) : (
                 <div className="checkout-item-list">
-                  {cartItems.map((item) => (
-                    <div key={item.id} className="checkout-item">
-                      <div>
-                        <p className="checkout-item-name">{item.name}</p>
-                        <p className="checkout-item-qty">x{item.quantity}</p>
+                  {cartItems.map((item, index) => {
+                    const itemKey =
+                      typeof getCartItemKey === 'function'
+                        ? getCartItemKey(item)
+                        : `${item.id}-${index}`
+                    const optionLines =
+                      typeof getItemDisplayOptions === 'function'
+                        ? getItemDisplayOptions(item)
+                        : []
+
+                    return (
+                      <div key={itemKey} className="checkout-item">
+                        <div>
+                          <p className="checkout-item-name">{item.name}</p>
+                          {optionLines.length > 0 && (
+                            <div className="checkout-item-options">
+                              {optionLines.map((line) => (
+                                <p key={line}>{line}</p>
+                              ))}
+                            </div>
+                          )}
+                          <p className="checkout-item-qty">x{item.quantity}</p>
+                        </div>
+                        <strong>{formatCurrency(item.price * item.quantity)}</strong>
                       </div>
-                      <strong>{formatCurrency(item.price * item.quantity)}</strong>
-                    </div>
-                  ))}
+                    )
+                  })}
                 </div>
               )}
 
@@ -226,6 +289,10 @@ function CheckoutPage() {
                 <div className="summary-row">
                   <span>Phí dịch vụ (5%)</span>
                   <span>{formatCurrency(serviceFee)}</span>
+                </div>
+                <div className="summary-row summary-discount">
+                  <span>Giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
+                  <span>-{formatCurrency(discountAmount)}</span>
                 </div>
                 <div className="summary-row summary-total">
                   <span>Tổng tiền</span>
