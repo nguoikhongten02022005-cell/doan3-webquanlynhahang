@@ -1,4 +1,10 @@
 import { useMemo, useState } from 'react'
+import {
+  BOOKING_SEATING_LABELS,
+  HOST_BOOKING_STATUS_ACTIONS,
+  HOST_BOOKING_STATUS_LABELS,
+} from '../data/bookingData'
+import { useBooking } from '../hooks/useBooking'
 
 const formatDateTime = (date, time) => {
   if (!date) return '--'
@@ -7,15 +13,7 @@ const formatDateTime = (date, time) => {
   return `${parsedDate.toLocaleDateString('vi-VN')} ${time || ''}`.trim()
 }
 
-const seatingLabels = {
-  KHONG_UU_TIEN: 'Không ưu tiên',
-  SANH_CHINH: 'Sảnh chính',
-  PHONG_VIP: 'Phòng riêng / VIP',
-  BAN_CONG: 'Ban công / ngoài trời',
-  QUAY_BAR: 'Quầy bar',
-}
-
-const getSeatingLabel = (value) => seatingLabels[value] || value || 'Không ưu tiên'
+const getSeatingLabel = (value) => BOOKING_SEATING_LABELS[value] || value || 'Không ưu tiên'
 const isVipBooking = (booking) => booking.seatingArea === 'PHONG_VIP'
 const needsManualConfirmation = (booking) => booking.status === 'CHO_XAC_NHAN' || booking.status === 'YEU_CAU_DAT_BAN' || booking.status === 'CAN_GOI_LAI' || isVipBooking(booking)
 
@@ -39,107 +37,16 @@ const getBookingPriorityNote = (booking) => {
 
 const formatGuests = (guests) => `${guests} khách`
 
-const readQueueStatuses = () => {
-  const raw = localStorage.getItem('restaurant_reception_queue')
-  if (!raw) return new Map()
-
-  try {
-    const parsed = JSON.parse(raw)
-    if (!Array.isArray(parsed)) return new Map()
-    return new Map(parsed.map((item) => [item.bookingCode, item.status]))
-  } catch {
-    return new Map()
-  }
-}
-
-const normalizeBookings = (bookings) => {
-  const queueStatusMap = readQueueStatuses()
-
-  return bookings.map((booking) => {
-    const queueStatus = queueStatusMap.get(booking.bookingCode)
-    return queueStatus && queueStatus !== booking.status
-      ? { ...booking, status: queueStatus }
-      : booking
-  })
-}
-
-const statusLabels = {
-  YEU_CAU_DAT_BAN: 'Yêu cầu đặt bàn',
-  GIU_CHO_TAM: 'Đã giữ chỗ tạm',
-  DA_XAC_NHAN: 'Đã xác nhận',
-  CAN_GOI_LAI: 'Cần gọi lại',
-  TU_CHOI_HET_CHO: 'Từ chối / hết chỗ',
-  CHO_XAC_NHAN: 'Chờ xác nhận',
-  DA_GHI_NHAN: 'Đã ghi nhận',
-  DA_HOAN_THANH: 'Đã hoàn thành',
-  DA_HUY: 'Đã hủy',
-}
-
-const statusActions = ['YEU_CAU_DAT_BAN', 'GIU_CHO_TAM', 'DA_XAC_NHAN', 'CAN_GOI_LAI', 'TU_CHOI_HET_CHO']
-
-const syncBookingsToQueue = (bookings) => {
-  localStorage.setItem('restaurant_bookings', JSON.stringify(bookings))
-
-  const queueString = localStorage.getItem('restaurant_reception_queue')
-  if (!queueString) return
-
-  try {
-    const queue = JSON.parse(queueString)
-    if (!Array.isArray(queue)) return
-
-    const nextQueue = queue.map((item) => {
-      const matchedBooking = bookings.find((booking) => item.bookingCode === booking.bookingCode)
-      return matchedBooking ? { ...item, status: matchedBooking.status } : item
-    })
-
-    localStorage.setItem('restaurant_reception_queue', JSON.stringify(nextQueue))
-  } catch {
-    // noop
-  }
-}
-
-const updateStatus = (bookings, bookingId, nextStatus) => {
-  const nextBookings = bookings.map((booking) => (
-    String(booking.id) === String(bookingId)
-      ? { ...booking, status: nextStatus }
-      : booking
-  ))
-
-  syncBookingsToQueue(nextBookings)
-  return normalizeBookings(nextBookings)
-}
-
-const readBookings = () => {
-  const raw = localStorage.getItem('restaurant_bookings')
-  if (!raw) return []
-
-  try {
-    const parsed = JSON.parse(raw)
-    return Array.isArray(parsed) ? normalizeBookings(parsed) : []
-  } catch {
-    return []
-  }
-}
-
 function HostDashboardPage() {
-  const [bookings, setBookings] = useState(() => readBookings())
+  const { bookingStatusActions, getHostBookings, getHostStats, sortHostBookings, updateHostBookingStatus } = useBooking()
+  const [bookings, setBookings] = useState(() => getHostBookings())
 
-  const stats = useMemo(() => {
-    const total = bookings.length
-    const pending = bookings.filter((item) => item.status === 'YEU_CAU_DAT_BAN' || item.status === 'CAN_GOI_LAI' || item.status === 'CHO_XAC_NHAN').length
-    const confirmed = bookings.filter((item) => item.status === 'DA_XAC_NHAN' || item.status === 'DA_GHI_NHAN' || item.status === 'GIU_CHO_TAM').length
-    const vip = bookings.filter((item) => isVipBooking(item)).length
+  const stats = useMemo(() => getHostStats(bookings), [bookings, getHostStats])
 
-    return { total, pending, confirmed, vip }
-  }, [bookings])
-
-  const sortedBookings = useMemo(
-    () => [...bookings].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0)),
-    [bookings],
-  )
+  const sortedBookings = useMemo(() => sortHostBookings(bookings), [bookings, sortHostBookings])
 
   const handleUpdateStatus = (bookingId, nextStatus) => {
-    setBookings((currentBookings) => updateStatus(currentBookings, bookingId, nextStatus))
+    setBookings((currentBookings) => updateHostBookingStatus(currentBookings, bookingId, nextStatus))
   }
 
   return (
@@ -188,7 +95,7 @@ function HostDashboardPage() {
                       <p>{booking.name} · {booking.phone}</p>
                     </div>
                     <span className={`status-chip tone-${getStatusTone(booking.status)}`}>
-                      {statusLabels[booking.status] || booking.status}
+                      {HOST_BOOKING_STATUS_LABELS[booking.status] || booking.status}
                     </span>
                   </div>
 
@@ -205,14 +112,14 @@ function HostDashboardPage() {
                   {booking.notes && <p className="host-booking-note">Ghi chú: {booking.notes}</p>}
 
                   <div className="host-booking-actions">
-                    {statusActions.map((actionStatus) => (
+                    {bookingStatusActions.map((actionStatus) => (
                       <button
                         key={actionStatus}
                         type="button"
                         className={`host-action-btn ${booking.status === actionStatus ? 'active' : ''}`}
                         onClick={() => handleUpdateStatus(booking.id, actionStatus)}
                       >
-                        {statusLabels[actionStatus]}
+                        {HOST_BOOKING_STATUS_LABELS[actionStatus]}
                       </button>
                     ))}
                   </div>

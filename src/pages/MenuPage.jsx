@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import FoodCard from '../components/FoodCard'
 import { useCart } from '../context/CartContext'
+import { formatCurrency } from '../utils/currency'
+import { parsePriceToNumber } from '../utils/price'
 
 function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('')
@@ -18,21 +20,6 @@ function MenuPage() {
     { value: 'M', label: 'Size M', surcharge: 0 },
     { value: 'L', label: 'Size L', surcharge: 30000 },
   ]
-
-  const parsePriceToNumber = (price) => {
-    if (typeof price === 'number') {
-      return price
-    }
-
-    if (typeof price === 'string') {
-      const numeric = Number(price.replace(/[^\d]/g, ''))
-      return Number.isNaN(numeric) ? 0 : numeric
-    }
-
-    return 0
-  }
-
-  const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
 
   useEffect(() => {
     if (!isDetailOpen) {

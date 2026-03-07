@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 function LoginPage() {
   const [identifier, setIdentifier] = useState('')
@@ -7,33 +8,19 @@ function LoginPage() {
   const [loginError, setLoginError] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
+  const { login } = useAuth()
 
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    const normalizedIdentifier = identifier.trim().toLowerCase()
-    const accounts = JSON.parse(localStorage.getItem('restaurant_accounts') ?? '[]')
+    const result = login(identifier, password)
 
-    const matchedAccount = accounts.find((account) => {
-      const username = String(account.username ?? '').toLowerCase()
-      const email = String(account.email ?? '').toLowerCase()
-      return username === normalizedIdentifier || email === normalizedIdentifier
-    })
-
-    if (!matchedAccount || matchedAccount.password !== password) {
-      setLoginError('Tên tài khoản/email hoặc mật khẩu không đúng.')
+    if (!result.success) {
+      setLoginError(result.error)
       return
     }
 
     setLoginError('')
-    localStorage.setItem(
-      'restaurant_current_user',
-      JSON.stringify({
-        fullName: matchedAccount.fullName,
-        username: matchedAccount.username,
-        email: matchedAccount.email,
-      }),
-    )
     navigate('/')
   }
 

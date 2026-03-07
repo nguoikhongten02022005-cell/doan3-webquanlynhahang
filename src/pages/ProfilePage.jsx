@@ -1,65 +1,10 @@
 import { useMemo, useState } from 'react'
-
-const tabs = [
-  { key: 'personal', label: 'Thông tin cá nhân' },
-  { key: 'orders', label: 'Lịch sử đơn hàng' },
-  { key: 'bookings', label: 'Lịch sử đặt bàn' },
-]
-
-const orderTimelineSteps = ['Mới đặt', 'Bếp làm món', 'Đang giao', 'Hoàn tất']
-
-const fallbackProfile = {
-  name: 'Nguyễn Văn Minh',
-  email: 'minh.nguyen@example.com',
-  phone: '0901 234 567',
-}
-
-const fallbackOrders = [
-  {
-    id: 'DH-1001',
-    date: '04/03/2026',
-    total: 525000,
-    status: 'Đang giao',
-  },
-  {
-    id: 'DH-0995',
-    date: '01/03/2026',
-    total: 760000,
-    status: 'Đã hoàn thành',
-  },
-  {
-    id: 'DH-0988',
-    date: '27/02/2026',
-    total: 345000,
-    status: 'Đang xử lý',
-  },
-]
-
-const fallbackBookings = [
-  {
-    id: 'DB-2301',
-    dateTime: '10/03/2026 19:00',
-    guests: 4,
-    status: '🟢 Đã xác nhận',
-    rawStatus: 'DA_XAC_NHAN',
-  },
-  {
-    id: 'DB-2294',
-    dateTime: '03/03/2026 18:30',
-    guests: 2,
-    status: '⚪ Đã hoàn thành',
-    rawStatus: 'DA_HOAN_THANH',
-  },
-  {
-    id: 'DB-2288',
-    dateTime: '26/02/2026 20:00',
-    guests: 6,
-    status: '⚪ Đã hoàn thành',
-    rawStatus: 'DA_HOAN_THANH',
-  },
-]
-
-const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
+import { STORAGE_KEYS } from '../constants/storageKeys'
+import { FALLBACK_ORDERS, FALLBACK_PROFILE, ORDER_TIMELINE_STEPS, PROFILE_TABS } from '../data/profileData'
+import { formatCurrency } from '../utils/currency'
+import { getStorageJSON } from '../services/storageService'
+import { useAuth } from '../hooks/useAuth'
+import { useBooking } from '../hooks/useBooking'
 
 const formatDate = (value) => {
   if (!value) {
@@ -73,44 +18,6 @@ const formatDate = (value) => {
 
   return date.toLocaleDateString('vi-VN')
 }
-
-const mapBookingStatus = (status) => {
-  if (!status) {
-    return '🟡 Yêu cầu đặt bàn'
-  }
-
-  if (status === 'CHO_XAC_NHAN' || status === 'YEU_CAU_DAT_BAN') {
-    return '🟡 Yêu cầu đặt bàn'
-  }
-
-  if (status === 'GIU_CHO_TAM') {
-    return '🟠 Đã giữ chỗ tạm'
-  }
-
-  if (status === 'DA_XAC_NHAN') {
-    return '🟢 Đã xác nhận'
-  }
-
-  if (status === 'CAN_GOI_LAI') {
-    return '📞 Cần gọi lại'
-  }
-
-  if (status === 'TU_CHOI_HET_CHO' || status === 'DA_HUY') {
-    return '🔴 Từ chối / hết chỗ'
-  }
-
-  if (status === 'DA_HOAN_THANH') {
-    return '⚪ Đã hoàn thành'
-  }
-
-  return status
-}
-
-const canCancelBooking = (status) => status === 'CHO_XAC_NHAN' || status === 'YEU_CAU_DAT_BAN' || status === 'GIU_CHO_TAM' || status === 'CAN_GOI_LAI'
-
-const formatBookingId = (bookingId) => `DB-${String(bookingId).slice(-6)}`
-
-const formatBookingDateTime = (booking) => `${formatDate(booking.date)} ${booking.time || ''}`.trim()
 
 const getOrderTimelineStep = (status) => {
   const normalized = String(status || '').trim().toLowerCase()
@@ -152,155 +59,65 @@ const getStatusTone = (status) => {
   return 'neutral'
 }
 
-const readBookings = () => {
-  const bookingsString = localStorage.getItem('restaurant_bookings')
-
-  if (!bookingsString) {
-    return null
-  }
-
-  try {
-    const parsedBookings = JSON.parse(bookingsString)
-    if (!Array.isArray(parsedBookings) || parsedBookings.length === 0) {
-      return null
-    }
-    return parsedBookings
-  } catch {
-    return null
-  }
-}
-
-const seatingAreaLabels = {
-  SANH_CHINH: 'Sảnh chính',
-  PHONG_VIP: 'Phòng VIP',
-  BAN_CONG: 'Ban công / Ngoài trời',
-  QUAY_BAR: 'Quầy bar',
-}
-
-const mapBookingItem = (booking) => ({
-  bookingId: booking.id,
-  id: formatBookingId(booking.id),
-  dateTime: formatBookingDateTime(booking),
-  guests: Number(booking.guests) || 0,
-  seatingArea: seatingAreaLabels[booking.seatingArea] || '',
-  rawStatus: booking.status || 'CHO_XAC_NHAN',
-  status: mapBookingStatus(booking.status),
-})
-
-const loadBookingHistory = () => {
-  const parsedBookings = readBookings()
-
-  if (!parsedBookings) {
-    return fallbackBookings
-  }
-
-  return [...parsedBookings]
-    .sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
-    .map(mapBookingItem)
-}
-
 function ProfilePage() {
+  const { currentUser } = useAuth()
+  const { cancelBooking, getBookingHistory } = useBooking()
   const [activeTab, setActiveTab] = useState('personal')
-  const [bookingHistory, setBookingHistory] = useState(() => loadBookingHistory())
+  const [bookingHistory, setBookingHistory] = useState(() => getBookingHistory())
   const [bookingMessage, setBookingMessage] = useState('')
 
   const profileData = useMemo(() => {
-    const userDataString = localStorage.getItem('restaurant_current_user')
-
-    if (!userDataString) {
-      return fallbackProfile
+    if (!currentUser) {
+      return FALLBACK_PROFILE
     }
 
-    try {
-      const userData = JSON.parse(userDataString)
-      return {
-        name: String(userData.fullName ?? userData.name ?? fallbackProfile.name),
-        email: String(userData.email ?? fallbackProfile.email),
-        phone: String(userData.phone ?? fallbackProfile.phone),
-      }
-    } catch {
-      return fallbackProfile
+    return {
+      name: String(currentUser.fullName ?? currentUser.name ?? FALLBACK_PROFILE.name),
+      email: String(currentUser.email ?? FALLBACK_PROFILE.email),
+      phone: String(currentUser.phone ?? FALLBACK_PROFILE.phone),
     }
-  }, [])
+  }, [currentUser])
 
   const orderHistory = useMemo(() => {
-    const ordersString = localStorage.getItem('restaurant_orders')
+    const parsedOrders = getStorageJSON(STORAGE_KEYS.ORDERS, null)
 
-    if (!ordersString) {
-      return fallbackOrders.map((order) => ({
+    if (!parsedOrders) {
+      return FALLBACK_ORDERS.map((order) => ({
         ...order,
         timelineStep: getOrderTimelineStep(order.status),
       }))
     }
 
-    try {
-      const parsedOrders = JSON.parse(ordersString)
+    if (!Array.isArray(parsedOrders) || parsedOrders.length === 0) {
+      return FALLBACK_ORDERS.map((order) => ({
+        ...order,
+        timelineStep: getOrderTimelineStep(order.status),
+      }))
+    }
 
-      if (!Array.isArray(parsedOrders) || parsedOrders.length === 0) {
-        return fallbackOrders.map((order) => ({
-          ...order,
-          timelineStep: getOrderTimelineStep(order.status),
-        }))
+    return parsedOrders.map((order) => {
+      const status = order.status || 'Đang xử lý'
+
+      return {
+        id: `DH-${String(order.id).slice(-6)}`,
+        date: formatDate(order.orderDate),
+        total: Number(order.total) || 0,
+        status,
+        timelineStep: getOrderTimelineStep(status),
       }
-
-      return parsedOrders.map((order) => {
-        const status = order.status || 'Đang xử lý'
-
-        return {
-          id: `DH-${String(order.id).slice(-6)}`,
-          date: formatDate(order.orderDate),
-          total: Number(order.total) || 0,
-          status,
-          timelineStep: getOrderTimelineStep(status),
-        }
-      })
-    } catch {
-      return fallbackOrders.map((order) => ({
-        ...order,
-        timelineStep: getOrderTimelineStep(order.status),
-      }))
-    }
+    })
   }, [])
 
   const handleCancelBooking = (bookingId, bookingCode) => {
-    const bookingsString = localStorage.getItem('restaurant_bookings')
+    const result = cancelBooking(bookingId, bookingCode)
 
-    if (!bookingsString) {
-      setBookingMessage('Không thể hủy đặt bàn này. Vui lòng thử lại.')
+    if (!result.success) {
+      setBookingMessage(result.error)
       return
     }
 
-    try {
-      const parsedBookings = JSON.parse(bookingsString)
-
-      if (!Array.isArray(parsedBookings)) {
-        setBookingMessage('Không thể hủy đặt bàn này. Vui lòng thử lại.')
-        return
-      }
-
-      const bookingIndex = parsedBookings.findIndex((item) => String(item.id) === String(bookingId))
-
-      if (bookingIndex === -1) {
-        setBookingMessage('Không thể hủy đặt bàn này. Vui lòng thử lại.')
-        return
-      }
-
-      if (!canCancelBooking(parsedBookings[bookingIndex].status)) {
-        setBookingMessage('Đặt bàn đã xác nhận. Vui lòng gọi hotline để được hỗ trợ hủy.')
-        return
-      }
-
-      parsedBookings[bookingIndex] = {
-        ...parsedBookings[bookingIndex],
-        status: 'DA_HUY',
-      }
-
-      localStorage.setItem('restaurant_bookings', JSON.stringify(parsedBookings))
-      setBookingHistory(loadBookingHistory())
-      setBookingMessage(`Đã hủy đặt bàn ${bookingCode} thành công.`)
-    } catch {
-      setBookingMessage('Không thể hủy đặt bàn này. Vui lòng thử lại.')
-    }
+    setBookingHistory(result.bookingHistory)
+    setBookingMessage(result.message)
   }
 
   return (
@@ -314,7 +131,7 @@ function ProfilePage() {
 
         <div className="profile-shell">
           <aside className="profile-tabs" aria-label="Điều hướng hồ sơ">
-            {tabs.map((tab) => (
+            {PROFILE_TABS.map((tab) => (
               <button
                 key={tab.key}
                 type="button"
@@ -368,7 +185,7 @@ function ProfilePage() {
                       </div>
 
                       <div className="order-progress" aria-label={`Tiến trình đơn ${order.id}`}>
-                        {orderTimelineSteps.map((stepLabel, index) => {
+                              {ORDER_TIMELINE_STEPS.map((stepLabel, index) => {
                           const stepNumber = index + 1
                           const isActive = order.timelineStep >= stepNumber
 

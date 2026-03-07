@@ -1,10 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-
-const VOUCHER_STORAGE_KEY = 'restaurant_applied_voucher'
-
-const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
+import { DEFAULT_VOUCHER } from '../constants/voucher'
+import { formatCurrency } from '../utils/currency'
+import {
+  clearAppliedVoucher as clearStoredVoucher,
+  getAppliedVoucher as getStoredVoucher,
+  setAppliedVoucher as saveVoucher,
+} from '../services/voucherService'
 
 function CartPage() {
   const navigate = useNavigate()
@@ -13,7 +16,7 @@ function CartPage() {
   const [note, setNote] = useState('')
   const [tableNumber, setTableNumber] = useState('')
   const [voucherCodeInput, setVoucherCodeInput] = useState('')
-  const [appliedVoucher, setAppliedVoucher] = useState(null)
+  const [appliedVoucher, setAppliedVoucherState] = useState(null)
   const [voucherError, setVoucherError] = useState('')
 
   const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
@@ -22,22 +25,10 @@ function CartPage() {
   const total = Math.max(0, subtotal + serviceFee - discountAmount)
 
   useEffect(() => {
-    const voucherString = localStorage.getItem(VOUCHER_STORAGE_KEY)
-    if (!voucherString) {
-      return
-    }
-
-    try {
-      const parsedVoucher = JSON.parse(voucherString)
-      if (parsedVoucher?.code === 'GIAM20K' && Number(parsedVoucher?.amount) > 0) {
-        setAppliedVoucher({
-          code: parsedVoucher.code,
-          amount: Number(parsedVoucher.amount),
-        })
-        setVoucherCodeInput(parsedVoucher.code)
-      }
-    } catch {
-      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+    const voucher = getStoredVoucher()
+    if (voucher) {
+      setAppliedVoucherState(voucher)
+      setVoucherCodeInput(voucher.code)
     }
   }, [])
 
@@ -46,9 +37,9 @@ function CartPage() {
       return
     }
 
-    setAppliedVoucher(null)
+    setAppliedVoucherState(null)
     setVoucherError('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
-    localStorage.removeItem(VOUCHER_STORAGE_KEY)
+    clearStoredVoucher()
   }, [subtotal, appliedVoucher])
 
   const handleGoToCheckout = () => {
@@ -58,9 +49,9 @@ function CartPage() {
     }
 
     if (appliedVoucher) {
-      localStorage.setItem(VOUCHER_STORAGE_KEY, JSON.stringify(appliedVoucher))
+      saveVoucher(appliedVoucher)
     } else {
-      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      clearStoredVoucher()
     }
 
     navigate('/checkout')
@@ -68,33 +59,33 @@ function CartPage() {
 
   const handleApplyVoucher = () => {
     if (subtotal <= 0) {
-      setAppliedVoucher(null)
+      setAppliedVoucherState(null)
       setVoucherError('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
-      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      clearStoredVoucher()
       return
     }
 
     const normalizedCode = voucherCodeInput.trim().toUpperCase()
 
-    if (normalizedCode !== 'GIAM20K') {
-      setAppliedVoucher(null)
+    if (normalizedCode !== DEFAULT_VOUCHER.code) {
+      setAppliedVoucherState(null)
       setVoucherError('Mã giảm giá không hợp lệ.')
-      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      clearStoredVoucher()
       return
     }
 
-    const voucher = { code: 'GIAM20K', amount: 20000 }
-    setAppliedVoucher(voucher)
+    const voucher = { ...DEFAULT_VOUCHER }
+    setAppliedVoucherState(voucher)
     setVoucherCodeInput(voucher.code)
     setVoucherError('')
-    localStorage.setItem(VOUCHER_STORAGE_KEY, JSON.stringify(voucher))
+    saveVoucher(voucher)
   }
 
   const handleClearVoucher = () => {
-    setAppliedVoucher(null)
+    setAppliedVoucherState(null)
     setVoucherCodeInput('')
     setVoucherError('')
-    localStorage.removeItem(VOUCHER_STORAGE_KEY)
+    clearStoredVoucher()
   }
 
   const renderVoucherMessage = () => {

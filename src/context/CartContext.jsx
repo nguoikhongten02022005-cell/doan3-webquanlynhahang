@@ -1,21 +1,9 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react'
-
-const CART_STORAGE_KEY = 'restaurant_cart'
+import { STORAGE_KEYS } from '../constants/storageKeys'
+import { parsePriceToNumber } from '../utils/price'
+import { getStorageJSON, setStorageJSON } from '../services/storageService'
 
 const CartContext = createContext(null)
-
-const parsePriceToNumber = (price) => {
-  if (typeof price === 'number') {
-    return price
-  }
-
-  if (typeof price === 'string') {
-    const numeric = Number(price.replace(/[^\d]/g, ''))
-    return Number.isNaN(numeric) ? 0 : numeric
-  }
-
-  return 0
-}
 
 const normalizeToppings = (toppings) => {
   if (!Array.isArray(toppings)) {
@@ -66,12 +54,7 @@ const normalizeCartItem = (item) => {
 
 const getInitialCartItems = () => {
   try {
-    const savedCart = localStorage.getItem(CART_STORAGE_KEY)
-    if (!savedCart) {
-      return []
-    }
-
-    const parsedCart = JSON.parse(savedCart)
+    const parsedCart = getStorageJSON(STORAGE_KEYS.CART, [])
     if (!Array.isArray(parsedCart)) {
       return []
     }
@@ -86,7 +69,7 @@ export function CartProvider({ children }) {
   const [cartItems, setCartItems] = useState(getInitialCartItems)
 
   useEffect(() => {
-    localStorage.setItem(CART_STORAGE_KEY, JSON.stringify(cartItems))
+    setStorageJSON(STORAGE_KEYS.CART, cartItems)
   }, [cartItems])
 
   const addToCart = (dish) => {

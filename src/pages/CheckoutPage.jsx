@@ -1,8 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-
-const VOUCHER_STORAGE_KEY = 'restaurant_applied_voucher'
+import { STORAGE_KEYS } from '../constants/storageKeys'
+import { formatCurrency } from '../utils/currency'
+import { getStorageJSON, setStorageJSON } from '../services/storageService'
+import { clearAppliedVoucher, getAppliedVoucher } from '../services/voucherService'
 
 const paymentMethods = [
   {
@@ -16,35 +18,6 @@ const paymentMethods = [
     description: 'Chuyển khoản trước khi giao hàng.',
   },
 ]
-
-const formatCurrency = (value) => `${value.toLocaleString('vi-VN')}₫`
-
-const getAppliedVoucher = () => {
-  const voucherString = localStorage.getItem(VOUCHER_STORAGE_KEY)
-  if (!voucherString) {
-    return null
-  }
-
-  try {
-    const parsedVoucher = JSON.parse(voucherString)
-
-    if (parsedVoucher?.code !== 'GIAM20K') {
-      return null
-    }
-
-    const amount = Number(parsedVoucher?.amount)
-    if (!Number.isFinite(amount) || amount <= 0) {
-      return null
-    }
-
-    return {
-      code: parsedVoucher.code,
-      amount,
-    }
-  } catch {
-    return null
-  }
-}
 
 function CheckoutPage() {
   const navigate = useNavigate()
@@ -63,7 +36,7 @@ function CheckoutPage() {
     const voucher = getAppliedVoucher()
 
     if (!voucher) {
-      localStorage.removeItem(VOUCHER_STORAGE_KEY)
+      clearAppliedVoucher()
       return
     }
 
@@ -101,17 +74,8 @@ function CheckoutPage() {
       return
     }
 
-    const ordersString = localStorage.getItem('restaurant_orders')
-    let existingOrders = []
-
-    if (ordersString) {
-      try {
-        const parsedOrders = JSON.parse(ordersString)
-        existingOrders = Array.isArray(parsedOrders) ? parsedOrders : []
-      } catch {
-        existingOrders = []
-      }
-    }
+    const existingOrdersRaw = getStorageJSON(STORAGE_KEYS.ORDERS, [])
+    const existingOrders = Array.isArray(existingOrdersRaw) ? existingOrdersRaw : []
 
     const newOrder = {
       id: Date.now(),
@@ -132,8 +96,8 @@ function CheckoutPage() {
       paymentMethod: formData.paymentMethod,
     }
 
-    localStorage.setItem('restaurant_orders', JSON.stringify([newOrder, ...existingOrders]))
-    localStorage.removeItem(VOUCHER_STORAGE_KEY)
+    setStorageJSON(STORAGE_KEYS.ORDERS, [newOrder, ...existingOrders])
+    clearAppliedVoucher()
 
     if (typeof clearCart === 'function') {
       clearCart()

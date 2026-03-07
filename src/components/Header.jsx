@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
+import { useAuth } from '../hooks/useAuth'
 
 const navItems = [
   { label: 'Trang chủ', to: '/' },
@@ -16,20 +17,9 @@ function Header() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { cartItems } = useCart()
+  const { currentUser, logout } = useAuth()
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
-
-  const userDataString = localStorage.getItem('restaurant_current_user')
-
-  let currentUser = null
-
-  if (userDataString) {
-    try {
-      currentUser = JSON.parse(userDataString)
-    } catch {
-      currentUser = null
-    }
-  }
 
   const closeMenus = () => {
     setMobileMenuOpen(false)
@@ -51,7 +41,7 @@ function Header() {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('restaurant_current_user')
+    logout()
     closeMenus()
     navigate('/')
   }

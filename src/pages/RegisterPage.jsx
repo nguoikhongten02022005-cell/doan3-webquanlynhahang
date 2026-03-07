@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
+import { useAuth } from '../hooks/useAuth'
 
 function RegisterPage() {
   const [fullName, setFullName] = useState('')
@@ -9,6 +10,7 @@ function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState('')
   const [registerError, setRegisterError] = useState('')
   const navigate = useNavigate()
+  const { register } = useAuth()
 
   const isPasswordMismatch = password !== confirmPassword
   const showPasswordMismatch = confirmPassword.length > 0 && isPasswordMismatch
@@ -20,29 +22,13 @@ function RegisterPage() {
       return
     }
 
-    const normalizedUsername = username.trim().toLowerCase()
-    const normalizedEmail = email.trim().toLowerCase()
-    const accounts = JSON.parse(localStorage.getItem('restaurant_accounts') ?? '[]')
+    const result = register({ fullName, username, email, password })
 
-    const hasDuplicate = accounts.some((account) => {
-      const existedUsername = String(account.username ?? '').toLowerCase()
-      const existedEmail = String(account.email ?? '').toLowerCase()
-      return existedUsername === normalizedUsername || existedEmail === normalizedEmail
-    })
-
-    if (hasDuplicate) {
-      setRegisterError('Tên tài khoản hoặc email đã tồn tại.')
+    if (!result.success) {
+      setRegisterError(result.error)
       return
     }
 
-    const newAccount = {
-      fullName: fullName.trim(),
-      username: username.trim(),
-      email: email.trim(),
-      password,
-    }
-
-    localStorage.setItem('restaurant_accounts', JSON.stringify([...accounts, newAccount]))
     setRegisterError('')
     navigate('/login', { state: { registered: true } })
   }
