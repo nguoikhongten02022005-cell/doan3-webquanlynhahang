@@ -323,6 +323,10 @@ function InternalDashboardPage() {
     }),
     [activeBookings, now],
   )
+  const checkedInBookings = useMemo(
+    () => filteredBookings.filter((booking) => booking.status === 'DA_HOAN_THANH').length,
+    [filteredBookings],
+  )
   const tableSummary = useMemo(() => getTableSummary(filteredBookings), [filteredBookings])
   const busyAreas = useMemo(
     () => tableSummary.filter((area) => area.occupancyRate >= 0.75),
@@ -656,12 +660,12 @@ function InternalDashboardPage() {
                           <strong>{upcomingSoonBookings.length}</strong>
                         </div>
                         <div className="internal-overview-item">
-                          <span>Khu vực sắp đầy</span>
-                          <strong>{busyAreas.length}</strong>
+                          <span>Booking đã check-in</span>
+                          <strong>{checkedInBookings}</strong>
                         </div>
                         <div className="internal-overview-item">
-                          <span>Đơn chờ xử lý</span>
-                          <strong>{openOrders.length}</strong>
+                          <span>Bàn sắp kín</span>
+                          <strong>{busyAreas.length}</strong>
                         </div>
                       </div>
                     </article>

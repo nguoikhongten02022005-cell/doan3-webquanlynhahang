@@ -5960,6 +5960,10 @@ a {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
 
+.internal-secondary-grid {
+  margin-top: -0.2rem;
+}
+
 .internal-priority-card {
   text-align: left;
   border-radius: 1rem;
@@ -6775,6 +6779,12 @@ a {
   border-color: rgba(234, 88, 12, 0.3);
   background: #fff7ed;
   color: var(--primary);
+}
+
+.profile-tab-btn:focus,
+.profile-tab-btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(234, 88, 12, 0.16);
 }
 
 .profile-card {
