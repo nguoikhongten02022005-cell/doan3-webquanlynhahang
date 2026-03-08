@@ -1,16 +1,19 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
+import ProtectedRoute from './components/ProtectedRoute'
+import InternalLayout from './layouts/InternalLayout'
 import MainLayout from './layouts/MainLayout'
-import HomePage from './pages/HomePage'
-import MenuPage from './pages/MenuPage'
+import AboutPage from './pages/AboutPage'
 import BookingPage from './pages/BookingPage'
 import CartPage from './pages/CartPage'
 import CheckoutPage from './pages/CheckoutPage'
-import ProfilePage from './pages/ProfilePage'
+import HomePage from './pages/HomePage'
+import InternalDashboardPage from './pages/InternalDashboardPage'
+import InternalLoginPage from './pages/InternalLoginPage'
 import LoginPage from './pages/LoginPage'
+import MenuPage from './pages/MenuPage'
+import ProfilePage from './pages/ProfilePage'
 import RegisterPage from './pages/RegisterPage'
-import AboutPage from './pages/AboutPage'
-import HostDashboardPage from './pages/HostDashboardPage'
 
 function App() {
   return (
@@ -24,10 +27,24 @@ function App() {
           <Route path="/cart" element={<CartPage />} />
           <Route path="/checkout" element={<CheckoutPage />} />
           <Route path="/profile" element={<ProfilePage />} />
-          <Route path="/host-dashboard" element={<HostDashboardPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/register" element={<RegisterPage />} />
         </Route>
+
+        <Route path="/internal" element={<InternalLayout />}>
+          <Route index element={<Navigate to="/internal/dashboard" replace />} />
+          <Route path="login" element={<InternalLoginPage />} />
+          <Route
+            path="dashboard"
+            element={(
+              <ProtectedRoute>
+                <InternalDashboardPage />
+              </ProtectedRoute>
+            )}
+          />
+        </Route>
+
+        <Route path="/host-dashboard" element={<Navigate to="/internal/dashboard" replace />} />
       </Routes>
     </BrowserRouter>
   )

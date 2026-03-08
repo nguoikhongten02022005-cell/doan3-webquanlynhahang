@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
 import {
+  AUTH_ROLES,
   AUTH_USER_CHANGED_EVENT,
   clearCurrentUser,
   findAccountByIdentifier,
@@ -76,6 +77,7 @@ export const useAuth = () => {
       username: payload.username.trim(),
       email: payload.email.trim(),
       password: payload.password,
+      role: AUTH_ROLES.CUSTOMER,
     }
 
     saveAccounts([...accounts, newAccount])
@@ -90,8 +92,17 @@ export const useAuth = () => {
     clearCurrentUser()
   }, [])
 
+  const role = currentUser?.role ?? AUTH_ROLES.CUSTOMER
+  const isAdmin = role === AUTH_ROLES.ADMIN
+  const isStaff = role === AUTH_ROLES.STAFF
+  const canAccessInternal = isAdmin || isStaff
+
   return {
     currentUser,
+    role,
+    isAdmin,
+    isStaff,
+    canAccessInternal,
     isAuthenticated: Boolean(currentUser),
     login,
     register,

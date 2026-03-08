@@ -2,6 +2,28 @@ import { STORAGE_KEYS } from '../constants/storageKeys'
 import { getStorageJSON, removeStorageItem, setStorageJSON } from './storageService'
 
 export const AUTH_USER_CHANGED_EVENT = 'auth:user-changed'
+export const AUTH_ROLES = Object.freeze({
+  CUSTOMER: 'customer',
+  STAFF: 'staff',
+  ADMIN: 'admin',
+})
+
+const DEFAULT_INTERNAL_ACCOUNTS = Object.freeze([
+  {
+    fullName: 'Quản trị nhà hàng',
+    username: 'admin',
+    email: 'admin@nguyenvi.local',
+    password: 'admin123',
+    role: AUTH_ROLES.ADMIN,
+  },
+  {
+    fullName: 'Nhân viên vận hành',
+    username: 'staff',
+    email: 'staff@nguyenvi.local',
+    password: 'staff123',
+    role: AUTH_ROLES.STAFF,
+  },
+])
 
 const dispatchAuthUserChanged = () => {
   if (typeof window === 'undefined') {
@@ -11,27 +33,86 @@ const dispatchAuthUserChanged = () => {
   window.dispatchEvent(new CustomEvent(AUTH_USER_CHANGED_EVENT))
 }
 
+const normalizeRole = (role) => {
+  if (role === AUTH_ROLES.ADMIN) return AUTH_ROLES.ADMIN
+  if (role === AUTH_ROLES.STAFF) return AUTH_ROLES.STAFF
+  return AUTH_ROLES.CUSTOMER
+}
+
+const normalizeAccount = (account) => {
+  if (!account || typeof account !== 'object') {
+    return null
+  }
+
+  return {
+    ...account,
+    fullName: String(account.fullName ?? account.name ?? '').trim(),
+    username: String(account.username ?? '').trim(),
+    email: String(account.email ?? '').trim(),
+    role: normalizeRole(account.role),
+  }
+}
+
+const normalizeCurrentUser = (account) => {
+  const normalizedAccount = normalizeAccount(account)
+
+  if (!normalizedAccount) {
+    return null
+  }
+
+  return {
+    fullName: normalizedAccount.fullName,
+    username: normalizedAccount.username,
+    email: normalizedAccount.email,
+    role: normalizedAccount.role,
+  }
+}
+
+const mergeAccounts = (accounts) => {
+  const mergedAccounts = [...DEFAULT_INTERNAL_ACCOUNTS, ...accounts]
+  const seenIdentifiers = new Set()
+
+  return mergedAccounts.filter((account) => {
+    const normalizedAccount = normalizeAccount(account)
+
+    if (!normalizedAccount) {
+      return false
+    }
+
+    const accountKey = `${normalizedAccount.username.toLowerCase()}::${normalizedAccount.email.toLowerCase()}`
+    if (seenIdentifiers.has(accountKey)) {
+      return false
+    }
+
+    seenIdentifiers.add(accountKey)
+    return true
+  })
+}
+
 export const getAccounts = () => {
   const accounts = getStorageJSON(STORAGE_KEYS.ACCOUNTS, [])
-  return Array.isArray(accounts) ? accounts : []
+  if (!Array.isArray(accounts)) {
+    return [...DEFAULT_INTERNAL_ACCOUNTS]
+  }
+
+  return mergeAccounts(accounts.map(normalizeAccount).filter(Boolean))
 }
 
 export const saveAccounts = (accounts) => {
-  setStorageJSON(STORAGE_KEYS.ACCOUNTS, accounts)
+  const normalizedAccounts = Array.isArray(accounts) ? accounts.map(normalizeAccount).filter(Boolean) : []
+  setStorageJSON(STORAGE_KEYS.ACCOUNTS, mergeAccounts(normalizedAccounts))
 }
 
-export const getCurrentUser = () => getStorageJSON(STORAGE_KEYS.CURRENT_USER, null)
+export const getCurrentUser = () => normalizeCurrentUser(getStorageJSON(STORAGE_KEYS.CURRENT_USER, null))
 
 export const saveCurrentUser = (account) => {
-  if (!account) {
+  const normalizedCurrentUser = normalizeCurrentUser(account)
+
+  if (!normalizedCurrentUser) {
     return
   }
 
-  setStorageJSON(STORAGE_KEYS.CURRENT_USER, {
-    fullName: account.fullName,
-    username: account.username,
-    email: account.email,
-  })
+  setStorageJSON(STORAGE_KEYS.CURRENT_USER, normalizedCurrentUser)
   dispatchAuthUserChanged()
 }
 

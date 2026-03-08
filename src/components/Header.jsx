@@ -17,7 +17,7 @@ function Header() {
   const { pathname } = useLocation()
   const navigate = useNavigate()
   const { cartItems } = useCart()
-  const { currentUser, logout } = useAuth()
+  const { currentUser, canAccessInternal, logout } = useAuth()
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const displayName = currentUser?.fullName ?? currentUser?.name
@@ -108,6 +108,11 @@ function Header() {
                     <div className="user-greeting">
                       Xin chào, <strong>{displayName}</strong>
                     </div>
+                    {canAccessInternal && (
+                      <Link to="/internal/dashboard" role="menuitem" onClick={handleNavLinkClick}>
+                        Bảng điều khiển nội bộ
+                      </Link>
+                    )}
                     <Link to="/profile" role="menuitem" onClick={handleNavLinkClick}>
                       Hồ sơ cá nhân
                     </Link>
@@ -159,6 +164,11 @@ function Header() {
               <div className="mobile-user-greeting">
                 Xin chào, <strong>{displayName}</strong>
               </div>
+              {canAccessInternal && (
+                <Link to="/internal/dashboard" onClick={handleNavLinkClick}>
+                  Bảng điều khiển nội bộ
+                </Link>
+              )}
               <Link to="/profile" onClick={handleNavLinkClick}>
                 Hồ sơ cá nhân
               </Link>

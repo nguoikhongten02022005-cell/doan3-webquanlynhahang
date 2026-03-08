@@ -1,14 +1,18 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
-function LoginPage() {
+function InternalLoginPage() {
   const [identifier, setIdentifier] = useState('')
   const [password, setPassword] = useState('')
   const [loginError, setLoginError] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
-  const { login } = useAuth()
+  const { canAccessInternal, isAuthenticated, login, logout } = useAuth()
+
+  if (isAuthenticated && canAccessInternal) {
+    return <Navigate to="/internal/dashboard" replace />
+  }
 
   const handleSubmit = (e) => {
     e.preventDefault()
@@ -20,29 +24,36 @@ function LoginPage() {
       return
     }
 
+    if (!['admin', 'staff'].includes(result.user?.role)) {
+      logout()
+      setLoginError('Tài khoản này không có quyền truy cập khu vực nội bộ.')
+      return
+    }
+
     setLoginError('')
-    navigate(location.state?.from || '/')
+    navigate(location.state?.from || '/internal/dashboard', { replace: true })
   }
 
   return (
-    <section className="auth-page">
-      <div className="auth-card">
-        <h1 className="auth-title">Đăng nhập</h1>
-        <p className="auth-subtitle">Chào mừng bạn quay trở lại nhà hàng của chúng tôi.</p>
-
-        {location.state?.registered && <p className="form-success">Đăng ký thành công. Vui lòng đăng nhập.</p>}
+    <section className="auth-page internal-login-page">
+      <div className="auth-card internal-login-card">
+        <p className="profile-kicker">Khu vực nội bộ</p>
+        <h1 className="auth-title">Đăng nhập nhân sự</h1>
+        <p className="auth-subtitle">
+          Dành cho quản trị viên và nhân viên vận hành truy cập bảng điều khiển nội bộ.
+        </p>
 
         <form onSubmit={handleSubmit} className="auth-form">
           <div className="form-group">
-            <label htmlFor="login-identifier" className="form-label">
+            <label htmlFor="internal-login-identifier" className="form-label">
               Tên tài khoản hoặc Email
             </label>
             <input
-              id="login-identifier"
+              id="internal-login-identifier"
               name="identifier"
               type="text"
               className="form-input"
-              placeholder="Nhập tên tài khoản hoặc email"
+              placeholder="Nhập tài khoản nội bộ"
               autoComplete="username"
               value={identifier}
               onChange={(e) => {
@@ -56,11 +67,11 @@ function LoginPage() {
           </div>
 
           <div className="form-group">
-            <label htmlFor="login-password" className="form-label">
+            <label htmlFor="internal-login-password" className="form-label">
               Mật khẩu
             </label>
             <input
-              id="login-password"
+              id="internal-login-password"
               name="password"
               type="password"
               className="form-input"
@@ -84,14 +95,14 @@ function LoginPage() {
           )}
 
           <button type="submit" className="btn btn-primary">
-            Đăng nhập
+            Vào khu vực nội bộ
           </button>
         </form>
 
         <p className="auth-switch-text">
-          Chưa có tài khoản?{' '}
-          <Link to="/register" className="auth-switch-link">
-            Đăng ký ngay
+          Bạn là khách hàng?{' '}
+          <Link to="/login" className="auth-switch-link">
+            Đăng nhập tại đây
           </Link>
         </p>
       </div>
@@ -99,4 +110,4 @@ function LoginPage() {
   )
 }
 
-export default LoginPage
+export default InternalLoginPage
