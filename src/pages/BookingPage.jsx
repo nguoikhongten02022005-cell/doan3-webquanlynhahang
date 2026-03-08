@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 import {
   BOOKING_STEP_ITEMS,
@@ -34,7 +33,6 @@ function BookingPage() {
     calendarOpen,
     calendarMonth,
     canViewPreviousMonth,
-    closedDate,
     draftRestored,
     firstAvailableSlotRef,
     firstAvailableSlotTime,
@@ -140,7 +138,7 @@ function BookingPage() {
                   <header className="booking-panel-header">
                     <div>
                       <p className="booking-side-kicker">Đặt bàn trực tuyến</p>
-                      <h2>{STEP_ITEMS.find((item) => item.id === step)?.title}</h2>
+                      <h2>{BOOKING_STEP_ITEMS.find((item) => item.id === step)?.title}</h2>
                     </div>
                     <div className="booking-panel-progress">Bước {step}/3</div>
                   </header>

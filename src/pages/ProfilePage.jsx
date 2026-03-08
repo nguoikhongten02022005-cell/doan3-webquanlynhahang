@@ -59,6 +59,13 @@ const getStatusTone = (status) => {
   return 'neutral'
 }
 
+const canCancelBooking = (status) => (
+  status === 'CHO_XAC_NHAN'
+  || status === 'YEU_CAU_DAT_BAN'
+  || status === 'GIU_CHO_TAM'
+  || status === 'CAN_GOI_LAI'
+)
+
 function ProfilePage() {
   const { currentUser } = useAuth()
   const { cancelBooking, getBookingHistory } = useBooking()
