@@ -1,11 +1,21 @@
-const canUseStorage = () => typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+const canUseStorage = () => {
+  try {
+    return typeof window !== 'undefined' && typeof window.localStorage !== 'undefined'
+  } catch {
+    return false
+  }
+}
 
 export const getStorageItem = (key) => {
   if (!canUseStorage()) {
     return null
   }
 
-  return localStorage.getItem(key)
+  try {
+    return window.localStorage.getItem(key)
+  } catch {
+    return null
+  }
 }
 
 export const setStorageItem = (key, value) => {
@@ -13,7 +23,11 @@ export const setStorageItem = (key, value) => {
     return
   }
 
-  localStorage.setItem(key, value)
+  try {
+    window.localStorage.setItem(key, value)
+  } catch {
+    // noop
+  }
 }
 
 export const removeStorageItem = (key) => {
@@ -21,7 +35,11 @@ export const removeStorageItem = (key) => {
     return
   }
 
-  localStorage.removeItem(key)
+  try {
+    window.localStorage.removeItem(key)
+  } catch {
+    // noop
+  }
 }
 
 export const getStorageJSON = (key, fallbackValue = null) => {
@@ -39,5 +57,9 @@ export const getStorageJSON = (key, fallbackValue = null) => {
 }
 
 export const setStorageJSON = (key, value) => {
-  setStorageItem(key, JSON.stringify(value))
+  try {
+    setStorageItem(key, JSON.stringify(value))
+  } catch {
+    // noop
+  }
 }

@@ -1,6 +1,16 @@
 import { STORAGE_KEYS } from '../constants/storageKeys'
 import { getStorageJSON, removeStorageItem, setStorageJSON } from './storageService'
 
+export const AUTH_USER_CHANGED_EVENT = 'auth:user-changed'
+
+const dispatchAuthUserChanged = () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.dispatchEvent(new CustomEvent(AUTH_USER_CHANGED_EVENT))
+}
+
 export const getAccounts = () => {
   const accounts = getStorageJSON(STORAGE_KEYS.ACCOUNTS, [])
   return Array.isArray(accounts) ? accounts : []
@@ -22,10 +32,12 @@ export const saveCurrentUser = (account) => {
     username: account.username,
     email: account.email,
   })
+  dispatchAuthUserChanged()
 }
 
 export const clearCurrentUser = () => {
   removeStorageItem(STORAGE_KEYS.CURRENT_USER)
+  dispatchAuthUserChanged()
 }
 
 export const findAccountByIdentifier = (accounts, identifier) => {

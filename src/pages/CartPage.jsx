@@ -4,6 +4,11 @@ import { useCart } from '../context/CartContext'
 import { DEFAULT_VOUCHER } from '../constants/voucher'
 import { formatCurrency } from '../utils/currency'
 import {
+  clearCheckoutDraft,
+  getCheckoutDraft,
+  setCheckoutDraft,
+} from '../services/checkoutDraftService'
+import {
   clearAppliedVoucher as clearStoredVoucher,
   getAppliedVoucher as getStoredVoucher,
   setAppliedVoucher as saveVoucher,
@@ -30,6 +35,12 @@ function CartPage() {
       setAppliedVoucherState(voucher)
       setVoucherCodeInput(voucher.code)
     }
+
+    const draft = getCheckoutDraft()
+    if (draft) {
+      setNote(draft.note)
+      setTableNumber(draft.tableNumber)
+    }
   }, [])
 
   useEffect(() => {
@@ -45,6 +56,7 @@ function CartPage() {
   const handleGoToCheckout = () => {
     if (cartItems.length === 0) {
       alert('Giỏ hàng trống!')
+      clearCheckoutDraft()
       return
     }
 
@@ -54,6 +66,7 @@ function CartPage() {
       clearStoredVoucher()
     }
 
+    setCheckoutDraft({ note, tableNumber })
     navigate('/checkout')
   }
 

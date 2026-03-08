@@ -24,6 +24,7 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     formData.guests && formData.date && formData.time && !invalidPastDate && !closedDate && !isLargeGroupHotlineOnly(guestCount),
   )
   const step2Complete = Boolean(formData.name.trim() && formData.phone.trim() && isValidPhoneNumber(formData.phone))
+  const primaryCtaDisabled = (step === 1 && !step1Complete) || (step === 2 && !step2Complete)
 
   const primaryCtaLabel = getPrimaryCtaLabel({
     step,
@@ -158,10 +159,13 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     bookingStatus,
     clearFieldError,
     inlineErrors,
+    primaryCtaDisabled,
     primaryCtaLabel,
     selectedSeatOperationalNote,
     setInlineErrors,
     setSubmitError,
+    step1Complete,
+    step2Complete,
     submitBooking,
     submitError,
     submitted,

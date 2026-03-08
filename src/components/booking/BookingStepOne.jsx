@@ -5,6 +5,7 @@ import BookingSeatingSelector from './BookingSeatingSelector'
 import BookingSlotPicker from './BookingSlotPicker'
 
 function BookingStepOne({
+  activeBookingSection,
   availability,
   calendar,
   formData,
@@ -13,78 +14,91 @@ function BookingStepOne({
   handlers,
   inlineErrors,
   invalidPastDate,
-  primaryCtaLabel,
+  nextStepHint,
   selectedMealDurationText,
   selectedSeatOperationalNote,
   bookingOperationalRules,
   serviceHotlineLink,
+  stepOneProgress,
 }) {
   return (
-    <div className="booking-step booking-step-premium">
-      <BookingGuestSelector
-        formData={formData}
-        guestCount={guestCount}
-        guestWarning={guestWarning}
-        inlineErrors={inlineErrors}
-        onGuestSelect={handlers.handleGuestSelect}
-        serviceHotlineLink={serviceHotlineLink}
-      />
+    <div className="booking-step booking-step-premium booking-step-progressive">
+      <div className="booking-step-guidance">
+        <p className="booking-side-kicker">Luồng đặt bàn nhanh</p>
+        <strong>{nextStepHint}</strong>
+      </div>
 
-      <BookingDateSection
-        calendarContainerRef={calendar.calendarContainerRef}
-        calendarDays={calendar.calendarDays}
-        calendarFocusedDate={calendar.calendarFocusedDate}
-        calendarOpen={calendar.calendarOpen}
-        calendarMonth={calendar.calendarMonth}
-        canViewPreviousMonth={calendar.canViewPreviousMonth}
-        formData={formData}
-        handleCalendarDayKeyDown={handlers.handleCalendarDayKeyDown}
-        handleCalendarMonthChange={handlers.handleCalendarMonthChange}
-        handleDateInputChange={handlers.handleDateInputChange}
-        handleDateSelect={handlers.handleDateSelect}
-        inlineErrors={inlineErrors}
-        isSelectedDateClosed={calendar.isSelectedDateClosed}
-        isSelectedDateOutOfRange={calendar.isSelectedDateOutOfRange}
-        maxBookableDate={calendar.maxBookableDate}
-        nextOpenDate={calendar.nextOpenDate}
-        openDateOptions={calendar.openDateOptions}
-        selectedDateLabel={calendar.selectedDateLabel}
-        selectedDateShort={calendar.selectedDateShort}
-        setCalendarFocusedDate={calendar.setCalendarFocusedDate}
-        todayString={calendar.todayString}
-        toggleCalendar={calendar.toggleCalendar}
-      />
+      <div className={`booking-flow-section ${activeBookingSection === 'guests' ? 'is-active' : ''}`}>
+        <BookingGuestSelector
+          formData={formData}
+          guestCount={guestCount}
+          guestWarning={guestWarning}
+          inlineErrors={inlineErrors}
+          onGuestSelect={handlers.handleGuestSelect}
+          serviceHotlineLink={serviceHotlineLink}
+        />
+      </div>
 
-      <BookingSlotPicker
-        availabilityPanelRef={availability.availabilityPanelRef}
-        firstAvailableSlotRef={availability.firstAvailableSlotRef}
-        firstAvailableSlotTime={availability.firstAvailableSlotTime}
-        formData={formData}
-        guestCount={guestCount}
-        handleSelectSuggestedTime={handlers.handleSelectSuggestedTime}
-        handleTimeSelect={handlers.handleTimeSelect}
-        inlineErrors={inlineErrors}
-        invalidPastDate={invalidPastDate}
-        recommendedSlotTime={availability.recommendedSlotTime}
-        selectedTimeSuggestions={availability.selectedTimeSuggestions}
-        slotGroups={availability.slotGroups}
-        slotsLoading={availability.slotsLoading}
-      />
+      <div className={`booking-flow-section ${activeBookingSection === 'date' ? 'is-active' : ''} ${stepOneProgress.hasGuests ? '' : 'is-locked'}`}>
+        <BookingDateSection
+          calendarContainerRef={calendar.calendarContainerRef}
+          calendarDays={calendar.calendarDays}
+          calendarFocusedDate={calendar.calendarFocusedDate}
+          calendarOpen={calendar.calendarOpen}
+          calendarMonth={calendar.calendarMonth}
+          canViewPreviousMonth={calendar.canViewPreviousMonth}
+          formData={formData}
+          handleCalendarDayKeyDown={handlers.handleCalendarDayKeyDown}
+          handleCalendarMonthChange={handlers.handleCalendarMonthChange}
+          handleDateInputChange={handlers.handleDateInputChange}
+          handleDateSelect={handlers.handleDateSelect}
+          inlineErrors={inlineErrors}
+          isLocked={!stepOneProgress.hasGuests}
+          isSelectedDateClosed={calendar.isSelectedDateClosed}
+          isSelectedDateOutOfRange={calendar.isSelectedDateOutOfRange}
+          maxBookableDate={calendar.maxBookableDate}
+          openDateOptions={calendar.openDateOptions}
+          selectedDateLabel={calendar.selectedDateLabel}
+          selectedDateShort={calendar.selectedDateShort}
+          setCalendarFocusedDate={calendar.setCalendarFocusedDate}
+          todayString={calendar.todayString}
+          toggleCalendar={calendar.toggleCalendar}
+        />
+      </div>
 
-      <BookingSeatingSelector
-        formData={formData}
-        guestCount={guestCount}
-        handleSeatingSelect={handlers.handleSeatingSelect}
-        selectedSeatOperationalNote={selectedSeatOperationalNote}
-      />
+      <div className={`booking-flow-section ${activeBookingSection === 'time' ? 'is-active' : ''} ${stepOneProgress.hasDate ? '' : 'is-locked'}`}>
+        <BookingSlotPicker
+          availabilityPanelRef={availability.availabilityPanelRef}
+          firstAvailableSlotRef={availability.firstAvailableSlotRef}
+          firstAvailableSlotTime={availability.firstAvailableSlotTime}
+          formData={formData}
+          guestCount={guestCount}
+          handleSelectSuggestedTime={handlers.handleSelectSuggestedTime}
+          handleTimeSelect={handlers.handleTimeSelect}
+          inlineErrors={inlineErrors}
+          invalidPastDate={invalidPastDate}
+          isLocked={!stepOneProgress.hasDate}
+          recommendedSlotTime={availability.recommendedSlotTime}
+          selectedTimeSuggestions={availability.selectedTimeSuggestions}
+          slotGroups={availability.slotGroups}
+          slotsLoading={availability.slotsLoading}
+        />
+      </div>
 
-      <BookingOperationalNotes
-        bookingOperationalRules={bookingOperationalRules}
-        selectedMealDurationText={selectedMealDurationText}
-      />
+      <div className={`booking-flow-section ${activeBookingSection === 'seating' ? 'is-active' : ''} ${stepOneProgress.hasTime ? '' : 'is-locked'}`}>
+        <BookingSeatingSelector
+          formData={formData}
+          guestCount={guestCount}
+          handleSeatingSelect={handlers.handleSeatingSelect}
+          selectedSeatOperationalNote={selectedSeatOperationalNote}
+        />
+      </div>
 
-      <div className="booking-action-row">
-        <button type="button" className="booking-primary-btn" onClick={handlers.handleStepOneContinue}>{primaryCtaLabel}</button>
+      <div className={`booking-flow-section ${stepOneProgress.hasTime ? '' : 'is-collapsed'}`}>
+        <BookingOperationalNotes
+          bookingOperationalRules={bookingOperationalRules}
+          selectedMealDurationText={selectedMealDurationText}
+        />
       </div>
     </div>
   )

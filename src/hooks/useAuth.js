@@ -1,5 +1,6 @@
-import { useCallback, useMemo } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import {
+  AUTH_USER_CHANGED_EVENT,
   clearCurrentUser,
   findAccountByIdentifier,
   getAccounts,
@@ -9,7 +10,29 @@ import {
 } from '../services/authService'
 
 export const useAuth = () => {
-  const currentUser = useMemo(() => getCurrentUser(), [])
+  const [currentUser, setCurrentUser] = useState(() => getCurrentUser())
+
+  useEffect(() => {
+    const syncCurrentUser = () => {
+      setCurrentUser(getCurrentUser())
+    }
+
+    const handleStorage = (event) => {
+      if (event.key && event.key !== 'restaurant_current_user') {
+        return
+      }
+
+      syncCurrentUser()
+    }
+
+    window.addEventListener('storage', handleStorage)
+    window.addEventListener(AUTH_USER_CHANGED_EVENT, syncCurrentUser)
+
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener(AUTH_USER_CHANGED_EVENT, syncCurrentUser)
+    }
+  }, [])
 
   const login = useCallback((identifier, password) => {
     const accounts = getAccounts()

@@ -20,6 +20,7 @@ function Header() {
   const { currentUser, logout } = useAuth()
 
   const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
+  const displayName = currentUser?.fullName ?? currentUser?.name
 
   const closeMenus = () => {
     setMobileMenuOpen(false)
@@ -104,7 +105,7 @@ function Header() {
                 {currentUser ? (
                   <>
                     <div className="user-greeting">
-                      Xin chào, <strong>{currentUser.name}</strong>
+                      Xin chào, <strong>{displayName}</strong>
                     </div>
                     <Link to="/profile" role="menuitem" onClick={handleNavLinkClick}>
                       Hồ sơ cá nhân
@@ -155,7 +156,7 @@ function Header() {
           {currentUser ? (
             <>
               <div className="mobile-user-greeting">
-                Xin chào, <strong>{currentUser.name}</strong>
+                Xin chào, <strong>{displayName}</strong>
               </div>
               <Link to="/profile" onClick={handleNavLinkClick}>
                 Hồ sơ cá nhân

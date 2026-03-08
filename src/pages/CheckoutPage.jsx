@@ -2,7 +2,9 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
 import { STORAGE_KEYS } from '../constants/storageKeys'
+import { useAuth } from '../hooks/useAuth'
 import { formatCurrency } from '../utils/currency'
+import { clearCheckoutDraft, getCheckoutDraft, setCheckoutDraft } from '../services/checkoutDraftService'
 import { getStorageJSON, setStorageJSON } from '../services/storageService'
 import { clearAppliedVoucher, getAppliedVoucher } from '../services/voucherService'
 
@@ -22,12 +24,14 @@ const paymentMethods = [
 function CheckoutPage() {
   const navigate = useNavigate()
   const { cartItems, clearCart, getItemDisplayOptions, getCartItemKey } = useCart()
+  const { currentUser } = useAuth()
 
   const [formData, setFormData] = useState({
     fullName: '',
     phone: '',
     address: '',
     note: '',
+    tableNumber: '',
     paymentMethod: 'cash',
   })
   const [appliedVoucher, setAppliedVoucher] = useState(null)
@@ -37,10 +41,18 @@ function CheckoutPage() {
 
     if (!voucher) {
       clearAppliedVoucher()
-      return
+    } else {
+      setAppliedVoucher(voucher)
     }
 
-    setAppliedVoucher(voucher)
+    const draft = getCheckoutDraft()
+    if (draft) {
+      setFormData((prev) => ({
+        ...prev,
+        note: draft.note,
+        tableNumber: draft.tableNumber,
+      }))
+    }
   }, [])
 
   const subtotal = useMemo(
@@ -54,10 +66,19 @@ function CheckoutPage() {
 
   const handleChange = (event) => {
     const { name, value } = event.target
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }))
+    setFormData((prev) => {
+      const nextFormData = {
+        ...prev,
+        [name]: value,
+      }
+
+      setCheckoutDraft({
+        note: nextFormData.note,
+        tableNumber: nextFormData.tableNumber,
+      })
+
+      return nextFormData
+    })
   }
 
   const handleSubmit = (event) => {
@@ -90,14 +111,18 @@ function CheckoutPage() {
       customer: {
         fullName: formData.fullName,
         phone: formData.phone,
+        email: currentUser?.email ?? '',
         address: formData.address,
       },
+      userEmail: currentUser?.email ?? '',
       note: formData.note,
+      tableNumber: formData.tableNumber,
       paymentMethod: formData.paymentMethod,
     }
 
     setStorageJSON(STORAGE_KEYS.ORDERS, [newOrder, ...existingOrders])
     clearAppliedVoucher()
+    clearCheckoutDraft()
 
     if (typeof clearCart === 'function') {
       clearCart()
@@ -166,6 +191,21 @@ function CheckoutPage() {
                   value={formData.address}
                   onChange={handleChange}
                   required
+                />
+              </div>
+
+              <div className="form-group">
+                <label className="form-label" htmlFor="tableNumber">
+                  Số bàn
+                </label>
+                <input
+                  id="tableNumber"
+                  name="tableNumber"
+                  type="text"
+                  className="form-input"
+                  placeholder="Nhập số bàn (nếu có)"
+                  value={formData.tableNumber}
+                  onChange={handleChange}
                 />
               </div>
 

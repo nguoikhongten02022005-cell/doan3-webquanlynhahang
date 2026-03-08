@@ -1,7 +1,7 @@
 import { BOOKING_NOTE_SUGGESTIONS, BOOKING_OCCASIONS } from '../../data/bookingData'
 import { formatDateDisplay, getSeatSummaryText } from '../../utils/booking'
 
-function BookingStepTwo({ formData, guestCount, inlineErrors, primaryCtaLabel, selectedMealDurationText, onBack, onChange, onContinue, onNoteSuggestion }) {
+function BookingStepTwo({ formData, guestCount, inlineErrors, selectedMealDurationText, onBack, onChange, onNoteSuggestion }) {
   return (
     <div className="booking-step booking-step-premium">
       <section className="booking-editorial-card booking-summary-ribbon">
@@ -63,11 +63,6 @@ function BookingStepTwo({ formData, guestCount, inlineErrors, primaryCtaLabel, s
           <textarea id="booking-notes" name="notes" className="form-textarea" placeholder="VD: Dị ứng thực phẩm, cần ghế em bé, muốn chỗ yên tĩnh, đến trễ khoảng 10 phút..." value={formData.notes} onChange={onChange} rows="4" />
         </div>
       </section>
-
-      <div className="booking-action-row booking-action-row-split">
-        <button type="button" className="booking-secondary-btn" onClick={onBack}>Quay lại bước trước</button>
-        <button type="button" className="booking-primary-btn" onClick={onContinue}>{primaryCtaLabel}</button>
-      </div>
     </div>
   )
 }

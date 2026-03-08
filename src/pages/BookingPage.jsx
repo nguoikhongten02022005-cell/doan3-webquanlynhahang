@@ -1,8 +1,7 @@
 import { useNavigate } from 'react-router-dom'
-import {
-  BOOKING_STEP_ITEMS,
-} from '../data/bookingData'
+import { BOOKING_STEP_ITEMS } from '../data/bookingData'
 import { BOOKING_DRAFT_BANNER, BOOKING_HERO_CONTENT } from '../constants/bookingUi'
+import { SITE_CONTACT } from '../constants/siteContact'
 import BookingSidebar from '../components/booking/BookingSidebar'
 import BookingStepOne from '../components/booking/BookingStepOne'
 import BookingStepTwo from '../components/booking/BookingStepTwo'
@@ -11,21 +10,18 @@ import BookingSuccess from '../components/booking/BookingSuccess'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 import { useBookingForm } from '../hooks/useBookingForm'
-import {
-  ONLINE_BOOKING_MAX_GUESTS,
-} from '../utils/booking'
-
-const SERVICE_HOTLINE = '(028) 3825 6789'
-const SERVICE_HOTLINE_LINK = 'tel:02838256789'
+import { ONLINE_BOOKING_MAX_GUESTS } from '../utils/booking'
 
 function BookingPage() {
   const navigate = useNavigate()
   const { currentUser } = useAuth()
   const { createBooking, getDraft, saveDraft } = useBooking()
   const {
+    activeBookingSection,
     availabilityPanelRef,
     bookingCode,
     bookingOperationalRules,
+    bookingSelectionSummary,
     bookingStatus,
     calendarContainerRef,
     calendarDays,
@@ -58,8 +54,9 @@ function BookingPage() {
     isSelectedDateClosed,
     isSelectedDateOutOfRange,
     maxBookableDate,
-    nextOpenDate,
+    nextStepHint,
     openDateOptions,
+    primaryCtaDisabled,
     primaryCtaLabel,
     recommendedSlotTime,
     selectedDateLabel,
@@ -72,6 +69,7 @@ function BookingPage() {
     slotGroups,
     slotsLoading,
     step,
+    stepOneProgress,
     submitError,
     submitted,
     successHeading,
@@ -80,26 +78,24 @@ function BookingPage() {
     toggleCalendar,
   } = useBookingForm({ currentUser, createBooking, getDraft, saveDraft })
 
+  const secondaryAction = step > 1 ? () => goToStep(step - 1) : null
+  const secondaryActionLabel = step === 2 ? 'Quay lại bước chọn bàn' : step === 3 ? 'Quay lại chỉnh sửa' : ''
+  const primaryAction = step === 1 ? handleStepOneContinue : step === 2 ? handleStepTwoContinue : undefined
+
   return (
     <div className="booking-page">
       <section className="booking-hero booking-hero-premium">
-        <div className="container booking-hero-shell">
-          <div className="booking-hero-copy">
+        <div className="container booking-hero-shell booking-hero-shell-compact">
+          <div className="booking-hero-copy booking-hero-copy-compact">
             <span className="booking-label">{BOOKING_HERO_CONTENT.label}</span>
-            <h1 className="booking-title booking-title-premium">
-              {BOOKING_HERO_CONTENT.title}
-            </h1>
-            <p className="booking-subtitle booking-subtitle-premium">
-              {BOOKING_HERO_CONTENT.subtitle}
-            </p>
+            <h1 className="booking-title booking-title-premium">{BOOKING_HERO_CONTENT.title}</h1>
+            <p className="booking-subtitle booking-subtitle-premium">{BOOKING_HERO_CONTENT.subtitle}</p>
           </div>
 
-          <div className="booking-hero-aside">
-            <div className="booking-hero-note-card">
-              <span className="booking-hero-note-label">{BOOKING_HERO_CONTENT.noteLabel}</span>
-              <strong>Tối đa {ONLINE_BOOKING_MAX_GUESTS} khách / lượt</strong>
-              <p>{BOOKING_HERO_CONTENT.noteText}</p>
-            </div>
+          <div className="booking-hero-note-inline">
+            <span className="booking-hero-note-label">{BOOKING_HERO_CONTENT.noteLabel}</span>
+            <strong>Tối đa {ONLINE_BOOKING_MAX_GUESTS} khách / lượt</strong>
+            <p>{BOOKING_HERO_CONTENT.noteText}</p>
           </div>
         </div>
       </section>
@@ -107,7 +103,21 @@ function BookingPage() {
       <section className="booking-form-section booking-form-section-premium">
         <div className="container">
           <div className="booking-layout-premium">
-            <BookingSidebar step={step} serviceHotline={SERVICE_HOTLINE} />
+            <BookingSidebar
+              bookingSelectionSummary={bookingSelectionSummary}
+              nextStepHint={nextStepHint}
+              onPrimaryAction={primaryAction}
+              onSecondaryAction={secondaryAction}
+              primaryActionForm={step === 3 ? 'booking-form' : undefined}
+              primaryActionType={step === 3 ? 'submit' : 'button'}
+              primaryCtaDisabled={step === 3 ? false : primaryCtaDisabled}
+              primaryCtaLabel={primaryCtaLabel}
+              secondaryCtaLabel={secondaryActionLabel}
+              serviceHotline={SITE_CONTACT.phoneDisplay}
+              serviceHotlineLink={SITE_CONTACT.phoneHref}
+              step={step}
+              submitError={step === 3 ? submitError : ''}
+            />
 
             <div className="booking-main-premium">
               {submitted ? (
@@ -122,7 +132,7 @@ function BookingPage() {
                   onGoProfile={() => navigate('/profile')}
                 />
               ) : (
-                <form className="booking-shell-premium" onSubmit={handleSubmit}>
+                <form id="booking-form" className="booking-shell-premium" onSubmit={handleSubmit}>
                   {draftRestored && (
                     <div className="booking-draft-banner">
                       <div>
@@ -135,16 +145,17 @@ function BookingPage() {
                     </div>
                   )}
 
-                  <header className="booking-panel-header">
+                  <header className="booking-panel-header booking-panel-header-compact">
                     <div>
                       <p className="booking-side-kicker">Đặt bàn trực tuyến</p>
                       <h2>{BOOKING_STEP_ITEMS.find((item) => item.id === step)?.title}</h2>
                     </div>
-                    <div className="booking-panel-progress">Bước {step}/3</div>
+                    <div className="booking-panel-progress booking-panel-progress-compact">{nextStepHint}</div>
                   </header>
 
                   {step === 1 && (
                     <BookingStepOne
+                      activeBookingSection={activeBookingSection}
                       bookingOperationalRules={bookingOperationalRules}
                       availability={{
                         availabilityPanelRef,
@@ -165,7 +176,6 @@ function BookingPage() {
                         isSelectedDateClosed,
                         isSelectedDateOutOfRange,
                         maxBookableDate,
-                        nextOpenDate,
                         openDateOptions,
                         selectedDateLabel,
                         selectedDateShort,
@@ -184,15 +194,15 @@ function BookingPage() {
                         handleGuestSelect,
                         handleSeatingSelect,
                         handleSelectSuggestedTime,
-                        handleStepOneContinue,
                         handleTimeSelect,
                       }}
                       inlineErrors={inlineErrors}
                       invalidPastDate={invalidPastDate}
-                      primaryCtaLabel={primaryCtaLabel}
+                      nextStepHint={nextStepHint}
                       selectedMealDurationText={selectedMealDurationText}
                       selectedSeatOperationalNote={selectedSeatOperationalNote}
-                      serviceHotlineLink={SERVICE_HOTLINE_LINK}
+                      serviceHotlineLink={SITE_CONTACT.phoneHref}
+                      stepOneProgress={stepOneProgress}
                     />
                   )}
 
@@ -201,11 +211,9 @@ function BookingPage() {
                       formData={formData}
                       guestCount={guestCount}
                       inlineErrors={inlineErrors}
-                      primaryCtaLabel={primaryCtaLabel}
                       selectedMealDurationText={selectedMealDurationText}
                       onBack={() => goToStep(1)}
                       onChange={handleChange}
-                      onContinue={handleStepTwoContinue}
                       onNoteSuggestion={handleNoteSuggestion}
                     />
                   )}
@@ -214,12 +222,30 @@ function BookingPage() {
                     <BookingStepThree
                       formData={formData}
                       guestCount={guestCount}
-                      primaryCtaLabel={primaryCtaLabel}
                       selectedSeatOperationalNote={selectedSeatOperationalNote}
-                      submitError={submitError}
-                      onBack={() => goToStep(2)}
                     />
                   )}
+
+                  <div className="booking-mobile-sticky-bar">
+                    <div className="booking-mobile-sticky-meta">
+                      <strong>{bookingSelectionSummary.guests}</strong>
+                      <span>{bookingSelectionSummary.time}</span>
+                    </div>
+                    {step === 3 ? (
+                      <button type="submit" className="booking-primary-btn booking-mobile-sticky-btn">
+                        {primaryCtaLabel}
+                      </button>
+                    ) : (
+                      <button
+                        type="button"
+                        className="booking-primary-btn booking-mobile-sticky-btn"
+                        onClick={primaryAction}
+                        disabled={primaryCtaDisabled}
+                      >
+                        {primaryCtaLabel}
+                      </button>
+                    )}
+                  </div>
                 </form>
               )}
             </div>

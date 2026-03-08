@@ -72,7 +72,12 @@ export const useBookingCalendar = ({ selectedDate, onDateSelect }) => {
     }
   }, [calendarOpen])
 
-  const toggleCalendar = () => {
+  const toggleCalendar = (nextState) => {
+    if (typeof nextState === 'boolean') {
+      setCalendarOpen(nextState)
+      return
+    }
+
     setCalendarOpen((prev) => !prev)
   }
 

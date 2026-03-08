@@ -1,7 +1,7 @@
 import { BOOKING_STATUS_LABELS } from '../../data/bookingData'
 import { formatDateDisplay, getBookingSubmissionStatus, getMealDurationText, getPolicyItems, getSeatSummaryText } from '../../utils/booking'
 
-function BookingStepThree({ formData, guestCount, primaryCtaLabel, selectedSeatOperationalNote, submitError, onBack }) {
+function BookingStepThree({ formData, guestCount, selectedSeatOperationalNote }) {
   const submissionStatus = getBookingSubmissionStatus({
     seatingArea: formData.seatingArea,
     guestCount,
@@ -56,13 +56,6 @@ function BookingStepThree({ formData, guestCount, primaryCtaLabel, selectedSeatO
                 <span>{item.text}</span>
               </div>
             ))}
-          </div>
-
-          {submitError && <p className="form-error" role="alert">{submitError}</p>}
-
-          <div className="booking-confirm-panel">
-            <button type="submit" className="booking-primary-btn booking-confirm-btn">{primaryCtaLabel}</button>
-            <button type="button" className="booking-secondary-btn" onClick={onBack}>Quay lại chỉnh sửa</button>
           </div>
         </aside>
       </section>

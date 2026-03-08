@@ -6,6 +6,8 @@ import {
   LARGE_GROUP_HOTLINE_MESSAGE,
   ONLINE_BOOKING_MAX_GUESTS,
   formatDateDisplay,
+  getLocalDateString,
+  getSeatSummaryText,
   isClosedDate,
   isLargeGroupHotlineOnly,
 } from '../utils/booking'
@@ -33,7 +35,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
   })
 
   const guestCount = Number(formData.guests) || 0
-  const todayString = useMemo(() => new Date().toISOString().slice(0, 10), [])
+  const todayString = useMemo(() => getLocalDateString(), [])
   const invalidPastDate = Boolean(formData.date && formData.date < todayString)
   const closedDate = Boolean(formData.date && isClosedDate(formData.date))
 
@@ -103,10 +105,13 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     bookingStatus,
     clearFieldError,
     inlineErrors,
+    primaryCtaDisabled,
     primaryCtaLabel,
     selectedSeatOperationalNote,
     setInlineErrors,
     setSubmitError,
+    step1Complete,
+    step2Complete,
     submitBooking,
     submitError,
     submitted,
@@ -167,6 +172,45 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     if (guestCount >= 6) return 'Nhóm từ 6 khách nên đặt sớm để ưu tiên bàn phù hợp hơn.'
     return ''
   }, [guestCount])
+
+  const bookingSelectionSummary = useMemo(() => ({
+    guests: guestCount ? `${guestCount} khách` : 'Chưa chọn số khách',
+    date: formData.date ? formatDateDisplay(formData.date) : 'Chưa chọn ngày',
+    time: formData.time || 'Chưa chọn giờ',
+    seatingArea: formData.time ? getSeatSummaryText(formData.seatingArea) : 'Chưa chọn khu vực',
+  }), [formData.date, formData.seatingArea, formData.time, guestCount])
+
+  const stepOneProgress = useMemo(() => ({
+    hasGuests: Boolean(guestCount),
+    hasDate: Boolean(formData.date && !invalidPastDate && !closedDate),
+    hasTime: Boolean(formData.time),
+    hasSeating: Boolean(formData.time && formData.seatingArea),
+  }), [closedDate, formData.date, formData.seatingArea, formData.time, guestCount, invalidPastDate])
+
+  const nextStepHint = useMemo(() => {
+    if (step === 1) {
+      if (!stepOneProgress.hasGuests) return 'Chọn số khách để bắt đầu xem bàn trống.'
+      if (isLargeGroupHotlineOnly(guestCount)) return LARGE_GROUP_HOTLINE_MESSAGE
+      if (!stepOneProgress.hasDate) return 'Chọn ngày dùng bữa để mở danh sách khung giờ phục vụ.'
+      if (!stepOneProgress.hasTime) return 'Chọn khung giờ phù hợp trước khi tiếp tục.'
+      return 'Bạn có thể tiếp tục sang bước nhập thông tin liên hệ.'
+    }
+
+    if (step === 2) {
+      if (!step2Complete) return 'Điền đủ họ tên và số điện thoại để tiếp tục xác nhận booking.'
+      return 'Kiểm tra lại thông tin và chuyển sang bước xác nhận cuối.'
+    }
+
+    return 'Kiểm tra lại toàn bộ thông tin rồi gửi yêu cầu đặt bàn.'
+  }, [guestCount, step, step2Complete, stepOneProgress])
+
+  const activeBookingSection = useMemo(() => {
+    if (!stepOneProgress.hasGuests) return 'guests'
+    if (!stepOneProgress.hasDate) return 'date'
+    if (!stepOneProgress.hasTime) return 'time'
+    if (!stepOneProgress.hasSeating) return 'seating'
+    return 'contact'
+  }, [stepOneProgress])
 
   const handleChange = (e) => {
     const { name, value } = e.target
@@ -337,6 +381,9 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     maxBookableDate,
     nextOpenDate,
     openDateOptions,
+    activeBookingSection,
+    bookingSelectionSummary,
+    primaryCtaDisabled,
     primaryCtaLabel,
     recommendedSlotTime,
     selectedDateLabel,
@@ -350,6 +397,9 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     slotGroups,
     slotsLoading,
     step,
+    step1Complete,
+    step2Complete,
+    stepOneProgress,
     submitError,
     submitted,
     successHeading,
@@ -360,5 +410,6 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     todayString,
     toggleCalendar,
     goToStep,
+    nextStepHint,
   }
 }

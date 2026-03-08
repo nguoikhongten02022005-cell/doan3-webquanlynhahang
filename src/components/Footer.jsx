@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { SITE_CONTACT } from '../constants/siteContact'
 
 function Footer() {
   return (
@@ -19,12 +20,12 @@ function Footer() {
         <section>
           <h3>Liên hệ</h3>
           <ul>
-            <li>28 Nguyễn Huệ, Q.1, TP. HCM</li>
+            <li>{SITE_CONTACT.address}</li>
             <li>
-              Hotline: <a href="tel:02812345678">(028) 1234 5678</a>
+              Hotline: <a href={SITE_CONTACT.phoneHref}>{SITE_CONTACT.phoneDisplay}</a>
             </li>
             <li>
-              Email: <a href="mailto:hello@nguyenvi.vn">hello@nguyenvi.vn</a>
+              Email: <a href={SITE_CONTACT.emailHref}>{SITE_CONTACT.emailDisplay}</a>
             </li>
           </ul>
         </section>
@@ -32,9 +33,10 @@ function Footer() {
         <section>
           <h3>Giờ mở cửa</h3>
           <ul>
-            <li>Thứ 2 - Thứ 6: 10:00 - 22:00</li>
-            <li>Thứ 7 - Chủ nhật: 08:00 - 22:30</li>
-            <li>Nhận đơn online đến 21:45</li>
+            {SITE_CONTACT.hours.map((item) => (
+              <li key={item.label}>{item.label}: {item.value}</li>
+            ))}
+            <li>{SITE_CONTACT.onlineOrderCutoff}</li>
           </ul>
         </section>
       </div>

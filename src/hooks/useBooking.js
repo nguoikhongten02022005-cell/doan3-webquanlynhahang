@@ -6,37 +6,23 @@ import {
 } from '../data/bookingData'
 import { getStorageJSON, removeStorageItem, setStorageJSON } from '../services/storageService'
 
-const fallbackBookings = [
-  {
-    id: 'DB-2301',
-    dateTime: '10/03/2026 19:00',
-    guests: 4,
-    status: '🟢 Đã xác nhận',
-    rawStatus: 'DA_XAC_NHAN',
-  },
-  {
-    id: 'DB-2294',
-    dateTime: '03/03/2026 18:30',
-    guests: 2,
-    status: '⚪ Đã hoàn thành',
-    rawStatus: 'DA_HOAN_THANH',
-  },
-  {
-    id: 'DB-2288',
-    dateTime: '26/02/2026 20:00',
-    guests: 6,
-    status: '⚪ Đã hoàn thành',
-    rawStatus: 'DA_HOAN_THANH',
-  },
-]
+export const BOOKING_DATA_CHANGED_EVENT = 'booking:data-changed'
+
+const dispatchBookingDataChanged = () => {
+  if (typeof window === 'undefined') {
+    return
+  }
+
+  window.dispatchEvent(new CustomEvent(BOOKING_DATA_CHANGED_EVENT))
+}
 
 const formatDate = (value) => {
   if (!value) return '--'
 
-  const date = new Date(value)
-  if (Number.isNaN(date.getTime())) return '--'
+  const [year, month, day] = String(value).split('-')
+  if (!year || !month || !day) return '--'
 
-  return date.toLocaleDateString('vi-VN')
+  return `${day}/${month}/${year}`
 }
 
 const formatBookingId = (bookingId) => `DB-${String(bookingId).slice(-6)}`
@@ -61,10 +47,10 @@ const canCancelBooking = (status) => (
 )
 
 const readBookings = () => {
-  const parsedBookings = getStorageJSON(STORAGE_KEYS.BOOKINGS, null)
+  const parsedBookings = getStorageJSON(STORAGE_KEYS.BOOKINGS, [])
 
-  if (!Array.isArray(parsedBookings) || parsedBookings.length === 0) {
-    return null
+  if (!Array.isArray(parsedBookings)) {
+    return []
   }
 
   return parsedBookings
@@ -80,12 +66,18 @@ const mapBookingItem = (booking) => ({
   status: mapBookingStatus(booking.status),
 })
 
-const loadBookingHistory = () => {
+const loadBookingHistory = (userEmail) => {
   const parsedBookings = readBookings()
-
-  if (!parsedBookings) return fallbackBookings
+  const normalizedUserEmail = String(userEmail ?? '').trim().toLowerCase()
 
   return [...parsedBookings]
+    .filter((booking) => {
+      if (!normalizedUserEmail) {
+        return false
+      }
+
+      return String(booking.userEmail ?? booking.email ?? '').trim().toLowerCase() === normalizedUserEmail
+    })
     .sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
     .map(mapBookingItem)
 }
@@ -127,18 +119,20 @@ const syncBookingsToQueue = (bookings) => {
   setStorageJSON(STORAGE_KEYS.BOOKINGS, bookings)
 
   const queue = getStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, [])
-  if (!Array.isArray(queue)) return
+  if (Array.isArray(queue)) {
+    try {
+      const nextQueue = queue.map((item) => {
+        const matchedBooking = bookings.find((booking) => item.bookingCode === booking.bookingCode)
+        return matchedBooking ? { ...item, status: matchedBooking.status } : item
+      })
 
-  try {
-    const nextQueue = queue.map((item) => {
-      const matchedBooking = bookings.find((booking) => item.bookingCode === booking.bookingCode)
-      return matchedBooking ? { ...item, status: matchedBooking.status } : item
-    })
-
-    setStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, nextQueue)
-  } catch {
-    // noop
+      setStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, nextQueue)
+    } catch {
+      // noop
+    }
   }
+
+  dispatchBookingDataChanged()
 }
 
 const updateBookingStatus = (bookings, bookingId, nextStatus) => {
@@ -166,21 +160,20 @@ export const useBooking = () => {
   const createBooking = useCallback(({ booking, confirmationPayload, receptionQueueItem }) => {
     const storedBookings = getStorageJSON(STORAGE_KEYS.BOOKINGS, [])
     const bookings = Array.isArray(storedBookings) ? storedBookings : []
-    bookings.push(booking)
-    setStorageJSON(STORAGE_KEYS.BOOKINGS, bookings)
+    const nextBookings = [...bookings, booking]
 
     setStorageJSON(STORAGE_KEYS.LAST_BOOKING_CONFIRMATION, confirmationPayload)
     removeStorageItem(STORAGE_KEYS.BOOKING_DRAFT)
 
     const receptionQueue = getStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, [])
     const safeReceptionQueue = Array.isArray(receptionQueue) ? receptionQueue : []
-    safeReceptionQueue.push(receptionQueueItem)
-    setStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, safeReceptionQueue)
+    setStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, [...safeReceptionQueue, receptionQueueItem])
+    syncBookingsToQueue(nextBookings)
   }, [])
 
-  const getBookingHistory = useCallback(() => loadBookingHistory(), [])
+  const getBookingHistory = useCallback((userEmail) => loadBookingHistory(userEmail), [])
 
-  const cancelBooking = useCallback((bookingId, bookingCode) => {
+  const cancelBooking = useCallback((bookingId, bookingCode, userEmail) => {
     const parsedBookings = getStorageJSON(STORAGE_KEYS.BOOKINGS, null)
 
     if (!Array.isArray(parsedBookings)) {
@@ -197,17 +190,18 @@ export const useBooking = () => {
       return { success: false, error: 'Đặt bàn đã xác nhận. Vui lòng gọi hotline để được hỗ trợ hủy.' }
     }
 
-    parsedBookings[bookingIndex] = {
-      ...parsedBookings[bookingIndex],
-      status: 'DA_HUY',
-    }
+    const nextBookings = parsedBookings.map((booking) => (
+      String(booking.id) === String(bookingId)
+        ? { ...booking, status: 'DA_HUY' }
+        : booking
+    ))
 
-    setStorageJSON(STORAGE_KEYS.BOOKINGS, parsedBookings)
+    syncBookingsToQueue(nextBookings)
 
     return {
       success: true,
       message: `Đã hủy đặt bàn ${bookingCode} thành công.`,
-      bookingHistory: loadBookingHistory(),
+      bookingHistory: loadBookingHistory(userEmail),
     }
   }, [])
 

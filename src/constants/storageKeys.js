@@ -6,6 +6,7 @@ export const STORAGE_KEYS = Object.freeze({
   ORDERS: 'restaurant_orders',
   BOOKINGS: 'restaurant_bookings',
   BOOKING_DRAFT: 'restaurant_booking_draft',
+  CHECKOUT_DRAFT: 'restaurant_checkout_draft',
   LAST_BOOKING_CONFIRMATION: 'restaurant_last_booking_confirmation',
   RECEPTION_QUEUE: 'restaurant_reception_queue',
 })

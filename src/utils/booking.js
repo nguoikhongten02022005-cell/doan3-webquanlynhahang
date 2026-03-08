@@ -331,8 +331,9 @@ export const getStepTwoErrors = ({ name, phone }) => {
 
 export const getPrimaryCtaLabel = ({ step, guestCount, date, time, step1Complete, step2Complete, closedDate, seatingArea, notes }) => {
   if (step === 1) {
-    if (!guestCount || !date) return 'Chọn số khách và ngày để xem giờ trống'
+    if (!guestCount) return 'Chọn số khách để xem giờ trống'
     if (isLargeGroupHotlineOnly(guestCount)) return 'Gọi hotline để đặt nhóm đông'
+    if (!date) return 'Chọn ngày dùng bữa để xem giờ trống'
     if (closedDate) return 'Vui lòng chọn ngày khác'
     if (!time) return 'Chọn khung giờ'
     if (step1Complete) return 'Tiếp tục nhập thông tin liên hệ'

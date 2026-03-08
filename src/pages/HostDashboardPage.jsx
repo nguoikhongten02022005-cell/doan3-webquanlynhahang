@@ -1,16 +1,18 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import {
   BOOKING_SEATING_LABELS,
   HOST_BOOKING_STATUS_ACTIONS,
   HOST_BOOKING_STATUS_LABELS,
 } from '../data/bookingData'
-import { useBooking } from '../hooks/useBooking'
+import { BOOKING_DATA_CHANGED_EVENT, useBooking } from '../hooks/useBooking'
 
 const formatDateTime = (date, time) => {
   if (!date) return '--'
-  const parsedDate = new Date(date)
-  if (Number.isNaN(parsedDate.getTime())) return `${date} ${time || ''}`.trim()
-  return `${parsedDate.toLocaleDateString('vi-VN')} ${time || ''}`.trim()
+
+  const [year, month, day] = String(date).split('-')
+  if (!year || !month || !day) return `${date} ${time || ''}`.trim()
+
+  return `${day}/${month}/${year} ${time || ''}`.trim()
 }
 
 const getSeatingLabel = (value) => BOOKING_SEATING_LABELS[value] || value || 'Không ưu tiên'
@@ -40,6 +42,28 @@ const formatGuests = (guests) => `${guests} khách`
 function HostDashboardPage() {
   const { bookingStatusActions, getHostBookings, getHostStats, sortHostBookings, updateHostBookingStatus } = useBooking()
   const [bookings, setBookings] = useState(() => getHostBookings())
+
+  useEffect(() => {
+    const reloadBookings = () => {
+      setBookings(getHostBookings())
+    }
+
+    const handleStorage = (event) => {
+      if (event.key && event.key !== 'restaurant_bookings' && event.key !== 'restaurant_reception_queue') {
+        return
+      }
+
+      reloadBookings()
+    }
+
+    window.addEventListener('storage', handleStorage)
+    window.addEventListener(BOOKING_DATA_CHANGED_EVENT, reloadBookings)
+
+    return () => {
+      window.removeEventListener('storage', handleStorage)
+      window.removeEventListener(BOOKING_DATA_CHANGED_EVENT, reloadBookings)
+    }
+  }, [getHostBookings])
 
   const stats = useMemo(() => getHostStats(bookings), [bookings, getHostStats])
 
