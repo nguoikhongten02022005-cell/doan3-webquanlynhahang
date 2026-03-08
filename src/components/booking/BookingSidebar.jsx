@@ -3,7 +3,6 @@ import { BOOKING_SIDEBAR_CONTENT } from '../../constants/bookingUi'
 
 function BookingSidebar({
   bookingSelectionSummary,
-  nextStepHint,
   onPrimaryAction,
   onSecondaryAction,
   primaryActionForm,
@@ -19,11 +18,8 @@ function BookingSidebar({
   return (
     <aside className="booking-sidebar-premium">
       <div className="booking-stepper-card booking-stepper-card-compact">
-        <div className="booking-side-card-head">
-          <div>
-            <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.progressTitle}</p>
-            <h3>Đi nhanh theo từng bước</h3>
-          </div>
+        <div className="booking-side-card-head booking-side-card-head-tight">
+          <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.progressTitle}</p>
           <span className="booking-progress-pill">Bước {step}/3</span>
         </div>
 
@@ -75,11 +71,6 @@ function BookingSidebar({
           </div>
         </div>
 
-        <div className="booking-next-step-callout">
-          <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.nextStepTitle}</p>
-          <strong>{nextStepHint}</strong>
-        </div>
-
         {submitError && <p className="form-error booking-rail-error" role="alert">{submitError}</p>}
 
         <div className="booking-rail-actions">
@@ -100,9 +91,15 @@ function BookingSidebar({
         </div>
       </div>
 
-      <div className="booking-side-card booking-side-card-dark">
-        <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.hoursTitle}</p>
-        <div className="booking-side-hours">
+      <div className="booking-side-card booking-side-card-dark booking-side-service-card">
+        <div className="booking-side-service-topline">
+          <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.quickContactTitle}</p>
+          <p className="booking-side-service-hotline">
+            📞 <a href={serviceHotlineLink}>{serviceHotline}</a>
+          </p>
+        </div>
+
+        <div className="booking-side-hours booking-side-hours-compact">
           {BOOKING_SIDEBAR_CONTENT.hours.map((item) => (
             <div key={item.label}>
               <strong>{item.label}</strong>
@@ -110,14 +107,8 @@ function BookingSidebar({
             </div>
           ))}
         </div>
-      </div>
 
-      <div className="booking-side-card booking-side-contact-card">
-        <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.quickContactTitle}</p>
-        <div className="booking-side-contact">
-          <p>
-            📞 <a href={serviceHotlineLink}>{serviceHotline}</a>
-          </p>
+        <div className="booking-side-contact booking-side-contact-compact">
           {BOOKING_SIDEBAR_CONTENT.contacts.map((item) => <p key={item}>{item}</p>)}
         </div>
       </div>

@@ -14,7 +14,6 @@ function BookingStepOne({
   handlers,
   inlineErrors,
   invalidPastDate,
-  nextStepHint,
   selectedMealDurationText,
   selectedSeatOperationalNote,
   bookingOperationalRules,
@@ -23,11 +22,6 @@ function BookingStepOne({
 }) {
   return (
     <div className="booking-step booking-step-premium booking-step-progressive">
-      <div className="booking-step-guidance">
-        <p className="booking-side-kicker">Luồng đặt bàn nhanh</p>
-        <strong>{nextStepHint}</strong>
-      </div>
-
       <div className={`booking-flow-section ${activeBookingSection === 'guests' ? 'is-active' : ''}`}>
         <BookingGuestSelector
           formData={formData}
@@ -42,6 +36,7 @@ function BookingStepOne({
       <div className={`booking-flow-section ${activeBookingSection === 'date' ? 'is-active' : ''} ${stepOneProgress.hasGuests ? '' : 'is-locked'}`}>
         <BookingDateSection
           calendarContainerRef={calendar.calendarContainerRef}
+          dateSectionRef={calendar.dateSectionRef}
           calendarDays={calendar.calendarDays}
           calendarFocusedDate={calendar.calendarFocusedDate}
           calendarOpen={calendar.calendarOpen}
@@ -66,7 +61,7 @@ function BookingStepOne({
         />
       </div>
 
-      <div className={`booking-flow-section ${activeBookingSection === 'time' ? 'is-active' : ''} ${stepOneProgress.hasDate ? '' : 'is-locked'}`}>
+      <div className={`booking-flow-section ${activeBookingSection === 'time' ? 'is-active' : ''} ${stepOneProgress.hasDate ? '' : 'is-locked'} ${stepOneProgress.hasDate ? '' : 'is-waiting'}`}>
         <BookingSlotPicker
           availabilityPanelRef={availability.availabilityPanelRef}
           firstAvailableSlotRef={availability.firstAvailableSlotRef}

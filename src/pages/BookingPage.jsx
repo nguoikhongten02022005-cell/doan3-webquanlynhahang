@@ -20,6 +20,7 @@ function BookingPage() {
     activeBookingSection,
     availabilityPanelRef,
     bookingCode,
+    dateSectionRef,
     bookingOperationalRules,
     bookingSelectionSummary,
     bookingStatus,
@@ -84,7 +85,7 @@ function BookingPage() {
 
   return (
     <div className="booking-page">
-      <section className="booking-hero booking-hero-premium">
+      <section className="booking-hero booking-hero-premium booking-hero-premium-tight">
         <div className="container booking-hero-shell booking-hero-shell-compact">
           <div className="booking-hero-copy booking-hero-copy-compact">
             <span className="booking-label">{BOOKING_HERO_CONTENT.label}</span>
@@ -105,7 +106,6 @@ function BookingPage() {
           <div className="booking-layout-premium">
             <BookingSidebar
               bookingSelectionSummary={bookingSelectionSummary}
-              nextStepHint={nextStepHint}
               onPrimaryAction={primaryAction}
               onSecondaryAction={secondaryAction}
               primaryActionForm={step === 3 ? 'booking-form' : undefined}
@@ -168,6 +168,7 @@ function BookingPage() {
                       }}
                       calendar={{
                         calendarContainerRef,
+                        dateSectionRef,
                         calendarDays,
                         calendarFocusedDate,
                         calendarOpen,
@@ -198,7 +199,6 @@ function BookingPage() {
                       }}
                       inlineErrors={inlineErrors}
                       invalidPastDate={invalidPastDate}
-                      nextStepHint={nextStepHint}
                       selectedMealDurationText={selectedMealDurationText}
                       selectedSeatOperationalNote={selectedSeatOperationalNote}
                       serviceHotlineLink={SITE_CONTACT.phoneHref}

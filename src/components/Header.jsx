@@ -71,27 +71,28 @@ function Header() {
         </nav>
 
         <div className="header-actions">
-          <Link to="/profile" className="icon-btn profile-btn" aria-label="Hồ sơ cá nhân" onClick={handleNavLinkClick}>
+          <Link to="/booking" className="icon-btn action-btn booking-btn" aria-label="Đặt bàn" data-tooltip="Đặt bàn" onClick={handleNavLinkClick}>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.7" />
-              <path d="M6 19.2c0-3.1 2.7-5 6-5s6 1.9 6 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+              <rect x="4.5" y="6" width="15" height="13.5" rx="2.2" stroke="currentColor" strokeWidth="1.7" />
+              <path d="M8 4.5v3M16 4.5v3M4.5 10.5h15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
             </svg>
           </Link>
 
-          <Link to="/cart" className="icon-btn cart-btn" aria-label="Giỏ hàng" onClick={handleNavLinkClick}>
+          <Link to="/cart" className="icon-btn action-btn cart-btn" aria-label="Giỏ hàng" data-tooltip="Giỏ hàng" onClick={handleNavLinkClick}>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 5h2l2.2 9.2a1 1 0 0 0 1 .8h7.9a1 1 0 0 0 1-.8L20 8H8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="10" cy="19" r="1.3" fill="currentColor" />
               <circle cx="17" cy="19" r="1.3" fill="currentColor" />
             </svg>
-            <span className="cart-count">{cartCount > 99 ? '99+' : cartCount}</span>
+            {cartCount > 0 ? <span className="cart-count">{cartCount > 99 ? '99+' : cartCount}</span> : null}
           </Link>
 
           <div className="user-menu-wrap desktop-only">
             <button
               type="button"
-              className="icon-btn"
-              aria-label="Tài khoản"
+              className="icon-btn action-btn"
+              aria-label={currentUser ? 'Tài khoản' : 'Đăng nhập'}
+              data-tooltip={currentUser ? 'Tài khoản' : 'Đăng nhập'}
               onClick={handleToggleUserMenu}
             >
               <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

@@ -3,9 +3,9 @@ import { SITE_CONTACT } from './siteContact'
 export const BOOKING_HERO_CONTENT = {
   label: 'Đặt bàn trực tuyến',
   title: 'Chọn bàn thật nhanh',
-  subtitle: 'Chọn số khách, ngày và giờ để kiểm tra bàn trống và hoàn tất yêu cầu ngay trên một màn hình.',
+  subtitle: 'Chọn số khách, ngày và giờ để chốt bàn trống ngay trong một flow ngắn gọn.',
   noteLabel: 'Phục vụ đặt online',
-  noteText: 'Nhóm 10 khách vẫn có thể đặt online. Nhóm trên 10 khách vui lòng gọi hotline để được hỗ trợ.',
+  noteText: 'Nhóm trên 10 khách vui lòng gọi hotline để được hỗ trợ nhanh hơn.',
 }
 
 export const BOOKING_DRAFT_BANNER = {

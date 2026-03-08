@@ -63,11 +63,11 @@ export const useBookingCalendar = ({ selectedDate, onDateSelect }) => {
       }
     }
 
-    document.addEventListener('mousedown', handlePointerDownOutside)
+    document.addEventListener('pointerdown', handlePointerDownOutside)
     document.addEventListener('keydown', handleEscapeKey)
 
     return () => {
-      document.removeEventListener('mousedown', handlePointerDownOutside)
+      document.removeEventListener('pointerdown', handlePointerDownOutside)
       document.removeEventListener('keydown', handleEscapeKey)
     }
   }, [calendarOpen])

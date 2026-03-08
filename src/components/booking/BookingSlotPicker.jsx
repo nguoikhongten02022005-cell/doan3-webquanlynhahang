@@ -31,9 +31,15 @@ function BookingSlotPicker({
       </div>
 
       {!formData.guests ? (
-        <div className="timeslot-placeholder booking-placeholder-large"><span className="placeholder-icon">🕐</span><span>Chọn số khách để xem giờ trống.</span></div>
+        <div className="booking-slot-awaiting-card" aria-live="polite">
+          <span className="booking-slot-awaiting-kicker">Sẵn sàng khi bạn bắt đầu</span>
+          <strong>Chọn số khách trước để xem giờ trống.</strong>
+        </div>
       ) : !formData.date ? (
-        <div className="timeslot-placeholder booking-placeholder-large"><span className="placeholder-icon">🕐</span><span>Chọn ngày dùng bữa để xem giờ trống.</span></div>
+        <div className="booking-slot-awaiting-card" aria-live="polite">
+          <span className="booking-slot-awaiting-kicker">Bước tiếp theo</span>
+          <strong>Chọn ngày dùng bữa để mở danh sách khung giờ.</strong>
+        </div>
       ) : slotsLoading ? (
         <div className="timeslot-loading booking-placeholder-large"><div className="slot-loading-spinner" /><span>Đang kiểm tra khung giờ trống...</span></div>
       ) : invalidPastDate ? (

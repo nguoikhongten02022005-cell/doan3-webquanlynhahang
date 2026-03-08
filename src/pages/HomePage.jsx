@@ -223,11 +223,23 @@ function HomePage() {
 
           <div className="hero-showcase" aria-hidden="true">
             <article className="hero-card">
-              <span className="hero-tag">Signature</span>
-              <div className="hero-art" />
+              <span className="hero-tag">Signature Plate</span>
+              <div className="hero-art">
+                <div className="hero-plate">
+                  <span className="hero-food hero-food--protein" />
+                  <span className="hero-food hero-food--glaze" />
+                  <span className="hero-food hero-food--puree" />
+                  <span className="hero-food hero-food--greens" />
+                  <span className="hero-food hero-food--accent" />
+                </div>
+                <div className="hero-art-note">
+                  <strong>Bò nướng tảng</strong>
+                  <span>Sốt tiêu xanh · Khoai mịn · Rau nướng</span>
+                </div>
+              </div>
               <div className="hero-card-meta">
-                <h3>Set tối Chef&apos;s Choice</h3>
-                <p>Khai vị · Món chính · Tráng miệng</p>
+                <h3>Chef&apos;s signature cho buổi tối</h3>
+                <p>Thịt nướng mọng vị, hoàn thiện cùng sốt đậm đà và phần ăn được plating chỉn chu.</p>
               </div>
             </article>
           </div>
@@ -262,7 +274,7 @@ function HomePage() {
 
           <div className="food-grid">
             {signatureDishes.map((dish) => (
-              <FoodCard key={dish.id} dish={dish} onAddToCart={handleAddToCart} onOpenDetail={openDetailModal} />
+              <FoodCard key={dish.id} dish={dish} onAddToCart={handleAddToCart} onOpenDetail={openDetailModal} variant="menu" />
             ))}
           </div>
         </div>
@@ -356,7 +368,7 @@ function HomePage() {
             <p>Chọn khung giờ đẹp và chúng tôi sẽ chuẩn bị bàn trước khi bạn đến.</p>
           </div>
           <Link className="btn btn-light" to="/booking">
-            Đặt Bàn Khung Giờ Đẹp
+            Đặt Bàn Cho Tối Nay
           </Link>
         </div>
       </section>

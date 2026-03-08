@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { BOOKING_SEATING_AREAS } from '../data/bookingData'
 import {
   CLOSED_DATE_HINT,
@@ -18,6 +18,7 @@ import { useBookingSubmission } from './useBookingSubmission'
 export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft }) => {
   const [step, setStep] = useState(1)
   const [draftRestored, setDraftRestored] = useState(false)
+  const dateSectionRef = useRef(null)
   const [formData, setFormData] = useState(() => {
     const draftData = getDraft()
 
@@ -189,7 +190,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
 
   const nextStepHint = useMemo(() => {
     if (step === 1) {
-      if (!stepOneProgress.hasGuests) return 'Chọn số khách để bắt đầu xem bàn trống.'
+      if (!stepOneProgress.hasGuests) return 'Chọn số khách để bắt đầu.'
       if (isLargeGroupHotlineOnly(guestCount)) return LARGE_GROUP_HOTLINE_MESSAGE
       if (!stepOneProgress.hasDate) return 'Chọn ngày dùng bữa để mở danh sách khung giờ phục vụ.'
       if (!stepOneProgress.hasTime) return 'Chọn khung giờ phù hợp trước khi tiếp tục.'
@@ -247,6 +248,10 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
         time: '',
         seatingArea: selectedArea && normalizedValue > selectedArea.maxGuests ? 'KHONG_UU_TIEN' : prev.seatingArea,
       }
+    })
+
+    window.requestAnimationFrame(() => {
+      dateSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' })
     })
   }
 
@@ -349,6 +354,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
   return {
     availabilityPanelRef,
     calendarContainerRef,
+    dateSectionRef,
     calendarDays,
     calendarFocusedDate,
     calendarOpen,

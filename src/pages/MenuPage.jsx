@@ -7,6 +7,7 @@ import { parsePriceToNumber } from '../utils/price'
 function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('Tất cả')
+  const [sortOption, setSortOption] = useState('featured')
   const [selectedDish, setSelectedDish] = useState(null)
   const [isDetailOpen, setIsDetailOpen] = useState(false)
   const [selectedSize, setSelectedSize] = useState('M')
@@ -15,6 +16,20 @@ function MenuPage() {
   const { addToCart } = useCart()
 
   const categories = ['Tất cả', 'Món Chính', 'Khai Vị', 'Đồ Uống', 'Tráng Miệng', 'Combo']
+  const categoryDescriptions = {
+    'Tất cả': 'Toàn bộ thực đơn trong ngày',
+    'Món Chính': 'Các món no bụng và đậm vị',
+    'Khai Vị': 'Nhẹ nhàng để bắt đầu bữa ăn',
+    'Đồ Uống': 'Nước uống mát lạnh và cà phê',
+    'Tráng Miệng': 'Món ngọt kết thúc bữa ăn',
+    Combo: 'Set tiết kiệm cho nhóm và cặp đôi',
+  }
+  const sortOptions = [
+    { value: 'featured', label: 'Nổi bật' },
+    { value: 'price-asc', label: 'Giá tăng dần' },
+    { value: 'price-desc', label: 'Giá giảm dần' },
+    { value: 'newest', label: 'Mới trước' },
+  ]
   const toppingOptions = ['Thêm phô mai', 'Thêm trứng', 'Sốt đặc biệt']
   const sizeOptions = [
     { value: 'M', label: 'Size M', surcharge: 0 },
@@ -111,7 +126,8 @@ function MenuPage() {
       price: '385.000đ',
       category: 'Món Chính',
       badge: 'Best Seller',
-      tone: 'tone-red'
+      tone: 'tone-red',
+      image: '/images/menu/bo-bit-tet-uc.jpg'
     },
     {
       id: 2,
@@ -120,7 +136,8 @@ function MenuPage() {
       price: '295.000đ',
       category: 'Món Chính',
       badge: 'Healthy',
-      tone: 'tone-amber'
+      tone: 'tone-amber',
+      image: '/images/menu/ca-hoi-teriyaki.jpg'
     },
     {
       id: 3,
@@ -138,7 +155,8 @@ function MenuPage() {
       price: '165.000đ',
       category: 'Món Chính',
       badge: 'New',
-      tone: 'tone-cool'
+      tone: 'tone-cool',
+      image: '/images/menu/mi-y-hai-san.jpg'
     },
     {
       id: 5,
@@ -183,7 +201,8 @@ function MenuPage() {
       price: '55.000đ',
       category: 'Đồ Uống',
       badge: 'Signature',
-      tone: 'tone-amber'
+      tone: 'tone-amber',
+      image: '/images/menu/tra-dao-cam-sa.jpg'
     },
     {
       id: 10,
@@ -268,12 +287,32 @@ function MenuPage() {
     }
   ]
 
-  const filteredDishes = allMenuDishes.filter((dish) => {
-    const matchesCategory = activeCategory === 'Tất cả' || dish.category === activeCategory
-    const matchesSearch = dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                          dish.description.toLowerCase().includes(searchQuery.toLowerCase())
-    return matchesCategory && matchesSearch
-  })
+  const filteredDishes = allMenuDishes
+    .filter((dish) => {
+      const matchesCategory = activeCategory === 'Tất cả' || dish.category === activeCategory
+      const matchesSearch = dish.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                            dish.description.toLowerCase().includes(searchQuery.toLowerCase())
+      return matchesCategory && matchesSearch
+    })
+    .sort((firstDish, secondDish) => {
+      if (sortOption === 'price-asc') {
+        return parsePriceToNumber(firstDish.price) - parsePriceToNumber(secondDish.price)
+      }
+
+      if (sortOption === 'price-desc') {
+        return parsePriceToNumber(secondDish.price) - parsePriceToNumber(firstDish.price)
+      }
+
+      if (sortOption === 'newest') {
+        return secondDish.id - firstDish.id
+      }
+
+      return 0
+    })
+
+  const activeCategoryLabel = activeCategory === 'Tất cả' ? 'Tất cả danh mục' : activeCategory
+  const activeCategoryDescription = categoryDescriptions[activeCategory]
+  const searchLabel = searchQuery.trim() ? `· Từ khóa “${searchQuery.trim()}”` : ''
 
   const handleAddToCart = (dish) => {
     addToCart({
@@ -303,7 +342,10 @@ function MenuPage() {
             </div>
 
             <div className="menu-categories">
-              <h3 className="menu-categories-title">Danh mục</h3>
+              <div className="menu-sidebar-head">
+                <h3 className="menu-categories-title">Danh mục</h3>
+                <span className="menu-sidebar-count">{categories.length - 1} nhóm món</span>
+              </div>
               <div className="menu-category-list">
                 {categories.map((category) => (
                   <button
@@ -312,7 +354,8 @@ function MenuPage() {
                     className={`menu-category-btn ${activeCategory === category ? 'active' : ''}`}
                     onClick={() => setActiveCategory(category)}
                   >
-                    {category}
+                    <span>{category}</span>
+                    <small>{category === 'Tất cả' ? allMenuDishes.length : allMenuDishes.filter((dish) => dish.category === category).length}</small>
                   </button>
                 ))}
               </div>
@@ -320,6 +363,33 @@ function MenuPage() {
           </aside>
 
           <main className="menu-main">
+            <div className="menu-toolbar">
+              <div className="menu-toolbar-copy">
+                <p className="menu-toolbar-eyebrow">Đang duyệt menu</p>
+                <h1 className="menu-toolbar-title">{activeCategoryLabel}</h1>
+                <p className="menu-toolbar-summary">
+                  {filteredDishes.length} món {searchLabel}
+                </p>
+                <p className="menu-toolbar-description">{activeCategoryDescription}</p>
+              </div>
+
+              <label className="menu-sort" htmlFor="menu-sort-select">
+                <span>Sắp xếp</span>
+                <select
+                  id="menu-sort-select"
+                  className="menu-sort-select"
+                  value={sortOption}
+                  onChange={(event) => setSortOption(event.target.value)}
+                >
+                  {sortOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+            </div>
+
             {filteredDishes.length === 0 ? (
               <div className="menu-empty">
                 <p>Không tìm thấy món ăn phù hợp với tìm kiếm của bạn</p>
@@ -327,7 +397,13 @@ function MenuPage() {
             ) : (
               <div className="menu-grid">
                 {filteredDishes.map((dish) => (
-                  <FoodCard key={dish.id} dish={dish} onAddToCart={handleAddToCart} onOpenDetail={openDetailModal} />
+                  <FoodCard
+                    key={dish.id}
+                    dish={dish}
+                    variant="menu"
+                    onAddToCart={handleAddToCart}
+                    onOpenDetail={openDetailModal}
+                  />
                 ))}
               </div>
             )}

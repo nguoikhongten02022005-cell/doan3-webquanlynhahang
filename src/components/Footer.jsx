@@ -1,7 +1,24 @@
 import { Link } from 'react-router-dom'
 import { SITE_CONTACT } from '../constants/siteContact'
 
-function Footer() {
+function Footer({ compact = false }) {
+  if (compact) {
+    return (
+      <footer className="site-footer site-footer-compact" id="about">
+        <div className="container footer-compact-bar">
+          <Link to="/" className="brand footer-brand">
+            <span className="brand-mark">NH</span>
+            <span className="brand-name">Nhà Hàng Nguyên Vị</span>
+          </Link>
+          <div className="footer-compact-contact">
+            <a href={SITE_CONTACT.phoneHref}>{SITE_CONTACT.phoneDisplay}</a>
+            <span>{SITE_CONTACT.onlineOrderCutoff}</span>
+          </div>
+        </div>
+      </footer>
+    )
+  }
+
   return (
     <footer className="site-footer" id="about">
       <div className="container footer-grid">
