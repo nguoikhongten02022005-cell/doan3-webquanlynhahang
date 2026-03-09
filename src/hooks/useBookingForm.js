@@ -1,44 +1,73 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect } from 'react'
 import { BOOKING_SEATING_AREAS } from '../data/bookingData'
 import {
   CLOSED_DATE_HINT,
   LARGE_GROUP_GUEST_COUNT,
   LARGE_GROUP_HOTLINE_MESSAGE,
-  ONLINE_BOOKING_MAX_GUESTS,
   formatDateDisplay,
-  getLocalDateString,
-  getSeatSummaryText,
   isClosedDate,
   isLargeGroupHotlineOnly,
 } from '../utils/booking'
 import { useBookingAvailability } from './useBookingAvailability'
 import { useBookingCalendar } from './useBookingCalendar'
+import { useBookingFormState } from './useBookingFormState'
 import { useBookingSubmission } from './useBookingSubmission'
 
 export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft }) => {
-  const [step, setStep] = useState(1)
-  const [draftRestored, setDraftRestored] = useState(false)
-  const dateSectionRef = useRef(null)
-  const [formData, setFormData] = useState(() => {
-    const draftData = getDraft()
+  const {
+    activeBookingSection,
+    bookingSelectionSummary,
+    closedDate,
+    dateSectionRef,
+    draftRestored,
+    formData,
+    guestCount,
+    guestWarning,
+    invalidPastDate,
+    nextStepHint,
+    setDraftRestored,
+    setFormData,
+    setStep,
+    step,
+    stepOneProgress,
+    todayString,
+  } = useBookingFormState({ currentUser, getDraft })
 
-    return {
-      guests: String(draftData?.guests ?? ''),
-      date: String(draftData?.date ?? ''),
-      time: String(draftData?.time ?? ''),
-      seatingArea: String(draftData?.seatingArea ?? 'KHONG_UU_TIEN'),
-      occasion: String(draftData?.occasion ?? ''),
-      notes: String(draftData?.notes ?? ''),
-      name: String(draftData?.name ?? currentUser?.fullName ?? currentUser?.name ?? ''),
-      phone: String(draftData?.phone ?? currentUser?.phone ?? ''),
-      email: String(draftData?.email ?? currentUser?.email ?? ''),
-    }
-  })
+  const {
+    availabilityPanelRef,
+    bookingOperationalRules,
+    firstAvailableSlotRef,
+    firstAvailableSlotTime,
+    recommendedSlotTime,
+    requestFocusFirstSlot,
+    requestScrollToAvailability,
+    selectedMealDurationText,
+    selectedTimeSuggestions,
+    slotData,
+    slotGroups,
+    slotsLoading,
+  } = useBookingAvailability({ closedDate, formData, guestCount, invalidPastDate, isLargeGroupHotlineOnly })
 
-  const guestCount = Number(formData.guests) || 0
-  const todayString = useMemo(() => getLocalDateString(), [])
-  const invalidPastDate = Boolean(formData.date && formData.date < todayString)
-  const closedDate = Boolean(formData.date && isClosedDate(formData.date))
+  const {
+    bookingCode,
+    bookingStatus,
+    clearFieldError,
+    inlineErrors,
+    primaryCtaDisabled,
+    primaryCtaLabel,
+    selectedSeatOperationalNote,
+    setInlineErrors,
+    setSubmitError,
+    step1Complete,
+    step2Complete,
+    submitBooking,
+    submitError,
+    submitted,
+    successHeading,
+    successStatusLabel,
+    validateStepOne,
+    validateStepTwo,
+  } = useBookingSubmission({ createBooking, currentUser, formData, guestCount, invalidPastDate, closedDate, slotData, step })
 
   const {
     calendarContainerRef,
@@ -86,42 +115,6 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     },
   })
 
-  const {
-    availabilityPanelRef,
-    bookingOperationalRules,
-    firstAvailableSlotRef,
-    firstAvailableSlotTime,
-    recommendedSlotTime,
-    requestFocusFirstSlot,
-    requestScrollToAvailability,
-    selectedMealDurationText,
-    selectedTimeSuggestions,
-    slotData,
-    slotGroups,
-    slotsLoading,
-  } = useBookingAvailability({ closedDate, formData, guestCount, invalidPastDate, isLargeGroupHotlineOnly })
-
-  const {
-    bookingCode,
-    bookingStatus,
-    clearFieldError,
-    inlineErrors,
-    primaryCtaDisabled,
-    primaryCtaLabel,
-    selectedSeatOperationalNote,
-    setInlineErrors,
-    setSubmitError,
-    step1Complete,
-    step2Complete,
-    submitBooking,
-    submitError,
-    submitted,
-    successHeading,
-    successStatusLabel,
-    validateStepOne,
-    validateStepTwo,
-  } = useBookingSubmission({ createBooking, currentUser, formData, guestCount, invalidPastDate, closedDate, slotData, step })
-
   useEffect(() => {
     const draftData = getDraft()
     if (!draftData) return
@@ -131,7 +124,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     if (draftData?.guests && draftData?.date && draftData?.time) {
       setStep(2)
     }
-  }, [getDraft])
+  }, [getDraft, setDraftRestored, setStep])
 
   useEffect(() => {
     if (!formData.time || slotsLoading) return
@@ -148,7 +141,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
         : `Khung giờ ${formData.time} hiện không còn chỗ. Vui lòng chọn giờ khác.`,
     }))
     if (step > 1) setStep(1)
-  }, [formData.time, selectedTimeSuggestions, setInlineErrors, slotData, slotsLoading, step])
+  }, [formData.time, selectedTimeSuggestions, setFormData, setInlineErrors, setStep, slotData, slotsLoading, step])
 
   useEffect(() => {
     if (submitted) return
@@ -168,53 +161,8 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     })
   }, [formData, saveDraft, submitted])
 
-  const guestWarning = useMemo(() => {
-    if (guestCount === ONLINE_BOOKING_MAX_GUESTS) return 'Nhóm 10 khách có thể cần host gọi lại để xác nhận cách xếp bàn.'
-    if (guestCount >= 6) return 'Nhóm từ 6 khách nên đặt sớm để ưu tiên bàn phù hợp hơn.'
-    return ''
-  }, [guestCount])
-
-  const bookingSelectionSummary = useMemo(() => ({
-    guests: guestCount ? `${guestCount} khách` : 'Chưa chọn số khách',
-    date: formData.date ? formatDateDisplay(formData.date) : 'Chưa chọn ngày',
-    time: formData.time || 'Chưa chọn giờ',
-    seatingArea: formData.time ? getSeatSummaryText(formData.seatingArea) : 'Chưa chọn khu vực',
-  }), [formData.date, formData.seatingArea, formData.time, guestCount])
-
-  const stepOneProgress = useMemo(() => ({
-    hasGuests: Boolean(guestCount),
-    hasDate: Boolean(formData.date && !invalidPastDate && !closedDate),
-    hasTime: Boolean(formData.time),
-    hasSeating: Boolean(formData.time && formData.seatingArea),
-  }), [closedDate, formData.date, formData.seatingArea, formData.time, guestCount, invalidPastDate])
-
-  const nextStepHint = useMemo(() => {
-    if (step === 1) {
-      if (!stepOneProgress.hasGuests) return 'Chọn số khách để bắt đầu.'
-      if (isLargeGroupHotlineOnly(guestCount)) return LARGE_GROUP_HOTLINE_MESSAGE
-      if (!stepOneProgress.hasDate) return 'Chọn ngày dùng bữa để mở danh sách khung giờ phục vụ.'
-      if (!stepOneProgress.hasTime) return 'Chọn khung giờ phù hợp trước khi tiếp tục.'
-      return 'Bạn có thể tiếp tục sang bước nhập thông tin liên hệ.'
-    }
-
-    if (step === 2) {
-      if (!step2Complete) return 'Điền đủ họ tên và số điện thoại để tiếp tục xác nhận booking.'
-      return 'Kiểm tra lại thông tin và chuyển sang bước xác nhận cuối.'
-    }
-
-    return 'Kiểm tra lại toàn bộ thông tin rồi gửi yêu cầu đặt bàn.'
-  }, [guestCount, step, step2Complete, stepOneProgress])
-
-  const activeBookingSection = useMemo(() => {
-    if (!stepOneProgress.hasGuests) return 'guests'
-    if (!stepOneProgress.hasDate) return 'date'
-    if (!stepOneProgress.hasTime) return 'time'
-    if (!stepOneProgress.hasSeating) return 'seating'
-    return 'contact'
-  }, [stepOneProgress])
-
-  const handleChange = (e) => {
-    const { name, value } = e.target
+  const handleChange = (event) => {
+    const { name, value } = event.target
     setSubmitError('')
     clearFieldError(name)
 
@@ -279,8 +227,8 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     closeCalendar()
   }
 
-  const handleDateInputChange = (e) => {
-    handleDateSelect(e.target.value)
+  const handleDateInputChange = (event) => {
+    handleDateSelect(event.target.value)
   }
 
   const handleNoteSuggestion = (suggestion) => {
@@ -346,8 +294,8 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     goToStep(3)
   }
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = (event) => {
+    event?.preventDefault?.()
     submitBooking({ goToStep, saveDraft })
   }
 

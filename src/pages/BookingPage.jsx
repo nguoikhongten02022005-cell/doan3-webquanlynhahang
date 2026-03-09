@@ -81,7 +81,7 @@ function BookingPage() {
 
   const secondaryAction = step > 1 ? () => goToStep(step - 1) : null
   const secondaryActionLabel = step === 2 ? 'Quay lại bước chọn bàn' : step === 3 ? 'Quay lại chỉnh sửa' : ''
-  const primaryAction = step === 1 ? handleStepOneContinue : step === 2 ? handleStepTwoContinue : undefined
+  const primaryAction = step === 1 ? handleStepOneContinue : step === 2 ? handleStepTwoContinue : handleSubmit
 
   return (
     <div className="booking-page">
@@ -108,8 +108,7 @@ function BookingPage() {
               bookingSelectionSummary={bookingSelectionSummary}
               onPrimaryAction={primaryAction}
               onSecondaryAction={secondaryAction}
-              primaryActionForm={step === 3 ? 'booking-form' : undefined}
-              primaryActionType={step === 3 ? 'submit' : 'button'}
+              primaryActionType="button"
               primaryCtaDisabled={step === 3 ? false : primaryCtaDisabled}
               primaryCtaLabel={primaryCtaLabel}
               secondaryCtaLabel={secondaryActionLabel}
@@ -231,20 +230,14 @@ function BookingPage() {
                       <strong>{bookingSelectionSummary.guests}</strong>
                       <span>{bookingSelectionSummary.time}</span>
                     </div>
-                    {step === 3 ? (
-                      <button type="submit" className="booking-primary-btn booking-mobile-sticky-btn">
-                        {primaryCtaLabel}
-                      </button>
-                    ) : (
-                      <button
-                        type="button"
-                        className="booking-primary-btn booking-mobile-sticky-btn"
-                        onClick={primaryAction}
-                        disabled={primaryCtaDisabled}
-                      >
-                        {primaryCtaLabel}
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      className="booking-primary-btn booking-mobile-sticky-btn"
+                      onClick={primaryAction}
+                      disabled={step === 3 ? false : primaryCtaDisabled}
+                    >
+                      {primaryCtaLabel}
+                    </button>
                   </div>
                 </form>
               )}

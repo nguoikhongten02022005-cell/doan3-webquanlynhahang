@@ -1,13 +1,29 @@
-export const MENU_CATEGORIES = ['Tất cả', 'Món Chính', 'Khai Vị', 'Đồ Uống', 'Tráng Miệng', 'Combo']
+export const MENU_CATEGORIES = Object.freeze(['Tất cả', 'Món Chính', 'Khai Vị', 'Đồ Uống', 'Tráng Miệng', 'Combo'])
 
-export const MENU_TOPPING_OPTIONS = ['Thêm phô mai', 'Thêm trứng', 'Sốt đặc biệt']
+export const MENU_CATEGORY_DESCRIPTIONS = Object.freeze({
+  'Tất cả': 'Toàn bộ thực đơn trong ngày',
+  'Món Chính': 'Các món no bụng và đậm vị',
+  'Khai Vị': 'Nhẹ nhàng để bắt đầu bữa ăn',
+  'Đồ Uống': 'Nước uống mát lạnh và cà phê',
+  'Tráng Miệng': 'Món ngọt kết thúc bữa ăn',
+  Combo: 'Set tiết kiệm cho nhóm và cặp đôi',
+})
 
-export const MENU_SIZE_OPTIONS = [
+export const MENU_SORT_OPTIONS = Object.freeze([
+  { value: 'featured', label: 'Nổi bật' },
+  { value: 'price-asc', label: 'Giá tăng dần' },
+  { value: 'price-desc', label: 'Giá giảm dần' },
+  { value: 'newest', label: 'Mới trước' },
+])
+
+export const MENU_TOPPING_OPTIONS = Object.freeze(['Thêm phô mai', 'Thêm trứng', 'Sốt đặc biệt'])
+
+export const MENU_SIZE_OPTIONS = Object.freeze([
   { value: 'M', label: 'Size M', surcharge: 0 },
   { value: 'L', label: 'Size L', surcharge: 30000 },
-]
+])
 
-export const MENU_DISHES = [
+export const MENU_DISHES = Object.freeze([
   {
     id: 1,
     name: 'Bò Bít Tết Úc',
@@ -16,6 +32,7 @@ export const MENU_DISHES = [
     category: 'Món Chính',
     badge: 'Best Seller',
     tone: 'tone-red',
+    image: '/images/menu/bo-bit-tet-uc.jpg',
   },
   {
     id: 2,
@@ -25,6 +42,7 @@ export const MENU_DISHES = [
     category: 'Món Chính',
     badge: 'Healthy',
     tone: 'tone-amber',
+    image: '/images/menu/ca-hoi-teriyaki.jpg',
   },
   {
     id: 3,
@@ -43,6 +61,7 @@ export const MENU_DISHES = [
     category: 'Món Chính',
     badge: 'New',
     tone: 'tone-cool',
+    image: '/images/menu/mi-y-hai-san.jpg',
   },
   {
     id: 5,
@@ -88,6 +107,7 @@ export const MENU_DISHES = [
     category: 'Đồ Uống',
     badge: 'Signature',
     tone: 'tone-amber',
+    image: '/images/menu/tra-dao-cam-sa.jpg',
   },
   {
     id: 10,
@@ -170,17 +190,17 @@ export const MENU_DISHES = [
     badge: 'Value',
     tone: 'tone-cool',
   },
-]
+])
 
-export const HOME_CATEGORIES = [
+export const HOME_CATEGORIES = Object.freeze([
   { name: 'Món Chính', icon: '🍲' },
   { name: 'Khai Vị', icon: '🥗' },
   { name: 'Đồ Uống', icon: '🍹' },
   { name: 'Tráng Miệng', icon: '🍮' },
   { name: 'Combo', icon: '🍱' },
-]
+])
 
-export const HOME_SIGNATURE_DISHES = [
+export const HOME_SIGNATURE_DISHES = Object.freeze([
   {
     id: 1,
     name: 'Bò Nướng Tảng Sốt Tiêu Xanh',
@@ -245,4 +265,4 @@ export const HOME_SIGNATURE_DISHES = [
     badge: 'Mới',
     tone: 'tone-mint',
   },
-]
+])
