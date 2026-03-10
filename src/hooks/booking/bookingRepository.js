@@ -34,15 +34,9 @@ export const readQueueStatuses = () => {
   }
 }
 
-export const normalizeBookings = (bookings, queueStatusMap = readQueueStatuses()) => bookings
+export const normalizeBookings = (bookings) => bookings
   .map(normalizeBooking)
   .filter(Boolean)
-  .map((booking) => {
-    const queueStatus = queueStatusMap.get(booking.bookingCode)
-    return queueStatus && queueStatus !== booking.status
-      ? { ...booking, status: queueStatus }
-      : booking
-  })
 
 export const readAllBookings = () => {
   const parsed = getStorageJSON(STORAGE_KEYS.BOOKINGS, [])
