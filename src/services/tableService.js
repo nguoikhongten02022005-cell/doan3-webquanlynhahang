@@ -1,6 +1,6 @@
-import { STORAGE_KEYS } from '../constants/storageKeys'
-import { TABLE_AREAS } from '../pages/internalDashboard/constants'
-import { getStorageJSON, setStorageJSON } from './storageService'
+import { STORAGE_KEYS } from '../constants/storageKeys.js'
+import { TABLE_AREAS } from '../pages/internalDashboard/constants.js'
+import { getStorageJSON, setStorageJSON } from './storageService.js'
 
 export const TABLE_STATUSES = Object.freeze({
   AVAILABLE: 'AVAILABLE',
