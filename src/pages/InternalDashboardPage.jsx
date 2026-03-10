@@ -1,24 +1,30 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AccountsTab from '../components/internalDashboard/AccountsTab'
 import BookingsTab from '../components/internalDashboard/BookingsTab'
+import DishesTab from '../components/internalDashboard/DishesTab'
 import OrdersTab from '../components/internalDashboard/OrdersTab'
 import OverviewTab from '../components/internalDashboard/OverviewTab'
 import TablesTab from '../components/internalDashboard/TablesTab'
 import { STORAGE_KEYS } from '../constants/storageKeys'
 import { useAuth } from '../hooks/useAuth'
+import { useMenuDishes } from '../hooks/useMenuDishes'
 import { BOOKING_DATA_CHANGED_EVENT, useBooking } from '../hooks/useBooking'
 import { DAY_FILTERS, INTERNAL_TABS, SHIFT_FILTERS, ACTIVE_BOOKING_STATUSES, CONFIRMED_BOOKING_STATUSES } from './internalDashboard/constants'
 import { getAccounts } from '../services/authService'
+import { getTables, TABLE_STATUSES, updateTableStatus } from '../services/tableService'
 import {
   getAccountsSummary,
   getOrdersSummary,
   getOverviewScopeLabel,
+  getTableInventorySummary,
   getTableSummary,
+  getUnassignedBookings,
+  isCheckedInBooking,
+  isUpcomingSoonBooking,
   matchesDayFilter,
   matchesShiftFilter,
   needsManualConfirmation,
-  parseBookingDateTime,
   readOrders,
   sortBookingsForOperations,
   sortOrdersForOperations,
@@ -28,23 +34,41 @@ import { getOrderStatusTone } from './internalDashboard/formatters'
 function InternalDashboardPage() {
   const navigate = useNavigate()
   const { currentUser, isAdmin } = useAuth()
-  const { bookingStatusActions, getHostBookings, updateHostBookingStatus } = useBooking()
+  const {
+    assignBookingTables,
+    createInternalBooking,
+    getAvailableTablesForBooking,
+    getHostBookings,
+    setBookingCheckedIn,
+    setBookingCompleted,
+    setBookingNoShow,
+    updateInternalBooking,
+  } = useBooking()
   const [activeTab, setActiveTab] = useState('overview')
   const [dayFilter, setDayFilter] = useState('all')
   const [shiftFilter, setShiftFilter] = useState('all')
   const [bookings, setBookings] = useState(() => getHostBookings())
   const [orders, setOrders] = useState(() => readOrders())
   const [accounts, setAccounts] = useState(() => getAccounts())
+  const [tables, setTables] = useState(() => getTables())
+  const { dishes } = useMenuDishes()
+
+  const reloadData = useCallback(() => {
+    setBookings(getHostBookings())
+    setOrders(readOrders())
+    setAccounts(getAccounts())
+    setTables(getTables())
+  }, [getHostBookings])
 
   useEffect(() => {
-    const reloadData = () => {
-      setBookings(getHostBookings())
-      setOrders(readOrders())
-      setAccounts(getAccounts())
-    }
-
     const handleStorage = (event) => {
-      if (!event.key || [STORAGE_KEYS.BOOKINGS, STORAGE_KEYS.RECEPTION_QUEUE, STORAGE_KEYS.ORDERS, STORAGE_KEYS.ACCOUNTS].includes(event.key)) {
+      if (!event.key || [
+        STORAGE_KEYS.BOOKINGS,
+        STORAGE_KEYS.RECEPTION_QUEUE,
+        STORAGE_KEYS.ORDERS,
+        STORAGE_KEYS.ACCOUNTS,
+        STORAGE_KEYS.TABLES,
+      ].includes(event.key)) {
         reloadData()
       }
     }
@@ -56,10 +80,10 @@ function InternalDashboardPage() {
       window.removeEventListener('storage', handleStorage)
       window.removeEventListener(BOOKING_DATA_CHANGED_EVENT, reloadData)
     }
-  }, [getHostBookings])
+  }, [reloadData])
 
   useEffect(() => {
-    if (!isAdmin && activeTab === 'accounts') {
+    if (!isAdmin && (activeTab === 'accounts' || activeTab === 'dishes')) {
       setActiveTab('overview')
     }
   }, [activeTab, isAdmin])
@@ -91,23 +115,15 @@ function InternalDashboardPage() {
   )
   const upcomingSoonBookings = useMemo(() => {
     const now = new Date()
-    return activeBookings.filter((booking) => {
-      const bookingTime = parseBookingDateTime(booking.date, booking.time)
-      if (!bookingTime) return false
-
-      const diff = bookingTime.getTime() - now.getTime()
-      return diff >= 0 && diff <= 2 * 60 * 60 * 1000
-    })
+    return activeBookings.filter((booking) => isUpcomingSoonBooking(booking, now))
   }, [activeBookings])
   const checkedInBookings = useMemo(
-    () => filteredBookings.filter((booking) => booking.status === 'DA_HOAN_THANH').length,
+    () => filteredBookings.filter((booking) => isCheckedInBooking(booking)).length,
     [filteredBookings],
   )
-  const tableSummary = useMemo(() => getTableSummary(filteredBookings), [filteredBookings])
-  const busyAreas = useMemo(
-    () => tableSummary.filter((area) => area.occupancyRate >= 0.75),
-    [tableSummary],
-  )
+  const tableSummary = useMemo(() => getTableSummary(tables), [tables])
+  const tableInventorySummary = useMemo(() => getTableInventorySummary(tables), [tables])
+  const unassignedBookings = useMemo(() => getUnassignedBookings(activeBookings), [activeBookings])
   const ordersSummary = useMemo(() => getOrdersSummary(orders), [orders])
   const openOrders = useMemo(
     () => sortOrdersForOperations(orders).filter((order) => getOrderStatusTone(order.status) === 'warning'),
@@ -127,6 +143,14 @@ function InternalDashboardPage() {
         action: () => setActiveTab('bookings'),
       },
       {
+        key: 'unassigned-bookings',
+        title: 'Chưa gán bàn',
+        value: unassignedBookings.length,
+        detail: unassignedBookings.length > 0 ? 'Cần phân bàn trước giờ khách đến.' : 'Các booking đang có bàn phù hợp.',
+        tone: unassignedBookings.length > 0 ? 'danger' : 'neutral',
+        action: () => setActiveTab('bookings'),
+      },
+      {
         key: 'arriving-soon',
         title: 'Khách sắp đến 2 giờ',
         value: upcomingSoonBookings.length,
@@ -135,38 +159,71 @@ function InternalDashboardPage() {
         action: () => setActiveTab('bookings'),
       },
       {
-        key: 'open-orders',
-        title: 'Đơn đang xử lý',
-        value: openOrders.length,
-        detail: openOrders.length > 0 ? 'Theo dõi đơn mới, đơn chờ bếp hoặc chờ thanh toán.' : 'Không có đơn mở cần theo dõi.',
-        tone: openOrders.length > 0 ? 'warning' : 'neutral',
-        action: () => setActiveTab('orders'),
-      },
-      {
-        key: 'busy-tables',
-        title: 'Bàn sắp đầy',
-        value: busyAreas.length,
-        detail: busyAreas.length > 0 ? 'Cần phân bổ khách sang khu vực còn trống.' : 'Công suất bàn đang ổn định.',
-        tone: busyAreas.length > 0 ? 'danger' : 'neutral',
+        key: 'dirty-tables',
+        title: 'Bàn cần dọn',
+        value: tableInventorySummary.dirty,
+        detail: tableInventorySummary.dirty > 0 ? 'Cần làm sạch trước khi nhận lượt mới.' : 'Không có bàn đang dọn.',
+        tone: tableInventorySummary.dirty > 0 ? 'warning' : 'neutral',
         action: () => setActiveTab('tables'),
       },
     ],
-    [busyAreas.length, openOrders.length, pendingBookings.length, upcomingSoonBookings.length],
+    [pendingBookings.length, tableInventorySummary.dirty, unassignedBookings.length, upcomingSoonBookings.length],
   )
 
-  const operationalAlerts = pendingBookings.length + upcomingSoonBookings.length + busyAreas.length + openOrders.length
-  const compactTableSummary = tableSummary.slice(0, 4)
-
-  const handleUpdateStatus = (bookingId, nextStatus) => {
-    setBookings((currentBookings) => updateHostBookingStatus(currentBookings, bookingId, nextStatus))
-  }
+  const operationalAlerts = pendingBookings.length + unassignedBookings.length + upcomingSoonBookings.length + tableInventorySummary.dirty
 
   const handleCreateBooking = () => {
-    navigate('/booking')
+    setActiveTab('bookings')
   }
 
   const handleCreateOrder = () => {
     navigate('/menu')
+  }
+
+  const handleCreateInternalBooking = (payload) => {
+    const result = createInternalBooking(payload, currentUser)
+    if (result?.success) reloadData()
+    return result
+  }
+
+  const handleUpdateInternalBooking = (bookingId, payload) => {
+    const result = updateInternalBooking(bookingId, payload)
+    if (result?.success) reloadData()
+    return result
+  }
+
+  const handleAssignTables = (bookingId, tableIds) => {
+    const result = assignBookingTables(bookingId, tableIds)
+    if (result?.success) reloadData()
+    return result
+  }
+
+  const handleCheckIn = (bookingId) => {
+    const result = setBookingCheckedIn(bookingId)
+    if (result?.success) reloadData()
+    return result
+  }
+
+  const handleComplete = (bookingId) => {
+    const result = setBookingCompleted(bookingId)
+    if (result?.success) reloadData()
+    return result
+  }
+
+  const handleNoShow = (bookingId) => {
+    const result = setBookingNoShow(bookingId)
+    if (result?.success) reloadData()
+    return result
+  }
+
+  const handleMarkTableDirty = (tableId) => {
+    updateTableStatus(tableId, TABLE_STATUSES.DIRTY)
+    reloadData()
+  }
+
+  const handleMarkTableReady = (tableId) => {
+    updateTableStatus(tableId, TABLE_STATUSES.AVAILABLE)
+    reloadData()
   }
 
   return (
@@ -257,9 +314,7 @@ function InternalDashboardPage() {
                 accountsSummary={accountsSummary}
                 activeBookings={activeBookings}
                 bookingQueue={bookingQueue}
-                busyAreas={busyAreas}
                 checkedInBookings={checkedInBookings}
-                compactTableSummary={compactTableSummary}
                 confirmedBookings={confirmedBookings}
                 isAdmin={isAdmin}
                 openOrders={openOrders}
@@ -267,8 +322,10 @@ function InternalDashboardPage() {
                 ordersSummary={ordersSummary}
                 pendingBookings={pendingBookings}
                 scopeLabel={scopeLabel}
+                tableInventorySummary={tableInventorySummary}
                 tableSummary={tableSummary}
                 upcomingSoonBookings={upcomingSoonBookings}
+                unassignedBookings={unassignedBookings}
                 urgentItems={urgentItems}
               />
             )}
@@ -276,8 +333,13 @@ function InternalDashboardPage() {
             {activeTab === 'bookings' && (
               <BookingsTab
                 bookingQueue={bookingQueue}
-                bookingStatusActions={bookingStatusActions}
-                handleUpdateStatus={handleUpdateStatus}
+                getAvailableTablesForBooking={getAvailableTablesForBooking}
+                handleAssignTables={handleAssignTables}
+                handleCheckIn={handleCheckIn}
+                handleComplete={handleComplete}
+                handleCreateInternalBooking={handleCreateInternalBooking}
+                handleNoShow={handleNoShow}
+                handleUpdateInternalBooking={handleUpdateInternalBooking}
                 scopeLabel={scopeLabel}
               />
             )}
@@ -287,7 +349,18 @@ function InternalDashboardPage() {
             )}
 
             {activeTab === 'tables' && (
-              <TablesTab scopeLabel={scopeLabel} tableSummary={tableSummary} />
+              <TablesTab
+                handleMarkTableDirty={handleMarkTableDirty}
+                handleMarkTableReady={handleMarkTableReady}
+                scopeLabel={scopeLabel}
+                tableInventorySummary={tableInventorySummary}
+                tableSummary={tableSummary}
+                tables={tables}
+              />
+            )}
+
+            {activeTab === 'dishes' && isAdmin && (
+              <DishesTab dishes={dishes} />
             )}
 
             {activeTab === 'accounts' && isAdmin && (

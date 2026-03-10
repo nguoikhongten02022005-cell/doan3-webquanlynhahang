@@ -79,8 +79,28 @@ export const HOST_BOOKING_STATUS_LABELS = {
   TU_CHOI_HET_CHO: 'Từ chối / hết chỗ',
   CHO_XAC_NHAN: 'Chờ xác nhận',
   DA_GHI_NHAN: 'Đã ghi nhận',
+  DA_CHECK_IN: 'Đã check-in',
+  DA_XEP_BAN: 'Đã vào bàn',
   DA_HOAN_THANH: 'Đã hoàn thành',
   DA_HUY: 'Đã hủy',
+  KHONG_DEN: 'Không đến',
 }
 
-export const HOST_BOOKING_STATUS_ACTIONS = ['YEU_CAU_DAT_BAN', 'GIU_CHO_TAM', 'DA_XAC_NHAN', 'CAN_GOI_LAI', 'TU_CHOI_HET_CHO']
+export const HOST_BOOKING_STATUS_ACTIONS = [
+  'YEU_CAU_DAT_BAN',
+  'GIU_CHO_TAM',
+  'DA_XAC_NHAN',
+  'CAN_GOI_LAI',
+  'DA_CHECK_IN',
+  'DA_XEP_BAN',
+  'DA_HOAN_THANH',
+  'DA_HUY',
+  'KHONG_DEN',
+  'TU_CHOI_HET_CHO',
+]
+
+export const INTERNAL_BOOKING_CREATE_STATUSES = [
+  'CHO_XAC_NHAN',
+  'DA_XAC_NHAN',
+  'CAN_GOI_LAI',
+]

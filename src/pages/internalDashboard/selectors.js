@@ -1,4 +1,5 @@
 import { STORAGE_KEYS } from '../../constants/storageKeys'
+import { TABLE_STATUSES } from '../../services/tableService'
 import { getStorageJSON } from '../../services/storageService'
 import {
   ACTIVE_BOOKING_STATUSES,
@@ -16,9 +17,26 @@ export const needsManualConfirmation = (booking) => PENDING_CONFIRMATION_STATUSE
 export const getBookingPriorityNote = (booking) => {
   if (isVipBooking(booking)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc phòng riêng.'
   if (booking.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
+  if (!Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0) return 'Booking chưa được gán bàn cụ thể.'
   if (booking.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ban công.'
   return ''
 }
+
+const FINAL_BOOKING_STATUSES = new Set([
+  'DA_HOAN_THANH',
+  'DA_HUY',
+  'KHONG_DEN',
+  'TU_CHOI_HET_CHO',
+])
+
+export const hasAssignedTables = (booking) => Array.isArray(booking?.assignedTableIds) && booking.assignedTableIds.length > 0
+export const isCheckedInBooking = (booking) => booking.status === 'DA_CHECK_IN' || booking.status === 'DA_XEP_BAN'
+export const isFinalBookingStatus = (booking) => FINAL_BOOKING_STATUSES.has(booking?.status)
+
+export const canAssignBookingTables = (booking) => !isFinalBookingStatus(booking)
+export const canCheckInBooking = (booking) => hasAssignedTables(booking) && !isCheckedInBooking(booking) && !isFinalBookingStatus(booking)
+export const canCompleteBooking = (booking) => booking?.status === 'DA_CHECK_IN' || booking?.status === 'DA_XEP_BAN'
+export const canMarkBookingNoShow = (booking) => !isCheckedInBooking(booking) && !isFinalBookingStatus(booking)
 
 export const parseBookingDateTime = (date, time) => {
   if (!date) return null
@@ -67,6 +85,18 @@ export const matchesShiftFilter = (booking, shiftFilter) => {
   return true
 }
 
+export const matchesBookingSearch = (booking, searchQuery) => {
+  const normalizedQuery = String(searchQuery || '').trim().toLowerCase()
+  if (!normalizedQuery) return true
+
+  return [
+    booking.bookingCode,
+    booking.name,
+    booking.phone,
+    booking.email,
+  ].some((value) => String(value || '').toLowerCase().includes(normalizedQuery))
+}
+
 export const readOrders = () => {
   const rawOrders = getStorageJSON(STORAGE_KEYS.ORDERS, [])
   return Array.isArray(rawOrders) ? rawOrders : []
@@ -81,28 +111,57 @@ export const getOrdersSummary = (orders) => ({
   revenue: orders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0),
 })
 
-export const getTableSummary = (bookings) => {
-  const counts = bookings
-    .filter((booking) => ACTIVE_BOOKING_STATUSES.has(booking.status))
-    .reduce((accumulator, booking) => {
-      const area = booking.seatingArea || 'KHONG_UU_TIEN'
-      accumulator[area] = (accumulator[area] || 0) + 1
-      return accumulator
-    }, {})
+export const getTableSummary = (tables) => {
+  const counts = tables.reduce((accumulator, table) => {
+    const area = table.areaId || 'KHONG_UU_TIEN'
+
+    if (!accumulator[area]) {
+      accumulator[area] = {
+        occupied: 0,
+        dirty: 0,
+        held: 0,
+      }
+    }
+
+    if (table.status === TABLE_STATUSES.OCCUPIED) {
+      accumulator[area].occupied += 1
+    }
+
+    if (table.status === TABLE_STATUSES.HELD) {
+      accumulator[area].held += 1
+    }
+
+    if (table.status === TABLE_STATUSES.DIRTY) {
+      accumulator[area].dirty += 1
+    }
+
+    return accumulator
+  }, {})
 
   return TABLE_AREAS.map((area) => {
-    const occupied = counts[area.id] || 0
-    const available = Math.max(area.total - occupied, 0)
-    const occupancyRate = area.total > 0 ? occupied / area.total : 0
+    const areaCounts = counts[area.id] || { occupied: 0, dirty: 0, held: 0 }
+    const unavailable = areaCounts.occupied + areaCounts.held + areaCounts.dirty
+    const available = Math.max(area.total - unavailable, 0)
+    const occupancyRate = area.total > 0 ? unavailable / area.total : 0
 
     return {
       ...area,
-      occupied,
+      occupied: areaCounts.occupied,
+      held: areaCounts.held,
+      dirty: areaCounts.dirty,
       available,
       occupancyRate,
     }
   })
 }
+
+export const getTableInventorySummary = (tables) => ({
+  total: tables.length,
+  available: tables.filter((table) => table.status === TABLE_STATUSES.AVAILABLE).length,
+  held: tables.filter((table) => table.status === TABLE_STATUSES.HELD).length,
+  occupied: tables.filter((table) => table.status === TABLE_STATUSES.OCCUPIED).length,
+  dirty: tables.filter((table) => table.status === TABLE_STATUSES.DIRTY).length,
+})
 
 export const getAccountsSummary = (accounts) => ({
   total: accounts.length,
@@ -117,14 +176,34 @@ export const getOverviewScopeLabel = (dayFilter, shiftFilter) => {
   return `${dayLabel} · ${shiftLabel}`
 }
 
+export const isCompletedBooking = (booking) => booking.status === 'DA_HOAN_THANH'
+export const isUpcomingSoonBooking = (booking, now) => {
+  const bookingTime = parseBookingDateTime(booking.date, booking.time)
+  if (!bookingTime) return false
+
+  const diff = bookingTime.getTime() - now.getTime()
+  return diff >= 0 && diff <= 2 * 60 * 60 * 1000
+}
+
+export const getUnassignedBookings = (bookings) => bookings.filter((booking) => {
+  if (!ACTIVE_BOOKING_STATUSES.has(booking.status)) {
+    return false
+  }
+
+  return !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
+})
+
 export const getBookingPriorityRank = (booking, now) => {
   const bookingTime = parseBookingDateTime(booking.date, booking.time)
   const diff = bookingTime ? bookingTime.getTime() - now.getTime() : Number.POSITIVE_INFINITY
+  const hasAssignedTables = Array.isArray(booking.assignedTableIds) && booking.assignedTableIds.length > 0
 
   if (needsManualConfirmation(booking)) return 0
-  if (diff >= 0 && diff <= 2 * 60 * 60 * 1000) return 1
-  if (CONFIRMED_BOOKING_STATUSES.has(booking.status)) return 2
-  return 3
+  if (!hasAssignedTables && CONFIRMED_BOOKING_STATUSES.has(booking.status)) return 1
+  if (diff >= 0 && diff <= 2 * 60 * 60 * 1000) return 2
+  if (isCheckedInBooking(booking)) return 3
+  if (CONFIRMED_BOOKING_STATUSES.has(booking.status)) return 4
+  return 5
 }
 
 export const sortBookingsForOperations = (bookings, now) => [...bookings].sort((left, right) => {

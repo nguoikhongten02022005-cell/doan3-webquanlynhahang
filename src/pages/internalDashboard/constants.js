@@ -3,7 +3,8 @@ export const INTERNAL_TABS = Object.freeze([
   { key: 'bookings', label: 'Đặt bàn' },
   { key: 'orders', label: 'Đơn đang mở' },
   { key: 'tables', label: 'Bàn ăn' },
-  { key: 'accounts', label: 'Quản trị & phân quyền', adminOnly: true },
+  { key: 'dishes', label: 'Quản lý món ăn', adminOnly: true },
+  { key: 'accounts', label: 'Tài khoản', adminOnly: true },
 ])
 
 export const DAY_FILTERS = Object.freeze([
@@ -32,6 +33,8 @@ export const ACTIVE_BOOKING_STATUSES = new Set([
   'CAN_GOI_LAI',
   'CHO_XAC_NHAN',
   'DA_GHI_NHAN',
+  'DA_CHECK_IN',
+  'DA_XEP_BAN',
 ])
 
 export const PENDING_CONFIRMATION_STATUSES = new Set([
@@ -44,4 +47,6 @@ export const CONFIRMED_BOOKING_STATUSES = new Set([
   'GIU_CHO_TAM',
   'DA_XAC_NHAN',
   'DA_GHI_NHAN',
+  'DA_CHECK_IN',
+  'DA_XEP_BAN',
 ])

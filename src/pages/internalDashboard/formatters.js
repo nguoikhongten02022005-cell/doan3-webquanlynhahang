@@ -24,7 +24,8 @@ export const formatGuests = (guests) => `${guests} khách`
 export const getSeatingLabel = (value) => BOOKING_SEATING_LABELS[value] || value || 'Không ưu tiên'
 
 export const getBookingStatusTone = (status) => {
-  if (status === 'DA_HUY' || status === 'TU_CHOI_HET_CHO') return 'danger'
+  if (status === 'DA_HUY' || status === 'TU_CHOI_HET_CHO' || status === 'KHONG_DEN') return 'danger'
+  if (status === 'DA_CHECK_IN' || status === 'DA_XEP_BAN') return 'neutral'
   if (status === 'DA_XAC_NHAN' || status === 'DA_GHI_NHAN' || status === 'DA_HOAN_THANH' || status === 'GIU_CHO_TAM') return 'success'
   return 'warning'
 }

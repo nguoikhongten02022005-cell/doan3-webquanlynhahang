@@ -1,0 +1,14 @@
+{
+  "mcpServers": {
+    "oracle": {
+      "type": "stdio",
+      "command": "oracle-mcp",
+      "args": [],
+      "env": {
+        "ORACLE_ENGINE": "browser",
+        "ORACLE_HOME_DIR": "C:\\Users\\Moderator\\.oracle-local",
+        "ORACLE_BROWSER_PROFILE_DIR": "C:\\Users\\Moderator\\.oracle-local\\browser-profile"
+      }
+    }
+  }
+}

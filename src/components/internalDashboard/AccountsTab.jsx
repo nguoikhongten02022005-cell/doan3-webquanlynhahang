@@ -2,9 +2,11 @@ function AccountsTab({ accounts }) {
   return (
     <article className="profile-card">
       <div className="host-board-head">
-        <h2>Quản trị tài khoản và phân quyền</h2>
+        <h2>Danh sách tài khoản nội bộ</h2>
         <span>{accounts.length} tài khoản</span>
       </div>
+
+      <p className="host-booking-note">Màn này hiện chỉ dùng để xem nhanh tài khoản và vai trò nội bộ.</p>
 
       <div className="profile-list internal-list-top-gap">
         {accounts.map((account) => (

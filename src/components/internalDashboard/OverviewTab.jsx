@@ -13,9 +13,7 @@ import { getBookingPriorityNote } from '../../pages/internalDashboard/selectors'
 function OverviewTab({
   activeBookings,
   bookingQueue,
-  busyAreas,
   checkedInBookings,
-  compactTableSummary,
   confirmedBookings,
   isAdmin,
   openOrders,
@@ -24,7 +22,9 @@ function OverviewTab({
   pendingBookings,
   scopeLabel,
   tableSummary,
+  tableInventorySummary,
   upcomingSoonBookings,
+  unassignedBookings,
   urgentItems,
   accountsSummary,
 }) {
@@ -43,8 +43,8 @@ function OverviewTab({
         </article>
         <article className="host-stat-card internal-kpi-card">
           <span>Bàn đang phục vụ / giữ chỗ</span>
-          <strong>{tableSummary.reduce((sum, area) => sum + area.occupied, 0)}</strong>
-          <p>{busyAreas.length > 0 ? `${busyAreas.length} khu vực đang cao tải.` : 'Chưa có khu vực quá tải.'}</p>
+          <strong>{tableInventorySummary.occupied + tableInventorySummary.held}</strong>
+          <p>{tableInventorySummary.available} bàn còn sẵn sàng nhận khách.</p>
         </article>
         <article className="host-stat-card internal-kpi-card">
           <span>Đơn đang mở</span>
@@ -101,6 +101,11 @@ function OverviewTab({
                     <p><span>Thời gian</span><strong>{formatDateTime(booking.date, booking.time)}</strong></p>
                     <p><span>Khu vực</span><strong>{getSeatingLabel(booking.seatingArea)}</strong></p>
                   </div>
+                  <p className="internal-board-note">
+                    {booking.assignedTables?.length > 0
+                      ? `Bàn: ${booking.assignedTables.map((table) => table.code).join(', ')}`
+                      : 'Chưa gán bàn cụ thể.'}
+                  </p>
                   {(getBookingPriorityNote(booking) || booking.notes) && (
                     <p className="internal-board-note">{getBookingPriorityNote(booking) || booking.notes}</p>
                   )}
@@ -145,11 +150,11 @@ function OverviewTab({
         <article className="host-board-card internal-operations-card internal-table-pressure-card">
           <div className="host-board-head">
             <h2>Áp lực bàn ăn</h2>
-            <span>{busyAreas.length} khu vực cần chú ý</span>
+            <span>{tableInventorySummary.dirty + unassignedBookings.length} điểm cần chú ý</span>
           </div>
 
           <div className="internal-board-list internal-board-list-scroll">
-            {compactTableSummary.map((area) => (
+            {tableSummary.map((area) => (
               <article key={area.id} className="internal-board-item">
                 <div className="internal-board-item-top">
                   <strong>{area.name}</strong>
@@ -158,7 +163,7 @@ function OverviewTab({
                   </span>
                 </div>
                 <p className="internal-board-note">
-                  {area.occupied} bàn đang phục vụ hoặc được giữ chỗ.
+                  {area.occupied} đang phục vụ · {area.held} giữ chỗ · {area.dirty} đang dọn.
                 </p>
               </article>
             ))}
@@ -217,8 +222,8 @@ function OverviewTab({
                 <strong>{checkedInBookings}</strong>
               </div>
               <div className="internal-overview-item">
-                <span>Bàn sắp kín</span>
-                <strong>{busyAreas.length}</strong>
+                <span>Chưa gán bàn</span>
+                <strong>{unassignedBookings.length}</strong>
               </div>
             </div>
           </article>

@@ -5,16 +5,17 @@ import { useCart } from '../context/CartContext'
 import {
   MENU_CATEGORIES,
   MENU_CATEGORY_DESCRIPTIONS,
-  MENU_DISHES,
   MENU_SORT_OPTIONS,
 } from '../data/menuData'
 import { useFoodDetailModal } from '../hooks/useFoodDetailModal'
+import { useMenuDishes } from '../hooks/useMenuDishes'
 import { parsePriceToNumber } from '../utils/price'
 
 function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('')
   const [activeCategory, setActiveCategory] = useState('Tất cả')
   const [sortOption, setSortOption] = useState('featured')
+  const { dishes } = useMenuDishes()
   const { addToCart } = useCart()
   const {
     closeDetailModal,
@@ -33,8 +34,18 @@ function MenuPage() {
     specialNote,
   } = useFoodDetailModal({ addToCart })
 
+  const categoryCounts = useMemo(
+    () => MENU_CATEGORIES.reduce((counts, category) => {
+      counts[category] = category === 'Tất cả'
+        ? dishes.length
+        : dishes.filter((dish) => dish.category === category).length
+      return counts
+    }, {}),
+    [dishes],
+  )
+
   const filteredDishes = useMemo(
-    () => MENU_DISHES
+    () => dishes
       .filter((dish) => {
         const matchesCategory = activeCategory === 'Tất cả' || dish.category === activeCategory
         const normalizedQuery = searchQuery.toLowerCase()
@@ -57,7 +68,7 @@ function MenuPage() {
 
         return 0
       }),
-    [activeCategory, searchQuery, sortOption],
+    [activeCategory, dishes, searchQuery, sortOption],
   )
 
   const activeCategoryLabel = activeCategory === 'Tất cả' ? 'Tất cả danh mục' : activeCategory
@@ -93,7 +104,7 @@ function MenuPage() {
                     onClick={() => setActiveCategory(category)}
                   >
                     <span>{category}</span>
-                    <small>{category === 'Tất cả' ? MENU_DISHES.length : MENU_DISHES.filter((dish) => dish.category === category).length}</small>
+                    <small>{categoryCounts[category] ?? 0}</small>
                   </button>
                 ))}
               </div>
