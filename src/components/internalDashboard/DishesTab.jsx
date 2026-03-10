@@ -206,7 +206,7 @@ function DishesTab({ dishes }) {
       <article className="profile-card">
         <div className="host-board-head">
           <h2>{formMode === 'edit' ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}</h2>
-          <span>{formMode === 'edit' ? `Đang sửa #${editingDishId}` : 'CRUD menu qua localStorage'}</span>
+          <span>{formMode === 'edit' ? `Đang sửa #${editingDishId}` : 'Cập nhật dữ liệu menu cho bản demo nội bộ'}</span>
         </div>
 
         <form className="internal-dish-form" onSubmit={handleSubmit}>
