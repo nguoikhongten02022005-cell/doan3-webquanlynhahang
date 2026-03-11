@@ -5,6 +5,7 @@ import { formatCurrency } from '../utils/currency'
 import { getStorageJSON } from '../services/storageService'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
+import { canCancelBooking } from '../hooks/booking/bookingPolicies.js'
 
 const formatDate = (value) => {
   if (!value) {
@@ -58,13 +59,6 @@ const getStatusTone = (status) => {
 
   return 'neutral'
 }
-
-const canCancelBooking = (status) => (
-  status === 'CHO_XAC_NHAN'
-  || status === 'YEU_CAU_DAT_BAN'
-  || status === 'GIU_CHO_TAM'
-  || status === 'CAN_GOI_LAI'
-)
 
 function ProfilePage() {
   const { currentUser } = useAuth()
