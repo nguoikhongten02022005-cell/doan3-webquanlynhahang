@@ -133,12 +133,12 @@ function CheckoutPage() {
   }
 
   return (
-    <div className="checkout-page">
+    <div className="checkout-page checkout-page-editorial">
       <div className="container">
         <div className="checkout-header">
           <p className="checkout-kicker">Checkout</p>
           <h1>Thanh toán đơn hàng</h1>
-          <p>Kiểm tra thông tin giao hàng và hoàn tất thanh toán nhanh chóng.</p>
+          <p>Kiểm tra thông tin giao hàng, phương thức thanh toán và hoàn tất bàn ăn tối của bạn.</p>
         </div>
 
         <form className="checkout-layout" onSubmit={handleSubmit}>

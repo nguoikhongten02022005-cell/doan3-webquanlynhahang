@@ -118,11 +118,12 @@ function CartPage() {
   }
 
   return (
-    <div className="cart-page">
+    <div className="cart-page cart-page-editorial">
       <div className="container">
         <div className="cart-header">
+          <p className="checkout-kicker">Tableside basket</p>
           <h1>Giỏ hàng của bạn</h1>
-          <p>{cartItems.length} món</p>
+          <p>{cartItems.length} món đang chờ được hoàn tất cho bàn ăn tối nay.</p>
         </div>
 
         <div className="cart-layout">
@@ -137,14 +138,14 @@ function CartPage() {
             ) : (
               cartItems.map((item) => {
                 const itemKey = typeof getCartItemKey === 'function' ? getCartItemKey(item) : item.id
-                const optionLines =
-                  typeof getItemDisplayOptions === 'function' ? getItemDisplayOptions(item) : []
+                const optionLines = typeof getItemDisplayOptions === 'function' ? getItemDisplayOptions(item) : []
 
                 return (
                   <div key={itemKey} className="cart-item">
                     <div className="cart-item-image" style={{ background: item.image }}></div>
 
                     <div className="cart-item-info">
+                      <p className="cart-item-kicker">Selected dish</p>
                       <h3>{item.name}</h3>
                       <p className="cart-item-price">{formatCurrency(item.price)}</p>
                       {optionLines.length > 0 && (
@@ -196,7 +197,7 @@ function CartPage() {
           </div>
 
           <div className="cart-summary">
-            <div className="summary-card">
+            <div className="summary-card cart-summary-card">
               <h2>Tổng kết đơn</h2>
 
               <div className="voucher-block">

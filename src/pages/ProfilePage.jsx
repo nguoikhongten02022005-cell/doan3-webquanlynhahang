@@ -6,6 +6,13 @@ import { getStorageJSON } from '../services/storageService'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 
+const canCancelBooking = (status) => (
+  status === 'CHO_XAC_NHAN'
+  || status === 'YEU_CAU_DAT_BAN'
+  || status === 'GIU_CHO_TAM'
+  || status === 'CAN_GOI_LAI'
+)
+
 const formatDate = (value) => {
   if (!value) {
     return '--'
@@ -23,9 +30,9 @@ const getOrderTimelineStep = (status) => {
   const normalized = String(status || '').trim().toLowerCase()
 
   if (
-    normalized.includes('đã thanh toán') ||
-    normalized.includes('đã hoàn thành') ||
-    normalized.includes('hoàn tất')
+    normalized.includes('đã thanh toán')
+    || normalized.includes('đã hoàn thành')
+    || normalized.includes('hoàn tất')
   ) {
     return 4
   }
@@ -126,7 +133,7 @@ function ProfilePage() {
   }
 
   return (
-    <div className="profile-page">
+    <div className="profile-page profile-page-editorial">
       <div className="container">
         <header className="profile-header">
           <p className="profile-kicker">Tài khoản</p>
@@ -196,7 +203,7 @@ function ProfilePage() {
                       </div>
 
                       <div className="order-progress" aria-label={`Tiến trình đơn ${order.id}`}>
-                              {ORDER_TIMELINE_STEPS.map((stepLabel, index) => {
+                        {ORDER_TIMELINE_STEPS.map((stepLabel, index) => {
                           const stepNumber = index + 1
                           const isActive = order.timelineStep >= stepNumber
 
