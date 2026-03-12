@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '../constants/storageKeys'
-import { getStorageJSON, removeStorageItem, setStorageJSON } from './storageService'
+import { getStorageItem, getStorageJSON, removeStorageItem, setStorageItem, setStorageJSON } from './storageService'
 
 export const AUTH_USER_CHANGED_EVENT = 'auth:user-changed'
 export const AUTH_ROLES = Object.freeze({
@@ -8,24 +8,7 @@ export const AUTH_ROLES = Object.freeze({
   ADMIN: 'admin',
 })
 
-const DEFAULT_INTERNAL_ACCOUNTS = Object.freeze([
-  {
-    fullName: 'Quản trị nhà hàng',
-    username: 'admin',
-    email: 'admin@nguyenvi.local',
-    password: 'admin123',
-    role: AUTH_ROLES.ADMIN,
-  },
-  {
-    fullName: 'Nhân viên vận hành',
-    username: 'staff',
-    email: 'staff@nguyenvi.local',
-    password: 'staff123',
-    role: AUTH_ROLES.STAFF,
-  },
-])
-
-const dispatchAuthUserChanged = () => {
+const phatSuKienThayDoiNguoiDung = () => {
   if (typeof window === 'undefined') {
     return
   }
@@ -33,101 +16,84 @@ const dispatchAuthUserChanged = () => {
   window.dispatchEvent(new CustomEvent(AUTH_USER_CHANGED_EVENT))
 }
 
-const normalizeRole = (role) => {
-  if (role === AUTH_ROLES.ADMIN) return AUTH_ROLES.ADMIN
-  if (role === AUTH_ROLES.STAFF) return AUTH_ROLES.STAFF
+const chuanHoaVaiTro = (vaiTro) => {
+  if (vaiTro === AUTH_ROLES.ADMIN) return AUTH_ROLES.ADMIN
+  if (vaiTro === AUTH_ROLES.STAFF) return AUTH_ROLES.STAFF
   return AUTH_ROLES.CUSTOMER
 }
 
-const normalizeAccount = (account) => {
-  if (!account || typeof account !== 'object') {
+const chuanHoaNguoiDung = (nguoiDung) => {
+  if (!nguoiDung || typeof nguoiDung !== 'object') {
     return null
   }
 
   return {
-    ...account,
-    fullName: String(account.fullName ?? account.name ?? '').trim(),
-    username: String(account.username ?? '').trim(),
-    email: String(account.email ?? '').trim(),
-    role: normalizeRole(account.role),
+    ...nguoiDung,
+    fullName: String(nguoiDung.fullName ?? nguoiDung.name ?? '').trim(),
+    username: String(nguoiDung.username ?? '').trim(),
+    email: String(nguoiDung.email ?? '').trim(),
+    phone: String(nguoiDung.phone ?? '').trim(),
+    role: chuanHoaVaiTro(nguoiDung.role),
   }
 }
 
-const normalizeCurrentUser = (account) => {
-  const normalizedAccount = normalizeAccount(account)
+const chuanHoaNguoiDungHienTai = (nguoiDung) => {
+  const nguoiDungDaChuanHoa = chuanHoaNguoiDung(nguoiDung)
 
-  if (!normalizedAccount) {
+  if (!nguoiDungDaChuanHoa) {
     return null
   }
 
   return {
-    fullName: normalizedAccount.fullName,
-    username: normalizedAccount.username,
-    email: normalizedAccount.email,
-    role: normalizedAccount.role,
+    fullName: nguoiDungDaChuanHoa.fullName,
+    username: nguoiDungDaChuanHoa.username,
+    email: nguoiDungDaChuanHoa.email,
+    phone: nguoiDungDaChuanHoa.phone,
+    role: nguoiDungDaChuanHoa.role,
   }
 }
 
-const mergeAccounts = (accounts) => {
-  const mergedAccounts = [...DEFAULT_INTERNAL_ACCOUNTS, ...accounts]
-  const seenIdentifiers = new Set()
+export const getCurrentUser = () => chuanHoaNguoiDungHienTai(getStorageJSON(STORAGE_KEYS.CURRENT_USER, null))
 
-  return mergedAccounts.filter((account) => {
-    const normalizedAccount = normalizeAccount(account)
+export const saveCurrentUser = (nguoiDung) => {
+  const nguoiDungHienTai = chuanHoaNguoiDungHienTai(nguoiDung)
 
-    if (!normalizedAccount) {
-      return false
-    }
-
-    const accountKey = `${normalizedAccount.username.toLowerCase()}::${normalizedAccount.email.toLowerCase()}`
-    if (seenIdentifiers.has(accountKey)) {
-      return false
-    }
-
-    seenIdentifiers.add(accountKey)
-    return true
-  })
-}
-
-export const getAccounts = () => {
-  const accounts = getStorageJSON(STORAGE_KEYS.ACCOUNTS, [])
-  if (!Array.isArray(accounts)) {
-    return [...DEFAULT_INTERNAL_ACCOUNTS]
-  }
-
-  return mergeAccounts(accounts.map(normalizeAccount).filter(Boolean))
-}
-
-export const saveAccounts = (accounts) => {
-  const normalizedAccounts = Array.isArray(accounts) ? accounts.map(normalizeAccount).filter(Boolean) : []
-  setStorageJSON(STORAGE_KEYS.ACCOUNTS, mergeAccounts(normalizedAccounts))
-}
-
-export const getCurrentUser = () => normalizeCurrentUser(getStorageJSON(STORAGE_KEYS.CURRENT_USER, null))
-
-export const saveCurrentUser = (account) => {
-  const normalizedCurrentUser = normalizeCurrentUser(account)
-
-  if (!normalizedCurrentUser) {
+  if (!nguoiDungHienTai) {
     return
   }
 
-  setStorageJSON(STORAGE_KEYS.CURRENT_USER, normalizedCurrentUser)
-  dispatchAuthUserChanged()
+  setStorageJSON(STORAGE_KEYS.CURRENT_USER, nguoiDungHienTai)
+  phatSuKienThayDoiNguoiDung()
 }
 
 export const clearCurrentUser = () => {
   removeStorageItem(STORAGE_KEYS.CURRENT_USER)
-  dispatchAuthUserChanged()
+  phatSuKienThayDoiNguoiDung()
 }
 
-export const findAccountByIdentifier = (accounts, identifier) => {
-  const normalizedIdentifier = String(identifier || '').trim().toLowerCase()
+export const getAuthToken = () => {
+  const token = getStorageItem(STORAGE_KEYS.AUTH_TOKEN)
+  return typeof token === 'string' && token.trim() ? token : ''
+}
 
-  return accounts.find((account) => {
-    const username = String(account?.username ?? '').toLowerCase()
-    const email = String(account?.email ?? '').toLowerCase()
+export const saveAuthToken = (token) => {
+  if (!token || typeof token !== 'string') {
+    return
+  }
 
-    return username === normalizedIdentifier || email === normalizedIdentifier
-  })
+  setStorageItem(STORAGE_KEYS.AUTH_TOKEN, token)
+}
+
+export const clearAuthToken = () => {
+  removeStorageItem(STORAGE_KEYS.AUTH_TOKEN)
+}
+
+export const saveAuthSession = ({ user, accessToken }) => {
+  saveCurrentUser(user)
+  saveAuthToken(accessToken)
+}
+
+export const clearAuthSession = () => {
+  clearAuthToken()
+  clearCurrentUser()
 }

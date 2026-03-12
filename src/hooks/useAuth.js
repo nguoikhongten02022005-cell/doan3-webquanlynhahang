@@ -1,110 +1,165 @@
 import { useCallback, useEffect, useState } from 'react'
+import { getMeApi, internalLoginApi, loginApi, logoutApi, registerApi } from '../services/api/authApi'
+import { shouldUseBackend } from '../services/apiClient'
 import {
   AUTH_ROLES,
   AUTH_USER_CHANGED_EVENT,
-  clearCurrentUser,
-  findAccountByIdentifier,
-  getAccounts,
+  clearAuthSession,
   getCurrentUser,
-  saveAccounts,
+  saveAuthSession,
   saveCurrentUser,
 } from '../services/authService'
 
 export const useAuth = () => {
-  const [currentUser, setCurrentUser] = useState(() => getCurrentUser())
+  const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => getCurrentUser())
 
   useEffect(() => {
-    const syncCurrentUser = () => {
-      setCurrentUser(getCurrentUser())
+    const dongBoNguoiDungHienTai = () => {
+      setNguoiDungHienTai(getCurrentUser())
     }
 
-    const handleStorage = (event) => {
+    const dongBoNguoiDungTuBackend = async () => {
+      if (!shouldUseBackend()) {
+        clearAuthSession()
+        return
+      }
+
+      try {
+        const phanHoi = await getMeApi()
+        const nguoiDung = phanHoi?.currentUser || phanHoi?.user || phanHoi
+
+        if (nguoiDung) {
+          saveCurrentUser(nguoiDung)
+        }
+      } catch {
+        clearAuthSession()
+      }
+    }
+
+    const xuLyStorage = (event) => {
       if (event.key && event.key !== 'restaurant_current_user') {
         return
       }
 
-      syncCurrentUser()
+      dongBoNguoiDungHienTai()
     }
 
-    window.addEventListener('storage', handleStorage)
-    window.addEventListener(AUTH_USER_CHANGED_EVENT, syncCurrentUser)
+    window.addEventListener('storage', xuLyStorage)
+    window.addEventListener(AUTH_USER_CHANGED_EVENT, dongBoNguoiDungHienTai)
+    dongBoNguoiDungTuBackend()
 
     return () => {
-      window.removeEventListener('storage', handleStorage)
-      window.removeEventListener(AUTH_USER_CHANGED_EVENT, syncCurrentUser)
+      window.removeEventListener('storage', xuLyStorage)
+      window.removeEventListener(AUTH_USER_CHANGED_EVENT, dongBoNguoiDungHienTai)
     }
   }, [])
 
-  const login = useCallback((identifier, password) => {
-    const accounts = getAccounts()
-    const matchedAccount = findAccountByIdentifier(accounts, identifier)
-
-    if (!matchedAccount || matchedAccount.password !== password) {
+  const dangNhapBangApi = useCallback(async (hamDangNhap, identifier, password, thongDiepLoiMacDinh) => {
+    if (!shouldUseBackend()) {
       return {
         success: false,
-        error: 'Tên tài khoản/email hoặc mật khẩu không đúng.',
+        error: 'Ứng dụng hiện được cấu hình không dùng backend.',
       }
     }
 
-    saveCurrentUser(matchedAccount)
+    try {
+      const phanHoi = await hamDangNhap(identifier, password)
+      const nguoiDung = phanHoi?.currentUser || phanHoi?.user
 
-    return {
-      success: true,
-      user: matchedAccount,
+      saveAuthSession({
+        user: nguoiDung,
+        accessToken: phanHoi?.accessToken,
+      })
+
+      return {
+        success: true,
+        user: nguoiDung,
+      }
+    } catch (error) {
+      clearAuthSession()
+      return {
+        success: false,
+        error: error?.message || thongDiepLoiMacDinh,
+      }
     }
   }, [])
 
-  const register = useCallback((payload) => {
-    const normalizedUsername = payload.username.trim().toLowerCase()
-    const normalizedEmail = payload.email.trim().toLowerCase()
-    const accounts = getAccounts()
+  const login = useCallback((identifier, password) => dangNhapBangApi(
+    loginApi,
+    identifier,
+    password,
+    'Đăng nhập thất bại.',
+  ), [dangNhapBangApi])
 
-    const hasDuplicate = accounts.some((account) => {
-      const existedUsername = String(account.username ?? '').toLowerCase()
-      const existedEmail = String(account.email ?? '').toLowerCase()
-      return existedUsername === normalizedUsername || existedEmail === normalizedEmail
-    })
+  const internalLogin = useCallback((identifier, password) => dangNhapBangApi(
+    internalLoginApi,
+    identifier,
+    password,
+    'Đăng nhập nội bộ thất bại.',
+  ), [dangNhapBangApi])
 
-    if (hasDuplicate) {
+  const register = useCallback(async (payload) => {
+    if (!shouldUseBackend()) {
       return {
         success: false,
-        error: 'Tên tài khoản hoặc email đã tồn tại.',
+        error: 'Ứng dụng hiện được cấu hình không dùng backend.',
       }
     }
 
-    const newAccount = {
-      fullName: payload.fullName.trim(),
-      username: payload.username.trim(),
-      email: payload.email.trim(),
-      password: payload.password,
-      role: AUTH_ROLES.CUSTOMER,
-    }
+    try {
+      const phanHoi = await registerApi(payload)
+      const nguoiDung = phanHoi?.currentUser || phanHoi?.user
 
-    saveAccounts([...accounts, newAccount])
+      saveAuthSession({
+        user: nguoiDung,
+        accessToken: phanHoi?.accessToken,
+      })
 
-    return {
-      success: true,
-      user: newAccount,
+      return {
+        success: true,
+        user: nguoiDung,
+      }
+    } catch (error) {
+      clearAuthSession()
+      return {
+        success: false,
+        error: error?.message || 'Đăng ký thất bại.',
+      }
     }
   }, [])
 
-  const logout = useCallback(() => {
-    clearCurrentUser()
+  const logout = useCallback(async () => {
+    if (shouldUseBackend()) {
+      try {
+        await logoutApi()
+      } catch {
+        // no-op
+      }
+    }
+
+    clearAuthSession()
   }, [])
 
-  const role = currentUser?.role ?? AUTH_ROLES.CUSTOMER
-  const isAdmin = role === AUTH_ROLES.ADMIN
-  const isStaff = role === AUTH_ROLES.STAFF
-  const canAccessInternal = isAdmin || isStaff
+  const vaiTro = nguoiDungHienTai?.role ?? AUTH_ROLES.CUSTOMER
+  const laAdmin = vaiTro === AUTH_ROLES.ADMIN
+  const laNhanVien = vaiTro === AUTH_ROLES.STAFF
+  const coTheVaoNoiBo = laAdmin || laNhanVien
 
   return {
-    currentUser,
-    role,
-    isAdmin,
-    isStaff,
-    canAccessInternal,
-    isAuthenticated: Boolean(currentUser),
+    currentUser: nguoiDungHienTai,
+    nguoiDungHienTai,
+    role: vaiTro,
+    vaiTro,
+    isAdmin: laAdmin,
+    laAdmin,
+    isStaff: laNhanVien,
+    laNhanVien,
+    canAccessInternal: coTheVaoNoiBo,
+    coTheVaoNoiBo,
+    isAuthenticated: Boolean(nguoiDungHienTai),
+    daDangNhap: Boolean(nguoiDungHienTai),
     login,
+    internalLogin,
     register,
     logout,
   }

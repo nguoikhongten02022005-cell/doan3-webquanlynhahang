@@ -1,0 +1,32 @@
+export const openApiDocument = {
+  openapi: '3.0.3',
+  info: {
+    title: 'Restaurant Management Server API',
+    version: '1.0.0',
+  },
+  servers: [
+    { url: 'http://localhost:4000/api', description: 'Compatibility API' },
+    { url: 'http://localhost:4000/api/v1', description: 'Versioned API' },
+  ],
+  paths: {
+    '/health': { get: { summary: 'Health check', responses: { '200': { description: 'OK' } } } },
+    '/auth/login': { post: { summary: 'Customer login', responses: { '200': { description: 'Authenticated' } } } },
+    '/auth/internal-login': { post: { summary: 'Internal login', responses: { '200': { description: 'Authenticated' } } } },
+    '/auth/register': { post: { summary: 'Customer register', responses: { '201': { description: 'Created' } } } },
+    '/auth/me': { get: { summary: 'Current user', responses: { '200': { description: 'Current user' } } } },
+    '/auth/refresh': { post: { summary: 'Refresh access token', responses: { '200': { description: 'Refreshed' } } } },
+    '/auth/logout': { post: { summary: 'Logout', responses: { '200': { description: 'Logged out' } } } },
+    '/bookings': { get: { summary: 'List bookings' }, post: { summary: 'Create booking' } },
+    '/bookings/history': { get: { summary: 'Booking history' } },
+    '/orders': { get: { summary: 'List orders' }, post: { summary: 'Create order' } },
+    '/orders/me': { get: { summary: 'My orders' } },
+    '/menu-items': { get: { summary: 'List menu items' } },
+    '/tables': { get: { summary: 'List tables' } },
+    '/vouchers/{code}': { get: { summary: 'Get voucher by code' } },
+    '/vouchers/validate': { post: { summary: 'Validate voucher' } },
+    '/profile/me': { get: { summary: 'Profile me' } },
+    '/profile/orders': { get: { summary: 'Profile orders' } },
+    '/profile/bookings': { get: { summary: 'Profile bookings' } },
+    '/internal/dashboard/stats': { get: { summary: 'Internal dashboard stats' } },
+  },
+}

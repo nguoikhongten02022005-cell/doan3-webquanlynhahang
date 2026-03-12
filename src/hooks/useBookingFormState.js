@@ -1,4 +1,5 @@
 import { useMemo, useRef, useState } from 'react'
+import { AUTH_ROLES } from '../services/authService'
 import {
   LARGE_GROUP_HOTLINE_MESSAGE,
   ONLINE_BOOKING_MAX_GUESTS,
@@ -14,6 +15,7 @@ export const useBookingFormState = ({ currentUser, getDraft }) => {
   const [step, setStep] = useState(1)
   const [draftRestored, setDraftRestored] = useState(false)
   const dateSectionRef = useRef(null)
+  const customerIdentity = currentUser?.role === AUTH_ROLES.CUSTOMER ? currentUser : null
   const [formData, setFormData] = useState(() => {
     const draftData = getDraft()
 
@@ -24,9 +26,9 @@ export const useBookingFormState = ({ currentUser, getDraft }) => {
       seatingArea: String(draftData?.seatingArea ?? 'KHONG_UU_TIEN'),
       occasion: String(draftData?.occasion ?? ''),
       notes: String(draftData?.notes ?? ''),
-      name: String(draftData?.name ?? currentUser?.fullName ?? currentUser?.name ?? ''),
-      phone: String(draftData?.phone ?? currentUser?.phone ?? ''),
-      email: String(draftData?.email ?? currentUser?.email ?? ''),
+      name: String(draftData?.name ?? customerIdentity?.fullName ?? customerIdentity?.name ?? ''),
+      phone: String(draftData?.phone ?? customerIdentity?.phone ?? ''),
+      email: String(draftData?.email ?? customerIdentity?.email ?? ''),
     }
   })
 

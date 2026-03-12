@@ -1,15 +1,11 @@
 export const STORAGE_KEYS = Object.freeze({
   CART: 'restaurant_cart',
   CURRENT_USER: 'restaurant_current_user',
-  ACCOUNTS: 'restaurant_accounts',
+  AUTH_TOKEN: 'restaurant_auth_token',
   MENU_DISHES: 'restaurant_menu_dishes',
   MENU_DISHES_REVISION: 'restaurant_menu_dishes_revision',
-  TABLES: 'restaurant_tables',
   APPLIED_VOUCHER: 'restaurant_applied_voucher',
-  ORDERS: 'restaurant_orders',
-  BOOKINGS: 'restaurant_bookings',
   BOOKING_DRAFT: 'restaurant_booking_draft',
   CHECKOUT_DRAFT: 'restaurant_checkout_draft',
   LAST_BOOKING_CONFIRMATION: 'restaurant_last_booking_confirmation',
-  RECEPTION_QUEUE: 'restaurant_reception_queue',
 })

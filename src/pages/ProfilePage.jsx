@@ -1,10 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
-import { STORAGE_KEYS } from '../constants/storageKeys'
-import { FALLBACK_PROFILE, ORDER_TIMELINE_STEPS, PROFILE_TABS } from '../data/profileData'
+import { ORDER_TIMELINE_STEPS, PROFILE_TABS } from '../data/profileData'
 import { formatCurrency } from '../utils/currency'
-import { getStorageJSON } from '../services/storageService'
+import { getMyOrders } from '../services/api/ordersGateway'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
+import { canCancelBooking } from '../hooks/booking/bookingPolicies.js'
 
 const canCancelBooking = (status) => (
   status === 'CHO_XAC_NHAN'
@@ -66,70 +66,59 @@ const getStatusTone = (status) => {
   return 'neutral'
 }
 
-const canCancelBooking = (status) => (
-  status === 'CHO_XAC_NHAN'
-  || status === 'YEU_CAU_DAT_BAN'
-  || status === 'GIU_CHO_TAM'
-  || status === 'CAN_GOI_LAI'
-)
-
 function ProfilePage() {
   const { currentUser } = useAuth()
   const { cancelBooking, getBookingHistory } = useBooking()
-  const [activeTab, setActiveTab] = useState('personal')
-  const [bookingHistory, setBookingHistory] = useState([])
-  const [bookingMessage, setBookingMessage] = useState('')
+  const [tabDangMo, setTabDangMo] = useState('personal')
+  const [lichSuDatBan, setLichSuDatBan] = useState([])
+  const [lichSuDonHang, setLichSuDonHang] = useState([])
+  const [thongBaoDatBan, setThongBaoDatBan] = useState('')
 
-  const profileData = useMemo(() => {
-    if (!currentUser) {
-      return FALLBACK_PROFILE
-    }
+  const thongTinHoSo = useMemo(() => ({
+    name: String(currentUser?.fullName ?? currentUser?.name ?? ''),
+    email: String(currentUser?.email ?? ''),
+    phone: String(currentUser?.phone ?? ''),
+  }), [currentUser])
+
+  const lichSuDonHangDaChuanHoa = useMemo(() => lichSuDonHang.map((order) => {
+    const status = order.status || 'Đang xử lý'
 
     return {
-      name: String(currentUser.fullName ?? currentUser.name ?? FALLBACK_PROFILE.name),
-      email: String(currentUser.email ?? FALLBACK_PROFILE.email),
-      phone: String(currentUser.phone ?? FALLBACK_PROFILE.phone),
+      id: `DH-${String(order.id).slice(-6)}`,
+      date: formatDate(order.orderDate),
+      total: Number(order.total) || 0,
+      status,
+      timelineStep: getOrderTimelineStep(status),
     }
-  }, [currentUser])
-
-  const orderHistory = useMemo(() => {
-    const parsedOrders = getStorageJSON(STORAGE_KEYS.ORDERS, [])
-    const normalizedCurrentEmail = String(currentUser?.email ?? '').trim().toLowerCase()
-
-    if (!Array.isArray(parsedOrders) || parsedOrders.length === 0 || !normalizedCurrentEmail) {
-      return []
-    }
-
-    return parsedOrders
-      .filter((order) => String(order?.customer?.email ?? order?.userEmail ?? '').trim().toLowerCase() === normalizedCurrentEmail)
-      .map((order) => {
-        const status = order.status || 'Đang xử lý'
-
-        return {
-          id: `DH-${String(order.id).slice(-6)}`,
-          date: formatDate(order.orderDate),
-          total: Number(order.total) || 0,
-          status,
-          timelineStep: getOrderTimelineStep(status),
-        }
-      })
-  }, [currentUser])
+  }), [lichSuDonHang])
 
   useEffect(() => {
-    setBookingHistory(getBookingHistory(currentUser?.email))
-    setBookingMessage('')
+    const loadProfileData = async () => {
+      if (!currentUser) {
+        setLichSuDatBan([])
+        setLichSuDonHang([])
+        setThongBaoDatBan('')
+        return
+      }
+
+      setLichSuDatBan(await getBookingHistory())
+      setLichSuDonHang(await getMyOrders())
+      setThongBaoDatBan('')
+    }
+
+    loadProfileData()
   }, [currentUser, getBookingHistory])
 
-  const handleCancelBooking = (bookingId, bookingCode) => {
-    const result = cancelBooking(bookingId, bookingCode, currentUser?.email)
+  const handleCancelBooking = async (bookingId, bookingCode) => {
+    const result = await cancelBooking(bookingId, bookingCode)
 
     if (!result.success) {
-      setBookingMessage(result.error)
+      setThongBaoDatBan(result.error)
       return
     }
 
-    setBookingHistory(result.bookingHistory)
-    setBookingMessage(result.message)
+    setLichSuDatBan(result.bookingHistory)
+    setThongBaoDatBan(result.message)
   }
 
   return (
@@ -147,8 +136,8 @@ function ProfilePage() {
               <button
                 key={tab.key}
                 type="button"
-                className={`profile-tab-btn ${activeTab === tab.key ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.key)}
+                className={`profile-tab-btn ${tabDangMo === tab.key ? 'active' : ''}`}
+                onClick={() => setTabDangMo(tab.key)}
               >
                 {tab.label}
               </button>
@@ -156,7 +145,7 @@ function ProfilePage() {
           </aside>
 
           <section className="profile-content-panel">
-            {activeTab === 'personal' && (
+            {tabDangMo === 'personal' && (
               <article className="profile-card">
                 <h2>Thông tin cá nhân</h2>
                 <div className="profile-form-grid">
@@ -164,38 +153,38 @@ function ProfilePage() {
                     <label className="form-label" htmlFor="profile-name">
                       Tên
                     </label>
-                    <input id="profile-name" className="form-input" value={profileData.name} readOnly />
+                    <input id="profile-name" className="form-input" value={thongTinHoSo.name} readOnly />
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="profile-email">
                       Email
                     </label>
-                    <input id="profile-email" className="form-input" value={profileData.email} readOnly />
+                    <input id="profile-email" className="form-input" value={thongTinHoSo.email} readOnly />
                   </div>
 
                   <div className="form-group">
                     <label className="form-label" htmlFor="profile-phone">
                       Số điện thoại
                     </label>
-                    <input id="profile-phone" className="form-input" value={profileData.phone} readOnly />
+                    <input id="profile-phone" className="form-input" value={thongTinHoSo.phone} readOnly />
                   </div>
                 </div>
               </article>
             )}
 
-            {activeTab === 'orders' && (
+            {tabDangMo === 'orders' && (
               <article className="profile-card">
                 <h2>Lịch sử đơn hàng</h2>
 
                 <div className="profile-list">
-                  {orderHistory.length === 0 && (
+                  {lichSuDonHangDaChuanHoa.length === 0 && (
                     <div className="profile-list-item">
                       <p className="booking-empty">Chưa có lịch sử đơn hàng nào.</p>
                     </div>
                   )}
 
-                  {orderHistory.map((order) => (
+                  {lichSuDonHangDaChuanHoa.map((order) => (
                     <div key={order.id} className="profile-list-item">
                       <div className="profile-list-top">
                         <strong>{order.id}</strong>
@@ -232,20 +221,20 @@ function ProfilePage() {
               </article>
             )}
 
-            {activeTab === 'bookings' && (
+            {tabDangMo === 'bookings' && (
               <article className="profile-card">
                 <h2>Lịch sử đặt bàn</h2>
 
-                {bookingMessage && <p className="booking-feedback">{bookingMessage}</p>}
+                {thongBaoDatBan && <p className="booking-feedback">{thongBaoDatBan}</p>}
 
                 <div className="profile-list">
-                  {bookingHistory.length === 0 && (
+                  {lichSuDatBan.length === 0 && (
                     <div className="profile-list-item">
                       <p className="booking-empty">Chưa có lịch sử đặt bàn nào.</p>
                     </div>
                   )}
 
-                  {bookingHistory.map((booking) => (
+                  {lichSuDatBan.map((booking) => (
                     <div key={`${booking.id}-${booking.bookingId ?? booking.id}`} className="profile-list-item">
                       <div className="profile-list-top">
                         <strong>{booking.id}</strong>
