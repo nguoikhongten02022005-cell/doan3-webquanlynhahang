@@ -45,6 +45,27 @@ enum VoucherDiscountType {
   PERCENTAGE
 }
 
+enum TrangThaiDonHang {
+  MOI_TAO
+  DA_XAC_NHAN
+  DANG_CHUAN_BI
+  DANG_PHUC_VU
+  DA_HOAN_THANH
+  DA_HUY
+}
+
+enum TrangThaiThanhToan {
+  CHUA_THANH_TOAN
+  DA_THANH_TOAN
+  DA_HOAN_TIEN
+}
+
+enum PhuongThucThanhToan {
+  TIEN_MAT
+  CHUYEN_KHOAN
+  THE
+}
+
 model User {
   id            Int            @id @default(autoincrement())
   fullName      String
@@ -155,6 +176,7 @@ model BookingTable {
 model MenuItem {
   id          Int      @id @default(autoincrement())
   name        String
+  slug        String   @unique
   description String
   price       Decimal  @db.Decimal(10, 2)
   category    String
@@ -171,25 +193,27 @@ model MenuItem {
 }
 
 model Order {
-  id                 Int         @id @default(autoincrement())
-  subtotal           Decimal     @db.Decimal(10, 2)
-  serviceFee         Decimal     @db.Decimal(10, 2)
-  discountAmount     Decimal     @db.Decimal(10, 2)
-  voucherCode        String      @default("")
-  total              Decimal     @db.Decimal(10, 2)
-  orderDate          DateTime    @default(now())
-  status             String      @default("Mới Đặt")
-  note               String      @default("")
-  tableNumber        String      @default("")
-  paymentMethod      String      @default("cash")
-  userEmail          String      @default("")
-  customerFullName   String      @default("")
-  customerPhone      String      @default("")
-  customerEmail      String      @default("")
-  customerAddress    String      @default("")
+  id                 Int                  @id @default(autoincrement())
+  maDonHang          String               @unique
+  subtotal           Decimal              @db.Decimal(10, 2)
+  serviceFee         Decimal              @db.Decimal(10, 2)
+  discountAmount     Decimal              @db.Decimal(10, 2)
+  voucherCode        String               @default("")
+  total              Decimal              @db.Decimal(10, 2)
+  orderDate          DateTime             @default(now())
+  status             TrangThaiDonHang     @default(MOI_TAO)
+  paymentStatus      TrangThaiThanhToan   @default(CHUA_THANH_TOAN)
+  note               String               @default("")
+  tableNumber        String               @default("")
+  paymentMethod      PhuongThucThanhToan  @default(TIEN_MAT)
+  userEmail          String               @default("")
+  customerFullName   String               @default("")
+  customerPhone      String               @default("")
+  customerEmail      String               @default("")
+  customerAddress    String               @default("")
   customerSnapshot   Json?
   userId             Int?
-  user               User?       @relation(fields: [userId], references: [id])
+  user               User?                @relation(fields: [userId], references: [id])
   items              OrderItem[]
 
   @@index([userId])
@@ -218,6 +242,8 @@ model OrderItem {
 model Voucher {
   id                Int                  @id @default(autoincrement())
   code              String               @unique
+  name              String
+  description       String               @default("")
   discountType      VoucherDiscountType  @default(FIXED)
   discountValue     Decimal              @db.Decimal(10, 2)
   minOrderAmount    Decimal              @default(0) @db.Decimal(10, 2)

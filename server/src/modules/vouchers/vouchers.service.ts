@@ -48,6 +48,8 @@ export const validateVoucherCode = async (code: string, orderAmount = 0) => {
 
 export const createVoucher = async (payload: {
   code: string
+  name: string
+  description: string
   discountType: 'FIXED' | 'PERCENTAGE'
   discountValue: number
   minOrderAmount?: number
@@ -67,6 +69,8 @@ export const createVoucher = async (payload: {
   return prisma.voucher.create({
     data: {
       code,
+      name: payload.name.trim(),
+      description: payload.description.trim(),
       discountType: payload.discountType,
       discountValue: payload.discountValue,
       minOrderAmount: payload.minOrderAmount ?? 0,
@@ -81,6 +85,8 @@ export const createVoucher = async (payload: {
 
 export const updateVoucher = async (id: number, payload: Partial<{
   code: string
+  name: string
+  description: string
   discountType: 'FIXED' | 'PERCENTAGE'
   discountValue: number
   minOrderAmount: number
@@ -100,6 +106,8 @@ export const updateVoucher = async (id: number, payload: Partial<{
     where: { id },
     data: {
       ...(payload.code !== undefined ? { code: payload.code.trim().toUpperCase() } : {}),
+      ...(payload.name !== undefined ? { name: payload.name.trim() } : {}),
+      ...(payload.description !== undefined ? { description: payload.description.trim() } : {}),
       ...(payload.discountType !== undefined ? { discountType: payload.discountType } : {}),
       ...(payload.discountValue !== undefined ? { discountValue: payload.discountValue } : {}),
       ...(payload.minOrderAmount !== undefined ? { minOrderAmount: payload.minOrderAmount } : {}),

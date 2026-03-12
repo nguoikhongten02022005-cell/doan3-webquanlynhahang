@@ -1,6 +1,7 @@
 import type { Request, Response } from 'express'
 import { HttpError } from '../../common/http-error.js'
 import { decimalToNumber, toIsoString } from '../../common/serializers.js'
+import { phanHoiThanhCong } from '../../common/phan-hoi.js'
 import { createVoucherSchema, updateVoucherSchema, validateVoucherSchema } from './vouchers.schema.js'
 import {
   createVoucher,
@@ -14,6 +15,8 @@ import {
 const mapVoucher = (voucher: {
   id: number
   code: string
+  name: string
+  description: string
   discountType: 'FIXED' | 'PERCENTAGE'
   discountValue: { toNumber(): number }
   minOrderAmount: { toNumber(): number }
@@ -28,6 +31,8 @@ const mapVoucher = (voucher: {
 }) => ({
   id: voucher.id,
   code: voucher.code,
+  name: voucher.name,
+  description: voucher.description,
   discountType: voucher.discountType,
   discountValue: decimalToNumber(voucher.discountValue),
   minOrderAmount: decimalToNumber(voucher.minOrderAmount),
@@ -48,9 +53,13 @@ export const getVoucher = async (req: Request, res: Response) => {
     throw new HttpError(404, 'Mã giảm giá không hợp lệ.')
   }
 
-  res.json({
-    code: voucher.code,
-    amount: decimalToNumber(voucher.discountValue),
+  return phanHoiThanhCong(res, {
+    message: 'Lấy thông tin mã giảm giá thành công.',
+    data: {
+      code: voucher.code,
+      name: voucher.name,
+      amount: decimalToNumber(voucher.discountValue),
+    },
   })
 }
 
@@ -58,8 +67,7 @@ export const postValidateVoucher = async (req: Request, res: Response) => {
   const payload = validateVoucherSchema.parse(req.body)
   const voucher = await validateVoucherCode(payload.code, payload.orderAmount)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Kiểm tra mã giảm giá thành công.',
     data: mapVoucher(voucher),
   })
@@ -67,22 +75,36 @@ export const postValidateVoucher = async (req: Request, res: Response) => {
 
 export const getVouchers = async (_req: Request, res: Response) => {
   const vouchers = await listVouchers()
-  res.json(vouchers.map(mapVoucher))
+  return phanHoiThanhCong(res, {
+    message: 'Lấy danh sách mã giảm giá thành công.',
+    data: vouchers.map(mapVoucher),
+    meta: { total: vouchers.length },
+  })
 }
 
 export const postVoucher = async (req: Request, res: Response) => {
   const payload = createVoucherSchema.parse(req.body)
   const voucher = await createVoucher(payload)
-  res.status(201).json(mapVoucher(voucher))
+  return phanHoiThanhCong(res, {
+    statusCode: 201,
+    message: 'Tạo mã giảm giá thành công.',
+    data: mapVoucher(voucher),
+  })
 }
 
 export const patchVoucher = async (req: Request, res: Response) => {
   const payload = updateVoucherSchema.parse(req.body)
   const voucher = await updateVoucher(Number(req.params.id), payload)
-  res.json(mapVoucher(voucher))
+  return phanHoiThanhCong(res, {
+    message: 'Cập nhật mã giảm giá thành công.',
+    data: mapVoucher(voucher),
+  })
 }
 
 export const removeVoucher = async (req: Request, res: Response) => {
   await deleteVoucher(Number(req.params.id))
-  res.status(204).send()
+  return phanHoiThanhCong(res, {
+    message: 'Xóa mã giảm giá thành công.',
+    data: null,
+  })
 }

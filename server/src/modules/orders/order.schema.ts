@@ -1,9 +1,8 @@
 import { z } from 'zod'
+import { phuongThucThanhToanHopLe, trangThaiDonHangHopLe } from './order-constants.js'
 
 const orderItemSchema = z.object({
-  id: z.number().optional(),
-  name: z.string().trim().min(1),
-  price: z.number(),
+  menuItemId: z.number().int().positive().optional(),
   quantity: z.number().int().positive(),
   selectedSize: z.string().optional().default('M'),
   selectedToppings: z.array(z.string()).optional().default([]),
@@ -13,24 +12,18 @@ const orderItemSchema = z.object({
 
 export const createOrderSchema = z.object({
   items: z.array(orderItemSchema).min(1),
-  subtotal: z.number(),
-  serviceFee: z.number(),
-  discountAmount: z.number(),
-  voucherCode: z.string().optional().default(''),
-  total: z.number(),
-  status: z.string().optional().default('Mới Đặt'),
+  voucherCode: z.string().trim().optional().default(''),
   customer: z.object({
-    fullName: z.string().optional().default(''),
-    phone: z.string().optional().default(''),
-    email: z.string().optional().default(''),
-    address: z.string().optional().default(''),
-  }),
-  userEmail: z.string().optional().default(''),
+    fullName: z.string().trim().optional().default(''),
+    phone: z.string().trim().optional().default(''),
+    email: z.string().trim().optional().default(''),
+    address: z.string().trim().optional().default(''),
+  }).optional().default({}),
   note: z.string().optional().default(''),
   tableNumber: z.string().optional().default(''),
-  paymentMethod: z.string().optional().default('cash'),
+  paymentMethod: z.enum(phuongThucThanhToanHopLe).optional().default('TIEN_MAT'),
 })
 
 export const updateOrderStatusSchema = z.object({
-  status: z.string().trim().min(1),
+  status: z.enum(trangThaiDonHangHopLe),
 })

@@ -1,5 +1,7 @@
 import type { Request, Response } from 'express'
-import { env } from '../../config/env.js'
+import { HttpError } from '../../common/http-error.js'
+import { phanHoiThanhCong } from '../../common/phan-hoi.js'
+import { cauHinhAuth, ganCookieRefreshToken, xoaCookieRefreshToken } from '../../config/auth.js'
 import { loginSchema, registerSchema, updateProfileSchema } from './auth.schema.js'
 import { mapCurrentUser, mapUser } from '../users/user.mapper.js'
 import {
@@ -12,38 +14,23 @@ import {
   updateAuthUserProfile,
 } from './auth.service.js'
 
-const refreshCookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax' as const,
-  secure: env.NODE_ENV === 'production',
-  path: '/api',
-}
-
-const setRefreshTokenCookie = (res: Response, refreshToken: string) => {
-  res.cookie(env.REFRESH_TOKEN_COOKIE_NAME, refreshToken, {
-    ...refreshCookieOptions,
-    expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-  })
-}
-
-const clearRefreshTokenCookie = (res: Response) => {
-  res.clearCookie(env.REFRESH_TOKEN_COOKIE_NAME, refreshCookieOptions)
-}
+const taoDuLieuAuth = (user: Parameters<typeof mapUser>[0], accessToken: string) => ({
+  accessToken,
+  tokenType: 'Bearer',
+  user: mapUser(user),
+  currentUser: mapCurrentUser(user),
+})
 
 export const login = async (req: Request, res: Response) => {
   const payload = loginSchema.parse(req.body)
   const user = await loginUser(payload.identifier, payload.password)
   const { accessToken, refreshToken } = await createSessionTokens(user)
 
-  setRefreshTokenCookie(res, refreshToken)
+  ganCookieRefreshToken(res, refreshToken)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Đăng nhập thành công.',
-    accessToken,
-    tokenType: 'Bearer',
-    user: mapUser(user),
-    currentUser: mapCurrentUser(user),
+    data: taoDuLieuAuth(user, accessToken),
   })
 }
 
@@ -52,15 +39,11 @@ export const internalLogin = async (req: Request, res: Response) => {
   const user = await loginUser(payload.identifier, payload.password, { allowedRoles: ['admin', 'staff'] })
   const { accessToken, refreshToken } = await createSessionTokens(user)
 
-  setRefreshTokenCookie(res, refreshToken)
+  ganCookieRefreshToken(res, refreshToken)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Đăng nhập nội bộ thành công.',
-    accessToken,
-    tokenType: 'Bearer',
-    user: mapUser(user),
-    currentUser: mapCurrentUser(user),
+    data: taoDuLieuAuth(user, accessToken),
   })
 }
 
@@ -69,26 +52,24 @@ export const register = async (req: Request, res: Response) => {
   const user = await registerUser(payload)
   const { accessToken, refreshToken } = await createSessionTokens(user)
 
-  setRefreshTokenCookie(res, refreshToken)
+  ganCookieRefreshToken(res, refreshToken)
 
-  res.status(201).json({
-    success: true,
+  return phanHoiThanhCong(res, {
+    statusCode: 201,
     message: 'Đăng ký tài khoản thành công.',
-    accessToken,
-    tokenType: 'Bearer',
-    user: mapUser(user),
-    currentUser: mapCurrentUser(user),
+    data: taoDuLieuAuth(user, accessToken),
   })
 }
 
 export const getMe = async (req: Request, res: Response) => {
   const user = await getAuthUserById(req.authUser!.id)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Lấy thông tin người dùng thành công.',
-    user: mapUser(user),
-    currentUser: mapCurrentUser(user),
+    data: {
+      user: mapUser(user),
+      currentUser: mapCurrentUser(user),
+    },
   })
 }
 
@@ -96,50 +77,43 @@ export const patchMe = async (req: Request, res: Response) => {
   const payload = updateProfileSchema.parse(req.body)
   const user = await updateAuthUserProfile(req.authUser!.id, payload)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Cập nhật hồ sơ thành công.',
-    user: mapUser(user),
-    currentUser: mapCurrentUser(user),
+    data: {
+      user: mapUser(user),
+      currentUser: mapCurrentUser(user),
+    },
   })
 }
 
 export const refresh = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies?.[env.REFRESH_TOKEN_COOKIE_NAME]
+  const refreshToken = req.cookies?.[cauHinhAuth.cookie.ten]
 
   if (!refreshToken) {
-    clearRefreshTokenCookie(res)
-    res.status(401).json({
-      success: false,
-      message: 'Không tìm thấy refresh token.',
-    })
-    return
+    xoaCookieRefreshToken(res)
+    throw new HttpError(401, 'Không tìm thấy refresh token.')
   }
 
   const { user, accessToken, refreshToken: nextRefreshToken } = await refreshSessionTokens(refreshToken)
-  setRefreshTokenCookie(res, nextRefreshToken)
+  ganCookieRefreshToken(res, nextRefreshToken)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Làm mới phiên đăng nhập thành công.',
-    accessToken,
-    tokenType: 'Bearer',
-    user: mapUser(user),
-    currentUser: mapCurrentUser(user),
+    data: taoDuLieuAuth(user, accessToken),
   })
 }
 
 export const logout = async (req: Request, res: Response) => {
-  const refreshToken = req.cookies?.[env.REFRESH_TOKEN_COOKIE_NAME]
+  const refreshToken = req.cookies?.[cauHinhAuth.cookie.ten]
 
   if (refreshToken) {
     await revokeRefreshToken(refreshToken)
   }
 
-  clearRefreshTokenCookie(res)
+  xoaCookieRefreshToken(res)
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
     message: 'Đăng xuất thành công.',
+    data: null,
   })
 }

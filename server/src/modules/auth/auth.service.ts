@@ -4,6 +4,7 @@ import { hashPassword, verifyPassword } from '../../common/utils/password.js'
 import { hashToken, signAccessToken, signRefreshToken, verifyRefreshToken } from '../../common/utils/jwt.js'
 import type { AuthUser } from '../../common/auth.js'
 import type { UserRole } from '@prisma/client'
+import { cauHinhAuth } from '../../config/auth.js'
 
 const findByIdentifier = async (identifier: string) => prisma.user.findFirst({
   where: {
@@ -32,26 +33,6 @@ const toAuthUser = (user: { id: number, email: string, username: string, role: U
   username: user.username,
   role: user.role,
 })
-
-const parseRefreshExpiry = () => {
-  const normalized = String(process.env.JWT_REFRESH_EXPIRES_IN || '7d').trim()
-  const match = normalized.match(/^(\d+)([dhms])$/i)
-
-  if (!match) {
-    return new Date(Date.now() + 7 * 24 * 60 * 60 * 1000)
-  }
-
-  const value = Number(match[1])
-  const unit = match[2].toLowerCase()
-  const multipliers: Record<string, number> = {
-    d: 24 * 60 * 60 * 1000,
-    h: 60 * 60 * 1000,
-    m: 60 * 1000,
-    s: 1000,
-  }
-
-  return new Date(Date.now() + value * multipliers[unit])
-}
 
 export const loginUser = async (identifier: string, password: string, options?: { allowedRoles?: UserRole[] }) => {
   const normalizedIdentifier = identifier.trim()
@@ -141,15 +122,17 @@ export const createSessionTokens = async (user: { id: number, email: string, use
   const accessToken = signAccessToken(authUser)
   const refreshToken = signRefreshToken(authUser)
 
+  const refreshTokenExpiresAt = cauHinhAuth.refreshToken.taoExpiresAt()
+
   await prisma.refreshToken.create({
     data: {
       tokenHash: hashToken(refreshToken),
       userId: user.id,
-      expiresAt: parseRefreshExpiry(),
+      expiresAt: refreshTokenExpiresAt,
     },
   })
 
-  return { accessToken, refreshToken }
+  return { accessToken, refreshToken, refreshTokenExpiresAt }
 }
 
 export const refreshSessionTokens = async (refreshToken: string) => {

@@ -18,15 +18,23 @@ import {
   updateBookingStatus,
 } from './bookings.service.js'
 import { HttpError } from '../../common/http-error.js'
+import { phanHoiThanhCong } from '../../common/phan-hoi.js'
 
 export const getBookings = async (_req: Request, res: Response) => {
   const bookings = await listBookings()
-  res.json(bookings.map(mapBooking))
+  return phanHoiThanhCong(res, {
+    message: 'Lấy danh sách booking thành công.',
+    data: bookings.map(mapBooking),
+    meta: { total: bookings.length },
+  })
 }
 
 export const getBooking = async (req: Request, res: Response) => {
   const booking = await getBookingById(Number(req.params.id), req.authUser!)
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Lấy thông tin booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const getBookingHistory = async (req: Request, res: Response) => {
@@ -35,7 +43,11 @@ export const getBookingHistory = async (req: Request, res: Response) => {
   }
 
   const bookings = await listBookingHistory(req.authUser)
-  res.json(bookings.map(mapBookingHistoryItem))
+  return phanHoiThanhCong(res, {
+    message: 'Lấy lịch sử đặt bàn thành công.',
+    data: bookings.map(mapBookingHistoryItem),
+    meta: { total: bookings.length },
+  })
 }
 
 export const postBooking = async (req: Request, res: Response) => {
@@ -47,7 +59,11 @@ export const postBooking = async (req: Request, res: Response) => {
     userEmail: req.authUser?.email ?? payload.userEmail,
     createdBy: req.authUser?.email ?? payload.createdBy,
   })
-  res.status(201).json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    statusCode: 201,
+    message: 'Tạo booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const postInternalBooking = async (req: Request, res: Response) => {
@@ -58,43 +74,68 @@ export const postInternalBooking = async (req: Request, res: Response) => {
     confirmationChannel: ['Nội bộ'],
     createdBy: req.authUser?.email ?? 'internal',
   })
-  res.status(201).json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    statusCode: 201,
+    message: 'Tạo booking nội bộ thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchBooking = async (req: Request, res: Response) => {
   const payload = updateBookingSchema.parse(req.body)
   const booking = await updateBooking(Number(req.params.id), payload)
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Cập nhật booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchBookingCancel = async (req: Request, res: Response) => {
   const booking = await cancelBookingByCustomer(Number(req.params.id), req.authUser!)
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Hủy booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchBookingStatus = async (req: Request, res: Response) => {
   const payload = updateBookingStatusSchema.parse(req.body)
   const booking = await updateBookingStatus(Number(req.params.id), payload.status)
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Cập nhật trạng thái booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchAssignTables = async (req: Request, res: Response) => {
   const payload = assignTablesSchema.parse(req.body)
   const booking = await assignTables(Number(req.params.id), payload.tableIds)
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Gán bàn cho booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchCheckInBooking = async (req: Request, res: Response) => {
   const booking = await updateBookingStatus(Number(req.params.id), 'DA_CHECK_IN')
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Check-in booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchCompleteBooking = async (req: Request, res: Response) => {
   const booking = await updateBookingStatus(Number(req.params.id), 'DA_HOAN_THANH')
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Hoàn thành booking thành công.',
+    data: mapBooking(booking),
+  })
 }
 
 export const patchNoShowBooking = async (req: Request, res: Response) => {
   const booking = await updateBookingStatus(Number(req.params.id), 'KHONG_DEN')
-  res.json(mapBooking(booking))
+  return phanHoiThanhCong(res, {
+    message: 'Cập nhật booking không đến thành công.',
+    data: mapBooking(booking),
+  })
 }

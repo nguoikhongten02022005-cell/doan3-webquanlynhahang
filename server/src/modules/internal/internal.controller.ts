@@ -1,5 +1,6 @@
 import type { Request, Response } from 'express'
 import { prisma } from '../../lib/prisma.js'
+import { phanHoiThanhCong } from '../../common/phan-hoi.js'
 
 export const getDashboardStats = async (_req: Request, res: Response) => {
   const [users, orders, bookings, tables] = await Promise.all([
@@ -19,8 +20,8 @@ export const getDashboardStats = async (_req: Request, res: Response) => {
     return accumulator
   }, {})
 
-  res.json({
-    success: true,
+  return phanHoiThanhCong(res, {
+    message: 'Lấy số liệu dashboard thành công.',
     data: {
       users: { total: users },
       orders: { total: orders },

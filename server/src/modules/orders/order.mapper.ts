@@ -7,6 +7,7 @@ const parseJsonArray = (value: unknown) => (Array.isArray(value) ? value.map((it
 
 export const mapOrder = (order: OrderWithItems) => ({
   id: order.id,
+  maDonHang: order.maDonHang,
   subtotal: decimalToNumber(order.subtotal),
   serviceFee: decimalToNumber(order.serviceFee),
   discountAmount: decimalToNumber(order.discountAmount),
@@ -14,6 +15,7 @@ export const mapOrder = (order: OrderWithItems) => ({
   total: decimalToNumber(order.total),
   orderDate: toIsoString(order.orderDate),
   status: order.status,
+  paymentStatus: order.paymentStatus,
   note: order.note,
   tableNumber: order.tableNumber,
   paymentMethod: order.paymentMethod,
@@ -27,6 +29,7 @@ export const mapOrder = (order: OrderWithItems) => ({
   items: Array.isArray(order.items)
     ? order.items.map((item) => ({
         id: item.id,
+        menuItemId: item.menuItemId,
         name: item.name,
         price: decimalToNumber(item.price),
         quantity: item.quantity,

@@ -2,6 +2,7 @@ import type { BookingStatus, Prisma } from '@prisma/client'
 import { prisma } from '../../lib/prisma.js'
 import { HttpError } from '../../common/http-error.js'
 import type { AuthUser } from '../../common/auth.js'
+import { kiemTraChuyenTrangThaiHopLe } from './booking-status.js'
 
 const bookingInclude = {
   bookingTables: {
@@ -252,6 +253,10 @@ export const updateBooking = async (id: number, payload: Partial<{
     ? await tx.user.findFirst({ where: { email: userEmailDaChuanHoa } })
     : null
 
+  if (payload.status !== undefined) {
+    kiemTraChuyenTrangThaiHopLe(booking.status, payload.status)
+  }
+
   const bookingDaCapNhat = await tx.booking.update({
     where: { id },
     data: {
@@ -288,6 +293,7 @@ export const updateBooking = async (id: number, payload: Partial<{
 
 export const updateBookingStatus = async (id: number, status: BookingStatus) => prisma.$transaction(async (tx) => {
   const booking = await layBookingTheoId(tx, id)
+  kiemTraChuyenTrangThaiHopLe(booking.status, status)
 
   const bookingDaCapNhat = await tx.booking.update({
     where: { id },
@@ -318,6 +324,11 @@ export const cancelBookingByCustomer = async (id: number, nguoiDung: AuthUser) =
 
 export const assignTables = async (id: number, tableIds: string[]) => prisma.$transaction(async (tx) => {
   const booking = await layBookingTheoId(tx, id)
+
+  if (['DA_HUY', 'TU_CHOI_HET_CHO', 'KHONG_DEN', 'DA_HOAN_THANH'].includes(booking.status)) {
+    throw new HttpError(400, 'Không thể gán bàn cho booking đã kết thúc hoặc đã hủy.')
+  }
+
   const tables = await tx.table.findMany({ where: { id: { in: tableIds } } })
 
   if (tables.length !== tableIds.length) {
@@ -354,6 +365,10 @@ export const assignTables = async (id: number, tableIds: string[]) => prisma.$tr
   const trangThaiMoi = booking.status === 'YEU_CAU_DAT_BAN' || booking.status === 'CHO_XAC_NHAN'
     ? 'GIU_CHO_TAM'
     : booking.status
+
+  if (trangThaiMoi !== booking.status) {
+    kiemTraChuyenTrangThaiHopLe(booking.status, trangThaiMoi)
+  }
 
   const bookingDaCapNhat = await tx.booking.update({
     where: { id: booking.id },

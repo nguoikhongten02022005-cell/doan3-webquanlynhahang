@@ -1,6 +1,7 @@
 import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import type { AccessTokenPayload, AuthUser, RefreshTokenPayload } from '../auth.js'
+import { cauHinhAuth } from '../../config/auth.js'
 import { env } from '../../config/env.js'
 import { HttpError } from '../http-error.js'
 
@@ -32,7 +33,7 @@ export const signRefreshToken = (user: AuthUser) => jwt.sign(
     type: 'refresh',
   } satisfies RefreshTokenPayload,
   env.JWT_REFRESH_SECRET,
-  { expiresIn: env.JWT_REFRESH_EXPIRES_IN } as jwt.SignOptions,
+  { expiresIn: cauHinhAuth.refreshToken.expiresIn } as jwt.SignOptions,
 )
 
 export const verifyRefreshToken = (token: string) => xacThucLoaiToken<RefreshTokenPayload>(

@@ -1,11 +1,13 @@
 export class HttpError extends Error {
   statusCode: number
-  details?: unknown
+  errors?: unknown
+  isOperational: boolean
 
-  constructor(statusCode: number, message: string, details?: unknown) {
+  constructor(statusCode: number, message: string, errors?: unknown, isOperational = true) {
     super(message)
     this.name = 'HttpError'
     this.statusCode = statusCode
-    this.details = details
+    this.errors = errors
+    this.isOperational = isOperational
   }
 }

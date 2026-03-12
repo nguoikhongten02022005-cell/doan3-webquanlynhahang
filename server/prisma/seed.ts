@@ -10,6 +10,14 @@ const TABLE_AREAS = [
   { id: 'QUAY_BAR', name: 'Quầy bar', description: 'Khu vực quầy bar và bàn cao', total: 5, capacities: [1, 1, 2, 2, 2], prefix: 'BAR' },
 ] as const
 
+const taoSlug = (value: string) => value
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/đ/g, 'd')
+  .replace(/[^a-z0-9]+/g, '-')
+  .replace(/^-+|-+$/g, '')
+
 const MENU_DISHES = [
   { name: 'Bò Bít Tết Úc', description: 'Thịt bò Úc cao cấp nướng chín vừa, kèm khoai tây nghiền', price: 385000, category: 'Món Chính', badge: 'Best Seller', tone: 'tone-red', image: '/images/menu/bo-bit-tet-uc.jpg' },
   { name: 'Cá Hồi Nướng Teriyaki', description: 'Phi lê cá hồi tươi nướng sốt Teriyaki đặc biệt', price: 295000, category: 'Món Chính', badge: 'Healthy', tone: 'tone-amber', image: '/images/menu/ca-hoi-teriyaki.jpg' },
@@ -82,13 +90,15 @@ async function main() {
   })
 
   for (const dish of MENU_DISHES) {
-    await prisma.menuItem.create({ data: dish })
+    await prisma.menuItem.create({ data: { ...dish, slug: taoSlug(dish.name) } })
   }
 
   await prisma.voucher.createMany({
     data: [
       {
         code: 'GIAM20K',
+        name: 'Giảm 20K',
+        description: 'Giảm trực tiếp 20.000đ cho mọi đơn đủ điều kiện.',
         discountType: VoucherDiscountType.FIXED,
         discountValue: 20000,
         minOrderAmount: 0,
@@ -96,6 +106,8 @@ async function main() {
       },
       {
         code: 'VIP50K',
+        name: 'VIP 50K',
+        description: 'Giảm 50.000đ cho đơn từ 300.000đ.',
         discountType: VoucherDiscountType.FIXED,
         discountValue: 50000,
         minOrderAmount: 300000,

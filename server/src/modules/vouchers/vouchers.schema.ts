@@ -7,6 +7,8 @@ export const validateVoucherSchema = z.object({
 
 export const createVoucherSchema = z.object({
   code: z.string().trim().min(1),
+  name: z.string().trim().min(1),
+  description: z.string().optional().default(''),
   discountType: z.enum(['FIXED', 'PERCENTAGE']).optional().default('FIXED'),
   discountValue: z.number().positive(),
   minOrderAmount: z.number().nonnegative().optional().default(0),

@@ -8,6 +8,7 @@ const menuPayloadSchema = z.object({
   badge: z.string().optional().default('Mới'),
   tone: z.string().optional().default('tone-amber'),
   image: z.string().optional().default(''),
+  isAvailable: z.boolean().optional().default(true),
 })
 
 export const createMenuItemSchema = menuPayloadSchema

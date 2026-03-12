@@ -6,6 +6,7 @@ import swaggerUi from 'swagger-ui-express'
 import { env } from './config/env.js'
 import { errorHandler } from './common/middleware/errorHandler.js'
 import { notFound } from './common/middleware/notFound.js'
+import { requestLogger } from './common/middleware/requestLogger.js'
 import { apiRouter, apiV1Router } from './routes/index.js'
 import { openApiDocument } from './docs/openapi.js'
 
@@ -28,6 +29,7 @@ app.use(cors({
 app.use(cookieParser())
 app.use(express.json())
 app.use(express.urlencoded({ extended: true }))
+app.use(requestLogger)
 
 if (env.API_DOCS_ENABLED) {
   app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(openApiDocument))
