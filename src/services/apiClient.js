@@ -18,6 +18,31 @@ const getAuthHeader = () => {
   }
 }
 
+const laPhanHoiBao = (phanHoi) => (
+  Boolean(phanHoi)
+  && typeof phanHoi === 'object'
+  && !Array.isArray(phanHoi)
+  && ('success' in phanHoi || 'data' in phanHoi || 'message' in phanHoi || 'meta' in phanHoi)
+)
+
+export const layDuLieu = (phanHoi) => (laPhanHoiBao(phanHoi) ? (phanHoi.data ?? null) : (phanHoi ?? null))
+
+export const layThongDiep = (phanHoi) => {
+  if (!laPhanHoiBao(phanHoi)) {
+    return ''
+  }
+
+  return typeof phanHoi.message === 'string' ? phanHoi.message : ''
+}
+
+export const layMeta = (phanHoi) => (laPhanHoiBao(phanHoi) ? (phanHoi.meta ?? null) : null)
+
+export const tachPhanHoi = (phanHoi) => ({
+  duLieu: layDuLieu(phanHoi),
+  thongDiep: layThongDiep(phanHoi),
+  meta: layMeta(phanHoi),
+})
+
 const request = async (path, options = {}) => {
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     credentials: 'include',

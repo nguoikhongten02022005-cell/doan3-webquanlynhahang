@@ -30,6 +30,8 @@ export const useAuth = () => {
 
         if (nguoiDung) {
           saveCurrentUser(nguoiDung)
+        } else {
+          clearAuthSession()
         }
       } catch {
         clearAuthSession()
@@ -65,10 +67,19 @@ export const useAuth = () => {
     try {
       const phanHoi = await hamDangNhap(identifier, password)
       const nguoiDung = phanHoi?.currentUser || phanHoi?.user
+      const accessToken = phanHoi?.accessToken
+
+      if (!nguoiDung || !accessToken) {
+        clearAuthSession()
+        return {
+          success: false,
+          error: thongDiepLoiMacDinh,
+        }
+      }
 
       saveAuthSession({
         user: nguoiDung,
-        accessToken: phanHoi?.accessToken,
+        accessToken,
       })
 
       return {
@@ -109,10 +120,19 @@ export const useAuth = () => {
     try {
       const phanHoi = await registerApi(payload)
       const nguoiDung = phanHoi?.currentUser || phanHoi?.user
+      const accessToken = phanHoi?.accessToken
+
+      if (!nguoiDung || !accessToken) {
+        clearAuthSession()
+        return {
+          success: false,
+          error: 'Đăng ký thất bại.',
+        }
+      }
 
       saveAuthSession({
         user: nguoiDung,
-        accessToken: phanHoi?.accessToken,
+        accessToken,
       })
 
       return {
