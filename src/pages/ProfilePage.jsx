@@ -6,13 +6,6 @@ import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 import { canCancelBooking } from '../hooks/booking/bookingPolicies.js'
 
-const canCancelBooking = (status) => (
-  status === 'CHO_XAC_NHAN'
-  || status === 'YEU_CAU_DAT_BAN'
-  || status === 'GIU_CHO_TAM'
-  || status === 'CAN_GOI_LAI'
-)
-
 const formatDate = (value) => {
   if (!value) {
     return '--'
@@ -101,8 +94,13 @@ function ProfilePage() {
         return
       }
 
-      setLichSuDatBan(await getBookingHistory())
-      setLichSuDonHang(await getMyOrders())
+      const [bookings, orders] = await Promise.all([
+        getBookingHistory(),
+        getMyOrders(),
+      ])
+
+      setLichSuDatBan(Array.isArray(bookings) ? bookings : [])
+      setLichSuDonHang(Array.isArray(orders) ? orders : [])
       setThongBaoDatBan('')
     }
 
