@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react'
 import { BOOKING_STATUS_LABELS } from '../data/bookingData'
+import { AUTH_ROLES } from '../services/authService'
 import {
   generateBookingCode,
   getBookingStatusHeadline,
@@ -54,7 +55,7 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
   const validateStepOne = () => getStepOneErrors({ guestCount, date: formData.date, time: formData.time, invalidPastDate, closedDate })
   const validateStepTwo = () => getStepTwoErrors({ name: formData.name, phone: formData.phone })
 
-  const submitBooking = ({ goToStep, saveDraft }) => {
+  const submitBooking = async ({ goToStep, saveDraft }) => {
     setSubmitError('')
 
     if (formData.phone.trim()) {
@@ -102,6 +103,8 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
       notes: formData.notes,
     })
 
+    const linkedUserEmail = currentUser?.role === AUTH_ROLES.CUSTOMER ? currentUser.email ?? null : null
+
     const booking = {
       id: Date.now(),
       guests: formData.guests,
@@ -116,42 +119,47 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
       source: 'web',
       createdAt: submissionTime,
       bookingCode: code,
-      userEmail: currentUser?.email ?? null,
+      userEmail: linkedUserEmail,
       occasion: formData.occasion,
       confirmationChannel: formData.email ? ['SMS', 'Email'] : ['SMS'],
     }
 
-    createBooking({
-      booking,
-      confirmationPayload: {
-        bookingCode: code,
-        status,
-        confirmationChannel: booking.confirmationChannel,
-        bookingId: booking.id,
-        createdAt: submissionTime,
-        mealDurationMinutes: getMealDuration(guestCount, formData.time),
-        sms: { to: formData.phone, sentAt: submissionTime, bookingCode: code, status },
-        email: formData.email ? { to: formData.email, sentAt: submissionTime, bookingCode: code, status } : null,
-      },
-      receptionQueueItem: {
-        bookingCode: code,
-        guestName: formData.name,
-        guests: formData.guests,
-        date: formData.date,
-        time: formData.time,
-        seatingArea: formData.seatingArea,
-        status,
-        source: 'web',
-        queuedAt: submissionTime,
-        mealDurationMinutes: getMealDuration(guestCount, formData.time),
-      },
-    })
+    try {
+      const createdBooking = await createBooking({
+        booking,
+        confirmationPayload: {
+          bookingCode: code,
+          status,
+          confirmationChannel: booking.confirmationChannel,
+          bookingId: booking.id,
+          createdAt: submissionTime,
+          mealDurationMinutes: getMealDuration(guestCount, formData.time),
+          sms: { to: formData.phone, sentAt: submissionTime, bookingCode: code, status },
+          email: formData.email ? { to: formData.email, sentAt: submissionTime, bookingCode: code, status } : null,
+        },
+        receptionQueueItem: {
+          bookingCode: code,
+          guestName: formData.name,
+          guests: formData.guests,
+          date: formData.date,
+          time: formData.time,
+          seatingArea: formData.seatingArea,
+          status,
+          source: 'web',
+          queuedAt: submissionTime,
+          mealDurationMinutes: getMealDuration(guestCount, formData.time),
+        },
+      })
 
-    setBookingCode(code)
-    setBookingStatus(status)
-    setSubmitted(true)
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-    return { success: true }
+      setBookingCode(createdBooking?.bookingCode || code)
+      setBookingStatus(createdBooking?.status || status)
+      setSubmitted(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+      return { success: true }
+    } catch (error) {
+      setSubmitError(error?.message || 'Không thể gửi yêu cầu đặt bàn. Vui lòng thử lại.')
+      return { success: false }
+    }
   }
 
   return {

@@ -6,8 +6,9 @@
       "args": [],
       "env": {
         "ORACLE_ENGINE": "browser",
-        "ORACLE_HOME_DIR": "C:\\Users\\Moderator\\.oracle-local",
-        "ORACLE_BROWSER_PROFILE_DIR": "C:\\Users\\Moderator\\.oracle-local\\browser-profile"
+        "ORACLE_MODEL": "gpt-5.4",
+        "ORACLE_HOME_DIR": "C:\\Users\\Moderator\\.oracle",
+        "ORACLE_BROWSER_PROFILE_DIR": "C:\\Users\\Moderator\\.oracle\\browser-profile"
       }
     }
   }

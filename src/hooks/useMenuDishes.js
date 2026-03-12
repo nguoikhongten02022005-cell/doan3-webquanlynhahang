@@ -1,32 +1,24 @@
 import { useCallback, useEffect, useState } from 'react'
-import { STORAGE_KEYS } from '../constants/storageKeys'
-import { MENU_DISHES_CHANGED_EVENT, getMenuDishes } from '../services/menuService'
+import { getMenuItemsApi } from '../services/api/menuApi'
 
 export const useMenuDishes = () => {
-  const [dishes, setDishes] = useState(() => getMenuDishes())
+  const [danhSachMon, setDanhSachMon] = useState([])
 
-  const reloadDishes = useCallback(() => {
-    setDishes(getMenuDishes())
+  const taiLaiDanhSachMon = useCallback(async () => {
+    const items = await getMenuItemsApi()
+    const monAn = Array.isArray(items) ? items : []
+    setDanhSachMon(monAn)
+    return monAn
   }, [])
 
   useEffect(() => {
-    const handleStorage = (event) => {
-      if (!event.key || event.key === STORAGE_KEYS.MENU_DISHES) {
-        reloadDishes()
-      }
-    }
-
-    window.addEventListener('storage', handleStorage)
-    window.addEventListener(MENU_DISHES_CHANGED_EVENT, reloadDishes)
-
-    return () => {
-      window.removeEventListener('storage', handleStorage)
-      window.removeEventListener(MENU_DISHES_CHANGED_EVENT, reloadDishes)
-    }
-  }, [reloadDishes])
+    taiLaiDanhSachMon()
+  }, [taiLaiDanhSachMon])
 
   return {
-    dishes,
-    reloadDishes,
+    dishes: danhSachMon,
+    danhSachMon,
+    reloadDishes: taiLaiDanhSachMon,
+    taiLaiDanhSachMon,
   }
 }

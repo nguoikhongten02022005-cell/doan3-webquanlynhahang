@@ -115,7 +115,7 @@ function BookingsTab({
     return ''
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     const nextError = validateForm()
@@ -139,8 +139,8 @@ function BookingsTab({
     }
 
     const result = formMode === 'edit'
-      ? handleUpdateInternalBooking(editingBookingId, payload)
-      : handleCreateInternalBooking(payload)
+      ? await handleUpdateInternalBooking(editingBookingId, payload)
+      : await handleCreateInternalBooking(payload)
 
     if (!result?.success) {
       setFormError(result?.error || 'Không thể lưu booking nội bộ.')
@@ -191,7 +191,7 @@ function BookingsTab({
     setAssignModalError('')
   }
 
-  const handleAssignSubmit = () => {
+  const handleAssignSubmit = async () => {
     if (!assigningBooking) {
       return
     }
@@ -201,7 +201,7 @@ function BookingsTab({
       return
     }
 
-    const result = handleAssignTables(assigningBooking.id, selectedTableIds)
+    const result = await handleAssignTables(assigningBooking.id, selectedTableIds)
     if (!result?.success) {
       setAssignModalError(result?.error || 'Không thể gán bàn cho booking này.')
       return
@@ -216,7 +216,7 @@ function BookingsTab({
     setFormError('')
   }
 
-  const handleConfirmAction = () => {
+  const handleConfirmAction = async () => {
     if (!pendingAction?.booking) {
       return
     }
@@ -225,15 +225,15 @@ function BookingsTab({
     let result = null
 
     if (type === 'checkIn') {
-      result = handleCheckIn(booking.id)
+      result = await handleCheckIn(booking.id)
     }
 
     if (type === 'complete') {
-      result = handleComplete(booking.id)
+      result = await handleComplete(booking.id)
     }
 
     if (type === 'noShow') {
-      result = handleNoShow(booking.id)
+      result = await handleNoShow(booking.id)
     }
 
     if (!result?.success) {
