@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '../constants/storageKeys'
-import { getStorageJSON, removeStorageItem, setStorageJSON } from './storageService'
+import { getStorageItem, getStorageJSON, removeStorageItem, setStorageItem, setStorageJSON } from './storageService'
 
 export const AUTH_USER_CHANGED_EVENT = 'auth:user-changed'
 export const AUTH_ROLES = Object.freeze({
@@ -124,7 +124,7 @@ export const clearCurrentUser = () => {
 }
 
 export const getAuthToken = () => {
-  const auth = getStorageJSON(STORAGE_KEYS.AUTH_TOKEN, null)
+  const auth = getStorageItem(STORAGE_KEYS.AUTH_TOKEN)
   return typeof auth === 'string' && auth.trim() ? auth : ''
 }
 
@@ -133,7 +133,7 @@ export const saveAuthToken = (token) => {
     return
   }
 
-  setStorageJSON(STORAGE_KEYS.AUTH_TOKEN, token)
+  setStorageItem(STORAGE_KEYS.AUTH_TOKEN, token)
 }
 
 export const clearAuthToken = () => {
