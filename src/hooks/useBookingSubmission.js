@@ -106,7 +106,6 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     const linkedUserEmail = currentUser?.role === AUTH_ROLES.CUSTOMER ? currentUser.email ?? null : null
 
     const booking = {
-      id: Date.now(),
       guests: formData.guests,
       date: formData.date,
       time: formData.time,
@@ -117,7 +116,6 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
       email: formData.email,
       status,
       source: 'web',
-      createdAt: submissionTime,
       bookingCode: code,
       userEmail: linkedUserEmail,
       occasion: formData.occasion,
@@ -131,23 +129,10 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
           bookingCode: code,
           status,
           confirmationChannel: booking.confirmationChannel,
-          bookingId: booking.id,
           createdAt: submissionTime,
           mealDurationMinutes: getMealDuration(guestCount, formData.time),
           sms: { to: formData.phone, sentAt: submissionTime, bookingCode: code, status },
           email: formData.email ? { to: formData.email, sentAt: submissionTime, bookingCode: code, status } : null,
-        },
-        receptionQueueItem: {
-          bookingCode: code,
-          guestName: formData.name,
-          guests: formData.guests,
-          date: formData.date,
-          time: formData.time,
-          seatingArea: formData.seatingArea,
-          status,
-          source: 'web',
-          queuedAt: submissionTime,
-          mealDurationMinutes: getMealDuration(guestCount, formData.time),
         },
       })
 
