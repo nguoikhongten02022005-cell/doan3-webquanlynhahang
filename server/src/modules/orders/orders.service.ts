@@ -1,5 +1,6 @@
 import { prisma } from '../../lib/prisma.js'
 import { HttpError } from '../../common/http-error.js'
+import type { AuthUser } from '../../common/auth.js'
 
 const getVoucherDiscount = (voucher: {
   discountType: 'FIXED' | 'PERCENTAGE'
@@ -17,24 +18,43 @@ const getVoucherDiscount = (voucher: {
   return Math.min(percentageDiscount, maxDiscount)
 }
 
+const chuanHoaEmail = (value?: string | null) => String(value || '').trim().toLowerCase()
+
+const laNhanSuNoiBo = (nguoiDung?: AuthUser | null) => nguoiDung?.role === 'admin' || nguoiDung?.role === 'staff'
+
+const laChuSoHuuDonHang = (order: { userId: number | null, userEmail: string }, nguoiDung: AuthUser) => {
+  if (order.userId && order.userId === nguoiDung.id) {
+    return true
+  }
+
+  return chuanHoaEmail(order.userEmail) === chuanHoaEmail(nguoiDung.email)
+}
+
 export const listOrders = () => prisma.order.findMany({
   include: { items: true },
   orderBy: { id: 'desc' },
 })
 
-export const listMyOrders = (userEmail: string) => prisma.order.findMany({
+export const listMyOrders = (nguoiDung: AuthUser) => prisma.order.findMany({
   where: {
-    userEmail: String(userEmail || '').trim().toLowerCase(),
+    OR: [
+      { userId: nguoiDung.id },
+      { userEmail: chuanHoaEmail(nguoiDung.email) },
+    ],
   },
   include: { items: true },
   orderBy: { id: 'desc' },
 })
 
-export const getOrderById = async (id: number) => {
+export const getOrderById = async (id: number, nguoiDung: AuthUser) => {
   const order = await prisma.order.findUnique({ where: { id }, include: { items: true } })
 
   if (!order) {
     throw new HttpError(404, 'Không tìm thấy đơn hàng.')
+  }
+
+  if (!laNhanSuNoiBo(nguoiDung) && !laChuSoHuuDonHang(order, nguoiDung)) {
+    throw new HttpError(403, 'Bạn không có quyền truy cập đơn hàng này.')
   }
 
   return order
@@ -68,12 +88,12 @@ export const createOrder = async (payload: {
   tableNumber: string
   paymentMethod: string
 }) => {
-  const normalizedUserEmail = payload.userEmail.trim().toLowerCase()
-  const normalizedCustomerEmail = payload.customer.email.trim().toLowerCase()
+  const userEmailDaChuanHoa = chuanHoaEmail(payload.userEmail)
+  const emailKhachHangDaChuanHoa = chuanHoaEmail(payload.customer.email)
 
   return prisma.$transaction(async (tx) => {
-    const user = normalizedUserEmail
-      ? await tx.user.findFirst({ where: { email: normalizedUserEmail } })
+    const nguoiDung = userEmailDaChuanHoa
+      ? await tx.user.findFirst({ where: { email: userEmailDaChuanHoa } })
       : null
 
     const menuItemIds = payload.items.map((item) => item.id).filter((value): value is number => Number.isInteger(value))
@@ -153,13 +173,16 @@ export const createOrder = async (payload: {
         note: payload.note,
         tableNumber: payload.tableNumber,
         paymentMethod: payload.paymentMethod,
-        userEmail: normalizedUserEmail,
+        userEmail: userEmailDaChuanHoa,
         customerFullName: payload.customer.fullName,
         customerPhone: payload.customer.phone,
-        customerEmail: normalizedCustomerEmail,
+        customerEmail: emailKhachHangDaChuanHoa,
         customerAddress: payload.customer.address,
-        customerSnapshot: payload.customer,
-        userId: user?.id,
+        customerSnapshot: {
+          ...payload.customer,
+          email: emailKhachHangDaChuanHoa,
+        },
+        userId: nguoiDung?.id,
         items: {
           create: payload.items.map((item) => {
             const menuItem = item.id ? menuItemLookup.get(item.id) : null

@@ -9,20 +9,25 @@ export const getOrders = async (_req: Request, res: Response) => {
 }
 
 export const getMyOrders = async (req: Request, res: Response) => {
-  const orders = await listMyOrders(req.authUser!.email)
+  const orders = await listMyOrders(req.authUser!)
   res.json(orders.map(mapOrder))
 }
 
 export const getOrder = async (req: Request, res: Response) => {
-  const order = await getOrderById(Number(req.params.id))
+  const order = await getOrderById(Number(req.params.id), req.authUser!)
   res.json(mapOrder(order))
 }
 
 export const postOrder = async (req: Request, res: Response) => {
   const payload = createOrderSchema.parse(req.body)
+  const emailNguoiDung = req.authUser?.email ?? payload.userEmail ?? payload.customer.email
   const order = await createOrder({
     ...payload,
-    userEmail: req.authUser?.email ?? payload.userEmail,
+    userEmail: emailNguoiDung,
+    customer: {
+      ...payload.customer,
+      email: payload.customer.email || emailNguoiDung,
+    },
   })
   res.status(201).json(mapOrder(order))
 }

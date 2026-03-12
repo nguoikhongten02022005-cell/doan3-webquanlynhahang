@@ -153,7 +153,7 @@ export const createSessionTokens = async (user: { id: number, email: string, use
 }
 
 export const refreshSessionTokens = async (refreshToken: string) => {
-  const payload = verifyRefreshToken(refreshToken)
+  verifyRefreshToken(refreshToken)
   const tokenHash = hashToken(refreshToken)
 
   const storedToken = await prisma.refreshToken.findUnique({
@@ -173,10 +173,10 @@ export const refreshSessionTokens = async (refreshToken: string) => {
   })
 
   const nextTokens = await createSessionTokens({
-    id: payload.id,
-    email: payload.email,
-    username: payload.username,
-    role: payload.role,
+    id: storedToken.user.id,
+    email: storedToken.user.email,
+    username: storedToken.user.username,
+    role: storedToken.user.role,
   })
 
   return {

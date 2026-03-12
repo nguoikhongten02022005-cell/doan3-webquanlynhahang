@@ -1,6 +1,7 @@
 import type { NextFunction, Request, Response } from 'express'
 import { HttpError } from '../http-error.js'
 import { verifyAccessToken } from '../utils/jwt.js'
+import { getAuthUserById } from '../../modules/auth/auth.service.js'
 
 const extractBearerToken = (request: Request) => {
   const authorization = request.header('authorization')
@@ -18,7 +19,23 @@ const extractBearerToken = (request: Request) => {
   return token.trim()
 }
 
-export const authenticate = (req: Request, _res: Response, next: NextFunction) => {
+const napNguoiDungXacThuc = async (token: string) => {
+  const payload = verifyAccessToken(token)
+  const nguoiDung = await getAuthUserById(payload.id)
+
+  if (nguoiDung.status !== 'ACTIVE') {
+    throw new HttpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.')
+  }
+
+  return {
+    id: nguoiDung.id,
+    email: nguoiDung.email,
+    username: nguoiDung.username,
+    role: nguoiDung.role,
+  }
+}
+
+export const authenticate = async (req: Request, _res: Response, next: NextFunction) => {
   try {
     const token = extractBearerToken(req)
 
@@ -26,22 +43,14 @@ export const authenticate = (req: Request, _res: Response, next: NextFunction) =
       throw new HttpError(401, 'Bạn cần đăng nhập để tiếp tục.')
     }
 
-    const payload = verifyAccessToken(token)
-
-    req.authUser = {
-      id: payload.id,
-      email: payload.email,
-      username: payload.username,
-      role: payload.role,
-    }
-
+    req.authUser = await napNguoiDungXacThuc(token)
     next()
   } catch {
     next(new HttpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.'))
   }
 }
 
-export const optionalAuthenticate = (req: Request, _res: Response, next: NextFunction) => {
+export const optionalAuthenticate = async (req: Request, _res: Response, next: NextFunction) => {
   try {
     const token = extractBearerToken(req)
 
@@ -50,13 +59,7 @@ export const optionalAuthenticate = (req: Request, _res: Response, next: NextFun
       return
     }
 
-    const payload = verifyAccessToken(token)
-    req.authUser = {
-      id: payload.id,
-      email: payload.email,
-      username: payload.username,
-      role: payload.role,
-    }
+    req.authUser = await napNguoiDungXacThuc(token)
     next()
   } catch {
     next(new HttpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.'))

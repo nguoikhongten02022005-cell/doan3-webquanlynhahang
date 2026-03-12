@@ -15,7 +15,7 @@ export const getProfileMe = async (req: Request, res: Response) => {
 }
 
 export const getProfileOrders = async (req: Request, res: Response) => {
-  const orders = await listMyOrders(req.authUser!.email)
+  const orders = await listMyOrders(req.authUser!)
   res.json({
     success: true,
     data: orders.map(mapOrder),
@@ -23,7 +23,7 @@ export const getProfileOrders = async (req: Request, res: Response) => {
 }
 
 export const getProfileBookings = async (req: Request, res: Response) => {
-  const bookings = await listBookingHistory(req.authUser!.email)
+  const bookings = await listBookingHistory(req.authUser!)
   res.json({
     success: true,
     data: bookings.map(mapBooking),
@@ -32,7 +32,7 @@ export const getProfileBookings = async (req: Request, res: Response) => {
 }
 
 export const getProfileBookingHistory = async (req: Request, res: Response) => {
-  const bookings = await listBookingHistory(req.authUser!.email)
+  const bookings = await listBookingHistory(req.authUser!)
   res.json({
     success: true,
     data: bookings.map(mapBookingHistoryItem),

@@ -1,7 +1,6 @@
 import type { Request, Response } from 'express'
 import {
   assignTablesSchema,
-  bookingHistoryQuerySchema,
   createBookingSchema,
   updateBookingSchema,
   updateBookingStatusSchema,
@@ -18,6 +17,7 @@ import {
   updateBooking,
   updateBookingStatus,
 } from './bookings.service.js'
+import { HttpError } from '../../common/http-error.js'
 
 export const getBookings = async (_req: Request, res: Response) => {
   const bookings = await listBookings()
@@ -25,20 +25,25 @@ export const getBookings = async (_req: Request, res: Response) => {
 }
 
 export const getBooking = async (req: Request, res: Response) => {
-  const booking = await getBookingById(Number(req.params.id))
+  const booking = await getBookingById(Number(req.params.id), req.authUser!)
   res.json(mapBooking(booking))
 }
 
 export const getBookingHistory = async (req: Request, res: Response) => {
-  const query = bookingHistoryQuerySchema.parse(req.query)
-  const bookings = await listBookingHistory(req.authUser?.email ?? query.userEmail)
+  if (!req.authUser) {
+    throw new HttpError(401, 'Bạn cần đăng nhập để xem lịch sử đặt bàn.')
+  }
+
+  const bookings = await listBookingHistory(req.authUser)
   res.json(bookings.map(mapBookingHistoryItem))
 }
 
 export const postBooking = async (req: Request, res: Response) => {
   const payload = createBookingSchema.parse(req.body)
+  const emailNguoiDung = req.authUser?.email ?? payload.email
   const booking = await createBooking({
     ...payload,
+    email: emailNguoiDung,
     userEmail: req.authUser?.email ?? payload.userEmail,
     createdBy: req.authUser?.email ?? payload.createdBy,
   })
@@ -63,7 +68,7 @@ export const patchBooking = async (req: Request, res: Response) => {
 }
 
 export const patchBookingCancel = async (req: Request, res: Response) => {
-  const booking = await cancelBookingByCustomer(Number(req.params.id), req.authUser!.email)
+  const booking = await cancelBookingByCustomer(Number(req.params.id), req.authUser!)
   res.json(mapBooking(booking))
 }
 

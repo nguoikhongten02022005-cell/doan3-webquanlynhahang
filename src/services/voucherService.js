@@ -1,40 +1,36 @@
 import { STORAGE_KEYS } from '../constants/storageKeys'
-import { DEFAULT_VOUCHER } from '../constants/voucher'
 import { getStorageJSON, removeStorageItem, setStorageJSON } from './storageService'
 
-const normalizeVoucher = (voucher) => {
-  if (!voucher) {
+const chuanHoaVoucher = (voucher) => {
+  if (!voucher || typeof voucher !== 'object') {
     return null
   }
 
-  const normalizedCode = String(voucher.code || '').toUpperCase()
-  const normalizedAmount = Number(voucher.amount)
+  const maGiamGia = String(voucher.code || '').trim().toUpperCase()
+  const soTienGiam = Number(voucher.amount ?? voucher.discountAmount ?? 0)
 
-  if (normalizedCode !== DEFAULT_VOUCHER.code || !Number.isFinite(normalizedAmount) || normalizedAmount <= 0) {
+  if (!maGiamGia || !Number.isFinite(soTienGiam) || soTienGiam <= 0) {
     return null
   }
 
   return {
-    code: normalizedCode,
-    amount: normalizedAmount,
+    code: maGiamGia,
+    amount: soTienGiam,
   }
 }
 
-export const getAppliedVoucher = () => {
-  const voucher = getStorageJSON(STORAGE_KEYS.APPLIED_VOUCHER, null)
-  return normalizeVoucher(voucher)
-}
+export const getAppliedVoucher = () => chuanHoaVoucher(getStorageJSON(STORAGE_KEYS.APPLIED_VOUCHER, null))
 
 export const setAppliedVoucher = (voucher) => {
-  const normalizedVoucher = normalizeVoucher(voucher)
+  const voucherDaChuanHoa = chuanHoaVoucher(voucher)
 
-  if (!normalizedVoucher) {
+  if (!voucherDaChuanHoa) {
     removeStorageItem(STORAGE_KEYS.APPLIED_VOUCHER)
     return null
   }
 
-  setStorageJSON(STORAGE_KEYS.APPLIED_VOUCHER, normalizedVoucher)
-  return normalizedVoucher
+  setStorageJSON(STORAGE_KEYS.APPLIED_VOUCHER, voucherDaChuanHoa)
+  return voucherDaChuanHoa
 }
 
 export const clearAppliedVoucher = () => {

@@ -2,6 +2,15 @@ import crypto from 'node:crypto'
 import jwt from 'jsonwebtoken'
 import type { AccessTokenPayload, AuthUser, RefreshTokenPayload } from '../auth.js'
 import { env } from '../../config/env.js'
+import { HttpError } from '../http-error.js'
+
+const xacThucLoaiToken = <T extends { type: string }>(payload: unknown, loaiMongMuon: T['type']) => {
+  if (!payload || typeof payload !== 'object' || (payload as { type?: string }).type !== loaiMongMuon) {
+    throw new HttpError(401, 'Phiên đăng nhập không hợp lệ hoặc đã hết hạn.')
+  }
+
+  return payload as T
+}
 
 export const signAccessToken = (user: AuthUser) => jwt.sign(
   {
@@ -12,7 +21,10 @@ export const signAccessToken = (user: AuthUser) => jwt.sign(
   { expiresIn: env.JWT_EXPIRES_IN } as jwt.SignOptions,
 )
 
-export const verifyAccessToken = (token: string) => jwt.verify(token, env.JWT_SECRET) as AccessTokenPayload
+export const verifyAccessToken = (token: string) => xacThucLoaiToken<AccessTokenPayload>(
+  jwt.verify(token, env.JWT_SECRET),
+  'access',
+)
 
 export const signRefreshToken = (user: AuthUser) => jwt.sign(
   {
@@ -23,6 +35,9 @@ export const signRefreshToken = (user: AuthUser) => jwt.sign(
   { expiresIn: env.JWT_REFRESH_EXPIRES_IN } as jwt.SignOptions,
 )
 
-export const verifyRefreshToken = (token: string) => jwt.verify(token, env.JWT_REFRESH_SECRET) as RefreshTokenPayload
+export const verifyRefreshToken = (token: string) => xacThucLoaiToken<RefreshTokenPayload>(
+  jwt.verify(token, env.JWT_REFRESH_SECRET),
+  'refresh',
+)
 
 export const hashToken = (token: string) => crypto.createHash('sha256').update(token).digest('hex')

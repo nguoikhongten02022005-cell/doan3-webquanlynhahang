@@ -1,17 +1,10 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { MENU_CATEGORIES } from '../../data/menuData'
 import {
   createMenuItemApi,
   deleteMenuItemApi,
   updateMenuItemApi,
 } from '../../services/api/menuApi'
-import { shouldUseBackend } from '../../services/apiClient'
-import {
-  createMenuDish,
-  deleteMenuDish,
-  MENU_DISHES_CONFLICT_ERROR,
-  updateMenuDish,
-} from '../../services/menuService'
 import { parsePriceToNumber } from '../../utils/price'
 
 const DEFAULT_FORM_VALUES = {
@@ -43,29 +36,21 @@ const formatPriceInput = (price) => {
 }
 
 function DishesTab({ dishes, reloadDishes }) {
-  const useBackend = shouldUseBackend()
-  const [formMode, setFormMode] = useState('create')
-  const [editingDishId, setEditingDishId] = useState(null)
-  const [editingDishSnapshot, setEditingDishSnapshot] = useState(null)
+  const [cheDoForm, setCheDoForm] = useState('create')
+  const [idMonDangSua, setIdMonDangSua] = useState(null)
   const [formValues, setFormValues] = useState(DEFAULT_FORM_VALUES)
-  const [formError, setFormError] = useState('')
+  const [loiForm, setLoiForm] = useState('')
 
   const sortedDishes = useMemo(
     () => [...dishes].sort((firstDish, secondDish) => secondDish.id - firstDish.id),
     [dishes],
   )
 
-  const editingDish = useMemo(
-    () => (editingDishId === null ? null : dishes.find((dish) => dish.id === editingDishId) ?? null),
-    [dishes, editingDishId],
-  )
-
   const resetForm = () => {
-    setFormMode('create')
-    setEditingDishId(null)
-    setEditingDishSnapshot(null)
+    setCheDoForm('create')
+    setIdMonDangSua(null)
     setFormValues(DEFAULT_FORM_VALUES)
-    setFormError('')
+    setLoiForm('')
   }
 
   const handleChange = (field) => (event) => {
@@ -74,33 +59,6 @@ function DishesTab({ dishes, reloadDishes }) {
       [field]: event.target.value,
     }))
   }
-
-  useEffect(() => {
-    if (formMode !== 'edit' || editingDishId === null || !editingDishSnapshot) {
-      return
-    }
-
-    if (!editingDish) {
-      resetForm()
-      setFormError('Món đang sửa đã bị thay đổi hoặc xóa ở tab khác. Form đã được làm mới.')
-      return
-    }
-
-    const hasExternalChange = (
-      editingDish.name !== editingDishSnapshot.name
-      || editingDish.description !== editingDishSnapshot.description
-      || editingDish.price !== editingDishSnapshot.price
-      || editingDish.category !== editingDishSnapshot.category
-      || (editingDish.badge || '') !== editingDishSnapshot.badge
-      || editingDish.tone !== editingDishSnapshot.tone
-      || (editingDish.image || '') !== editingDishSnapshot.image
-    )
-
-    if (hasExternalChange) {
-      resetForm()
-      setFormError('Món đang sửa đã được cập nhật ở tab khác. Form đã được làm mới để tránh ghi đè.')
-    }
-  }, [editingDish, editingDishId, editingDishSnapshot, formMode])
 
   const validateForm = () => {
     if (!formValues.name.trim()) {
@@ -131,7 +89,7 @@ function DishesTab({ dishes, reloadDishes }) {
 
     const nextError = validateForm()
     if (nextError) {
-      setFormError(nextError)
+      setLoiForm(nextError)
       return
     }
 
@@ -147,29 +105,26 @@ function DishesTab({ dishes, reloadDishes }) {
     }
 
     try {
-      const savedDish = useBackend
-        ? (formMode === 'edit' ? await updateMenuItemApi(editingDishId, payload) : await createMenuItemApi(payload))
-        : (formMode === 'edit' ? updateMenuDish(editingDishId, payload) : createMenuDish(payload))
+      const savedDish = cheDoForm === 'edit'
+        ? await updateMenuItemApi(idMonDangSua, payload)
+        : await createMenuItemApi(payload)
 
       if (!savedDish) {
-        setFormError('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')
+        setLoiForm('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')
         return
       }
 
       await reloadDishes?.()
       resetForm()
     } catch (error) {
-      if (error?.code === MENU_DISHES_CONFLICT_ERROR) {
-        setFormError('Menu vừa được cập nhật ở tab khác. Vui lòng tải dữ liệu mới và thử lại.')
-        return
-      }
-
-      setFormError(error?.message || 'Không thể lưu món ăn. Vui lòng thử lại.')
+      setLoiForm(error?.message || 'Không thể lưu món ăn. Vui lòng thử lại.')
     }
   }
 
   const handleEditDish = (dish) => {
-    const nextSnapshot = {
+    setCheDoForm('edit')
+    setIdMonDangSua(dish.id)
+    setFormValues({
       name: dish.name,
       description: dish.description,
       price: dish.price,
@@ -177,13 +132,8 @@ function DishesTab({ dishes, reloadDishes }) {
       badge: dish.badge || '',
       tone: dish.tone,
       image: dish.image || '',
-    }
-
-    setFormMode('edit')
-    setEditingDishId(dish.id)
-    setEditingDishSnapshot(nextSnapshot)
-    setFormValues(nextSnapshot)
-    setFormError('')
+    })
+    setLoiForm('')
   }
 
   const handleDeleteDish = async (dish) => {
@@ -194,24 +144,14 @@ function DishesTab({ dishes, reloadDishes }) {
     }
 
     try {
-      if (useBackend) {
-        await deleteMenuItemApi(dish.id)
-      } else {
-        deleteMenuDish(dish.id)
-      }
-
+      await deleteMenuItemApi(dish.id)
       await reloadDishes?.()
 
-      if (editingDishId === dish.id) {
+      if (idMonDangSua === dish.id) {
         resetForm()
       }
     } catch (error) {
-      if (error?.code === MENU_DISHES_CONFLICT_ERROR) {
-        setFormError('Menu vừa được cập nhật ở tab khác. Vui lòng tải dữ liệu mới và thử lại.')
-        return
-      }
-
-      setFormError(error?.message || 'Không thể xóa món ăn. Vui lòng thử lại.')
+      setLoiForm(error?.message || 'Không thể xóa món ăn. Vui lòng thử lại.')
     }
   }
 
@@ -219,8 +159,8 @@ function DishesTab({ dishes, reloadDishes }) {
     <div className="internal-dashboard-stack">
       <article className="profile-card">
         <div className="host-board-head">
-          <h2>{formMode === 'edit' ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}</h2>
-          <span>{formMode === 'edit' ? `Đang sửa #${editingDishId}` : useBackend ? 'Đồng bộ trực tiếp với backend menu' : 'Cập nhật dữ liệu menu cho bản demo nội bộ'}</span>
+          <h2>{cheDoForm === 'edit' ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}</h2>
+          <span>{cheDoForm === 'edit' ? `Đang sửa #${idMonDangSua}` : 'Đồng bộ trực tiếp với backend menu'}</span>
         </div>
 
         <form className="internal-dish-form" onSubmit={handleSubmit}>
@@ -230,7 +170,7 @@ function DishesTab({ dishes, reloadDishes }) {
               <input
                 id="dish-name"
                 type="text"
-                className={`form-input ${formError && !formValues.name.trim() ? 'form-input-error' : ''}`}
+                className={`form-input ${loiForm && !formValues.name.trim() ? 'form-input-error' : ''}`}
                 placeholder="Ví dụ: Cơm chiên hải sản"
                 value={formValues.name}
                 onChange={handleChange('name')}
@@ -241,7 +181,7 @@ function DishesTab({ dishes, reloadDishes }) {
               <span className="form-label">Mô tả</span>
               <textarea
                 id="dish-description"
-                className={`form-textarea ${formError && !formValues.description.trim() ? 'form-input-error' : ''}`}
+                className={`form-textarea ${loiForm && !formValues.description.trim() ? 'form-input-error' : ''}`}
                 rows="3"
                 placeholder="Mô tả ngắn về món ăn"
                 value={formValues.description}
@@ -254,7 +194,7 @@ function DishesTab({ dishes, reloadDishes }) {
               <input
                 id="dish-price"
                 type="text"
-                className={`form-input ${formError && parsePriceToNumber(formValues.price) <= 0 ? 'form-input-error' : ''}`}
+                className={`form-input ${loiForm && parsePriceToNumber(formValues.price) <= 0 ? 'form-input-error' : ''}`}
                 placeholder="Ví dụ: 125.000đ"
                 value={formValues.price}
                 onChange={handleChange('price')}
@@ -318,13 +258,13 @@ function DishesTab({ dishes, reloadDishes }) {
             </label>
           </div>
 
-          {formError ? <p className="form-error">{formError}</p> : null}
+          {loiForm ? <p className="form-error">{loiForm}</p> : null}
 
           <div className="internal-dish-form-actions">
             <button type="submit" className="btn btn-primary">
-              {formMode === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}
+              {cheDoForm === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}
             </button>
-            {formMode === 'edit' ? (
+            {cheDoForm === 'edit' ? (
               <button type="button" className="btn btn-ghost" onClick={resetForm}>
                 Hủy sửa
               </button>

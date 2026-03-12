@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { DEFAULT_VOUCHER } from '../constants/voucher'
 import { formatCurrency } from '../utils/currency'
 import {
   clearCheckoutDraft,
@@ -13,45 +12,47 @@ import {
   getAppliedVoucher as getStoredVoucher,
   setAppliedVoucher as saveVoucher,
 } from '../services/voucherService'
+import { validateVoucherApi } from '../services/api/voucherApi'
 
 function CartPage() {
   const navigate = useNavigate()
   const { cartItems, updateQuantity, removeFromCart, getCartItemKey, getItemDisplayOptions } = useCart()
 
-  const [note, setNote] = useState('')
-  const [tableNumber, setTableNumber] = useState('')
-  const [voucherCodeInput, setVoucherCodeInput] = useState('')
-  const [appliedVoucher, setAppliedVoucherState] = useState(null)
-  const [voucherError, setVoucherError] = useState('')
+  const [ghiChu, setGhiChu] = useState('')
+  const [soBan, setSoBan] = useState('')
+  const [maVoucherNhap, setMaVoucherNhap] = useState('')
+  const [voucherDaApDung, setVoucherDaApDung] = useState(null)
+  const [loiVoucher, setLoiVoucher] = useState('')
+  const [dangApVoucher, setDangApVoucher] = useState(false)
 
-  const subtotal = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const serviceFee = subtotal * 0.05
-  const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal + serviceFee) : 0
-  const total = Math.max(0, subtotal + serviceFee - discountAmount)
+  const tamTinh = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
+  const phiDichVu = tamTinh * 0.05
+  const soTienGiam = voucherDaApDung ? Math.min(voucherDaApDung.amount, tamTinh + phiDichVu) : 0
+  const tongTien = Math.max(0, tamTinh + phiDichVu - soTienGiam)
 
   useEffect(() => {
     const voucher = getStoredVoucher()
     if (voucher) {
-      setAppliedVoucherState(voucher)
-      setVoucherCodeInput(voucher.code)
+      setVoucherDaApDung(voucher)
+      setMaVoucherNhap(voucher.code)
     }
 
     const draft = getCheckoutDraft()
     if (draft) {
-      setNote(draft.note)
-      setTableNumber(draft.tableNumber)
+      setGhiChu(draft.note)
+      setSoBan(draft.tableNumber)
     }
   }, [])
 
   useEffect(() => {
-    if (subtotal > 0 || !appliedVoucher) {
+    if (tamTinh > 0 || !voucherDaApDung) {
       return
     }
 
-    setAppliedVoucherState(null)
-    setVoucherError('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
+    setVoucherDaApDung(null)
+    setLoiVoucher('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
     clearStoredVoucher()
-  }, [subtotal, appliedVoucher])
+  }, [tamTinh, voucherDaApDung])
 
   const handleGoToCheckout = () => {
     if (cartItems.length === 0) {
@@ -60,56 +61,84 @@ function CartPage() {
       return
     }
 
-    if (appliedVoucher) {
-      saveVoucher(appliedVoucher)
+    if (voucherDaApDung) {
+      saveVoucher(voucherDaApDung)
     } else {
       clearStoredVoucher()
     }
 
-    setCheckoutDraft({ note, tableNumber })
+    setCheckoutDraft({ note: ghiChu, tableNumber: soBan })
     navigate('/checkout')
   }
 
-  const handleApplyVoucher = () => {
-    if (subtotal <= 0) {
-      setAppliedVoucherState(null)
-      setVoucherError('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
+  const handleApplyVoucher = async () => {
+    if (tamTinh <= 0) {
+      setVoucherDaApDung(null)
+      setLoiVoucher('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
       clearStoredVoucher()
       return
     }
 
-    const normalizedCode = voucherCodeInput.trim().toUpperCase()
+    const maVoucher = maVoucherNhap.trim().toUpperCase()
 
-    if (normalizedCode !== DEFAULT_VOUCHER.code) {
-      setAppliedVoucherState(null)
-      setVoucherError('Mã giảm giá không hợp lệ.')
+    if (!maVoucher) {
+      setVoucherDaApDung(null)
+      setLoiVoucher('Vui lòng nhập mã giảm giá.')
       clearStoredVoucher()
       return
     }
 
-    const voucher = { ...DEFAULT_VOUCHER }
-    setAppliedVoucherState(voucher)
-    setVoucherCodeInput(voucher.code)
-    setVoucherError('')
-    saveVoucher(voucher)
+    try {
+      setDangApVoucher(true)
+      const phanHoi = await validateVoucherApi(maVoucher, tamTinh)
+      const voucher = phanHoi?.data
+        ? {
+            code: phanHoi.data.code,
+            amount: phanHoi.data.discountType === 'FIXED'
+              ? Number(phanHoi.data.discountValue || 0)
+              : Math.min(
+                  (tamTinh * Number(phanHoi.data.discountValue || 0)) / 100,
+                  Number(phanHoi.data.maxDiscountAmount || Number.MAX_SAFE_INTEGER),
+                ),
+          }
+        : null
+      const voucherHopLe = saveVoucher(voucher)
+
+      if (!voucherHopLe) {
+        setVoucherDaApDung(null)
+        setLoiVoucher('Mã giảm giá không hợp lệ.')
+        clearStoredVoucher()
+        return
+      }
+
+      setVoucherDaApDung(voucherHopLe)
+      setMaVoucherNhap(voucherHopLe.code)
+      setLoiVoucher('')
+    } catch (error) {
+      setVoucherDaApDung(null)
+      setLoiVoucher(error?.message || 'Mã giảm giá không hợp lệ.')
+      clearStoredVoucher()
+    } finally {
+      setDangApVoucher(false)
+    }
   }
 
   const handleClearVoucher = () => {
-    setAppliedVoucherState(null)
-    setVoucherCodeInput('')
-    setVoucherError('')
+    setVoucherDaApDung(null)
+    setMaVoucherNhap('')
+    setLoiVoucher('')
     clearStoredVoucher()
   }
 
   const renderVoucherMessage = () => {
-    if (voucherError) {
-      return <p className="voucher-message error">{voucherError}</p>
+    if (loiVoucher) {
+      return <p className="voucher-message error">{loiVoucher}</p>
     }
 
-    if (appliedVoucher) {
+    if (voucherDaApDung) {
       return (
         <p className="voucher-message success">
-          Đã áp mã {appliedVoucher.code}: -{formatCurrency(appliedVoucher.amount)}
+          Đã áp mã {voucherDaApDung.code}: -{formatCurrency(soTienGiam)}
         </p>
       )
     }
@@ -202,25 +231,25 @@ function CartPage() {
               <div className="voucher-block">
                 <div className="voucher-header">
                   <h3>Mã giảm giá</h3>
-                  <p>Nhập GIAM20K để giảm 20.000đ</p>
+                  <p>Nhập mã hợp lệ để áp dụng giảm giá từ hệ thống.</p>
                 </div>
                 <div className="voucher-controls">
                   <input
                     type="text"
                     className="form-input voucher-input"
-                    placeholder="Nhập mã GIAM20K"
-                    value={voucherCodeInput}
+                    placeholder="Nhập mã giảm giá"
+                    value={maVoucherNhap}
                     onChange={(event) => {
-                      setVoucherCodeInput(event.target.value)
-                      if (voucherError) {
-                        setVoucherError('')
+                      setMaVoucherNhap(event.target.value)
+                      if (loiVoucher) {
+                        setLoiVoucher('')
                       }
                     }}
                   />
-                  <button type="button" className="btn btn-primary voucher-apply-btn" onClick={handleApplyVoucher}>
-                    Áp dụng
+                  <button type="button" className="btn btn-primary voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>
+                    {dangApVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}
                   </button>
-                  {appliedVoucher && (
+                  {voucherDaApDung && (
                     <button type="button" className="btn btn-ghost voucher-clear-btn" onClick={handleClearVoucher}>
                       Bỏ mã
                     </button>
@@ -231,24 +260,24 @@ function CartPage() {
 
               <div className="summary-row">
                 <span>Tạm tính</span>
-                <span>{formatCurrency(subtotal)}</span>
+                <span>{formatCurrency(tamTinh)}</span>
               </div>
 
               <div className="summary-row">
                 <span>Phí dịch vụ (5%)</span>
-                <span>{formatCurrency(serviceFee)}</span>
+                <span>{formatCurrency(phiDichVu)}</span>
               </div>
 
               <div className="summary-row summary-discount">
-                <span>Giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
-                <span>-{formatCurrency(discountAmount)}</span>
+                <span>Giảm giá {voucherDaApDung ? `(${voucherDaApDung.code})` : ''}</span>
+                <span>-{formatCurrency(soTienGiam)}</span>
               </div>
 
               <div className="summary-divider"></div>
 
               <div className="summary-row summary-total">
                 <span>Tổng cộng</span>
-                <strong>{formatCurrency(total)}</strong>
+                <strong>{formatCurrency(tongTien)}</strong>
               </div>
 
               <div className="summary-form">
@@ -258,8 +287,8 @@ function CartPage() {
                     type="text"
                     className="form-input"
                     placeholder="Nhập số bàn (nếu có)"
-                    value={tableNumber}
-                    onChange={(event) => setTableNumber(event.target.value)}
+                    value={soBan}
+                    onChange={(event) => setSoBan(event.target.value)}
                   />
                 </div>
 
@@ -269,8 +298,8 @@ function CartPage() {
                     className="form-textarea"
                     placeholder="Ví dụ: Không hành, ít cay..."
                     rows="3"
-                    value={note}
-                    onChange={(event) => setNote(event.target.value)}
+                    value={ghiChu}
+                    onChange={(event) => setGhiChu(event.target.value)}
                   ></textarea>
                 </div>
               </div>

@@ -3,13 +3,13 @@ import { useAuth } from '../hooks/useAuth'
 
 function ProtectedRoute({ children }) {
   const location = useLocation()
-  const { isAuthenticated, canAccessInternal } = useAuth()
+  const { daDangNhap, coTheVaoNoiBo } = useAuth()
 
-  if (!isAuthenticated) {
+  if (!daDangNhap) {
     return <Navigate to="/internal/login" replace state={{ from: location.pathname }} />
   }
 
-  if (!canAccessInternal) {
+  if (!coTheVaoNoiBo) {
     return <Navigate to="/" replace />
   }
 

@@ -3,14 +3,14 @@ import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useAuth } from '../hooks/useAuth'
 
 function InternalLoginPage() {
-  const [identifier, setIdentifier] = useState('')
-  const [password, setPassword] = useState('')
-  const [loginError, setLoginError] = useState('')
+  const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
+  const [matKhau, setMatKhau] = useState('')
+  const [loiDangNhap, setLoiDangNhap] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
-  const { canAccessInternal, isAuthenticated, internalLogin, logout } = useAuth()
+  const { coTheVaoNoiBo, daDangNhap, internalLogin, logout } = useAuth()
 
-  if (isAuthenticated && canAccessInternal) {
+  if (daDangNhap && coTheVaoNoiBo) {
     return <Navigate to="/internal/dashboard" replace />
   }
 
@@ -18,20 +18,20 @@ function InternalLoginPage() {
     e.preventDefault()
 
     ;(async () => {
-      const result = await internalLogin(identifier, password)
+      const ketQua = await internalLogin(tenDangNhapHoacEmail, matKhau)
 
-      if (!result.success) {
-        setLoginError(result.error)
+      if (!ketQua.success) {
+        setLoiDangNhap(ketQua.error)
         return
       }
 
-      if (!['admin', 'staff'].includes(result.user?.role)) {
-        logout()
-        setLoginError('Tài khoản này không có quyền truy cập khu vực nội bộ.')
+      if (!['admin', 'staff'].includes(ketQua.user?.role)) {
+        await logout()
+        setLoiDangNhap('Tài khoản này không có quyền truy cập khu vực nội bộ.')
         return
       }
 
-      setLoginError('')
+      setLoiDangNhap('')
       navigate(location.state?.from || '/internal/dashboard', { replace: true })
     })()
   }
@@ -57,11 +57,11 @@ function InternalLoginPage() {
               className="form-input"
               placeholder="Nhập tài khoản nội bộ"
               autoComplete="username"
-              value={identifier}
+              value={tenDangNhapHoacEmail}
               onChange={(e) => {
-                setIdentifier(e.target.value)
-                if (loginError) {
-                  setLoginError('')
+                setTenDangNhapHoacEmail(e.target.value)
+                if (loiDangNhap) {
+                  setLoiDangNhap('')
                 }
               }}
               required
@@ -79,20 +79,20 @@ function InternalLoginPage() {
               className="form-input"
               placeholder="Nhập mật khẩu"
               autoComplete="current-password"
-              value={password}
+              value={matKhau}
               onChange={(e) => {
-                setPassword(e.target.value)
-                if (loginError) {
-                  setLoginError('')
+                setMatKhau(e.target.value)
+                if (loiDangNhap) {
+                  setLoiDangNhap('')
                 }
               }}
               required
             />
           </div>
 
-          {loginError && (
+          {loiDangNhap && (
             <p className="form-error" role="alert">
-              {loginError}
+              {loiDangNhap}
             </p>
           )}
 

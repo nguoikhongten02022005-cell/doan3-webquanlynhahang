@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import AccountsTab from '../components/internalDashboard/AccountsTab'
 import BookingsTab from '../components/internalDashboard/BookingsTab'
@@ -7,157 +7,125 @@ import OrdersTab from '../components/internalDashboard/OrdersTab'
 import OverviewTab from '../components/internalDashboard/OverviewTab'
 import TablesTab from '../components/internalDashboard/TablesTab'
 import { useAuth } from '../hooks/useAuth'
-import { useMenuDishes } from '../hooks/useMenuDishes'
-import { BOOKING_DATA_CHANGED_EVENT, useBooking } from '../hooks/useBooking'
-import { DAY_FILTERS, INTERNAL_TABS, SHIFT_FILTERS, ACTIVE_BOOKING_STATUSES, CONFIRMED_BOOKING_STATUSES } from './internalDashboard/constants'
-import { getOrders } from '../services/api/ordersGateway'
-import { getTablesGateway, updateTableStatusGateway } from '../services/api/tablesGateway'
-import { getAccountsGateway } from '../services/api/usersGateway'
-import { TABLE_STATUSES } from '../services/tableService'
-import {
-  getAccountsSummary,
-  getOrdersSummary,
-  getOverviewScopeLabel,
-  getTableInventorySummary,
-  getTableSummary,
-  getUnassignedBookings,
-  isCheckedInBooking,
-  isUpcomingSoonBooking,
-  matchesDayFilter,
-  matchesShiftFilter,
-  needsManualConfirmation,
-  sortBookingsForOperations,
-  sortOrdersForOperations,
-} from './internalDashboard/selectors'
-import { getOrderStatusTone } from './internalDashboard/formatters'
+import { DAY_FILTERS, INTERNAL_TABS, SHIFT_FILTERS } from './internalDashboard/constants'
+import { getOverviewScopeLabel, matchesDayFilter, matchesShiftFilter } from './internalDashboard/selectors'
+import { useInternalDashboardData } from './internalDashboard/useInternalDashboardData'
 
 function InternalDashboardPage() {
   const navigate = useNavigate()
   const { currentUser, isAdmin } = useAuth()
+  const [tabDangMo, setTabDangMo] = useState('overview')
+  const [boLocNgay, setBoLocNgay] = useState('all')
+  const [boLocCa, setBoLocCa] = useState('all')
   const {
-    assignBookingTables,
-    createInternalBooking,
+    accountsSummary,
+    activeBookings,
+    bookingQueue,
+    checkedInBookings,
+    confirmedBookings,
+    danhSachBan,
+    danhSachDatBan,
+    danhSachDonHang,
+    danhSachMon,
+    danhSachTaiKhoan,
+    handleAssignTables,
+    handleCheckIn,
+    handleComplete,
+    handleCreateInternalBooking,
+    handleMarkTableDirty,
+    handleMarkTableReady,
+    handleNoShow,
+    handleUpdateInternalBooking,
     getAvailableTablesForBooking,
-    getHostBookings,
-    setBookingCheckedIn,
-    setBookingCompleted,
-    setBookingNoShow,
-    updateInternalBooking,
-  } = useBooking()
-  const [activeTab, setActiveTab] = useState('overview')
-  const [dayFilter, setDayFilter] = useState('all')
-  const [shiftFilter, setShiftFilter] = useState('all')
-  const [bookings, setBookings] = useState([])
-  const [orders, setOrders] = useState([])
-  const [accounts, setAccounts] = useState([])
-  const [tables, setTables] = useState([])
-  const { dishes, reloadDishes } = useMenuDishes()
-
-  const reloadData = useCallback(async () => {
-    const [nextBookings, nextOrders, nextAccounts, nextTables] = await Promise.all([
-      getHostBookings(),
-      getOrders(),
-      getAccountsGateway(),
-      getTablesGateway(),
-    ])
-
-    setBookings(Array.isArray(nextBookings) ? nextBookings : [])
-    setOrders(Array.isArray(nextOrders) ? nextOrders : [])
-    setAccounts(Array.isArray(nextAccounts) ? nextAccounts : [])
-    setTables(Array.isArray(nextTables) ? nextTables : [])
-  }, [getHostBookings])
+    openOrders,
+    ordersSummary,
+    pendingBookings,
+    sortedOrders,
+    tableInventorySummary,
+    tableSummary,
+    taiLaiDanhSachMon,
+    upcomingSoonBookings,
+    unassignedBookings,
+  } = useInternalDashboardData()
 
   useEffect(() => {
-    reloadData()
-
-    const handleStorage = () => {
-      reloadData()
+    if (!isAdmin && (tabDangMo === 'accounts' || tabDangMo === 'dishes')) {
+      setTabDangMo('overview')
     }
-
-    window.addEventListener('storage', handleStorage)
-    window.addEventListener(BOOKING_DATA_CHANGED_EVENT, reloadData)
-
-    return () => {
-      window.removeEventListener('storage', handleStorage)
-      window.removeEventListener(BOOKING_DATA_CHANGED_EVENT, reloadData)
-    }
-  }, [reloadData])
-
-  useEffect(() => {
-    if (!isAdmin && (activeTab === 'accounts' || activeTab === 'dishes')) {
-      setActiveTab('overview')
-    }
-  }, [activeTab, isAdmin])
+  }, [tabDangMo, isAdmin])
 
   const visibleTabs = useMemo(
     () => INTERNAL_TABS.filter((tab) => !tab.adminOnly || isAdmin),
     [isAdmin],
   )
 
-  const scopeLabel = useMemo(() => getOverviewScopeLabel(dayFilter, shiftFilter), [dayFilter, shiftFilter])
+  const scopeLabel = useMemo(() => getOverviewScopeLabel(boLocNgay, boLocCa), [boLocNgay, boLocCa])
 
-  const filteredBookings = useMemo(() => {
+  const danhSachDatBanDaLoc = useMemo(() => {
     const now = new Date()
-    return bookings.filter((booking) => matchesDayFilter(booking, dayFilter, now) && matchesShiftFilter(booking, shiftFilter))
-  }, [bookings, dayFilter, shiftFilter])
+    return danhSachDatBan.filter((booking) => matchesDayFilter(booking, boLocNgay, now) && matchesShiftFilter(booking, boLocCa))
+  }, [danhSachDatBan, boLocCa, boLocNgay])
 
-  const bookingQueue = useMemo(() => sortBookingsForOperations(filteredBookings, new Date()), [filteredBookings])
-  const activeBookings = useMemo(
-    () => bookingQueue.filter((booking) => ACTIVE_BOOKING_STATUSES.has(booking.status)),
-    [bookingQueue],
+  const bookingQueueDaLoc = useMemo(
+    () => bookingQueue.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
+    [bookingQueue, danhSachDatBanDaLoc],
   )
-  const pendingBookings = useMemo(
-    () => bookingQueue.filter((booking) => needsManualConfirmation(booking)),
-    [bookingQueue],
+
+  const activeBookingsDaLoc = useMemo(
+    () => activeBookings.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
+    [activeBookings, danhSachDatBanDaLoc],
   )
-  const confirmedBookings = useMemo(
-    () => activeBookings.filter((booking) => CONFIRMED_BOOKING_STATUSES.has(booking.status)),
-    [activeBookings],
+
+  const confirmedBookingsDaLoc = useMemo(
+    () => confirmedBookings.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
+    [confirmedBookings, danhSachDatBanDaLoc],
   )
-  const upcomingSoonBookings = useMemo(() => {
-    const now = new Date()
-    return activeBookings.filter((booking) => isUpcomingSoonBooking(booking, now))
-  }, [activeBookings])
-  const checkedInBookings = useMemo(
-    () => filteredBookings.filter((booking) => isCheckedInBooking(booking)).length,
-    [filteredBookings],
+
+  const pendingBookingsDaLoc = useMemo(
+    () => pendingBookings.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
+    [pendingBookings, danhSachDatBanDaLoc],
   )
-  const tableSummary = useMemo(() => getTableSummary(tables), [tables])
-  const tableInventorySummary = useMemo(() => getTableInventorySummary(tables), [tables])
-  const unassignedBookings = useMemo(() => getUnassignedBookings(activeBookings), [activeBookings])
-  const ordersSummary = useMemo(() => getOrdersSummary(orders), [orders])
-  const openOrders = useMemo(
-    () => sortOrdersForOperations(orders).filter((order) => getOrderStatusTone(order.status) === 'warning'),
-    [orders],
+
+  const upcomingSoonBookingsDaLoc = useMemo(
+    () => upcomingSoonBookings.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
+    [upcomingSoonBookings, danhSachDatBanDaLoc],
   )
-  const sortedOrders = useMemo(() => sortOrdersForOperations(orders), [orders])
-  const accountsSummary = useMemo(() => getAccountsSummary(accounts), [accounts])
+
+  const checkedInBookingsDaLoc = useMemo(
+    () => danhSachDatBanDaLoc.filter((booking) => booking.status === 'DA_CHECK_IN' || booking.status === 'DA_XEP_BAN').length,
+    [danhSachDatBanDaLoc],
+  )
+
+  const unassignedBookingsDaLoc = useMemo(
+    () => unassignedBookings.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
+    [unassignedBookings, danhSachDatBanDaLoc],
+  )
 
   const urgentItems = useMemo(
     () => [
       {
         key: 'pending-bookings',
         title: 'Chờ xác nhận',
-        value: pendingBookings.length,
-        detail: pendingBookings.length > 0 ? 'Ưu tiên gọi lại và chốt bàn.' : 'Không có booking chờ xử lý.',
-        tone: pendingBookings.length > 0 ? 'warning' : 'neutral',
-        action: () => setActiveTab('bookings'),
+        value: pendingBookingsDaLoc.length,
+        detail: pendingBookingsDaLoc.length > 0 ? 'Ưu tiên gọi lại và chốt bàn.' : 'Không có booking chờ xử lý.',
+        tone: pendingBookingsDaLoc.length > 0 ? 'warning' : 'neutral',
+        action: () => setTabDangMo('bookings'),
       },
       {
         key: 'unassigned-bookings',
         title: 'Chưa gán bàn',
-        value: unassignedBookings.length,
-        detail: unassignedBookings.length > 0 ? 'Cần phân bàn trước giờ khách đến.' : 'Các booking đang có bàn phù hợp.',
-        tone: unassignedBookings.length > 0 ? 'danger' : 'neutral',
-        action: () => setActiveTab('bookings'),
+        value: unassignedBookingsDaLoc.length,
+        detail: unassignedBookingsDaLoc.length > 0 ? 'Cần phân bàn trước giờ khách đến.' : 'Các booking đang có bàn phù hợp.',
+        tone: unassignedBookingsDaLoc.length > 0 ? 'danger' : 'neutral',
+        action: () => setTabDangMo('bookings'),
       },
       {
         key: 'arriving-soon',
         title: 'Khách sắp đến 2 giờ',
-        value: upcomingSoonBookings.length,
-        detail: upcomingSoonBookings.length > 0 ? 'Kiểm tra bàn, host và ghi chú đặc biệt.' : 'Chưa có lượt đến gần trong 2 giờ tới.',
-        tone: upcomingSoonBookings.length > 0 ? 'success' : 'neutral',
-        action: () => setActiveTab('bookings'),
+        value: upcomingSoonBookingsDaLoc.length,
+        detail: upcomingSoonBookingsDaLoc.length > 0 ? 'Kiểm tra bàn, host và ghi chú đặc biệt.' : 'Chưa có lượt đến gần trong 2 giờ tới.',
+        tone: upcomingSoonBookingsDaLoc.length > 0 ? 'success' : 'neutral',
+        action: () => setTabDangMo('bookings'),
       },
       {
         key: 'dirty-tables',
@@ -165,66 +133,20 @@ function InternalDashboardPage() {
         value: tableInventorySummary.dirty,
         detail: tableInventorySummary.dirty > 0 ? 'Cần làm sạch trước khi nhận lượt mới.' : 'Không có bàn đang dọn.',
         tone: tableInventorySummary.dirty > 0 ? 'warning' : 'neutral',
-        action: () => setActiveTab('tables'),
+        action: () => setTabDangMo('tables'),
       },
     ],
-    [pendingBookings.length, tableInventorySummary.dirty, unassignedBookings.length, upcomingSoonBookings.length],
+    [pendingBookingsDaLoc.length, tableInventorySummary.dirty, unassignedBookingsDaLoc.length, upcomingSoonBookingsDaLoc.length],
   )
 
-  const operationalAlerts = pendingBookings.length + unassignedBookings.length + upcomingSoonBookings.length + tableInventorySummary.dirty
+  const operationalAlerts = pendingBookingsDaLoc.length + unassignedBookingsDaLoc.length + upcomingSoonBookingsDaLoc.length + tableInventorySummary.dirty
 
   const handleCreateBooking = () => {
-    setActiveTab('bookings')
+    setTabDangMo('bookings')
   }
 
   const handleCreateOrder = () => {
     navigate('/menu')
-  }
-
-  const handleCreateInternalBooking = async (payload) => {
-    const result = await createInternalBooking(payload, currentUser)
-    if (result?.success) await reloadData()
-    return result
-  }
-
-  const handleUpdateInternalBooking = async (bookingId, payload) => {
-    const result = await updateInternalBooking(bookingId, payload)
-    if (result?.success) await reloadData()
-    return result
-  }
-
-  const handleAssignTables = async (bookingId, tableIds) => {
-    const result = await assignBookingTables(bookingId, tableIds)
-    if (result?.success) await reloadData()
-    return result
-  }
-
-  const handleCheckIn = async (bookingId) => {
-    const result = await setBookingCheckedIn(bookingId)
-    if (result?.success) await reloadData()
-    return result
-  }
-
-  const handleComplete = async (bookingId) => {
-    const result = await setBookingCompleted(bookingId)
-    if (result?.success) await reloadData()
-    return result
-  }
-
-  const handleNoShow = async (bookingId) => {
-    const result = await setBookingNoShow(bookingId)
-    if (result?.success) await reloadData()
-    return result
-  }
-
-  const handleMarkTableDirty = async (tableId) => {
-    await updateTableStatusGateway(tableId, TABLE_STATUSES.DIRTY)
-    await reloadData()
-  }
-
-  const handleMarkTableReady = async (tableId) => {
-    await updateTableStatusGateway(tableId, TABLE_STATUSES.AVAILABLE)
-    await reloadData()
   }
 
   return (
@@ -253,8 +175,8 @@ function InternalDashboardPage() {
                   <button
                     key={filter.key}
                     type="button"
-                    className={`internal-pill ${dayFilter === filter.key ? 'active' : ''}`}
-                    onClick={() => setDayFilter(filter.key)}
+                    className={`internal-pill ${boLocNgay === filter.key ? 'active' : ''}`}
+                    onClick={() => setBoLocNgay(filter.key)}
                   >
                     {filter.label}
                   </button>
@@ -269,8 +191,8 @@ function InternalDashboardPage() {
                   <button
                     key={filter.key}
                     type="button"
-                    className={`internal-pill ${shiftFilter === filter.key ? 'active' : ''}`}
-                    onClick={() => setShiftFilter(filter.key)}
+                    className={`internal-pill ${boLocCa === filter.key ? 'active' : ''}`}
+                    onClick={() => setBoLocCa(filter.key)}
                   >
                     {filter.label}
                   </button>
@@ -284,7 +206,7 @@ function InternalDashboardPage() {
                 <button type="button" className="internal-quick-btn internal-quick-btn-primary" onClick={handleCreateBooking}>
                   Tạo booking
                 </button>
-                <button type="button" className="internal-quick-btn" onClick={() => setActiveTab('tables')}>
+                <button type="button" className="internal-quick-btn" onClick={() => setTabDangMo('tables')}>
                   Mở sơ đồ bàn
                 </button>
                 <button type="button" className="internal-quick-btn" onClick={handleCreateOrder}>
@@ -301,8 +223,8 @@ function InternalDashboardPage() {
               <button
                 key={tab.key}
                 type="button"
-                className={`profile-tab-btn ${activeTab === tab.key ? 'active' : ''}`}
-                onClick={() => setActiveTab(tab.key)}
+                className={`profile-tab-btn ${tabDangMo === tab.key ? 'active' : ''}`}
+                onClick={() => setTabDangMo(tab.key)}
               >
                 {tab.label}
               </button>
@@ -310,31 +232,31 @@ function InternalDashboardPage() {
           </aside>
 
           <section className="internal-dashboard-content">
-            {activeTab === 'overview' && (
+            {tabDangMo === 'overview' && (
               <OverviewTab
                 accountsSummary={accountsSummary}
-                activeBookings={activeBookings}
-                bookingQueue={bookingQueue}
-                checkedInBookings={checkedInBookings}
-                confirmedBookings={confirmedBookings}
+                activeBookings={activeBookingsDaLoc}
+                bookingQueue={bookingQueueDaLoc}
+                checkedInBookings={checkedInBookingsDaLoc}
+                confirmedBookings={confirmedBookingsDaLoc}
                 isAdmin={isAdmin}
                 openOrders={openOrders}
                 operationalAlerts={operationalAlerts}
                 ordersSummary={ordersSummary}
-                pendingBookings={pendingBookings}
+                pendingBookings={pendingBookingsDaLoc}
                 scopeLabel={scopeLabel}
                 tableInventorySummary={tableInventorySummary}
                 tableSummary={tableSummary}
-                upcomingSoonBookings={upcomingSoonBookings}
-                unassignedBookings={unassignedBookings}
+                upcomingSoonBookings={upcomingSoonBookingsDaLoc}
+                unassignedBookings={unassignedBookingsDaLoc}
                 urgentItems={urgentItems}
               />
             )}
 
-            {activeTab === 'bookings' && (
+            {tabDangMo === 'bookings' && (
               <BookingsTab
-                bookingQueue={bookingQueue}
-                getAvailableTablesForBooking={(booking) => getAvailableTablesForBooking(booking, tables)}
+                bookingQueue={bookingQueueDaLoc}
+                getAvailableTablesForBooking={(booking) => getAvailableTablesForBooking(booking, danhSachBan)}
                 handleAssignTables={handleAssignTables}
                 handleCheckIn={handleCheckIn}
                 handleComplete={handleComplete}
@@ -345,27 +267,27 @@ function InternalDashboardPage() {
               />
             )}
 
-            {activeTab === 'orders' && (
+            {tabDangMo === 'orders' && (
               <OrdersTab orders={sortedOrders} />
             )}
 
-            {activeTab === 'tables' && (
+            {tabDangMo === 'tables' && (
               <TablesTab
                 handleMarkTableDirty={handleMarkTableDirty}
                 handleMarkTableReady={handleMarkTableReady}
                 scopeLabel={scopeLabel}
                 tableInventorySummary={tableInventorySummary}
                 tableSummary={tableSummary}
-                tables={tables}
+                tables={danhSachBan}
               />
             )}
 
-            {activeTab === 'dishes' && isAdmin && (
-              <DishesTab dishes={dishes} reloadDishes={reloadDishes} />
+            {tabDangMo === 'dishes' && isAdmin && (
+              <DishesTab dishes={danhSachMon} reloadDishes={taiLaiDanhSachMon} />
             )}
 
-            {activeTab === 'accounts' && isAdmin && (
-              <AccountsTab accounts={accounts} />
+            {tabDangMo === 'accounts' && isAdmin && (
+              <AccountsTab accounts={danhSachTaiKhoan} />
             )}
           </section>
         </div>
