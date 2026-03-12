@@ -294,9 +294,9 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     goToStep(3)
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event?.preventDefault?.()
-    submitBooking({ goToStep, saveDraft })
+    await submitBooking({ goToStep, saveDraft })
   }
 
   return {

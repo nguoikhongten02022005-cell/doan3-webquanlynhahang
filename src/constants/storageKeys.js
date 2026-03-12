@@ -1,6 +1,7 @@
 export const STORAGE_KEYS = Object.freeze({
   CART: 'restaurant_cart',
   CURRENT_USER: 'restaurant_current_user',
+  AUTH_TOKEN: 'restaurant_auth_token',
   ACCOUNTS: 'restaurant_accounts',
   MENU_DISHES: 'restaurant_menu_dishes',
   MENU_DISHES_REVISION: 'restaurant_menu_dishes_revision',

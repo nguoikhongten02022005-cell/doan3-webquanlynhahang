@@ -71,6 +71,7 @@ export const normalizeBooking = (booking) => {
         : [],
     internalNote: String(booking.internalNote ?? '').trim(),
     assignedTableIds,
+    assignedTables: Array.isArray(booking.assignedTables) ? booking.assignedTables.filter(Boolean) : [],
     checkedInAt: String(booking.checkedInAt ?? '').trim(),
     seatedAt: String(booking.seatedAt ?? '').trim(),
     completedAt: String(booking.completedAt ?? '').trim(),
@@ -82,7 +83,7 @@ export const normalizeBooking = (booking) => {
 
 export const mapBookingItem = (booking) => ({
   bookingId: booking.id,
-  id: formatBookingId(booking.id),
+  id: booking.bookingCode || formatBookingId(booking.id),
   dateTime: formatBookingDateTime(booking),
   guests: Number(booking.guests) || 0,
   seatingArea: BOOKING_SEATING_LABELS[booking.seatingArea] || '',

@@ -1,6 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { MENU_CATEGORIES } from '../../data/menuData'
 import {
+  createMenuItemApi,
+  deleteMenuItemApi,
+  updateMenuItemApi,
+} from '../../services/api/menuApi'
+import { shouldUseBackend } from '../../services/apiClient'
+import {
   createMenuDish,
   deleteMenuDish,
   MENU_DISHES_CONFLICT_ERROR,
@@ -36,7 +42,8 @@ const formatPriceInput = (price) => {
   return normalizedPrice > 0 ? `${normalizedPrice.toLocaleString('vi-VN')}đ` : ''
 }
 
-function DishesTab({ dishes }) {
+function DishesTab({ dishes, reloadDishes }) {
+  const useBackend = shouldUseBackend()
   const [formMode, setFormMode] = useState('create')
   const [editingDishId, setEditingDishId] = useState(null)
   const [editingDishSnapshot, setEditingDishSnapshot] = useState(null)
@@ -119,7 +126,7 @@ function DishesTab({ dishes }) {
     return ''
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     const nextError = validateForm()
@@ -140,15 +147,16 @@ function DishesTab({ dishes }) {
     }
 
     try {
-      const savedDish = formMode === 'edit'
-        ? updateMenuDish(editingDishId, payload)
-        : createMenuDish(payload)
+      const savedDish = useBackend
+        ? (formMode === 'edit' ? await updateMenuItemApi(editingDishId, payload) : await createMenuItemApi(payload))
+        : (formMode === 'edit' ? updateMenuDish(editingDishId, payload) : createMenuDish(payload))
 
       if (!savedDish) {
         setFormError('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')
         return
       }
 
+      await reloadDishes?.()
       resetForm()
     } catch (error) {
       if (error?.code === MENU_DISHES_CONFLICT_ERROR) {
@@ -156,7 +164,7 @@ function DishesTab({ dishes }) {
         return
       }
 
-      throw error
+      setFormError(error?.message || 'Không thể lưu món ăn. Vui lòng thử lại.')
     }
   }
 
@@ -178,7 +186,7 @@ function DishesTab({ dishes }) {
     setFormError('')
   }
 
-  const handleDeleteDish = (dish) => {
+  const handleDeleteDish = async (dish) => {
     const shouldDelete = window.confirm(`Xóa món "${dish.name}" khỏi menu?`)
 
     if (!shouldDelete) {
@@ -186,7 +194,13 @@ function DishesTab({ dishes }) {
     }
 
     try {
-      deleteMenuDish(dish.id)
+      if (useBackend) {
+        await deleteMenuItemApi(dish.id)
+      } else {
+        deleteMenuDish(dish.id)
+      }
+
+      await reloadDishes?.()
 
       if (editingDishId === dish.id) {
         resetForm()
@@ -197,7 +211,7 @@ function DishesTab({ dishes }) {
         return
       }
 
-      throw error
+      setFormError(error?.message || 'Không thể xóa món ăn. Vui lòng thử lại.')
     }
   }
 
@@ -206,7 +220,7 @@ function DishesTab({ dishes }) {
       <article className="profile-card">
         <div className="host-board-head">
           <h2>{formMode === 'edit' ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}</h2>
-          <span>{formMode === 'edit' ? `Đang sửa #${editingDishId}` : 'Cập nhật dữ liệu menu cho bản demo nội bộ'}</span>
+          <span>{formMode === 'edit' ? `Đang sửa #${editingDishId}` : useBackend ? 'Đồng bộ trực tiếp với backend menu' : 'Cập nhật dữ liệu menu cho bản demo nội bộ'}</span>
         </div>
 
         <form className="internal-dish-form" onSubmit={handleSubmit}>

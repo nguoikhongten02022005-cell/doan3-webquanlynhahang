@@ -22,15 +22,17 @@ function RegisterPage() {
       return
     }
 
-    const result = register({ fullName, username, email, password })
+    ;(async () => {
+      const result = await register({ fullName, username, email, password })
 
-    if (!result.success) {
-      setRegisterError(result.error)
-      return
-    }
+      if (!result.success) {
+        setRegisterError(result.error)
+        return
+      }
 
-    setRegisterError('')
-    navigate('/login', { state: { registered: true } })
+      setRegisterError('')
+      navigate('/login', { state: { registered: true } })
+    })()
   }
 
   return (

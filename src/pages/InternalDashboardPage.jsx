@@ -6,13 +6,14 @@ import DishesTab from '../components/internalDashboard/DishesTab'
 import OrdersTab from '../components/internalDashboard/OrdersTab'
 import OverviewTab from '../components/internalDashboard/OverviewTab'
 import TablesTab from '../components/internalDashboard/TablesTab'
-import { STORAGE_KEYS } from '../constants/storageKeys'
 import { useAuth } from '../hooks/useAuth'
 import { useMenuDishes } from '../hooks/useMenuDishes'
 import { BOOKING_DATA_CHANGED_EVENT, useBooking } from '../hooks/useBooking'
 import { DAY_FILTERS, INTERNAL_TABS, SHIFT_FILTERS, ACTIVE_BOOKING_STATUSES, CONFIRMED_BOOKING_STATUSES } from './internalDashboard/constants'
-import { getAccounts } from '../services/authService'
-import { getTables, TABLE_STATUSES, updateTableStatus } from '../services/tableService'
+import { getOrders } from '../services/api/ordersGateway'
+import { getTablesGateway, updateTableStatusGateway } from '../services/api/tablesGateway'
+import { getAccountsGateway } from '../services/api/usersGateway'
+import { TABLE_STATUSES } from '../services/tableService'
 import {
   getAccountsSummary,
   getOrdersSummary,
@@ -25,7 +26,6 @@ import {
   matchesDayFilter,
   matchesShiftFilter,
   needsManualConfirmation,
-  readOrders,
   sortBookingsForOperations,
   sortOrdersForOperations,
 } from './internalDashboard/selectors'
@@ -47,30 +47,31 @@ function InternalDashboardPage() {
   const [activeTab, setActiveTab] = useState('overview')
   const [dayFilter, setDayFilter] = useState('all')
   const [shiftFilter, setShiftFilter] = useState('all')
-  const [bookings, setBookings] = useState(() => getHostBookings())
-  const [orders, setOrders] = useState(() => readOrders())
-  const [accounts, setAccounts] = useState(() => getAccounts())
-  const [tables, setTables] = useState(() => getTables())
-  const { dishes } = useMenuDishes()
+  const [bookings, setBookings] = useState([])
+  const [orders, setOrders] = useState([])
+  const [accounts, setAccounts] = useState([])
+  const [tables, setTables] = useState([])
+  const { dishes, reloadDishes } = useMenuDishes()
 
-  const reloadData = useCallback(() => {
-    setBookings(getHostBookings())
-    setOrders(readOrders())
-    setAccounts(getAccounts())
-    setTables(getTables())
+  const reloadData = useCallback(async () => {
+    const [nextBookings, nextOrders, nextAccounts, nextTables] = await Promise.all([
+      getHostBookings(),
+      getOrders(),
+      getAccountsGateway(),
+      getTablesGateway(),
+    ])
+
+    setBookings(Array.isArray(nextBookings) ? nextBookings : [])
+    setOrders(Array.isArray(nextOrders) ? nextOrders : [])
+    setAccounts(Array.isArray(nextAccounts) ? nextAccounts : [])
+    setTables(Array.isArray(nextTables) ? nextTables : [])
   }, [getHostBookings])
 
   useEffect(() => {
-    const handleStorage = (event) => {
-      if (!event.key || [
-        STORAGE_KEYS.BOOKINGS,
-        STORAGE_KEYS.RECEPTION_QUEUE,
-        STORAGE_KEYS.ORDERS,
-        STORAGE_KEYS.ACCOUNTS,
-        STORAGE_KEYS.TABLES,
-      ].includes(event.key)) {
-        reloadData()
-      }
+    reloadData()
+
+    const handleStorage = () => {
+      reloadData()
     }
 
     window.addEventListener('storage', handleStorage)
@@ -180,50 +181,50 @@ function InternalDashboardPage() {
     navigate('/menu')
   }
 
-  const handleCreateInternalBooking = (payload) => {
-    const result = createInternalBooking(payload, currentUser)
-    if (result?.success) reloadData()
+  const handleCreateInternalBooking = async (payload) => {
+    const result = await createInternalBooking(payload, currentUser)
+    if (result?.success) await reloadData()
     return result
   }
 
-  const handleUpdateInternalBooking = (bookingId, payload) => {
-    const result = updateInternalBooking(bookingId, payload)
-    if (result?.success) reloadData()
+  const handleUpdateInternalBooking = async (bookingId, payload) => {
+    const result = await updateInternalBooking(bookingId, payload)
+    if (result?.success) await reloadData()
     return result
   }
 
-  const handleAssignTables = (bookingId, tableIds) => {
-    const result = assignBookingTables(bookingId, tableIds)
-    if (result?.success) reloadData()
+  const handleAssignTables = async (bookingId, tableIds) => {
+    const result = await assignBookingTables(bookingId, tableIds)
+    if (result?.success) await reloadData()
     return result
   }
 
-  const handleCheckIn = (bookingId) => {
-    const result = setBookingCheckedIn(bookingId)
-    if (result?.success) reloadData()
+  const handleCheckIn = async (bookingId) => {
+    const result = await setBookingCheckedIn(bookingId)
+    if (result?.success) await reloadData()
     return result
   }
 
-  const handleComplete = (bookingId) => {
-    const result = setBookingCompleted(bookingId)
-    if (result?.success) reloadData()
+  const handleComplete = async (bookingId) => {
+    const result = await setBookingCompleted(bookingId)
+    if (result?.success) await reloadData()
     return result
   }
 
-  const handleNoShow = (bookingId) => {
-    const result = setBookingNoShow(bookingId)
-    if (result?.success) reloadData()
+  const handleNoShow = async (bookingId) => {
+    const result = await setBookingNoShow(bookingId)
+    if (result?.success) await reloadData()
     return result
   }
 
-  const handleMarkTableDirty = (tableId) => {
-    updateTableStatus(tableId, TABLE_STATUSES.DIRTY)
-    reloadData()
+  const handleMarkTableDirty = async (tableId) => {
+    await updateTableStatusGateway(tableId, TABLE_STATUSES.DIRTY)
+    await reloadData()
   }
 
-  const handleMarkTableReady = (tableId) => {
-    updateTableStatus(tableId, TABLE_STATUSES.AVAILABLE)
-    reloadData()
+  const handleMarkTableReady = async (tableId) => {
+    await updateTableStatusGateway(tableId, TABLE_STATUSES.AVAILABLE)
+    await reloadData()
   }
 
   return (
@@ -333,7 +334,7 @@ function InternalDashboardPage() {
             {activeTab === 'bookings' && (
               <BookingsTab
                 bookingQueue={bookingQueue}
-                getAvailableTablesForBooking={getAvailableTablesForBooking}
+                getAvailableTablesForBooking={(booking) => getAvailableTablesForBooking(booking, tables)}
                 handleAssignTables={handleAssignTables}
                 handleCheckIn={handleCheckIn}
                 handleComplete={handleComplete}
@@ -360,7 +361,7 @@ function InternalDashboardPage() {
             )}
 
             {activeTab === 'dishes' && isAdmin && (
-              <DishesTab dishes={dishes} />
+              <DishesTab dishes={dishes} reloadDishes={reloadDishes} />
             )}
 
             {activeTab === 'accounts' && isAdmin && (

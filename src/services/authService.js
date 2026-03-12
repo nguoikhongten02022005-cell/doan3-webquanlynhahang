@@ -49,6 +49,7 @@ const normalizeAccount = (account) => {
     fullName: String(account.fullName ?? account.name ?? '').trim(),
     username: String(account.username ?? '').trim(),
     email: String(account.email ?? '').trim(),
+    phone: String(account.phone ?? '').trim(),
     role: normalizeRole(account.role),
   }
 }
@@ -64,6 +65,7 @@ const normalizeCurrentUser = (account) => {
     fullName: normalizedAccount.fullName,
     username: normalizedAccount.username,
     email: normalizedAccount.email,
+    phone: normalizedAccount.phone,
     role: normalizedAccount.role,
   }
 }
@@ -119,6 +121,33 @@ export const saveCurrentUser = (account) => {
 export const clearCurrentUser = () => {
   removeStorageItem(STORAGE_KEYS.CURRENT_USER)
   dispatchAuthUserChanged()
+}
+
+export const getAuthToken = () => {
+  const auth = getStorageJSON(STORAGE_KEYS.AUTH_TOKEN, null)
+  return typeof auth === 'string' && auth.trim() ? auth : ''
+}
+
+export const saveAuthToken = (token) => {
+  if (!token || typeof token !== 'string') {
+    return
+  }
+
+  setStorageJSON(STORAGE_KEYS.AUTH_TOKEN, token)
+}
+
+export const clearAuthToken = () => {
+  removeStorageItem(STORAGE_KEYS.AUTH_TOKEN)
+}
+
+export const saveAuthSession = ({ user, accessToken }) => {
+  saveCurrentUser(user)
+  saveAuthToken(accessToken)
+}
+
+export const clearAuthSession = () => {
+  clearAuthToken()
+  clearCurrentUser()
 }
 
 export const findAccountByIdentifier = (accounts, identifier) => {

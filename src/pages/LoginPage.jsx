@@ -13,15 +13,17 @@ function LoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    const result = login(identifier, password)
+    ;(async () => {
+      const result = await login(identifier, password)
 
-    if (!result.success) {
-      setLoginError(result.error)
-      return
-    }
+      if (!result.success) {
+        setLoginError(result.error)
+        return
+      }
 
-    setLoginError('')
-    navigate(location.state?.from || '/')
+      setLoginError('')
+      navigate(location.state?.from || '/')
+    })()
   }
 
   return (

@@ -1,11 +1,10 @@
 import { useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useCart } from '../context/CartContext'
-import { STORAGE_KEYS } from '../constants/storageKeys'
 import { useAuth } from '../hooks/useAuth'
 import { formatCurrency } from '../utils/currency'
 import { clearCheckoutDraft, getCheckoutDraft, setCheckoutDraft } from '../services/checkoutDraftService'
-import { getStorageJSON, setStorageJSON } from '../services/storageService'
+import { createOrder } from '../services/api/ordersGateway'
 import { clearAppliedVoucher, getAppliedVoucher } from '../services/voucherService'
 
 const paymentMethods = [
@@ -81,7 +80,7 @@ function CheckoutPage() {
     })
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
 
     if (cartItems.length === 0) {
@@ -95,41 +94,40 @@ function CheckoutPage() {
       return
     }
 
-    const existingOrdersRaw = getStorageJSON(STORAGE_KEYS.ORDERS, [])
-    const existingOrders = Array.isArray(existingOrdersRaw) ? existingOrdersRaw : []
+    try {
+      await createOrder({
+        items: cartItems,
+        subtotal,
+        serviceFee,
+        discountAmount,
+        voucherCode: appliedVoucher?.code || '',
+        total,
+        orderDate: new Date().toISOString(),
+        status: 'Mới Đặt',
+        customer: {
+          fullName: formData.fullName,
+          phone: formData.phone,
+          email: currentUser?.email ?? '',
+          address: formData.address,
+        },
+        userEmail: currentUser?.email ?? '',
+        note: formData.note,
+        tableNumber: formData.tableNumber,
+        paymentMethod: formData.paymentMethod,
+      })
 
-    const newOrder = {
-      id: Date.now(),
-      items: cartItems,
-      subtotal,
-      serviceFee,
-      discountAmount,
-      voucherCode: appliedVoucher?.code || '',
-      total,
-      orderDate: new Date().toISOString(),
-      status: 'Mới Đặt',
-      customer: {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        email: currentUser?.email ?? '',
-        address: formData.address,
-      },
-      userEmail: currentUser?.email ?? '',
-      note: formData.note,
-      tableNumber: formData.tableNumber,
-      paymentMethod: formData.paymentMethod,
+      clearAppliedVoucher()
+      clearCheckoutDraft()
+
+      if (typeof clearCart === 'function') {
+        clearCart()
+      }
+
+      alert('Đặt hàng thành công')
+      navigate('/profile')
+    } catch (error) {
+      alert(error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.')
     }
-
-    setStorageJSON(STORAGE_KEYS.ORDERS, [newOrder, ...existingOrders])
-    clearAppliedVoucher()
-    clearCheckoutDraft()
-
-    if (typeof clearCart === 'function') {
-      clearCart()
-    }
-
-    alert('Đặt hàng thành công')
-    navigate('/profile')
   }
 
   return (

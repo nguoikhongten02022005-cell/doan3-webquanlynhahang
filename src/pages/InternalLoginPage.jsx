@@ -8,7 +8,7 @@ function InternalLoginPage() {
   const [loginError, setLoginError] = useState('')
   const location = useLocation()
   const navigate = useNavigate()
-  const { canAccessInternal, isAuthenticated, login, logout } = useAuth()
+  const { canAccessInternal, isAuthenticated, internalLogin, logout } = useAuth()
 
   if (isAuthenticated && canAccessInternal) {
     return <Navigate to="/internal/dashboard" replace />
@@ -17,21 +17,23 @@ function InternalLoginPage() {
   const handleSubmit = (e) => {
     e.preventDefault()
 
-    const result = login(identifier, password)
+    ;(async () => {
+      const result = await internalLogin(identifier, password)
 
-    if (!result.success) {
-      setLoginError(result.error)
-      return
-    }
+      if (!result.success) {
+        setLoginError(result.error)
+        return
+      }
 
-    if (!['admin', 'staff'].includes(result.user?.role)) {
-      logout()
-      setLoginError('Tài khoản này không có quyền truy cập khu vực nội bộ.')
-      return
-    }
+      if (!['admin', 'staff'].includes(result.user?.role)) {
+        logout()
+        setLoginError('Tài khoản này không có quyền truy cập khu vực nội bộ.')
+        return
+      }
 
-    setLoginError('')
-    navigate(location.state?.from || '/internal/dashboard', { replace: true })
+      setLoginError('')
+      navigate(location.state?.from || '/internal/dashboard', { replace: true })
+    })()
   }
 
   return (

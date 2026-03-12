@@ -1,6 +1,4 @@
-import { STORAGE_KEYS } from '../../constants/storageKeys'
 import { TABLE_STATUSES } from '../../services/tableService'
-import { getStorageJSON } from '../../services/storageService'
 import {
   ACTIVE_BOOKING_STATUSES,
   CONFIRMED_BOOKING_STATUSES,
@@ -95,11 +93,6 @@ export const matchesBookingSearch = (booking, searchQuery) => {
     booking.phone,
     booking.email,
   ].some((value) => String(value || '').toLowerCase().includes(normalizedQuery))
-}
-
-export const readOrders = () => {
-  const rawOrders = getStorageJSON(STORAGE_KEYS.ORDERS, [])
-  return Array.isArray(rawOrders) ? rawOrders : []
 }
 
 export const getOrdersSummary = (orders) => ({

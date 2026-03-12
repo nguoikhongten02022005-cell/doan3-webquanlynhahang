@@ -1,8 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
-import { STORAGE_KEYS } from '../constants/storageKeys'
 import { FALLBACK_PROFILE, ORDER_TIMELINE_STEPS, PROFILE_TABS } from '../data/profileData'
 import { formatCurrency } from '../utils/currency'
-import { getStorageJSON } from '../services/storageService'
+import { getMyOrders } from '../services/api/ordersGateway'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 import { canCancelBooking } from '../hooks/booking/bookingPolicies.js'
@@ -65,6 +64,7 @@ function ProfilePage() {
   const { cancelBooking, getBookingHistory } = useBooking()
   const [activeTab, setActiveTab] = useState('personal')
   const [bookingHistory, setBookingHistory] = useState([])
+  const [orderHistory, setOrderHistory] = useState([])
   const [bookingMessage, setBookingMessage] = useState('')
 
   const profileData = useMemo(() => {
@@ -79,36 +79,30 @@ function ProfilePage() {
     }
   }, [currentUser])
 
-  const orderHistory = useMemo(() => {
-    const parsedOrders = getStorageJSON(STORAGE_KEYS.ORDERS, [])
-    const normalizedCurrentEmail = String(currentUser?.email ?? '').trim().toLowerCase()
+  const normalizedOrderHistory = useMemo(() => orderHistory.map((order) => {
+    const status = order.status || 'Đang xử lý'
 
-    if (!Array.isArray(parsedOrders) || parsedOrders.length === 0 || !normalizedCurrentEmail) {
-      return []
+    return {
+      id: `DH-${String(order.id).slice(-6)}`,
+      date: formatDate(order.orderDate),
+      total: Number(order.total) || 0,
+      status,
+      timelineStep: getOrderTimelineStep(status),
     }
-
-    return parsedOrders
-      .filter((order) => String(order?.customer?.email ?? order?.userEmail ?? '').trim().toLowerCase() === normalizedCurrentEmail)
-      .map((order) => {
-        const status = order.status || 'Đang xử lý'
-
-        return {
-          id: `DH-${String(order.id).slice(-6)}`,
-          date: formatDate(order.orderDate),
-          total: Number(order.total) || 0,
-          status,
-          timelineStep: getOrderTimelineStep(status),
-        }
-      })
-  }, [currentUser])
+  }), [orderHistory])
 
   useEffect(() => {
-    setBookingHistory(getBookingHistory(currentUser?.email))
-    setBookingMessage('')
+    const loadProfileData = async () => {
+      setBookingHistory(await getBookingHistory(currentUser?.email))
+      setOrderHistory(await getMyOrders())
+      setBookingMessage('')
+    }
+
+    loadProfileData()
   }, [currentUser, getBookingHistory])
 
-  const handleCancelBooking = (bookingId, bookingCode) => {
-    const result = cancelBooking(bookingId, bookingCode, currentUser?.email)
+  const handleCancelBooking = async (bookingId, bookingCode) => {
+    const result = await cancelBooking(bookingId, bookingCode, currentUser?.email)
 
     if (!result.success) {
       setBookingMessage(result.error)
@@ -176,13 +170,13 @@ function ProfilePage() {
                 <h2>Lịch sử đơn hàng</h2>
 
                 <div className="profile-list">
-                  {orderHistory.length === 0 && (
+                  {normalizedOrderHistory.length === 0 && (
                     <div className="profile-list-item">
                       <p className="booking-empty">Chưa có lịch sử đơn hàng nào.</p>
                     </div>
                   )}
 
-                  {orderHistory.map((order) => (
+                  {normalizedOrderHistory.map((order) => (
                     <div key={order.id} className="profile-list-item">
                       <div className="profile-list-top">
                         <strong>{order.id}</strong>

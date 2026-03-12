@@ -2,6 +2,16 @@ import { useCallback } from 'react'
 import { STORAGE_KEYS } from '../constants/storageKeys'
 import { HOST_BOOKING_STATUS_ACTIONS } from '../data/bookingData'
 import { generateBookingCode } from '../utils/booking/submission'
+import { shouldUseBackend } from '../services/apiClient'
+import {
+  assignBookingTablesApi,
+  cancelBookingApi,
+  createBookingApi,
+  getBookingHistoryApi,
+  getBookingsApi,
+  updateBookingApi,
+  updateBookingStatusApi,
+} from '../services/api/bookingApi'
 import { getTables, TABLE_STATUSES } from '../services/tableService'
 import { getStorageJSON, removeStorageItem, setStorageJSON } from '../services/storageService'
 import {
@@ -19,6 +29,7 @@ import {
 } from './booking/bookingMappers'
 import {
   BOOKING_DATA_CHANGED_EVENT,
+  dispatchBookingDataChanged,
   loadBookingHistory,
   normalizeBookings,
   readAllBookings,
@@ -38,6 +49,8 @@ import {
 export { BOOKING_DATA_CHANGED_EVENT }
 
 export const useBooking = () => {
+  const useBackend = shouldUseBackend()
+
   const saveDraft = useCallback((draftPayload) => {
     setStorageJSON(STORAGE_KEYS.BOOKING_DRAFT, draftPayload)
   }, [])
@@ -48,7 +61,21 @@ export const useBooking = () => {
     removeStorageItem(STORAGE_KEYS.BOOKING_DRAFT)
   }, [])
 
-  const createBooking = useCallback(({ booking, confirmationPayload, receptionQueueItem }) => {
+  const createBooking = useCallback(async ({ booking, confirmationPayload, receptionQueueItem }) => {
+    if (useBackend) {
+      const createdBooking = normalizeBooking(await createBookingApi(booking))
+
+      setStorageJSON(STORAGE_KEYS.LAST_BOOKING_CONFIRMATION, {
+        ...confirmationPayload,
+        bookingCode: createdBooking?.bookingCode || confirmationPayload?.bookingCode,
+        bookingId: createdBooking?.id || confirmationPayload?.bookingId,
+        status: createdBooking?.status || confirmationPayload?.status,
+      })
+      removeStorageItem(STORAGE_KEYS.BOOKING_DRAFT)
+      dispatchBookingDataChanged()
+      return createdBooking
+    }
+
     const storedBookings = getStorageJSON(STORAGE_KEYS.BOOKINGS, [])
     const bookings = Array.isArray(storedBookings) ? storedBookings : []
     const nextBookings = [...bookings, normalizeBooking(booking)].filter(Boolean)
@@ -60,9 +87,32 @@ export const useBooking = () => {
     const safeReceptionQueue = Array.isArray(receptionQueue) ? receptionQueue : []
     setStorageJSON(STORAGE_KEYS.RECEPTION_QUEUE, [...safeReceptionQueue, receptionQueueItem])
     syncBookingsToQueue(nextBookings, getTables())
-  }, [])
+    return normalizeBooking(booking)
+  }, [useBackend])
 
-  const createInternalBooking = useCallback((payload, actor) => {
+  const createInternalBooking = useCallback(async (payload, actor) => {
+    if (useBackend) {
+      try {
+        const initialStatus = INTERNAL_BOOKING_CREATE_STATUSES.has(payload.status) ? payload.status : 'DA_XAC_NHAN'
+        const booking = normalizeBooking(await createBookingApi({
+          ...payload,
+          status: initialStatus,
+          source: 'internal',
+          confirmationChannel: ['Nội bộ'],
+          createdBy: actor?.email || actor?.username || 'internal',
+          userEmail: payload.email || null,
+        }))
+
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          booking,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể tạo booking nội bộ.' }
+      }
+    }
+
     const currentBookings = normalizeBookings(readBookings())
     const nextId = getNextBookingId(currentBookings)
     const timestamp = new Date().toISOString()
@@ -99,9 +149,22 @@ export const useBooking = () => {
       booking,
       bookings: syncBookingsToQueue([...currentBookings, booking], getTables()),
     }
-  }, [])
+  }, [useBackend])
 
-  const updateInternalBooking = useCallback((bookingId, payload) => {
+  const updateInternalBooking = useCallback(async (bookingId, payload) => {
+    if (useBackend) {
+      try {
+        const updatedBooking = normalizeBooking(await updateBookingApi(bookingId, getMetadataPatchForInternalBooking(payload)))
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          booking: updatedBooking,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể cập nhật booking.' }
+      }
+    }
+
     const currentBookings = normalizeBookings(readBookings())
     const matchedBooking = currentBookings.find((booking) => String(booking.id) === String(bookingId))
 
@@ -159,9 +222,22 @@ export const useBooking = () => {
       booking: updatedBooking,
       bookings: syncBookingsToQueue(nextBookings, nextTables),
     }
-  }, [])
+  }, [useBackend])
 
-  const assignBookingTables = useCallback((bookingId, tableIds) => {
+  const assignBookingTables = useCallback(async (bookingId, tableIds) => {
+    if (useBackend) {
+      try {
+        const booking = normalizeBooking(await assignBookingTablesApi(bookingId, tableIds))
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          booking,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể gán bàn cho booking này.' }
+      }
+    }
+
     const result = assignTablesForBooking({ bookings: normalizeBookings(readBookings()), bookingId, tableIds })
 
     if (!result.success) {
@@ -172,9 +248,22 @@ export const useBooking = () => {
       success: true,
       bookings: result.bookings,
     }
-  }, [])
+  }, [useBackend])
 
-  const setBookingCheckedIn = useCallback((bookingId) => {
+  const setBookingCheckedIn = useCallback(async (bookingId) => {
+    if (useBackend) {
+      try {
+        const booking = normalizeBooking(await updateBookingStatusApi(bookingId, 'DA_CHECK_IN'))
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          booking,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể check-in booking.' }
+      }
+    }
+
     const currentBookings = normalizeBookings(readBookings())
     const matchedBooking = currentBookings.find((booking) => String(booking.id) === String(bookingId))
     const validation = canCheckInBooking(matchedBooking)
@@ -187,9 +276,22 @@ export const useBooking = () => {
       success: true,
       bookings: updateBookingStatus(currentBookings, bookingId, 'DA_CHECK_IN'),
     }
-  }, [])
+  }, [useBackend])
 
-  const setBookingCompleted = useCallback((bookingId) => {
+  const setBookingCompleted = useCallback(async (bookingId) => {
+    if (useBackend) {
+      try {
+        const booking = normalizeBooking(await updateBookingStatusApi(bookingId, 'DA_HOAN_THANH'))
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          booking,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể hoàn thành booking.' }
+      }
+    }
+
     const currentBookings = normalizeBookings(readBookings())
     const matchedBooking = currentBookings.find((booking) => String(booking.id) === String(bookingId))
     const validation = canCompleteBooking(matchedBooking)
@@ -202,9 +304,22 @@ export const useBooking = () => {
       success: true,
       bookings: updateBookingStatus(currentBookings, bookingId, 'DA_HOAN_THANH'),
     }
-  }, [])
+  }, [useBackend])
 
-  const setBookingNoShow = useCallback((bookingId) => {
+  const setBookingNoShow = useCallback(async (bookingId) => {
+    if (useBackend) {
+      try {
+        const booking = normalizeBooking(await updateBookingStatusApi(bookingId, 'KHONG_DEN'))
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          booking,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể đánh dấu không đến.' }
+      }
+    }
+
     const currentBookings = normalizeBookings(readBookings())
     const matchedBooking = currentBookings.find((booking) => String(booking.id) === String(bookingId))
     const validation = canMarkBookingNoShow(matchedBooking)
@@ -217,16 +332,37 @@ export const useBooking = () => {
       success: true,
       bookings: updateBookingStatus(currentBookings, bookingId, 'KHONG_DEN'),
     }
-  }, [])
+  }, [useBackend])
 
   const releaseBookingTables = useCallback(() => ({
     success: false,
     error: 'Không hỗ trợ trả bàn độc lập. Hãy hoàn thành, đánh dấu không đến hoặc hủy booking để đồng bộ trạng thái bàn.',
   }), [])
 
-  const getBookingHistory = useCallback((userEmail) => loadBookingHistory(userEmail), [])
+  const getBookingHistory = useCallback(async (userEmail) => {
+    if (useBackend) {
+      return getBookingHistoryApi(userEmail)
+    }
 
-  const cancelBooking = useCallback((bookingId, bookingCode, userEmail) => {
+    return loadBookingHistory(userEmail)
+  }, [useBackend])
+
+  const cancelBooking = useCallback(async (bookingId, bookingCode, userEmail) => {
+    if (useBackend) {
+      try {
+        await cancelBookingApi(bookingId)
+        const bookingHistory = await getBookingHistoryApi(userEmail)
+        dispatchBookingDataChanged()
+        return {
+          success: true,
+          message: `Đã hủy đặt bàn ${bookingCode} thành công.`,
+          bookingHistory,
+        }
+      } catch (error) {
+        return { success: false, error: error?.message || 'Không thể hủy đặt bàn này. Vui lòng thử lại.' }
+      }
+    }
+
     const parsedBookings = getStorageJSON(STORAGE_KEYS.BOOKINGS, null)
 
     if (!Array.isArray(parsedBookings)) {
@@ -253,9 +389,15 @@ export const useBooking = () => {
         .sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0))
         .map(mapBookingItem),
     }
-  }, [])
+  }, [useBackend])
 
-  const getHostBookings = useCallback(() => readAllBookings(), [])
+  const getHostBookings = useCallback(async () => {
+    if (useBackend) {
+      return getBookingsApi()
+    }
+
+    return readAllBookings()
+  }, [useBackend])
 
   const getHostStats = useCallback((bookings) => {
     const total = bookings.length
@@ -278,8 +420,8 @@ export const useBooking = () => {
     return updateBookingStatus(bookings, bookingId, nextStatus)
   }, [])
 
-  const getAvailableTablesForBooking = useCallback((booking) => {
-    const tables = getTables()
+  const getAvailableTablesForBooking = useCallback((booking, tablesOverride = null) => {
+    const tables = Array.isArray(tablesOverride) ? tablesOverride : getTables()
     const guestCount = Number(booking?.guests) || 0
 
     return tables.filter((table) => {

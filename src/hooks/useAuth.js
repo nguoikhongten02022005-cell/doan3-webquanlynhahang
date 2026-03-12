@@ -1,12 +1,15 @@
 import { useCallback, useEffect, useState } from 'react'
+import { getMeApi, internalLoginApi, loginApi, registerApi } from '../services/api/authApi'
+import { shouldUseBackend } from '../services/apiClient'
 import {
   AUTH_ROLES,
   AUTH_USER_CHANGED_EVENT,
-  clearCurrentUser,
+  clearAuthSession,
   findAccountByIdentifier,
   getAccounts,
   getCurrentUser,
   saveAccounts,
+  saveAuthSession,
   saveCurrentUser,
 } from '../services/authService'
 
@@ -16,6 +19,23 @@ export const useAuth = () => {
   useEffect(() => {
     const syncCurrentUser = () => {
       setCurrentUser(getCurrentUser())
+    }
+
+    const hydrateCurrentUser = async () => {
+      if (!shouldUseBackend()) {
+        return
+      }
+
+      try {
+        const response = await getMeApi()
+        const user = response?.currentUser || response?.user || response
+
+        if (user) {
+          saveCurrentUser(user)
+        }
+      } catch {
+        clearAuthSession()
+      }
     }
 
     const handleStorage = (event) => {
@@ -28,6 +48,7 @@ export const useAuth = () => {
 
     window.addEventListener('storage', handleStorage)
     window.addEventListener(AUTH_USER_CHANGED_EVENT, syncCurrentUser)
+    hydrateCurrentUser()
 
     return () => {
       window.removeEventListener('storage', handleStorage)
@@ -35,7 +56,29 @@ export const useAuth = () => {
     }
   }, [])
 
-  const login = useCallback((identifier, password) => {
+  const login = useCallback(async (identifier, password) => {
+    if (shouldUseBackend()) {
+      try {
+        const response = await loginApi(identifier, password)
+        const user = response?.currentUser || response?.user
+
+        saveAuthSession({
+          user,
+          accessToken: response?.accessToken,
+        })
+
+        return {
+          success: true,
+          user,
+        }
+      } catch (error) {
+        return {
+          success: false,
+          error: error?.message || 'Đăng nhập thất bại.',
+        }
+      }
+    }
+
     const accounts = getAccounts()
     const matchedAccount = findAccountByIdentifier(accounts, identifier)
 
@@ -54,7 +97,55 @@ export const useAuth = () => {
     }
   }, [])
 
-  const register = useCallback((payload) => {
+  const internalLogin = useCallback(async (identifier, password) => {
+    if (shouldUseBackend()) {
+      try {
+        const response = await internalLoginApi(identifier, password)
+        const user = response?.currentUser || response?.user
+
+        saveAuthSession({
+          user,
+          accessToken: response?.accessToken,
+        })
+
+        return {
+          success: true,
+          user,
+        }
+      } catch (error) {
+        return {
+          success: false,
+          error: error?.message || 'Đăng nhập nội bộ thất bại.',
+        }
+      }
+    }
+
+    return login(identifier, password)
+  }, [login])
+
+  const register = useCallback(async (payload) => {
+    if (shouldUseBackend()) {
+      try {
+        const response = await registerApi(payload)
+        const user = response?.currentUser || response?.user
+
+        saveAuthSession({
+          user,
+          accessToken: response?.accessToken,
+        })
+
+        return {
+          success: true,
+          user,
+        }
+      } catch (error) {
+        return {
+          success: false,
+          error: error?.message || 'Đăng ký thất bại.',
+        }
+      }
+    }
+
     const normalizedUsername = payload.username.trim().toLowerCase()
     const normalizedEmail = payload.email.trim().toLowerCase()
     const accounts = getAccounts()
@@ -89,7 +180,7 @@ export const useAuth = () => {
   }, [])
 
   const logout = useCallback(() => {
-    clearCurrentUser()
+    clearAuthSession()
   }, [])
 
   const role = currentUser?.role ?? AUTH_ROLES.CUSTOMER
@@ -105,6 +196,7 @@ export const useAuth = () => {
     canAccessInternal,
     isAuthenticated: Boolean(currentUser),
     login,
+    internalLogin,
     register,
     logout,
   }
