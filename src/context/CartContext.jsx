@@ -31,6 +31,8 @@ const createVariantKey = ({ id, selectedSize, selectedToppings, specialNote }) =
 
 const getItemKey = (item) => item.variantKey || createVariantKey(item)
 
+const isVariantKey = (value) => typeof value === 'string' && value.includes('__')
+
 const normalizeCartItem = (item) => {
   const normalizedSize = String(item?.selectedSize || 'M').trim().toUpperCase() || 'M'
   const normalizedToppings = normalizeToppings(item?.selectedToppings)
@@ -94,24 +96,22 @@ export function CartProvider({ children }) {
     })
   }
 
-  const removeFromCart = (itemIdentifier) => {
-    const isVariantKey = typeof itemIdentifier === 'string' && itemIdentifier.includes('__')
+  const removeFromCart = (variantKey) => {
+    if (!isVariantKey(variantKey)) {
+      return
+    }
 
-    setCartItems((prevItems) =>
-      prevItems.filter((item) =>
-        isVariantKey ? getItemKey(item) !== itemIdentifier : item.id !== itemIdentifier,
-      ),
-    )
+    setCartItems((prevItems) => prevItems.filter((item) => getItemKey(item) !== variantKey))
   }
 
-  const updateQuantity = (itemIdentifier, delta) => {
-    const isVariantKey = typeof itemIdentifier === 'string' && itemIdentifier.includes('__')
+  const updateQuantity = (variantKey, delta) => {
+    if (!isVariantKey(variantKey)) {
+      return
+    }
 
     setCartItems((prevItems) =>
       prevItems.map((item) => {
-        const isTarget = isVariantKey ? getItemKey(item) === itemIdentifier : item.id === itemIdentifier
-
-        if (!isTarget) {
+        if (getItemKey(item) !== variantKey) {
           return item
         }
 

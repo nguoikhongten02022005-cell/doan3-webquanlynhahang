@@ -31,6 +31,7 @@ export const useBookingFormState = ({ currentUser, getDraft }) => {
       email: String(draftData?.email ?? customerIdentity?.email ?? ''),
     }
   })
+  const restoredDraft = useMemo(() => getDraft(), [getDraft])
 
   const guestCount = Number(formData.guests) || 0
   const todayString = useMemo(() => getLocalDateString(), [])
@@ -91,6 +92,7 @@ export const useBookingFormState = ({ currentUser, getDraft }) => {
     dateSectionRef,
     draftRestored,
     formData,
+    restoredDraft,
     guestCount,
     guestWarning,
     invalidPastDate,

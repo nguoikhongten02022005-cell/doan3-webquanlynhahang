@@ -1,39 +1,25 @@
 import { useMemo, useState } from 'react'
-import { MENU_CATEGORIES } from '../../data/menuData'
+import { MENU_CANONICAL_CATEGORIES, MENU_DEFAULT_CATEGORY } from '../../constants/menuCategories'
+import { MENU_DEFAULT_BADGE, MENU_DEFAULT_TONE, MENU_TONE_OPTIONS } from '../../constants/menuOptions'
 import {
   createMenuItemApi,
   deleteMenuItemApi,
   updateMenuItemApi,
 } from '../../services/api/menuApi'
+import { mapDishFormToPayload, mapDishToFormValues, normalizeMenuCategory } from '../../services/mappers/menuMappers'
 import { parsePriceToNumber } from '../../utils/price'
 
 const DEFAULT_FORM_VALUES = {
   name: '',
   description: '',
   price: '',
-  category: MENU_CATEGORIES[1] || '',
-  badge: 'Mới',
-  tone: 'tone-amber',
+  category: MENU_DEFAULT_CATEGORY,
+  badge: MENU_DEFAULT_BADGE,
+  tone: MENU_DEFAULT_TONE,
   image: '',
 }
 
-const DISH_TONE_OPTIONS = [
-  'tone-amber',
-  'tone-red',
-  'tone-gold',
-  'tone-cool',
-  'tone-green',
-  'tone-mint',
-  'tone-brown',
-  'tone-violet',
-]
-
-const CATEGORY_OPTIONS = MENU_CATEGORIES.filter((category) => category !== 'Tất cả')
-
-const formatPriceInput = (price) => {
-  const normalizedPrice = parsePriceToNumber(price)
-  return normalizedPrice > 0 ? `${normalizedPrice.toLocaleString('vi-VN')}đ` : ''
-}
+const CATEGORY_OPTIONS = MENU_CANONICAL_CATEGORIES
 
 function DishesTab({ dishes, reloadDishes }) {
   const [cheDoForm, setCheDoForm] = useState('create')
@@ -42,7 +28,7 @@ function DishesTab({ dishes, reloadDishes }) {
   const [loiForm, setLoiForm] = useState('')
 
   const sortedDishes = useMemo(
-    () => [...dishes].sort((firstDish, secondDish) => secondDish.id - firstDish.id),
+    () => [...dishes].sort((firstDish, secondDish) => (Number(secondDish.id) || 0) - (Number(firstDish.id) || 0)),
     [dishes],
   )
 
@@ -73,7 +59,7 @@ function DishesTab({ dishes, reloadDishes }) {
       return 'Vui lòng nhập giá món.'
     }
 
-    if (!CATEGORY_OPTIONS.includes(formValues.category)) {
+    if (!CATEGORY_OPTIONS.includes(normalizeMenuCategory(formValues.category))) {
       return 'Danh mục món ăn không hợp lệ.'
     }
 
@@ -93,19 +79,10 @@ function DishesTab({ dishes, reloadDishes }) {
       return
     }
 
-    const payload = {
-      ...formValues,
-      name: formValues.name.trim(),
-      description: formValues.description.trim(),
-      price: formatPriceInput(formValues.price),
-      category: formValues.category,
-      badge: formValues.badge.trim(),
-      tone: formValues.tone.trim() || 'tone-amber',
-      image: formValues.image.trim(),
-    }
+    const payload = mapDishFormToPayload(formValues)
 
     try {
-      const savedDish = cheDoForm === 'edit'
+      const { duLieu: savedDish } = cheDoForm === 'edit'
         ? await updateMenuItemApi(idMonDangSua, payload)
         : await createMenuItemApi(payload)
 
@@ -124,15 +101,7 @@ function DishesTab({ dishes, reloadDishes }) {
   const handleEditDish = (dish) => {
     setCheDoForm('edit')
     setIdMonDangSua(dish.id)
-    setFormValues({
-      name: dish.name,
-      description: dish.description,
-      price: dish.price,
-      category: dish.category,
-      badge: dish.badge || '',
-      tone: dish.tone,
-      image: dish.image || '',
-    })
+    setFormValues(mapDishToFormValues(dish))
     setLoiForm('')
   }
 
@@ -144,7 +113,12 @@ function DishesTab({ dishes, reloadDishes }) {
     }
 
     try {
-      await deleteMenuItemApi(dish.id)
+      const { duLieu: deletedDish } = await deleteMenuItemApi(dish.id)
+
+      if (deletedDish === undefined) {
+        setLoiForm('Không thể xóa món ăn. Vui lòng thử lại.')
+        return
+      }
       await reloadDishes?.()
 
       if (idMonDangSua === dish.id) {
@@ -237,7 +211,7 @@ function DishesTab({ dishes, reloadDishes }) {
                 value={formValues.tone}
                 onChange={handleChange('tone')}
               >
-                {DISH_TONE_OPTIONS.map((tone) => (
+                {MENU_TONE_OPTIONS.map((tone) => (
                   <option key={tone} value={tone}>
                     {tone}
                   </option>

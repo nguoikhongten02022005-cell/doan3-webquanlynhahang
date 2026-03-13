@@ -1,21 +1,22 @@
 import { useMemo, useState } from 'react'
 import FoodCard from '../components/FoodCard'
 import FoodDetailModal from '../components/menu/FoodDetailModal'
+import { MENU_ALL_CATEGORY, MENU_CATEGORIES, MENU_CATEGORY_DESCRIPTIONS } from '../constants/menuCategories'
+import { MENU_SORT_OPTIONS } from '../constants/menuOptions'
 import { useCart } from '../context/CartContext'
-import {
-  MENU_CATEGORIES,
-  MENU_CATEGORY_DESCRIPTIONS,
-  MENU_SORT_OPTIONS,
-} from '../data/menuData'
 import { useFoodDetailModal } from '../hooks/useFoodDetailModal'
 import { useMenuDishes } from '../hooks/useMenuDishes'
-import { parsePriceToNumber } from '../utils/price'
 
 function MenuPage() {
   const [searchQuery, setSearchQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState('Tất cả')
+  const [activeCategory, setActiveCategory] = useState(MENU_ALL_CATEGORY)
   const [sortOption, setSortOption] = useState('featured')
-  const { dishes } = useMenuDishes()
+  const {
+    dishes,
+    loading,
+    error,
+    reloadDishes,
+  } = useMenuDishes()
   const { addToCart } = useCart()
   const {
     closeDetailModal,
@@ -34,9 +35,11 @@ function MenuPage() {
     specialNote,
   } = useFoodDetailModal({ addToCart })
 
+  const normalizedQuery = searchQuery.trim().toLowerCase()
+
   const categoryCounts = useMemo(
     () => MENU_CATEGORIES.reduce((counts, category) => {
-      counts[category] = category === 'Tất cả'
+      counts[category] = category === MENU_ALL_CATEGORY
         ? dishes.length
         : dishes.filter((dish) => dish.category === category).length
       return counts
@@ -47,33 +50,39 @@ function MenuPage() {
   const filteredDishes = useMemo(
     () => dishes
       .filter((dish) => {
-        const matchesCategory = activeCategory === 'Tất cả' || dish.category === activeCategory
-        const normalizedQuery = searchQuery.toLowerCase()
-        const matchesSearch = dish.name.toLowerCase().includes(normalizedQuery)
-          || dish.description.toLowerCase().includes(normalizedQuery)
+        const matchesCategory = activeCategory === MENU_ALL_CATEGORY || dish.category === activeCategory
+        const searchableName = String(dish?.name || '').toLowerCase()
+        const searchableDescription = String(dish?.description || '').toLowerCase()
+        const matchesSearch = !normalizedQuery
+          || searchableName.includes(normalizedQuery)
+          || searchableDescription.includes(normalizedQuery)
         return matchesCategory && matchesSearch
       })
       .sort((firstDish, secondDish) => {
         if (sortOption === 'price-asc') {
-          return parsePriceToNumber(firstDish.price) - parsePriceToNumber(secondDish.price)
+          return (firstDish.priceValue || 0) - (secondDish.priceValue || 0)
         }
 
         if (sortOption === 'price-desc') {
-          return parsePriceToNumber(secondDish.price) - parsePriceToNumber(firstDish.price)
+          return (secondDish.priceValue || 0) - (firstDish.priceValue || 0)
         }
 
         if (sortOption === 'newest') {
-          return secondDish.id - firstDish.id
+          return (Number(secondDish.id) || 0) - (Number(firstDish.id) || 0)
         }
 
         return 0
       }),
-    [activeCategory, dishes, searchQuery, sortOption],
+    [activeCategory, dishes, normalizedQuery, sortOption],
   )
 
-  const activeCategoryLabel = activeCategory === 'Tất cả' ? 'Tất cả danh mục' : activeCategory
-  const activeCategoryDescription = MENU_CATEGORY_DESCRIPTIONS[activeCategory] || MENU_CATEGORY_DESCRIPTIONS['Tất cả']
-  const searchLabel = searchQuery.trim() ? `· Từ khóa “${searchQuery.trim()}”` : ''
+  const hasSourceDishes = dishes.length > 0
+  const hasLoadError = Boolean(error)
+  const isEmptyState = !loading && !hasLoadError && !hasSourceDishes
+  const isNoResultState = !loading && !hasLoadError && hasSourceDishes && filteredDishes.length === 0
+  const activeCategoryLabel = activeCategory === MENU_ALL_CATEGORY ? 'Tất cả danh mục' : activeCategory
+  const activeCategoryDescription = MENU_CATEGORY_DESCRIPTIONS[activeCategory] || MENU_CATEGORY_DESCRIPTIONS[MENU_ALL_CATEGORY]
+  const searchLabel = normalizedQuery ? `· Từ khóa “${searchQuery.trim()}”` : ''
 
   return (
     <div className="menu-page">
@@ -117,7 +126,7 @@ function MenuPage() {
                 <p className="menu-toolbar-eyebrow">Đang duyệt menu</p>
                 <h1 className="menu-toolbar-title">{activeCategoryLabel}</h1>
                 <p className="menu-toolbar-summary">
-                  {filteredDishes.length} món {searchLabel}
+                  {loading ? 'Đang tải thực đơn...' : `${filteredDishes.length} món ${searchLabel}`}
                 </p>
                 <p className="menu-toolbar-description">{activeCategoryDescription}</p>
               </div>
@@ -139,11 +148,34 @@ function MenuPage() {
               </label>
             </div>
 
-            {filteredDishes.length === 0 ? (
+            {loading ? (
               <div className="menu-empty">
-                <p>Không tìm thấy món ăn phù hợp với tìm kiếm của bạn</p>
+                <p>Đang tải thực đơn...</p>
               </div>
-            ) : (
+            ) : null}
+
+            {!loading && hasLoadError ? (
+              <div className="menu-empty">
+                <p>{error}</p>
+                <button type="button" className="btn btn-primary" onClick={reloadDishes}>
+                  Tải lại
+                </button>
+              </div>
+            ) : null}
+
+            {isEmptyState ? (
+              <div className="menu-empty">
+                <p>Hiện chưa có món nào trong thực đơn.</p>
+              </div>
+            ) : null}
+
+            {isNoResultState ? (
+              <div className="menu-empty">
+                <p>Không tìm thấy món ăn phù hợp với bộ lọc hiện tại.</p>
+              </div>
+            ) : null}
+
+            {!loading && !hasLoadError && !isEmptyState && !isNoResultState ? (
               <div className="menu-grid">
                 {filteredDishes.map((dish) => (
                   <FoodCard
@@ -155,7 +187,7 @@ function MenuPage() {
                   />
                 ))}
               </div>
-            )}
+            ) : null}
           </main>
         </div>
       </div>

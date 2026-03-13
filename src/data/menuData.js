@@ -1,27 +1,7 @@
-export const MENU_CATEGORIES = Object.freeze(['Tất cả', 'Món Chính', 'Khai Vị', 'Đồ Uống', 'Tráng Miệng', 'Combo'])
+import { HOME_MENU_CATEGORIES, MENU_CATEGORIES, MENU_CATEGORY_DESCRIPTIONS } from '../constants/menuCategories'
+import { MENU_SIZE_OPTIONS, MENU_SORT_OPTIONS, MENU_TOPPING_OPTIONS } from '../constants/menuOptions'
 
-export const MENU_CATEGORY_DESCRIPTIONS = Object.freeze({
-  'Tất cả': 'Toàn bộ thực đơn trong ngày',
-  'Món Chính': 'Các món no bụng và đậm vị',
-  'Khai Vị': 'Nhẹ nhàng để bắt đầu bữa ăn',
-  'Đồ Uống': 'Nước uống mát lạnh và cà phê',
-  'Tráng Miệng': 'Món ngọt kết thúc bữa ăn',
-  Combo: 'Set tiết kiệm cho nhóm và cặp đôi',
-})
-
-export const MENU_SORT_OPTIONS = Object.freeze([
-  { value: 'featured', label: 'Nổi bật' },
-  { value: 'price-asc', label: 'Giá tăng dần' },
-  { value: 'price-desc', label: 'Giá giảm dần' },
-  { value: 'newest', label: 'Mới trước' },
-])
-
-export const MENU_TOPPING_OPTIONS = Object.freeze(['Thêm phô mai', 'Thêm trứng', 'Sốt đặc biệt'])
-
-export const MENU_SIZE_OPTIONS = Object.freeze([
-  { value: 'M', label: 'Size M', surcharge: 0 },
-  { value: 'L', label: 'Size L', surcharge: 30000 },
-])
+export { MENU_CATEGORIES, MENU_CATEGORY_DESCRIPTIONS, MENU_SORT_OPTIONS, MENU_TOPPING_OPTIONS, MENU_SIZE_OPTIONS }
 
 export const MENU_DISHES = Object.freeze([
   {
@@ -192,13 +172,7 @@ export const MENU_DISHES = Object.freeze([
   },
 ])
 
-export const HOME_CATEGORIES = Object.freeze([
-  { name: 'Món Chính', icon: '🍲' },
-  { name: 'Khai Vị', icon: '🥗' },
-  { name: 'Đồ Uống', icon: '🍹' },
-  { name: 'Tráng Miệng', icon: '🍮' },
-  { name: 'Combo', icon: '🍱' },
-])
+export const HOME_CATEGORIES = HOME_MENU_CATEGORIES
 
 export const HOME_SIGNATURE_DISHES = Object.freeze([
   {

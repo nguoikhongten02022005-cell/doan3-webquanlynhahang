@@ -11,7 +11,8 @@ import {
   updateBookingStatusApi,
   assignBookingTablesApi,
 } from '../services/api/bookingApi'
-import { getStorageJSON, removeStorageItem, setStorageJSON } from '../services/storageService'
+import { setStorageJSON } from '../services/storageService'
+import { clearBookingDraft, getValidBookingDraft, saveBookingDraft } from '../utils/bookingDraft'
 import { TABLE_STATUSES } from '../services/tableService'
 import { canCancelBooking } from './booking/bookingPolicies'
 import {
@@ -30,14 +31,12 @@ export const dispatchBookingDataChanged = () => {
 }
 
 export const useBooking = () => {
-  const saveDraft = useCallback((draftPayload) => {
-    setStorageJSON(STORAGE_KEYS.BOOKING_DRAFT, draftPayload)
-  }, [])
+  const saveDraft = useCallback((draftPayload) => saveBookingDraft(STORAGE_KEYS.BOOKING_DRAFT, draftPayload), [])
 
-  const getDraft = useCallback(() => getStorageJSON(STORAGE_KEYS.BOOKING_DRAFT, null), [])
+  const getDraft = useCallback(() => getValidBookingDraft(STORAGE_KEYS.BOOKING_DRAFT), [])
 
   const clearDraft = useCallback(() => {
-    removeStorageItem(STORAGE_KEYS.BOOKING_DRAFT)
+    clearBookingDraft(STORAGE_KEYS.BOOKING_DRAFT)
   }, [])
 
   const createBooking = useCallback(async ({ booking, confirmationPayload }) => {
@@ -50,7 +49,7 @@ export const useBooking = () => {
       bookingId: createdBooking?.id || confirmationPayload?.bookingId,
       status: createdBooking?.status || confirmationPayload?.status,
     })
-    removeStorageItem(STORAGE_KEYS.BOOKING_DRAFT)
+    clearBookingDraft(STORAGE_KEYS.BOOKING_DRAFT)
     dispatchBookingDataChanged()
     return createdBooking
   }, [])

@@ -1,4 +1,4 @@
-import { MENU_SIZE_OPTIONS, MENU_TOPPING_OPTIONS } from '../../data/menuData'
+import { MENU_SIZE_OPTIONS, MENU_TOPPING_OPTIONS } from '../../constants/menuOptions'
 import { formatCurrency } from '../../utils/currency'
 import { parsePriceToNumber } from '../../utils/price'
 
@@ -23,7 +23,8 @@ function FoodDetailModal({
     return null
   }
 
-  const titleId = `${scope}-food-detail-title-${selectedDish.id}`
+  const safeDish = selectedDish || {}
+  const titleId = `${scope}-food-detail-title-${safeDish.id}`
   const noteId = `${scope}-special-note`
 
   return (
@@ -33,14 +34,14 @@ function FoodDetailModal({
           ×
         </button>
 
-        <div className={`food-detail-hero ${selectedDish.tone}`}>
-          <span className="food-badge">{selectedDish.badge}</span>
+        <div className={`food-detail-hero ${safeDish.tone || ''}`}>
+          <span className="food-badge">{safeDish.badge}</span>
         </div>
 
         <div className="food-detail-content">
-          <h3 id={titleId}>{selectedDish.name}</h3>
-          <p>{selectedDish.description}</p>
-          <strong className="food-detail-base-price">Giá gốc: {formatCurrency(parsePriceToNumber(selectedDish.price))}</strong>
+          <h3 id={titleId}>{safeDish.name}</h3>
+          <p>{safeDish.description}</p>
+          <strong className="food-detail-base-price">Giá gốc: {formatCurrency(parsePriceToNumber(safeDish.price))}</strong>
 
           <div className="food-detail-group">
             <p className="food-detail-group-title">Chọn size</p>

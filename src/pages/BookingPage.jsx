@@ -57,6 +57,7 @@ function BookingPage() {
     maxBookableDate,
     nextStepHint,
     openDateOptions,
+    isSubmitting,
     primaryCtaDisabled,
     primaryCtaLabel,
     recommendedSlotTime,
@@ -109,7 +110,7 @@ function BookingPage() {
               onPrimaryAction={primaryAction}
               onSecondaryAction={secondaryAction}
               primaryActionType="button"
-              primaryCtaDisabled={step === 3 ? false : primaryCtaDisabled}
+              primaryCtaDisabled={step === 3 ? isSubmitting : primaryCtaDisabled}
               primaryCtaLabel={primaryCtaLabel}
               secondaryCtaLabel={secondaryActionLabel}
               serviceHotline={SITE_CONTACT.phoneDisplay}
@@ -234,7 +235,7 @@ function BookingPage() {
                       type="button"
                       className="booking-primary-btn booking-mobile-sticky-btn"
                       onClick={primaryAction}
-                      disabled={step === 3 ? false : primaryCtaDisabled}
+                      disabled={step === 3 ? isSubmitting : primaryCtaDisabled}
                     >
                       {primaryCtaLabel}
                     </button>

@@ -90,15 +90,15 @@ function CartPage() {
 
     try {
       setDangApVoucher(true)
-      const phanHoi = await validateVoucherApi(maVoucher, tamTinh)
-      const voucher = phanHoi?.data
+      const { duLieu } = await validateVoucherApi(maVoucher, tamTinh)
+      const voucher = duLieu
         ? {
-            code: phanHoi.data.code,
-            amount: phanHoi.data.discountType === 'FIXED'
-              ? Number(phanHoi.data.discountValue || 0)
+            code: duLieu.code,
+            amount: duLieu.discountType === 'FIXED'
+              ? Number(duLieu.discountValue || 0)
               : Math.min(
-                  (tamTinh * Number(phanHoi.data.discountValue || 0)) / 100,
-                  Number(phanHoi.data.maxDiscountAmount || Number.MAX_SAFE_INTEGER),
+                  (tamTinh * Number(duLieu.discountValue || 0)) / 100,
+                  Number(duLieu.maxDiscountAmount || Number.MAX_SAFE_INTEGER),
                 ),
           }
         : null

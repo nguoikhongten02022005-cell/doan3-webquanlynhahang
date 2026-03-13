@@ -10,8 +10,12 @@ import {
   saveCurrentUser,
 } from '../services/authService'
 
+const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || null
+const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.accessToken || ''
+
 export const useAuth = () => {
   const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => getCurrentUser())
+  const [isAuthBootstrapping, setIsAuthBootstrapping] = useState(true)
 
   useEffect(() => {
     const dongBoNguoiDungHienTai = () => {
@@ -19,22 +23,34 @@ export const useAuth = () => {
     }
 
     const dongBoNguoiDungTuBackend = async () => {
+      setIsAuthBootstrapping(true)
+
       if (!shouldUseBackend()) {
-        clearAuthSession()
+        dongBoNguoiDungHienTai()
+        setIsAuthBootstrapping(false)
         return
       }
 
       try {
-        const phanHoi = await getMeApi()
-        const nguoiDung = phanHoi?.currentUser || phanHoi?.user || phanHoi
+        const { duLieu } = await getMeApi()
+        const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
 
         if (nguoiDung) {
           saveCurrentUser(nguoiDung)
+          setNguoiDungHienTai(getCurrentUser())
         } else {
           clearAuthSession()
+          setNguoiDungHienTai(null)
         }
-      } catch {
-        clearAuthSession()
+      } catch (error) {
+        if (error?.status === 401) {
+          clearAuthSession()
+          setNguoiDungHienTai(null)
+        } else {
+          dongBoNguoiDungHienTai()
+        }
+      } finally {
+        setIsAuthBootstrapping(false)
       }
     }
 
@@ -65,9 +81,9 @@ export const useAuth = () => {
     }
 
     try {
-      const phanHoi = await hamDangNhap(identifier, password)
-      const nguoiDung = phanHoi?.currentUser || phanHoi?.user
-      const accessToken = phanHoi?.accessToken
+      const { duLieu } = await hamDangNhap(identifier, password)
+      const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
+      const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
 
       if (!nguoiDung || !accessToken) {
         clearAuthSession()
@@ -118,9 +134,9 @@ export const useAuth = () => {
     }
 
     try {
-      const phanHoi = await registerApi(payload)
-      const nguoiDung = phanHoi?.currentUser || phanHoi?.user
-      const accessToken = phanHoi?.accessToken
+      const { duLieu } = await registerApi(payload)
+      const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
+      const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
 
       if (!nguoiDung || !accessToken) {
         clearAuthSession()
@@ -178,6 +194,7 @@ export const useAuth = () => {
     coTheVaoNoiBo,
     isAuthenticated: Boolean(nguoiDungHienTai),
     daDangNhap: Boolean(nguoiDungHienTai),
+    isAuthBootstrapping,
     login,
     internalLogin,
     register,

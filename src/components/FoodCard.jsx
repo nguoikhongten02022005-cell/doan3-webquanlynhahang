@@ -1,7 +1,8 @@
 function FoodCard({ dish, onAddToCart, onOpenDetail, variant = 'default' }) {
   const canOpenDetail = typeof onOpenDetail === 'function'
   const isMenuVariant = variant === 'menu'
-  const hasImage = typeof dish.image === 'string' && dish.image.trim().length > 0
+  const safeDish = dish || {}
+  const hasImage = typeof safeDish.image === 'string' && safeDish.image.trim().length > 0
 
   const handleThumbKeyDown = (event) => {
     if (!canOpenDetail) {
@@ -10,24 +11,24 @@ function FoodCard({ dish, onAddToCart, onOpenDetail, variant = 'default' }) {
 
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault()
-      onOpenDetail(dish)
+      onOpenDetail(safeDish)
     }
   }
 
   return (
-    <article className={`food-card ${dish.tone} ${isMenuVariant ? 'food-card--menu' : ''}`}>
+    <article className={`food-card ${safeDish.tone || ''} ${isMenuVariant ? 'food-card--menu' : ''}`}>
       <div
         className={`food-thumb ${canOpenDetail ? 'is-clickable' : ''} ${isMenuVariant ? 'food-thumb--menu' : ''} ${hasImage ? 'has-image' : 'is-placeholder'}`}
         role={canOpenDetail ? 'button' : undefined}
         tabIndex={canOpenDetail ? 0 : undefined}
-        onClick={canOpenDetail ? () => onOpenDetail(dish) : undefined}
+        onClick={canOpenDetail ? () => onOpenDetail(safeDish) : undefined}
         onKeyDown={handleThumbKeyDown}
       >
         {hasImage ? (
-          <img className="food-thumb-image" src={dish.image} alt={dish.name} loading="lazy" />
+          <img className="food-thumb-image" src={safeDish.image} alt={safeDish.name || 'Món ăn'} loading="lazy" />
         ) : null}
         <div className="food-thumb-head">
-          <span className="food-badge">{dish.badge}</span>
+          <span className="food-badge">{safeDish.badge}</span>
           {isMenuVariant ? <span className="food-thumb-label">{hasImage ? 'Ảnh 4:3' : 'Ảnh món ăn'}</span> : null}
         </div>
         {isMenuVariant && !hasImage ? (
@@ -44,15 +45,15 @@ function FoodCard({ dish, onAddToCart, onOpenDetail, variant = 'default' }) {
       </div>
       <div className={`food-body ${isMenuVariant ? 'food-body--menu' : ''}`}>
         <div className="food-copy">
-          <h3>{dish.name}</h3>
-          <p>{dish.description}</p>
+          <h3>{safeDish.name}</h3>
+          <p>{safeDish.description}</p>
         </div>
         <div className="food-bottom">
-          <strong>{dish.price}</strong>
+          <strong>{safeDish.price}</strong>
           <button
             type="button"
             className={`add-btn ${isMenuVariant ? 'add-btn--menu' : ''}`}
-            onClick={() => onAddToCart(dish)}
+            onClick={() => onAddToCart(safeDish)}
           >
             + Thêm
           </button>
