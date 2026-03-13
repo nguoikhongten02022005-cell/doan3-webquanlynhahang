@@ -5,8 +5,11 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
+    "dev:frontend": "vite",
+    "dev:server": "npm --prefix server run dev",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node --test src/**/*.test.js",
     "preview": "vite preview"
   },
   "dependencies": {

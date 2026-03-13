@@ -1,4 +1,5 @@
 import { BOOKING_SEATING_LABELS } from '../../data/bookingData'
+import { getOrderStatusTone as getCanonicalOrderStatusTone } from '../../utils/order'
 
 export const formatDate = (value) => {
   if (!value) return '--'
@@ -30,14 +31,7 @@ export const getBookingStatusTone = (status) => {
   return 'warning'
 }
 
-export const getOrderStatusTone = (status) => {
-  const text = String(status || '').toLowerCase()
-
-  if (text.includes('hoàn thành') || text.includes('đã giao') || text.includes('đã thanh toán')) return 'success'
-  if (text.includes('mới') || text.includes('đang') || text.includes('chờ')) return 'warning'
-  if (text.includes('hủy')) return 'danger'
-  return 'neutral'
-}
+export const getOrderStatusTone = (status) => getCanonicalOrderStatusTone(status)
 
 export const getChannelLabel = (channel) => {
   if (Array.isArray(channel) && channel.length > 0) return channel.join(' / ')

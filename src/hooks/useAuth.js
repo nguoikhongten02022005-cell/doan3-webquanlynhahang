@@ -42,13 +42,8 @@ export const useAuth = () => {
           clearAuthSession()
           setNguoiDungHienTai(null)
         }
-      } catch (error) {
-        if (error?.status === 401) {
-          clearAuthSession()
-          setNguoiDungHienTai(null)
-        } else {
-          dongBoNguoiDungHienTai()
-        }
+      } catch {
+        dongBoNguoiDungHienTai()
       } finally {
         setIsAuthBootstrapping(false)
       }
