@@ -21,7 +21,8 @@ export const mapBookingStatus = (status) => {
   if (status === 'CAN_GOI_LAI') return '📞 Cần gọi lại'
   if (status === 'DA_CHECK_IN') return '🟣 Đã check-in'
   if (status === 'DA_XEP_BAN') return '🍽️ Đã vào bàn'
-  if (status === 'TU_CHOI_HET_CHO' || status === 'DA_HUY') return '🔴 Từ chối / hết chỗ'
+  if (status === 'TU_CHOI_HET_CHO') return '🔴 Từ chối / hết chỗ'
+  if (status === 'DA_HUY') return '🔴 Đã hủy'
   if (status === 'KHONG_DEN') return '⚫ Không đến'
   if (status === 'DA_HOAN_THANH') return '⚪ Đã hoàn thành'
   return status

@@ -8,6 +8,7 @@ import {
   getOrderStatusTone,
   getSeatingLabel,
 } from '../../pages/internalDashboard/formatters'
+import { getOrderStatusLabel } from '../../utils/order'
 import { getBookingPriorityNote } from '../../pages/internalDashboard/selectors'
 
 function OverviewTab({
@@ -133,7 +134,7 @@ function OverviewTab({
                       <p>{order.customer?.fullName || 'Khách lẻ'}</p>
                     </div>
                     <span className={`status-chip tone-${getOrderStatusTone(order.status)}`}>
-                      {order.status || 'Mới đặt'}
+                      {getOrderStatusLabel(order.status)}
                     </span>
                   </div>
                   <div className="profile-list-meta internal-board-meta">

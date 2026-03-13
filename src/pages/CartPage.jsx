@@ -26,7 +26,7 @@ function CartPage() {
   const [dangApVoucher, setDangApVoucher] = useState(false)
 
   const tamTinh = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const phiDichVu = tamTinh * 0.05
+  const phiDichVu = 0
   const soTienGiam = voucherDaApDung ? Math.min(voucherDaApDung.amount, tamTinh + phiDichVu) : 0
   const tongTien = Math.max(0, tamTinh + phiDichVu - soTienGiam)
 
@@ -265,7 +265,7 @@ function CartPage() {
               </div>
 
               <div className="summary-row">
-                <span>Phí dịch vụ (5%)</span>
+                <span>Phí dịch vụ theo backend</span>
                 <span>{formatCurrency(phiDichVu)}</span>
               </div>
 
@@ -277,9 +277,13 @@ function CartPage() {
               <div className="summary-divider"></div>
 
               <div className="summary-row summary-total">
-                <span>Tổng cộng</span>
+                <span>Tổng cộng ước tính</span>
                 <strong>{formatCurrency(tongTien)}</strong>
               </div>
+
+              <p className="checkout-summary-note">
+                Tổng tiền cuối cùng sẽ được backend xác nhận khi tạo đơn hàng.
+              </p>
 
               <div className="summary-form">
                 <div className="form-group">

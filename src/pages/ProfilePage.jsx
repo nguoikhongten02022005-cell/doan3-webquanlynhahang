@@ -1,10 +1,18 @@
 import { useEffect, useMemo, useState } from 'react'
-import { ORDER_TIMELINE_STEPS, PROFILE_TABS } from '../data/profileData'
+import { PROFILE_TABS } from '../data/profileData'
 import { formatCurrency } from '../utils/currency'
 import { getMyOrders } from '../services/api/ordersGateway'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 import { canCancelBooking } from '../hooks/booking/bookingPolicies.js'
+import {
+  getOrderStatusLabel,
+  getOrderStatusTone,
+  getOrderTimelineStep,
+  isCancelledOrderStatus,
+  ORDER_TIMELINE_STEPS,
+} from '../utils/order'
+import { getBookingStatusTone } from './internalDashboard/formatters'
 
 const formatDate = (value) => {
   if (!value) {
@@ -17,46 +25,6 @@ const formatDate = (value) => {
   }
 
   return date.toLocaleDateString('vi-VN')
-}
-
-const getOrderTimelineStep = (status) => {
-  const normalized = String(status || '').trim().toLowerCase()
-
-  if (
-    normalized.includes('đã thanh toán')
-    || normalized.includes('đã hoàn thành')
-    || normalized.includes('hoàn tất')
-  ) {
-    return 4
-  }
-
-  if (normalized.includes('đang giao') || normalized.includes('đã lên món')) {
-    return 3
-  }
-
-  if (normalized.includes('bếp đang làm')) {
-    return 2
-  }
-
-  return 1
-}
-
-const getStatusTone = (status) => {
-  const text = String(status || '').toLowerCase()
-
-  if (text.includes('hoàn thành') || text.includes('hoàn tất') || text.includes('thanh toán') || text.includes('xác nhận')) {
-    return 'success'
-  }
-
-  if (text.includes('đang giao') || text.includes('đang xử lý') || text.includes('chờ')) {
-    return 'warning'
-  }
-
-  if (text.includes('hủy')) {
-    return 'danger'
-  }
-
-  return 'neutral'
 }
 
 function ProfilePage() {
@@ -74,14 +42,17 @@ function ProfilePage() {
   }), [currentUser])
 
   const lichSuDonHangDaChuanHoa = useMemo(() => lichSuDonHang.map((order) => {
-    const status = order.status || 'Đang xử lý'
+    const rawStatus = String(order?.status || '').trim()
 
     return {
       id: `DH-${String(order.id).slice(-6)}`,
       date: formatDate(order.orderDate),
       total: Number(order.total) || 0,
-      status,
-      timelineStep: getOrderTimelineStep(status),
+      rawStatus,
+      statusLabel: getOrderStatusLabel(rawStatus),
+      statusTone: getOrderStatusTone(rawStatus),
+      timelineStep: getOrderTimelineStep(rawStatus),
+      isCancelled: isCancelledOrderStatus(rawStatus),
     }
   }), [lichSuDonHang])
 
@@ -186,22 +157,31 @@ function ProfilePage() {
                     <div key={order.id} className="profile-list-item">
                       <div className="profile-list-top">
                         <strong>{order.id}</strong>
-                        <span className={`status-chip tone-${getStatusTone(order.status)}`}>{order.status}</span>
+                        <span className={`status-chip tone-${order.statusTone}`}>{order.statusLabel}</span>
                       </div>
 
-                      <div className="order-progress" aria-label={`Tiến trình đơn ${order.id}`}>
-                        {ORDER_TIMELINE_STEPS.map((stepLabel, index) => {
-                          const stepNumber = index + 1
-                          const isActive = order.timelineStep >= stepNumber
+                      {order.isCancelled ? (
+                        <div className="order-progress order-progress-cancelled" aria-label={`Tiến trình đơn ${order.id}`}>
+                          <div className="order-progress-step active">
+                            <span className="order-progress-dot" aria-hidden="true" />
+                            <span className="order-progress-label">Đơn hàng đã hủy</span>
+                          </div>
+                        </div>
+                      ) : (
+                        <div className="order-progress" aria-label={`Tiến trình đơn ${order.id}`}>
+                          {ORDER_TIMELINE_STEPS.map((stepLabel, index) => {
+                            const stepNumber = index + 1
+                            const isActive = order.timelineStep >= stepNumber
 
-                          return (
-                            <div key={stepLabel} className={`order-progress-step ${isActive ? 'active' : ''}`}>
-                              <span className="order-progress-dot" aria-hidden="true" />
-                              <span className="order-progress-label">{stepLabel}</span>
-                            </div>
-                          )
-                        })}
-                      </div>
+                            return (
+                              <div key={stepLabel} className={`order-progress-step ${isActive ? 'active' : ''}`}>
+                                <span className="order-progress-dot" aria-hidden="true" />
+                                <span className="order-progress-label">{stepLabel}</span>
+                              </div>
+                            )
+                          })}
+                        </div>
+                      )}
 
                       <div className="profile-list-meta">
                         <p>
@@ -236,7 +216,7 @@ function ProfilePage() {
                     <div key={`${booking.id}-${booking.bookingId ?? booking.id}`} className="profile-list-item">
                       <div className="profile-list-top">
                         <strong>{booking.id}</strong>
-                        <span className={`status-chip tone-${getStatusTone(booking.status)}`}>{booking.status}</span>
+                        <span className={`status-chip tone-${getBookingStatusTone(booking.rawStatus)}`}>{booking.status}</span>
                       </div>
 
                       <div className="profile-list-meta">

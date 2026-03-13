@@ -6,19 +6,7 @@ import { formatCurrency } from '../utils/currency'
 import { clearCheckoutDraft, getCheckoutDraft, setCheckoutDraft } from '../services/checkoutDraftService'
 import { createOrder } from '../services/api/ordersGateway'
 import { clearAppliedVoucher, getAppliedVoucher } from '../services/voucherService'
-
-const paymentMethods = [
-  {
-    value: 'cash',
-    label: 'Tiền mặt khi nhận hàng',
-    description: 'Thanh toán trực tiếp khi nhận món.',
-  },
-  {
-    value: 'banking',
-    label: 'Chuyển khoản',
-    description: 'Chuyển khoản trước khi giao hàng.',
-  },
-]
+import { buildCreateOrderPayload, PAYMENT_METHOD_OPTIONS } from '../utils/order'
 
 function CheckoutPage() {
   const navigate = useNavigate()
@@ -31,7 +19,7 @@ function CheckoutPage() {
     address: '',
     note: '',
     tableNumber: '',
-    paymentMethod: 'cash',
+    paymentMethod: 'TIEN_MAT',
   })
   const [appliedVoucher, setAppliedVoucher] = useState(null)
 
@@ -59,8 +47,8 @@ function CheckoutPage() {
     [cartItems],
   )
 
-  const serviceFee = subtotal * 0.05
-  const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal + serviceFee) : 0
+  const serviceFee = 0
+  const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal) : 0
   const total = Math.max(0, subtotal + serviceFee - discountAmount)
 
   const handleChange = (event) => {
@@ -95,26 +83,21 @@ function CheckoutPage() {
     }
 
     try {
-      await createOrder({
-        items: cartItems,
-        subtotal,
-        serviceFee,
-        discountAmount,
-        voucherCode: appliedVoucher?.code || '',
-        total,
-        orderDate: new Date().toISOString(),
-        status: 'Mới Đặt',
+      const orderPayload = buildCreateOrderPayload({
+        cartItems,
+        voucherCode: appliedVoucher?.code,
         customer: {
           fullName: formData.fullName,
           phone: formData.phone,
           email: currentUser?.email ?? '',
           address: formData.address,
         },
-        userEmail: currentUser?.email ?? '',
         note: formData.note,
         tableNumber: formData.tableNumber,
         paymentMethod: formData.paymentMethod,
       })
+
+      await createOrder(orderPayload)
 
       clearAppliedVoucher()
       clearCheckoutDraft()
@@ -226,7 +209,7 @@ function CheckoutPage() {
             <div className="checkout-payment-block">
               <h3>Phương thức thanh toán</h3>
               <div className="checkout-payment-options">
-                {paymentMethods.map((method) => (
+                {PAYMENT_METHOD_OPTIONS.map((method) => (
                   <label key={method.value} className="payment-option">
                     <input
                       type="radio"
@@ -285,22 +268,26 @@ function CheckoutPage() {
 
               <div className="checkout-totals">
                 <div className="summary-row">
-                  <span>Tạm tính</span>
+                  <span>Tạm tính món</span>
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="summary-row">
-                  <span>Phí dịch vụ (5%)</span>
+                  <span>Phí dịch vụ theo backend</span>
                   <span>{formatCurrency(serviceFee)}</span>
                 </div>
                 <div className="summary-row summary-discount">
-                  <span>Giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
+                  <span>Ước tính giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
                   <span>-{formatCurrency(discountAmount)}</span>
                 </div>
                 <div className="summary-row summary-total">
-                  <span>Tổng tiền</span>
+                  <span>Tổng ước tính</span>
                   <strong>{formatCurrency(total)}</strong>
                 </div>
               </div>
+
+              <p className="checkout-summary-note">
+                Tổng tiền cuối cùng sẽ được backend xác nhận khi tạo đơn hàng.
+              </p>
 
               <button type="submit" className="btn btn-primary w-full" disabled={cartItems.length === 0}>
                 Đặt hàng ngay

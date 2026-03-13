@@ -1,5 +1,6 @@
 import { formatCurrency } from '../../utils/currency'
 import { formatDate, getOrderStatusTone } from '../../pages/internalDashboard/formatters'
+import { getOrderStatusLabel, getPaymentMethodLabel } from '../../utils/order'
 
 function OrdersTab({ orders }) {
   return (
@@ -20,14 +21,14 @@ function OrdersTab({ orders }) {
           <div key={order.id} className="profile-list-item">
             <div className="profile-list-top">
               <strong>DH-{String(order.id).slice(-6)}</strong>
-              <span className={`status-chip tone-${getOrderStatusTone(order.status)}`}>{order.status || 'Mới đặt'}</span>
+              <span className={`status-chip tone-${getOrderStatusTone(order.status)}`}>{getOrderStatusLabel(order.status)}</span>
             </div>
 
             <div className="profile-list-meta internal-order-meta">
               <p><span>Khách hàng</span><strong>{order.customer?.fullName || 'Khách lẻ'}</strong></p>
               <p><span>Ngày tạo</span><strong>{formatDate(order.orderDate)}</strong></p>
               <p><span>Tổng tiền</span><strong>{formatCurrency(order.total)}</strong></p>
-              <p><span>Thanh toán</span><strong>{order.paymentMethod || 'Chưa chọn'}</strong></p>
+              <p><span>Thanh toán</span><strong>{getPaymentMethodLabel(order.paymentMethod)}</strong></p>
             </div>
 
             {order.note && <p className="host-booking-note">Ghi chú đơn: {order.note}</p>}

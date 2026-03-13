@@ -97,10 +97,7 @@ export const matchesBookingSearch = (booking, searchQuery) => {
 
 export const getOrdersSummary = (orders) => ({
   total: orders.length,
-  pending: orders.filter((order) => {
-    const text = String(order?.status || '').toLowerCase()
-    return text.includes('mới') || text.includes('đang') || text.includes('chờ')
-  }).length,
+  pending: orders.filter((order) => getOrderStatusTone(order?.status) === 'warning').length,
   revenue: orders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0),
 })
 
