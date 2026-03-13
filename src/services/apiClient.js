@@ -1,10 +1,23 @@
-const DEFAULT_API_BASE_URL = 'http://localhost:4000/api'
-
 import { STORAGE_KEYS } from '../constants/storageKeys'
 import { getStorageItem } from './storageService'
 
+const DEFAULT_DEV_API_BASE_URL = 'http://localhost:4000/api'
+
 export const shouldUseBackend = () => String(import.meta.env.VITE_USE_BACKEND || 'false').toLowerCase() === 'true'
-export const getApiBaseUrl = () => import.meta.env.VITE_API_BASE_URL || DEFAULT_API_BASE_URL
+
+export const getApiBaseUrl = () => {
+  const configuredBaseUrl = String(import.meta.env.VITE_API_BASE_URL || '').trim()
+
+  if (configuredBaseUrl) {
+    return configuredBaseUrl
+  }
+
+  if (import.meta.env.DEV) {
+    return DEFAULT_DEV_API_BASE_URL
+  }
+
+  throw new Error('Thiếu VITE_API_BASE_URL cho frontend đang bật backend mode.')
+}
 
 const getAuthHeader = () => {
   const token = getStorageItem(STORAGE_KEYS.AUTH_TOKEN)
@@ -44,14 +57,19 @@ export const tachPhanHoi = (phanHoi) => ({
 })
 
 const request = async (path, options = {}) => {
+  const { headers: customHeaders = {}, body, ...restOptions } = options
+  const shouldSetJsonContentType = body !== undefined && !(body instanceof FormData)
+  const headers = {
+    ...getAuthHeader(),
+    ...(shouldSetJsonContentType ? { 'Content-Type': 'application/json' } : {}),
+    ...customHeaders,
+  }
+
   const response = await fetch(`${getApiBaseUrl()}${path}`, {
     credentials: 'include',
-    headers: {
-      'Content-Type': 'application/json',
-      ...getAuthHeader(),
-      ...(options.headers || {}),
-    },
-    ...options,
+    headers,
+    body,
+    ...restOptions,
   })
 
   if (response.status === 204) {

@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { MENU_SIZE_OPTIONS } from '../data/menuData'
+import { MENU_SIZE_OPTIONS } from '../constants/menuOptions'
 import { parsePriceToNumber } from '../utils/price'
 
 export const useFoodDetailModal = ({ addToCart, sizeOptions = MENU_SIZE_OPTIONS }) => {

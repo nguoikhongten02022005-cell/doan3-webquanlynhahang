@@ -1,12 +1,16 @@
+import { useMemo } from 'react'
 import { Link } from 'react-router-dom'
 import FoodCard from '../components/FoodCard'
 import FoodDetailModal from '../components/menu/FoodDetailModal'
+import { HOME_MENU_CATEGORIES } from '../constants/menuCategories'
 import { useCart } from '../context/CartContext'
-import { HOME_CATEGORIES, HOME_SIGNATURE_DISHES } from '../data/menuData'
 import { useFoodDetailModal } from '../hooks/useFoodDetailModal'
+import { useMenuDishes } from '../hooks/useMenuDishes'
+import { getHomeSignatureDishes } from '../services/mappers/menuMappers'
 
 function HomePage() {
   const { addToCart } = useCart()
+  const { dishes } = useMenuDishes()
   const {
     closeDetailModal,
     detailPrice,
@@ -23,6 +27,8 @@ function HomePage() {
     setSpecialNote,
     specialNote,
   } = useFoodDetailModal({ addToCart })
+
+  const signatureDishes = useMemo(() => getHomeSignatureDishes(dishes), [dishes])
 
   return (
     <div className="home-page">
@@ -90,7 +96,7 @@ function HomePage() {
             <p>Chọn nhanh món bạn muốn và đi thẳng tới phần thực đơn liên quan.</p>
           </div>
           <div className="category-row">
-            {HOME_CATEGORIES.map((category) => (
+            {HOME_MENU_CATEGORIES.map((category) => (
               <Link key={category.name} to="/menu" className="category-item">
                 <span className="category-icon" aria-hidden="true">
                   {category.icon}
@@ -110,7 +116,7 @@ function HomePage() {
           </div>
 
           <div className="food-grid">
-            {HOME_SIGNATURE_DISHES.map((dish) => (
+            {signatureDishes.map((dish) => (
               <FoodCard key={dish.id} dish={dish} onAddToCart={handleAddToCart} onOpenDetail={openDetailModal} variant="menu" />
             ))}
           </div>

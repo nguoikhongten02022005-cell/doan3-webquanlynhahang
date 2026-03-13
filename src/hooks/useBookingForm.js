@@ -21,6 +21,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     dateSectionRef,
     draftRestored,
     formData,
+    restoredDraft,
     guestCount,
     guestWarning,
     invalidPastDate,
@@ -49,27 +50,6 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
   } = useBookingAvailability({ closedDate, formData, guestCount, invalidPastDate, isLargeGroupHotlineOnly })
 
   const {
-    bookingCode,
-    bookingStatus,
-    clearFieldError,
-    inlineErrors,
-    primaryCtaDisabled,
-    primaryCtaLabel,
-    selectedSeatOperationalNote,
-    setInlineErrors,
-    setSubmitError,
-    step1Complete,
-    step2Complete,
-    submitBooking,
-    submitError,
-    submitted,
-    successHeading,
-    successStatusLabel,
-    validateStepOne,
-    validateStepTwo,
-  } = useBookingSubmission({ createBooking, currentUser, formData, guestCount, invalidPastDate, closedDate, slotData, step })
-
-  const {
     calendarContainerRef,
     calendarDays,
     calendarFocusedDate,
@@ -90,47 +70,76 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     toggleCalendar,
   } = useBookingCalendar({
     selectedDate: formData.date,
-    onDateSelect: (value) => {
-      setSubmitError('')
-      clearFieldError('date')
-      clearFieldError('time')
-
-      if (!value) {
-        setFormData((prev) => ({ ...prev, date: '', time: '', seatingArea: 'KHONG_UU_TIEN' }))
-        return
-      }
-
-      if (value < todayString || value > maxBookableDate || isClosedDate(value)) {
-        setInlineErrors((prev) => ({
-          ...prev,
-          date: value > maxBookableDate ? `Hiện chỉ mở nhận bàn đến ${formatDateDisplay(maxBookableDate)}.` : CLOSED_DATE_HINT,
-        }))
-        return
-      }
-
-      requestScrollToAvailability()
-      requestFocusFirstSlot()
-      setFormData((prev) => ({ ...prev, date: value, time: '', seatingArea: 'KHONG_UU_TIEN' }))
-      closeCalendar()
-    },
+    onDateSelect: (value) => applyDateSelection(value, closeCalendar),
   })
 
+  const {
+    bookingCode,
+    bookingStatus,
+    clearFieldError,
+    inlineErrors,
+    isSubmitting,
+    primaryCtaDisabled,
+    primaryCtaLabel,
+    selectedSeatOperationalNote,
+    setInlineErrors,
+    setSubmitError,
+    step1Complete,
+    step2Complete,
+    submitBooking,
+    submitError,
+    submitted,
+    successHeading,
+    successStatusLabel,
+    validateStepOne,
+    validateStepTwo,
+  } = useBookingSubmission({ createBooking, currentUser, formData, guestCount, invalidPastDate, closedDate, slotData, step })
+
+  function applyDateSelection(value, closeCalendarHandler) {
+    setSubmitError('')
+    clearFieldError('date')
+    clearFieldError('time')
+
+    if (!value) {
+      setFormData((prev) => ({ ...prev, date: '', time: '', seatingArea: 'KHONG_UU_TIEN' }))
+      return
+    }
+
+    if (value < todayString || value > maxBookableDate || isClosedDate(value)) {
+      setInlineErrors((prev) => ({
+        ...prev,
+        date: value > maxBookableDate ? `Hiện chỉ mở nhận bàn đến ${formatDateDisplay(maxBookableDate)}.` : CLOSED_DATE_HINT,
+      }))
+      return
+    }
+
+    requestScrollToAvailability()
+    requestFocusFirstSlot()
+    setFormData((prev) => ({ ...prev, date: value, time: '', seatingArea: 'KHONG_UU_TIEN' }))
+    closeCalendarHandler?.()
+  }
+
   useEffect(() => {
-    const draftData = getDraft()
-    if (!draftData) return
+    if (!restoredDraft) {
+      return
+    }
 
     setDraftRestored(true)
 
-    if (draftData?.guests && draftData?.date && draftData?.time) {
+    if (restoredDraft.guests && restoredDraft.date && restoredDraft.time) {
       setStep(2)
     }
-  }, [getDraft, setDraftRestored, setStep])
+  }, [restoredDraft, setDraftRestored, setStep])
 
   useEffect(() => {
-    if (!formData.time || slotsLoading) return
+    if (!formData.time || slotsLoading) {
+      return
+    }
 
     const stillAvailable = slotData.available.some((slot) => slot.time === formData.time)
-    if (stillAvailable) return
+    if (stillAvailable) {
+      return
+    }
 
     const suggestions = selectedTimeSuggestions
     setFormData((prev) => ({ ...prev, time: '' }))
@@ -140,26 +149,33 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
         ? `Khung giờ ${formData.time} hiện không còn chỗ. Gợi ý: ${suggestions.join(', ')}.`
         : `Khung giờ ${formData.time} hiện không còn chỗ. Vui lòng chọn giờ khác.`,
     }))
-    if (step > 1) setStep(1)
+
+    if (step > 1) {
+      setStep(1)
+    }
   }, [formData.time, selectedTimeSuggestions, setFormData, setInlineErrors, setStep, slotData, slotsLoading, step])
 
   useEffect(() => {
-    if (submitted) return
-    if (!formData.phone.trim()) return
+    if (submitted || isSubmitting || !formData.phone.trim()) {
+      return
+    }
 
-    saveDraft({
-      guests: formData.guests,
-      date: formData.date,
-      time: formData.time,
-      seatingArea: formData.seatingArea,
-      name: formData.name,
-      phone: formData.phone,
-      email: formData.email,
-      notes: formData.notes,
-      occasion: formData.occasion,
-      updatedAt: new Date().toISOString(),
-    })
-  }, [formData, saveDraft, submitted])
+    const timeoutId = window.setTimeout(() => {
+      saveDraft({
+        guests: formData.guests,
+        date: formData.date,
+        time: formData.time,
+        seatingArea: formData.seatingArea,
+        name: formData.name,
+        phone: formData.phone,
+        email: formData.email,
+        notes: formData.notes,
+        occasion: formData.occasion,
+      })
+    }, 300)
+
+    return () => window.clearTimeout(timeoutId)
+  }, [formData, isSubmitting, saveDraft, submitted])
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -204,38 +220,20 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
   }
 
   const handleDateSelect = (value) => {
-    setSubmitError('')
-    clearFieldError('date')
-    clearFieldError('time')
-
-    if (!value) {
-      setFormData((prev) => ({ ...prev, date: '', time: '', seatingArea: 'KHONG_UU_TIEN' }))
-      return
-    }
-
-    if (value < todayString || value > maxBookableDate || isClosedDate(value)) {
-      setInlineErrors((prev) => ({
-        ...prev,
-        date: value > maxBookableDate ? `Hiện chỉ mở nhận bàn đến ${formatDateDisplay(maxBookableDate)}.` : CLOSED_DATE_HINT,
-      }))
-      return
-    }
-
-    requestScrollToAvailability()
-    requestFocusFirstSlot()
-    setFormData((prev) => ({ ...prev, date: value, time: '', seatingArea: 'KHONG_UU_TIEN' }))
-    closeCalendar()
+    applyDateSelection(value, closeCalendar)
   }
 
   const handleDateInputChange = (event) => {
-    handleDateSelect(event.target.value)
+    applyDateSelection(event.target.value, closeCalendar)
   }
 
   const handleNoteSuggestion = (suggestion) => {
     setFormData((prev) => {
       const currentNotes = prev.notes.trim()
       const exists = currentNotes.toLowerCase().includes(suggestion.toLowerCase())
-      if (exists) return prev
+      if (exists) {
+        return prev
+      }
 
       return {
         ...prev,
@@ -245,7 +243,10 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
   }
 
   const handleTimeSelect = (slot) => {
-    if (slot.status === 'full') return
+    if (slot.status === 'full') {
+      return
+    }
+
     setSubmitError('')
     clearFieldError('time')
     setFormData((prev) => ({
@@ -263,7 +264,10 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
 
   const handleSeatingSelect = (areaValue) => {
     const area = BOOKING_SEATING_AREAS.find((item) => item.value === areaValue)
-    if (!area || guestCount > area.maxGuests) return
+    if (!area || guestCount > area.maxGuests) {
+      return
+    }
+
     setFormData((prev) => ({ ...prev, seatingArea: areaValue }))
   }
 
@@ -277,7 +281,9 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
 
     if (Object.keys(errors).length > 0) {
       setInlineErrors((prev) => ({ ...prev, ...errors }))
-      if (errors.guests && isLargeGroupHotlineOnly(guestCount)) setSubmitError(LARGE_GROUP_HOTLINE_MESSAGE)
+      if (errors.guests && isLargeGroupHotlineOnly(guestCount)) {
+        setSubmitError(LARGE_GROUP_HOTLINE_MESSAGE)
+      }
       return
     }
 
@@ -286,6 +292,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
 
   const handleStepTwoContinue = () => {
     const errors = validateStepTwo()
+
     if (Object.keys(errors).length > 0) {
       setInlineErrors((prev) => ({ ...prev, ...errors }))
       return
@@ -332,6 +339,7 @@ export const useBookingForm = ({ currentUser, createBooking, getDraft, saveDraft
     invalidPastDate,
     isSelectedDateClosed,
     isSelectedDateOutOfRange,
+    isSubmitting,
     maxBookableDate,
     nextOpenDate,
     openDateOptions,

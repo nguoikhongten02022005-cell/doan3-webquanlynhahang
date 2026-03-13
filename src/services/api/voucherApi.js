@@ -1,4 +1,4 @@
-import { apiClient } from '../apiClient'
+import { apiClient, tachPhanHoi } from '../apiClient'
 
-export const getVoucherByCodeApi = (code) => apiClient.get(`/vouchers/${encodeURIComponent(code)}`)
-export const validateVoucherApi = (code, orderAmount = 0) => apiClient.post('/vouchers/validate', { code, orderAmount })
+export const getVoucherByCodeApi = async (code) => tachPhanHoi(await apiClient.get(`/vouchers/${encodeURIComponent(code)}`))
+export const validateVoucherApi = async (code, orderAmount = 0) => tachPhanHoi(await apiClient.post('/vouchers/validate', { code, orderAmount }))

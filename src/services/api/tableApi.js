@@ -1,4 +1,4 @@
-import { apiClient } from '../apiClient'
+import { apiClient, tachPhanHoi } from '../apiClient'
 
-export const getTablesApi = () => apiClient.get('/tables')
-export const updateTableStatusApi = (id, status) => apiClient.patch(`/tables/${id}/status`, { status })
+export const getTablesApi = async () => tachPhanHoi(await apiClient.get('/tables'))
+export const updateTableStatusApi = async (id, status) => tachPhanHoi(await apiClient.patch(`/tables/${id}/status`, { status }))

@@ -364,13 +364,13 @@ a { color: inherit; text-decoration: none; }
   font-size: 1.12rem; font-weight: 700; color: var(--primary);
 }
 .add-btn {
-  width: 2.2rem; height: 2.2rem; border-radius: 50%;
+  height: 2.2rem; padding: 0 1rem; border-radius: 2rem;
   border: 1.5px solid var(--primary); background: transparent;
-  color: var(--primary); display: grid; place-items: center;
-  cursor: pointer; transition: all 0.25s ease; font-size: 1rem;
+  color: var(--primary); display: inline-flex; align-items: center; justify-content: center;
+  cursor: pointer; transition: all 0.25s ease; font-size: 0.9rem; font-weight: 600; white-space: nowrap;
 }
 .add-btn:hover { background: var(--primary); color: #fff; }
-.add-btn--menu { width: 1.9rem; height: 1.9rem; font-size: 0.9rem; }
+.add-btn--menu { height: 1.9rem; padding: 0 0.8rem; font-size: 0.85rem; }
 
 /* Food card placeholder */
 .food-card.is-placeholder .food-thumb {
@@ -980,8 +980,25 @@ a { color: inherit; text-decoration: none; }
 /* Booking layout */
 .booking-form-section { padding: 2rem 0 4rem; }
 .booking-layout-premium {
-  max-width: 900px; margin: 0 auto;
+  max-width: 1200px;
+  margin: 0 auto;
+  display: flex;
+  gap: 2rem;
+  align-items: flex-start;
 }
+
+.booking-sidebar-premium {
+  width: 350px;
+  position: sticky;
+  top: 2rem;
+  flex-shrink: 0;
+}
+
+.booking-main-premium {
+  flex: 1;
+  min-width: 0;
+}
+
 .booking-shell-premium {
   background: #fff; border: 1px solid var(--line);
   border-radius: var(--radius-xl); overflow: hidden;

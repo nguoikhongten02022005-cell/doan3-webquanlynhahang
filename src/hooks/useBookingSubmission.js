@@ -20,14 +20,15 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
   const [bookingStatus, setBookingStatus] = useState('YEU_CAU_DAT_BAN')
   const [submitError, setSubmitError] = useState('')
   const [inlineErrors, setInlineErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const step1Complete = Boolean(
     formData.guests && formData.date && formData.time && !invalidPastDate && !closedDate && !isLargeGroupHotlineOnly(guestCount),
   )
   const step2Complete = Boolean(formData.name.trim() && formData.phone.trim() && isValidPhoneNumber(formData.phone))
-  const primaryCtaDisabled = (step === 1 && !step1Complete) || (step === 2 && !step2Complete)
+  const primaryCtaDisabled = isSubmitting || (step === 1 && !step1Complete) || (step === 2 && !step2Complete)
 
-  const primaryCtaLabel = getPrimaryCtaLabel({
+  const defaultPrimaryCtaLabel = getPrimaryCtaLabel({
     step,
     guestCount,
     date: formData.date,
@@ -38,6 +39,7 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     seatingArea: formData.seatingArea,
     notes: formData.notes,
   })
+  const primaryCtaLabel = isSubmitting ? 'Đang gửi yêu cầu...' : defaultPrimaryCtaLabel
 
   const selectedSeatOperationalNote = useMemo(() => getSeatOperationalNote(formData.seatingArea), [formData.seatingArea])
   const successStatusLabel = BOOKING_STATUS_LABELS[bookingStatus] || bookingStatus
@@ -56,6 +58,10 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
   const validateStepTwo = () => getStepTwoErrors({ name: formData.name, phone: formData.phone })
 
   const submitBooking = async ({ goToStep, saveDraft }) => {
+    if (isSubmitting) {
+      return { success: false }
+    }
+
     setSubmitError('')
 
     if (formData.phone.trim()) {
@@ -69,7 +75,6 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
         email: formData.email,
         notes: formData.notes,
         occasion: formData.occasion,
-        updatedAt: new Date().toISOString(),
       })
     }
 
@@ -123,6 +128,8 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     }
 
     try {
+      setIsSubmitting(true)
+
       const createdBooking = await createBooking({
         booking,
         confirmationPayload: {
@@ -144,6 +151,8 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     } catch (error) {
       setSubmitError(error?.message || 'Không thể gửi yêu cầu đặt bàn. Vui lòng thử lại.')
       return { success: false }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 
@@ -162,6 +171,7 @@ export const useBookingSubmission = ({ createBooking, currentUser, formData, gue
     submitBooking,
     submitError,
     submitted,
+    isSubmitting,
     successHeading,
     successStatusLabel,
     validateStepOne,

@@ -3,7 +3,11 @@ import { useAuth } from '../hooks/useAuth'
 
 function ProtectedRoute({ children }) {
   const location = useLocation()
-  const { daDangNhap, coTheVaoNoiBo } = useAuth()
+  const { daDangNhap, coTheVaoNoiBo, isAuthBootstrapping } = useAuth()
+
+  if (isAuthBootstrapping) {
+    return <div className="booking-empty">Đang xác thực phiên đăng nhập...</div>
+  }
 
   if (!daDangNhap) {
     return <Navigate to="/internal/login" replace state={{ from: location.pathname }} />
