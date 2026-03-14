@@ -12,3 +12,90 @@ body,
 body {
   min-width: 320px;
 }
+
+button,
+input,
+textarea,
+select {
+  font: inherit;
+}
+
+.notification-stack {
+  position: fixed;
+  top: 20px;
+  right: 20px;
+  z-index: 1200;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  width: min(360px, calc(100vw - 24px));
+}
+
+.notification-card {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 16px;
+  border-radius: 18px;
+  border: 1px solid rgba(17, 24, 39, 0.08);
+  background: rgba(255, 252, 247, 0.97);
+  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.14);
+  backdrop-filter: blur(10px);
+}
+
+.notification-card.tone-success {
+  border-color: rgba(30, 102, 58, 0.16);
+  background: rgba(244, 252, 246, 0.98);
+}
+
+.notification-card.tone-warning {
+  border-color: rgba(180, 118, 13, 0.2);
+  background: rgba(255, 249, 235, 0.98);
+}
+
+.notification-card.tone-danger {
+  border-color: rgba(185, 28, 28, 0.16);
+  background: rgba(254, 242, 242, 0.98);
+}
+
+.notification-copy {
+  display: grid;
+  gap: 4px;
+}
+
+.notification-copy strong {
+  color: #172033;
+  font-size: 0.95rem;
+}
+
+.notification-copy p {
+  margin: 0;
+  color: #4b5563;
+  font-size: 0.92rem;
+  line-height: 1.45;
+}
+
+.notification-close {
+  border: 0;
+  background: transparent;
+  color: #6b7280;
+  cursor: pointer;
+  font-size: 1.15rem;
+  line-height: 1;
+  padding: 2px;
+}
+
+.notification-close:hover {
+  color: #111827;
+}
+
+@media (max-width: 640px) {
+  .notification-stack {
+    top: auto;
+    right: 12px;
+    bottom: 12px;
+    left: 12px;
+    width: auto;
+  }
+}

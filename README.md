@@ -1,18 +1,18 @@
 # Quản lý nhà hàng
 
-Frontend chạy ở thư mục root. Backend canonical duy nhất cho flow phát triển và kiểm thử hiện tại nằm trong `server/`.
+Phần giao diện chạy ở thư mục gốc. Phần máy chủ chuẩn dùng cho phát triển và kiểm thử hiện tại nằm trong `server/`.
 
 ## Cấu trúc chính
 
-- `src/`: frontend React + Vite
-- `server/`: backend canonical đang dùng thật
-- `backend/`: bản cũ/legacy, không nên dùng cho flow chính nếu không có lý do rất cụ thể
+- `src/`: giao diện React + Vite
+- `server/`: máy chủ chuẩn đang dùng thật
+- `backend/`: bản cũ để tham khảo lịch sử, không nên dùng cho luồng chính nếu không có lý do rất cụ thể
 
 ## Chạy dự án
 
-> Không dùng `backend/` để chạy app hằng ngày trừ khi bạn đang điều tra mã legacy một cách có chủ đích.
+> Không dùng `backend/` để chạy ứng dụng hằng ngày trừ khi bạn đang kiểm tra lại phần mã cũ một cách có chủ đích.
 
-### Frontend
+### Giao diện
 
 Tại root:
 
@@ -28,7 +28,7 @@ VITE_USE_BACKEND=true
 VITE_API_BASE_URL=http://localhost:4000/api
 ```
 
-### Backend
+### Máy chủ
 
 Trong `server/`:
 
@@ -46,19 +46,19 @@ Hoặc từ root:
 npm run dev:backend
 ```
 
-## Contract nguồn sự thật
+## Nguồn đối chiếu chính
 
-Khi đối chiếu FE ↔ BE, luôn bám `server/`:
+Khi đối chiếu giao diện với máy chủ, luôn bám theo `server/`:
 
-- Order DTO: `server/src/modules/orders/order.schema.ts`
-- Order business logic: `server/src/modules/orders/orders.service.ts`
-- Order response mapper: `server/src/modules/orders/order.mapper.ts`
-- Auth refresh: `server/src/modules/auth/auth.route.ts`, `server/src/modules/auth/auth.controller.ts`
+- Lược đồ đơn hàng: `server/src/modules/orders/order.schema.ts`
+- Xử lý nghiệp vụ đơn hàng: `server/src/modules/orders/orders.service.ts`
+- Bộ chuyển dữ liệu phản hồi đơn hàng: `server/src/modules/orders/order.mapper.ts`
+- Làm mới xác thực: `server/src/modules/auth/auth.route.ts`, `server/src/modules/auth/auth.controller.ts`
 
 ## Lưu ý vận hành
 
-- FE checkout chỉ gửi payload order đúng DTO backend; backend là nơi tính tiền cuối cùng.
-- Refresh token flow dùng `/auth/refresh` với cookie HTTP-only từ backend `server/`.
-- Status/order timeline ở FE map trực tiếp từ enum backend, không parse text tự do.
-- `backend/` là legacy/stale: chỉ để tham khảo lịch sử, không phải backend chuẩn để chạy app hằng ngày.
-- Postman/environment phục vụ flow hiện tại nên ưu tiên dùng các file dưới `server/postman/`.
+- Phần thanh toán ở giao diện chỉ gửi dữ liệu đơn hàng đúng với lược đồ từ máy chủ; máy chủ là nơi tính tiền cuối cùng.
+- Luồng làm mới xác thực dùng `/auth/refresh` với cookie HTTP-only từ `server/`.
+- Trạng thái và tiến trình đơn hàng ở giao diện bám trực tiếp theo enum từ máy chủ, không tự phân tích chuỗi văn bản.
+- `backend/` là phần mã cũ: chỉ để tham khảo lịch sử, không phải máy chủ chuẩn để chạy ứng dụng hằng ngày.
+- Nếu dùng Postman cho luồng hiện tại, hãy ưu tiên các tệp trong `server/postman/`.
