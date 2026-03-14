@@ -2,12 +2,15 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.jsx'
-import { CartProvider } from './context/CartContext.jsx'
+import { GioHangProvider } from './context/GioHangContext.jsx'
+import { ThongBaoProvider } from './context/ThongBaoContext.jsx'
 
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <CartProvider>
-      <App />
-    </CartProvider>
+    <ThongBaoProvider>
+      <GioHangProvider>
+        <App />
+      </GioHangProvider>
+    </ThongBaoProvider>
   </StrictMode>,
 )
