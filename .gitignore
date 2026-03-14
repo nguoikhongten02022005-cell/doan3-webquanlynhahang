@@ -14,12 +14,18 @@ dist-ssr
 .env
 
 # Editor directories and files
+.vs/
 .vscode/*
 !.vscode/extensions.json
 .idea
 .DS_Store
 *.suo
+*.user
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
+
+# Build artifacts
+bin/
+obj/
