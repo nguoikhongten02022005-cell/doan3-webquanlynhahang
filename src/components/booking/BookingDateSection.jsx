@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { WEEKDAY_LABELS } from '../../data/bookingData'
 import { BOOKING_CALENDAR_WEEKDAYS } from '../../constants/bookingUi'
-import { CLOSED_WEEKDAY_TEXT, formatCalendarMonth } from '../../utils/booking'
+import { CLOSED_WEEKDAY_TEXT, formatCalendarMonth } from '../../utils/booking/index'
 
 function BookingDateSection({
   calendarContainerRef,

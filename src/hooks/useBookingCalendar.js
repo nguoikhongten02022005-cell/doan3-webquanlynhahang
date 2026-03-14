@@ -10,7 +10,7 @@ import {
   getNearestSelectableDate,
   getNextOpenDate,
   isClosedDate,
-} from '../utils/booking'
+} from '../utils/booking/index'
 
 export const useBookingCalendar = ({ selectedDate, onDateSelect }) => {
   const [calendarOpen, setCalendarOpen] = useState(false)

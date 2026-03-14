@@ -5,7 +5,7 @@ import {
   getMealDurationText,
   getOperationalRules,
   simulateSlotAvailability,
-} from '../utils/booking'
+} from '../utils/booking/index'
 
 const AVAILABILITY_DELAY = 550
 

@@ -7,9 +7,9 @@ import {
   getBookingStatusTone,
   getOrderStatusTone,
   getSeatingLabel,
-} from '../../pages/internalDashboard/formatters'
+} from '../../features/internalDashboard/formatters'
 import { getOrderStatusLabel } from '../../utils/order'
-import { getBookingPriorityNote } from '../../pages/internalDashboard/selectors'
+import { getBookingPriorityNote } from '../../features/internalDashboard/selectors'
 
 function OverviewTab({
   activeBookings,

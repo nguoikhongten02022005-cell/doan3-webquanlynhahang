@@ -4,7 +4,7 @@ import { useCart } from '../context/CartContext'
 import { useAuth } from '../hooks/useAuth'
 import { formatCurrency } from '../utils/currency'
 import { clearCheckoutDraft, getCheckoutDraft, setCheckoutDraft } from '../services/checkoutDraftService'
-import { createOrder } from '../services/api/ordersGateway'
+import { createOrderApi } from '../services/api/orderApi'
 import { clearAppliedVoucher, getAppliedVoucher } from '../services/voucherService'
 import { buildCreateOrderPayload, getInvalidOrderItems, PAYMENT_METHOD_OPTIONS } from '../utils/order'
 
@@ -103,7 +103,7 @@ function CheckoutPage() {
         paymentMethod: formData.paymentMethod,
       })
 
-      await createOrder(orderPayload)
+      await createOrderApi(orderPayload)
 
       clearAppliedVoucher()
       clearCheckoutDraft()

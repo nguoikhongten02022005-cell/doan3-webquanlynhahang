@@ -1,5 +1,5 @@
 import { BOOKING_SLOT_LEGEND } from '../../constants/bookingUi'
-import { INVALID_DATE_HINT, LARGE_GROUP_HOTLINE_MESSAGE, ONLINE_BOOKING_MAX_GUESTS } from '../../utils/booking'
+import { INVALID_DATE_HINT, LARGE_GROUP_HOTLINE_MESSAGE, ONLINE_BOOKING_MAX_GUESTS } from '../../utils/booking/index'
 
 function BookingSlotPicker({
   availabilityPanelRef,

@@ -12,7 +12,7 @@ import {
   getStepTwoErrors,
   isLargeGroupHotlineOnly,
   isValidPhoneNumber,
-} from '../utils/booking'
+} from '../utils/booking/index'
 
 export const useBookingSubmission = ({ createBooking, currentUser, formData, guestCount, invalidPastDate, closedDate, slotData, step }) => {
   const [submitted, setSubmitted] = useState(false)

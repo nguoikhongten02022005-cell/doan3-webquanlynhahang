@@ -7,7 +7,7 @@ import {
   formatDateDisplay,
   isClosedDate,
   isLargeGroupHotlineOnly,
-} from '../utils/booking'
+} from '../utils/booking/index'
 import { useBookingAvailability } from './useBookingAvailability'
 import { useBookingCalendar } from './useBookingCalendar'
 import { useBookingFormState } from './useBookingFormState'

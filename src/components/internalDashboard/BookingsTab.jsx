@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { HOST_BOOKING_STATUS_LABELS, INTERNAL_BOOKING_CREATE_STATUSES } from '../../data/bookingData'
-import { formatDateTime, formatGuests, getBookingStatusTone, getChannelLabel, getSeatingLabel } from '../../pages/internalDashboard/formatters'
+import { formatDateTime, formatGuests, getBookingStatusTone, getChannelLabel, getSeatingLabel } from '../../features/internalDashboard/formatters'
 import {
   canAssignBookingTables,
   canCheckInBooking,
@@ -9,7 +9,7 @@ import {
   getBookingPriorityNote,
   matchesBookingSearch,
   needsManualConfirmation,
-} from '../../pages/internalDashboard/selectors'
+} from '../../features/internalDashboard/selectors'
 
 const DEFAULT_FORM_VALUES = {
   name: '',

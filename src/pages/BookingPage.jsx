@@ -10,7 +10,7 @@ import BookingSuccess from '../components/booking/BookingSuccess'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 import { useBookingForm } from '../hooks/useBookingForm'
-import { ONLINE_BOOKING_MAX_GUESTS } from '../utils/booking'
+import { ONLINE_BOOKING_MAX_GUESTS } from '../utils/booking/index'
 
 function BookingPage() {
   const navigate = useNavigate()

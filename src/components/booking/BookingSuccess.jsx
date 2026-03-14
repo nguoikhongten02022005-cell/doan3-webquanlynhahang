@@ -1,4 +1,4 @@
-import { formatDateDisplay, getBookingStatusMessage, getPolicyItems, getSeatSummaryText } from '../../utils/booking'
+import { formatDateDisplay, getBookingStatusMessage, getPolicyItems, getSeatSummaryText } from '../../utils/booking/index'
 
 function BookingSuccess({ bookingCode, bookingStatus, formData, guestCount, successHeading, successStatusLabel, onGoHome, onGoProfile }) {
   return (

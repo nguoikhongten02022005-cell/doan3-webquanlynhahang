@@ -1,5 +1,5 @@
 import { BOOKING_GUEST_OPTIONS } from '../../data/bookingData'
-import { LARGE_GROUP_GUEST_COUNT, LARGE_GROUP_HOTLINE_MESSAGE, ONLINE_BOOKING_MAX_GUESTS } from '../../utils/booking'
+import { LARGE_GROUP_GUEST_COUNT, LARGE_GROUP_HOTLINE_MESSAGE, ONLINE_BOOKING_MAX_GUESTS } from '../../utils/booking/index'
 
 function BookingGuestSelector({ formData, guestCount, guestWarning, inlineErrors, onGuestSelect, serviceHotlineLink }) {
   return (
