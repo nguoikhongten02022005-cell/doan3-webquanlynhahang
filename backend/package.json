@@ -1,7 +1,8 @@
 {
-  "name": "quan-ly-nha-hang-backend",
+  "name": "quan-ly-nha-hang-backend-legacy",
   "private": true,
   "version": "0.0.0",
+  "description": "Legacy backend kept only for reference. Canonical backend lives in ../server",
   "type": "module",
   "scripts": {
     "dev": "tsx watch src/server.ts",

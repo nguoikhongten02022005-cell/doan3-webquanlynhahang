@@ -4,8 +4,8 @@ import { SITE_CONTACT } from '../constants/siteContact'
 function Footer({ compact = false }) {
   if (compact) {
     return (
-      <footer className="site-footer site-footer-compact" id="about">
-        <div className="container footer-compact-bar">
+      <footer className="site-footer site-footer-compact booking-footer-compact" id="about">
+        <div className="footer-compact-bar footer-compact-bar-full">
           <Link to="/" className="brand footer-brand">
             <span className="brand-mark">NH</span>
             <span className="brand-name">Nhà Hàng Nguyên Vị</span>
@@ -27,7 +27,7 @@ function Footer({ compact = false }) {
             <span className="brand-mark">NH</span>
             <span className="brand-name">Nhà Hàng Nguyên Vị</span>
           </Link>
-          <p>Không gian ấm cúng, món ăn chỉn chu, dịch vụ thân thiện cho mọi buổi gặp gỡ.</p>
+          <p>Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.</p>
           <div className="social-links">
             <a href="#">Facebook</a>
             <a href="#">Instagram</a>

@@ -2,10 +2,12 @@
   "name": "quan-ly-nha-hang",
   "private": true,
   "version": "0.0.0",
+  "description": "Frontend app with canonical backend in server/",
   "type": "module",
   "scripts": {
     "dev": "vite",
     "dev:frontend": "vite",
+    "dev:backend": "npm --prefix server run dev",
     "dev:server": "npm --prefix server run dev",
     "build": "vite build",
     "lint": "eslint .",

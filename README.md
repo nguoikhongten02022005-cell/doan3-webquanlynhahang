@@ -1,6 +1,6 @@
 # Quản lý nhà hàng
 
-Frontend chạy ở thư mục root, backend chuẩn nằm trong `server/`.
+Frontend chạy ở thư mục root. Backend canonical duy nhất cho flow phát triển và kiểm thử hiện tại nằm trong `server/`.
 
 ## Cấu trúc chính
 
@@ -9,6 +9,8 @@ Frontend chạy ở thư mục root, backend chuẩn nằm trong `server/`.
 - `backend/`: bản cũ/legacy, không nên dùng cho flow chính nếu không có lý do rất cụ thể
 
 ## Chạy dự án
+
+> Không dùng `backend/` để chạy app hằng ngày trừ khi bạn đang điều tra mã legacy một cách có chủ đích.
 
 ### Frontend
 
@@ -38,6 +40,12 @@ npm run prisma:seed
 npm run dev
 ```
 
+Hoặc từ root:
+
+```bash
+npm run dev:backend
+```
+
 ## Contract nguồn sự thật
 
 Khi đối chiếu FE ↔ BE, luôn bám `server/`:
@@ -52,4 +60,5 @@ Khi đối chiếu FE ↔ BE, luôn bám `server/`:
 - FE checkout chỉ gửi payload order đúng DTO backend; backend là nơi tính tiền cuối cùng.
 - Refresh token flow dùng `/auth/refresh` với cookie HTTP-only từ backend `server/`.
 - Status/order timeline ở FE map trực tiếp từ enum backend, không parse text tự do.
-- `backend/` hiện nên xem là legacy/stale để tham khảo, không phải backend chuẩn để chạy app hằng ngày.
+- `backend/` là legacy/stale: chỉ để tham khảo lịch sử, không phải backend chuẩn để chạy app hằng ngày.
+- Postman/environment phục vụ flow hiện tại nên ưu tiên dùng các file dưới `server/postman/`.

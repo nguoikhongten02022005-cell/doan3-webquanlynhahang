@@ -35,7 +35,14 @@ function FoodDetailModal({
         </button>
 
         <div className={`food-detail-hero ${safeDish.tone || ''}`}>
-          <span className="food-badge">{safeDish.badge}</span>
+          {safeDish.image ? (
+            <img className="food-detail-hero-image" src={safeDish.image} alt={safeDish.name || 'Món ăn'} loading="lazy" />
+          ) : (
+            <div className="food-detail-hero-fallback" aria-hidden="true">{safeDish.name?.slice(0, 1) || 'M'}</div>
+          )}
+          <div className="food-detail-hero-overlay">
+            <span className="food-badge">{safeDish.badge}</span>
+          </div>
         </div>
 
         <div className="food-detail-content">

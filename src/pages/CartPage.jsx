@@ -150,7 +150,7 @@ function CartPage() {
     <div className="cart-page cart-page-editorial">
       <div className="container">
         <div className="cart-header">
-          <p className="checkout-kicker">Tableside basket</p>
+          <p className="checkout-kicker">Đơn gọi món tại bàn</p>
           <h1>Giỏ hàng của bạn</h1>
           <p>{cartItems.length} món đang chờ được hoàn tất cho bàn ăn tối nay.</p>
         </div>
@@ -174,7 +174,7 @@ function CartPage() {
                     <div className="cart-item-image" style={{ background: item.image }}></div>
 
                     <div className="cart-item-info">
-                      <p className="cart-item-kicker">Selected dish</p>
+                      <p className="cart-item-kicker">Món đã chọn</p>
                       <h3>{item.name}</h3>
                       <p className="cart-item-price">{formatCurrency(item.price)}</p>
                       {optionLines.length > 0 && (
