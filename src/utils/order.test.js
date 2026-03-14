@@ -2,12 +2,15 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import {
   buildCreateOrderPayload,
+  getInvalidOrderItems,
   getOrderStatusLabel,
   getOrderStatusTone,
   getOrderTimelineStep,
   getPaymentMethodLabel,
   isCancelledOrderStatus,
   mapCartItemToOrderItem,
+  normalizeMenuItemId,
+  normalizePaymentMethod,
 } from './order.js'
 
 test('mapCartItemToOrderItem maps cart item to server DTO shape without legacy fields', () => {
@@ -103,5 +106,21 @@ test('payment method helpers normalize canonical values', () => {
   })
 
   assert.equal(payload.paymentMethod, 'CHUYEN_KHOAN')
+  assert.equal(normalizePaymentMethod('card'), 'THE')
   assert.equal(getPaymentMethodLabel('THE'), 'Thẻ')
+})
+
+test('order helper flags invalid cart items before submit', () => {
+  assert.equal(normalizeMenuItemId('12'), 12)
+  assert.equal(normalizeMenuItemId('abc'), undefined)
+
+  const invalidItems = getInvalidOrderItems([
+    { id: 1, quantity: 1 },
+    { id: 'abc', quantity: 2 },
+    { menuItemId: null, quantity: 1 },
+  ])
+
+  assert.equal(invalidItems.length, 2)
+  assert.deepEqual(invalidItems[0], { id: 'abc', quantity: 2 })
+  assert.deepEqual(invalidItems[1], { menuItemId: null, quantity: 1 })
 })

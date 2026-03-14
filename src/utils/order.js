@@ -42,18 +42,18 @@ export const PAYMENT_METHOD_LABELS = Object.freeze({
 export const PAYMENT_METHOD_OPTIONS = Object.freeze([
   {
     value: 'TIEN_MAT',
-    label: 'Tiền mặt khi nhận hàng',
-    description: 'Thanh toán trực tiếp khi nhận món.',
+    label: 'Tiền mặt',
+    description: 'Thanh toán trực tiếp tại bàn hoặc khi nhận món.',
   },
   {
     value: 'CHUYEN_KHOAN',
     label: 'Chuyển khoản',
-    description: 'Chuyển khoản trước khi giao hàng.',
+    description: 'Chuyển khoản cho đơn mang đi hoặc dùng tại bàn.',
   },
   {
     value: 'THE',
     label: 'Thanh toán bằng thẻ',
-    description: 'Dùng thẻ khi quầy hoặc thiết bị hỗ trợ.',
+    description: 'Dùng thẻ tại quầy hoặc thiết bị hỗ trợ.',
   },
 ])
 
@@ -73,7 +73,7 @@ const PAYMENT_METHOD_ALIASES = Object.freeze({
   card: 'THE',
 })
 
-const normalizePaymentMethod = (value) => {
+export const normalizePaymentMethod = (value) => {
   const normalized = normalizeText(value)
 
   if (PAYMENT_METHOD_LABELS[normalized]) {
@@ -83,7 +83,7 @@ const normalizePaymentMethod = (value) => {
   return PAYMENT_METHOD_ALIASES[normalized.toLowerCase()] || 'TIEN_MAT'
 }
 
-const normalizeMenuItemId = (value) => {
+export const normalizeMenuItemId = (value) => {
   const normalized = Number(value)
   return Number.isInteger(normalized) && normalized > 0 ? normalized : undefined
 }
@@ -105,7 +105,7 @@ export const getPaymentMethodLabel = (paymentMethod) => (
 )
 
 export const mapCartItemToOrderItem = (item) => ({
-  menuItemId: normalizeMenuItemId(item?.id),
+  menuItemId: normalizeMenuItemId(item?.menuItemId ?? item?.id),
   quantity: Math.max(1, Number(item?.quantity) || 1),
   selectedSize: normalizeSelectedSize(item?.selectedSize),
   selectedToppings: normalizeSelectedToppings(item?.selectedToppings),
@@ -126,3 +126,9 @@ export const buildCreateOrderPayload = ({ cartItems, voucherCode, customer, note
   tableNumber: normalizeText(tableNumber),
   paymentMethod: normalizePaymentMethod(paymentMethod),
 })
+
+export const getInvalidOrderItems = (cartItems) => (
+  Array.isArray(cartItems)
+    ? cartItems.filter((item) => !normalizeMenuItemId(item?.menuItemId ?? item?.id))
+    : []
+)

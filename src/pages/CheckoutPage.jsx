@@ -6,7 +6,7 @@ import { formatCurrency } from '../utils/currency'
 import { clearCheckoutDraft, getCheckoutDraft, setCheckoutDraft } from '../services/checkoutDraftService'
 import { createOrder } from '../services/api/ordersGateway'
 import { clearAppliedVoucher, getAppliedVoucher } from '../services/voucherService'
-import { buildCreateOrderPayload, PAYMENT_METHOD_OPTIONS } from '../utils/order'
+import { buildCreateOrderPayload, getInvalidOrderItems, PAYMENT_METHOD_OPTIONS } from '../utils/order'
 
 function CheckoutPage() {
   const navigate = useNavigate()
@@ -77,8 +77,14 @@ function CheckoutPage() {
       return
     }
 
-    if (!formData.fullName || !formData.phone || !formData.address) {
-      alert('Vui lòng nhập đầy đủ họ tên, số điện thoại và địa chỉ giao hàng.')
+    if (!formData.fullName || !formData.phone) {
+      alert('Vui lòng nhập đầy đủ họ tên và số điện thoại.')
+      return
+    }
+
+    const invalidOrderItems = getInvalidOrderItems(cartItems)
+    if (invalidOrderItems.length > 0) {
+      alert('Có món trong giỏ hàng không còn hợp lệ để tạo đơn. Vui lòng quay lại menu và thêm lại món.')
       return
     }
 
@@ -117,14 +123,14 @@ function CheckoutPage() {
     <div className="checkout-page checkout-page-editorial">
       <div className="container">
         <div className="checkout-header">
-          <p className="checkout-kicker">Checkout</p>
+          <p className="checkout-kicker">Hoàn tất đơn gọi món</p>
           <h1>Thanh toán đơn hàng</h1>
-          <p>Kiểm tra thông tin giao hàng, phương thức thanh toán và hoàn tất bàn ăn tối của bạn.</p>
+          <p>Kiểm tra thông tin liên hệ, vị trí phục vụ và phương thức thanh toán trước khi hoàn tất đơn của bạn.</p>
         </div>
 
         <form className="checkout-layout" onSubmit={handleSubmit}>
           <section className="checkout-form-panel">
-            <h2>Thông tin nhận hàng</h2>
+            <h2>Thông tin liên hệ</h2>
 
             <div className="checkout-form-grid">
               <div className="form-group full">
@@ -136,7 +142,7 @@ function CheckoutPage() {
                   name="fullName"
                   type="text"
                   className="form-input"
-                  placeholder="Nhập họ tên người nhận"
+                  placeholder="Nhập họ tên người đặt / nhận món"
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -161,17 +167,16 @@ function CheckoutPage() {
 
               <div className="form-group full">
                 <label className="form-label" htmlFor="address">
-                  Địa chỉ giao hàng
+                  Địa chỉ
                 </label>
                 <input
                   id="address"
                   name="address"
                   type="text"
                   className="form-input"
-                  placeholder="Số nhà, đường, phường/xã, quận/huyện"
+                  placeholder="Nhập địa chỉ nếu cần giao hoặc xác nhận vị trí phục vụ"
                   value={formData.address}
                   onChange={handleChange}
-                  required
                 />
               </div>
 
@@ -272,7 +277,7 @@ function CheckoutPage() {
                   <span>{formatCurrency(subtotal)}</span>
                 </div>
                 <div className="summary-row">
-                  <span>Phí dịch vụ theo backend</span>
+                  <span>Phí dịch vụ tham chiếu</span>
                   <span>{formatCurrency(serviceFee)}</span>
                 </div>
                 <div className="summary-row summary-discount">
@@ -286,7 +291,7 @@ function CheckoutPage() {
               </div>
 
               <p className="checkout-summary-note">
-                Tổng tiền cuối cùng sẽ được backend xác nhận khi tạo đơn hàng.
+                Tổng tiền cuối cùng sẽ do backend xác nhận khi tạo đơn hàng từ dữ liệu menu hiện tại.
               </p>
 
               <button type="submit" className="btn btn-primary w-full" disabled={cartItems.length === 0}>

@@ -123,7 +123,7 @@ function MenuPage() {
           <main className="menu-main">
             <div className="menu-toolbar">
               <div className="menu-toolbar-copy">
-                <p className="menu-toolbar-eyebrow">Đang duyệt menu</p>
+                <p className="menu-toolbar-eyebrow">Thực đơn trong ngày</p>
                 <h1 className="menu-toolbar-title">{activeCategoryLabel}</h1>
                 <p className="menu-toolbar-summary">
                   {loading ? 'Đang tải thực đơn...' : `${filteredDishes.length} món ${searchLabel}`}

@@ -65,17 +65,14 @@ function Header() {
               className={isActive(item.to) ? 'active' : ''}
               onClick={handleNavLinkClick}
             >
-              {item.label}
+              <span>{item.label}</span>
             </Link>
           ))}
         </nav>
 
         <div className="header-actions">
-          <Link to="/booking" className="icon-btn action-btn booking-btn" aria-label="Đặt bàn" data-tooltip="Đặt bàn" onClick={handleNavLinkClick}>
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <rect x="4.5" y="6" width="15" height="13.5" rx="2.2" stroke="currentColor" strokeWidth="1.7" />
-              <path d="M8 4.5v3M16 4.5v3M4.5 10.5h15" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-            </svg>
+          <Link to="/booking" className="btn btn-primary header-booking-btn" onClick={handleNavLinkClick}>
+            Đặt bàn
           </Link>
 
           <Link to="/cart" className="icon-btn action-btn cart-btn" aria-label="Giỏ hàng" data-tooltip="Giỏ hàng" onClick={handleNavLinkClick}>
@@ -148,7 +145,7 @@ function Header() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="mobile-menu container">
+        <div className="mobile-menu open container">
           {navItems.map((item) => (
             <Link
               key={item.label}

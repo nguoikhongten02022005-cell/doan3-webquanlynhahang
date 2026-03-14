@@ -181,23 +181,37 @@ export const useBooking = () => {
 
   const getBookingHistory = useCallback(async () => {
     const { duLieu } = await getBookingHistoryApi()
-    return Array.isArray(duLieu) ? duLieu : []
+
+    if (!Array.isArray(duLieu)) {
+      return []
+    }
+
+    return duLieu
+      .map((item) => {
+        if (item && typeof item === 'object' && 'bookingId' in item && 'dateTime' in item && 'rawStatus' in item) {
+          return item
+        }
+
+        const normalized = normalizeBooking(item)
+        return normalized ? mapBookingItem(normalized) : null
+      })
+      .filter(Boolean)
   }, [])
 
   const cancelBooking = useCallback(async (bookingId, bookingCode) => {
     try {
       const { thongDiep } = await cancelBookingApi(bookingId)
-      const { duLieu: bookingHistory } = await getBookingHistoryApi()
+      const bookingHistory = await getBookingHistory()
       dispatchBookingDataChanged()
       return {
         success: true,
         message: thongDiep || `Đã hủy đặt bàn ${bookingCode} thành công.`,
-        bookingHistory: Array.isArray(bookingHistory) ? bookingHistory : [],
+        bookingHistory,
       }
     } catch (error) {
       return { success: false, error: error?.message || 'Không thể hủy đặt bàn này. Vui lòng thử lại.' }
     }
-  }, [])
+  }, [getBookingHistory])
 
   const getHostBookings = useCallback(async () => {
     const { duLieu } = await getBookingsApi()

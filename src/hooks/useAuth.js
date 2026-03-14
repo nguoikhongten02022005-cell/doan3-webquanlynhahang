@@ -43,7 +43,8 @@ export const useAuth = () => {
           setNguoiDungHienTai(null)
         }
       } catch {
-        dongBoNguoiDungHienTai()
+        clearAuthSession()
+        setNguoiDungHienTai(null)
       } finally {
         setIsAuthBootstrapping(false)
       }

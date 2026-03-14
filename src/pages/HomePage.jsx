@@ -8,6 +8,20 @@ import { useFoodDetailModal } from '../hooks/useFoodDetailModal'
 import { useMenuDishes } from '../hooks/useMenuDishes'
 import { getHomeSignatureDishes } from '../services/mappers/menuMappers'
 
+const HOME_CATEGORY_NOTES = {
+  'Món Chính': 'Đậm vị, chỉn chu cho bữa chính.',
+  'Khai Vị': 'Nhẹ nhàng để mở vị và khởi nhịp bàn ăn.',
+  'Đồ Uống': 'Cocktail, trà và thức uống đi cùng món.',
+  'Tráng Miệng': 'Một kết thúc mềm và gọn cho bữa tối.',
+  Combo: 'Lựa chọn tiện cho cặp đôi và nhóm nhỏ.',
+}
+
+const HOME_ATMOSPHERE_NOTES = [
+  'Editorial tối giản',
+  'Tông kem ấm và nhẹ',
+  'Dễ thay ảnh món về sau',
+]
+
 function HomePage() {
   const { addToCart } = useCart()
   const { dishes } = useMenuDishes()
@@ -35,54 +49,63 @@ function HomePage() {
       <section className="hero" id="home">
         <div className="container hero-grid">
           <div className="hero-copy">
-            <p className="eyebrow">Ẩm thực chuẩn nhà hàng</p>
-            <h1>Hương vị nguyên bản, trải nghiệm trọn vẹn.</h1>
+            <p className="eyebrow">Nhà hàng nguyên vị</p>
+            <h1>
+              Một homepage
+              <br />
+              gọn, sang và
+              <br />
+              đủ chỗ để món ăn
+              <br />
+              tự kể chuyện.
+            </h1>
             <p>
-              Từ nguyên liệu tuyển chọn đến cách trình bày tinh gọn, mỗi món ăn được hoàn thiện để bạn có một bữa ăn ngon đúng nghĩa.
+              Từ phần mở đầu đến khu món nổi bật, mọi nhịp trình bày được tiết chế để thực khách nhìn thấy sự chỉn chu ngay từ lần ghé đầu tiên.
             </p>
             <div className="hero-actions-group">
-              <Link className="btn btn-primary" to="/menu">
-                Xem Thực Đơn
+              <Link className="btn btn-primary" to="/booking">
+                Đặt bàn ngay
               </Link>
-              <Link className="btn btn-ghost" to="/booking">
-                Đặt Bàn Ngay
+              <Link className="btn btn-ghost" to="/menu">
+                Xem thực đơn
               </Link>
             </div>
-            <div className="hero-stats" aria-label="Thông tin nhanh">
-              <div className="stat-chip">
-                <strong>150+</strong>
-                <span>Món được phục vụ mỗi ngày</span>
-              </div>
-              <div className="stat-chip">
-                <strong>4.9/5</strong>
-                <span>Đánh giá từ khách hàng</span>
-              </div>
-              <div className="stat-chip">
-                <strong>20 phút</strong>
-                <span>Thời gian chuẩn bị trung bình</span>
-              </div>
+            <div className="hero-atmosphere" aria-label="Tinh thần trình bày">
+              {HOME_ATMOSPHERE_NOTES.map((item) => (
+                <span key={item}>{item}</span>
+              ))}
             </div>
           </div>
 
-          <div className="hero-showcase" aria-hidden="true">
+          <div className="hero-showcase">
             <article className="hero-card">
-              <span className="hero-tag">Signature Plate</span>
+              <div className="hero-card-head">
+                <span className="hero-tag">Hero visual</span>
+                <span className="hero-note-chip">Sẵn sàng thay ảnh món</span>
+              </div>
+
               <div className="hero-art">
-                <div className="hero-plate">
-                  <span className="hero-food hero-food--protein" />
-                  <span className="hero-food hero-food--glaze" />
-                  <span className="hero-food hero-food--puree" />
-                  <span className="hero-food hero-food--greens" />
-                  <span className="hero-food hero-food--accent" />
-                </div>
-                <div className="hero-art-note">
-                  <strong>Bò nướng tảng</strong>
-                  <span>Sốt tiêu xanh · Khoai mịn · Rau nướng</span>
+                <div className="hero-visual-frame">
+                  <div className="hero-visual-copy">
+                    <span className="hero-visual-kicker">Khung ảnh signature</span>
+                    <strong>Chỉ cần thay ảnh món chủ đạo tại đây.</strong>
+                    <span>Giữ bố cục sáng, gọn và đủ sang kể cả khi chưa có ảnh thật.</span>
+                  </div>
+
+                  <div className="hero-plate" aria-hidden="true">
+                    <span className="hero-food hero-food--protein" />
+                    <span className="hero-food hero-food--glaze" />
+                    <span className="hero-food hero-food--puree" />
+                    <span className="hero-food hero-food--greens" />
+                    <span className="hero-food hero-food--accent" />
+                  </div>
                 </div>
               </div>
+
               <div className="hero-card-meta">
-                <h3>Chef&apos;s signature cho buổi tối</h3>
-                <p>Thịt nướng mọng vị, hoàn thiện cùng sốt đậm đà và phần ăn được plating chỉn chu.</p>
+                <p className="hero-card-overline">Tinh thần trình bày</p>
+                <h3>Editorial nhẹ, sang và dễ thay đổi về sau.</h3>
+                <p>Giữ phần visual như một frame món chủ đạo để sau này cập nhật ảnh thật mà không cần đụng đến flow hiện tại.</p>
               </div>
             </article>
           </div>
@@ -91,17 +114,25 @@ function HomePage() {
 
       <section className="categories" id="menu">
         <div className="container">
-          <div className="section-head">
-            <h2>Danh mục nổi bật</h2>
-            <p>Chọn nhanh món bạn muốn và đi thẳng tới phần thực đơn liên quan.</p>
+          <div className="section-head section-head--split">
+            <div className="section-head-copy">
+              <p className="eyebrow">Đi nhanh vào thực đơn</p>
+              <h2>Danh mục nổi bật</h2>
+            </div>
+            <p className="section-head-description">Những nhóm món được sắp gọn để người xem chọn nhanh phần mình quan tâm và tiếp tục đi sâu vào menu.</p>
           </div>
+
           <div className="category-row">
-            {HOME_MENU_CATEGORIES.map((category) => (
+            {HOME_MENU_CATEGORIES.map((category, index) => (
               <Link key={category.name} to="/menu" className="category-item">
+                <span className="category-index">0{index + 1}</span>
                 <span className="category-icon" aria-hidden="true">
                   {category.icon}
                 </span>
-                <span>{category.name}</span>
+                <span className="category-copy">
+                  <strong>{category.name}</strong>
+                  <small>{HOME_CATEGORY_NOTES[category.name]}</small>
+                </span>
               </Link>
             ))}
           </div>
@@ -110,9 +141,17 @@ function HomePage() {
 
       <section className="signature-section">
         <div className="container">
-          <div className="section-head center">
-            <h2>Món Ngon Phải Thử</h2>
-            <p>Những món được gọi nhiều nhất trong tuần này.</p>
+          <div className="section-head section-head--split signature-head">
+            <div className="section-head-copy">
+              <p className="eyebrow">Chef&apos;s picks</p>
+              <h2>Món Ngon Phải Thử</h2>
+            </div>
+            <div className="signature-intro">
+              <p>Những món được gọi nhiều nhất trong tuần, giữ nguyên đầy đủ thao tác xem chi tiết và thêm món như luồng hiện tại.</p>
+              <Link className="signature-link" to="/menu">
+                Xem toàn bộ thực đơn
+              </Link>
+            </div>
           </div>
 
           <div className="food-grid">
@@ -141,13 +180,23 @@ function HomePage() {
 
       <section className="booking-banner" id="booking">
         <div className="container booking-inner">
-          <div>
-            <h2>Bạn muốn có một bữa tối hoàn hảo? Hãy giữ chỗ ngay.</h2>
-            <p>Chọn khung giờ đẹp và chúng tôi sẽ chuẩn bị bàn trước khi bạn đến.</p>
+          <div className="booking-copy">
+            <p className="eyebrow">Đặt bàn tinh gọn</p>
+            <h2>Giữ một góc bàn đẹp cho buổi hẹn tối nay.</h2>
+            <p>Chọn khung giờ phù hợp và để đội ngũ chuẩn bị sẵn không gian vừa vặn cho cuộc gặp của bạn.</p>
+            <div className="booking-points" aria-label="Điểm nổi bật đặt bàn">
+              <span>Khung giờ rõ ràng</span>
+              <span>Xác nhận nhanh</span>
+              <span>Phù hợp cặp đôi và nhóm nhỏ</span>
+            </div>
           </div>
-          <Link className="btn btn-light" to="/booking">
-            Đặt Bàn Cho Tối Nay
-          </Link>
+
+          <div className="booking-cta">
+            <Link className="btn btn-light" to="/booking">
+              Giữ bàn cho tối nay
+            </Link>
+            <span>Mở form đặt bàn chỉ trong vài bước.</span>
+          </div>
         </div>
       </section>
     </div>

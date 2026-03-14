@@ -85,41 +85,42 @@ function BookingPage() {
   const primaryAction = step === 1 ? handleStepOneContinue : step === 2 ? handleStepTwoContinue : handleSubmit
 
   return (
-    <div className="booking-page">
+    <div className="booking-page booking-page-fullbleed">
       <section className="booking-hero booking-hero-premium booking-hero-premium-tight">
-        <div className="container booking-hero-shell booking-hero-shell-compact">
+        <div className="booking-hero-shell booking-hero-shell-full">
           <div className="booking-hero-copy booking-hero-copy-compact">
             <span className="booking-label">{BOOKING_HERO_CONTENT.label}</span>
-            <h1 className="booking-title booking-title-premium">{BOOKING_HERO_CONTENT.title}</h1>
-            <p className="booking-subtitle booking-subtitle-premium">{BOOKING_HERO_CONTENT.subtitle}</p>
+            <h1 className="booking-title booking-title-premium">Đặt bàn tinh gọn cho một buổi dùng bữa chỉn chu</h1>
+            <p className="booking-subtitle booking-subtitle-premium">Chọn số khách, ngày và khung giờ trong trải nghiệm đặt chỗ nhẹ nhàng, rõ ràng và đúng nhịp của một nhà hàng.</p>
           </div>
 
-          <div className="booking-hero-note-inline">
-            <span className="booking-hero-note-label">{BOOKING_HERO_CONTENT.noteLabel}</span>
-            <strong>Tối đa {ONLINE_BOOKING_MAX_GUESTS} khách / lượt</strong>
+          <div className="booking-hero-note-inline booking-hero-note-panel">
+            <div>
+              <span className="booking-hero-note-label">{BOOKING_HERO_CONTENT.noteLabel}</span>
+              <strong>Tối đa {ONLINE_BOOKING_MAX_GUESTS} khách / lượt</strong>
+            </div>
             <p>{BOOKING_HERO_CONTENT.noteText}</p>
           </div>
         </div>
       </section>
 
       <section className="booking-form-section booking-form-section-premium">
-        <div className="container">
-          <div className="booking-layout-premium">
-            <BookingSidebar
-              bookingSelectionSummary={bookingSelectionSummary}
-              onPrimaryAction={primaryAction}
-              onSecondaryAction={secondaryAction}
-              primaryActionType="button"
-              primaryCtaDisabled={step === 3 ? isSubmitting : primaryCtaDisabled}
-              primaryCtaLabel={primaryCtaLabel}
-              secondaryCtaLabel={secondaryActionLabel}
-              serviceHotline={SITE_CONTACT.phoneDisplay}
-              serviceHotlineLink={SITE_CONTACT.phoneHref}
-              step={step}
-              submitError={step === 3 ? submitError : ''}
-            />
+        <div className="booking-layout-premium booking-layout-premium-full">
+          <BookingSidebar
+            bookingSelectionSummary={bookingSelectionSummary}
+            onPrimaryAction={primaryAction}
+            onSecondaryAction={secondaryAction}
+            primaryActionType="button"
+            primaryCtaDisabled={step === 3 ? isSubmitting : primaryCtaDisabled}
+            primaryCtaLabel={primaryCtaLabel}
+            secondaryCtaLabel={secondaryActionLabel}
+            serviceHotline={SITE_CONTACT.phoneDisplay}
+            serviceHotlineLink={SITE_CONTACT.phoneHref}
+            step={step}
+            submitError={step === 3 ? submitError : ''}
+          />
 
-            <div className="booking-main-premium">
+          <div className="booking-main-premium">
               {submitted ? (
                 <BookingSuccess
                   bookingCode={bookingCode}
@@ -242,7 +243,6 @@ function BookingPage() {
                   </div>
                 </form>
               )}
-            </div>
           </div>
         </div>
       </section>
