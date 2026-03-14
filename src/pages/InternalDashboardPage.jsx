@@ -7,9 +7,9 @@ import OrdersTab from '../components/internalDashboard/OrdersTab'
 import OverviewTab from '../components/internalDashboard/OverviewTab'
 import TablesTab from '../components/internalDashboard/TablesTab'
 import { useAuth } from '../hooks/useAuth'
-import { DAY_FILTERS, INTERNAL_TABS, SHIFT_FILTERS } from './internalDashboard/constants'
-import { getOverviewScopeLabel, matchesDayFilter, matchesShiftFilter } from './internalDashboard/selectors'
-import { useInternalDashboardData } from './internalDashboard/useInternalDashboardData'
+import { DAY_FILTERS, INTERNAL_TABS, SHIFT_FILTERS } from '../features/internalDashboard/constants'
+import { getOverviewScopeLabel, matchesDayFilter, matchesShiftFilter } from '../features/internalDashboard/selectors'
+import { useInternalDashboardData } from '../features/internalDashboard/useInternalDashboardData'
 
 function InternalDashboardPage() {
   const navigate = useNavigate()

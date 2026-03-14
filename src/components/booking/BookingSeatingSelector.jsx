@@ -1,5 +1,5 @@
 import { BOOKING_SEATING_AREAS } from '../../data/bookingData'
-import { getSeatDisabledHint, getSeatOperationalNote, shouldDisableSeatOption } from '../../utils/booking'
+import { getSeatDisabledHint, getSeatOperationalNote, shouldDisableSeatOption } from '../../utils/booking/index'
 
 function BookingSeatingSelector({ formData, guestCount, handleSeatingSelect, selectedSeatOperationalNote }) {
   return (

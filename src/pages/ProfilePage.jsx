@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { PROFILE_TABS } from '../data/profileData'
 import { formatCurrency } from '../utils/currency'
-import { getMyOrders } from '../services/api/ordersGateway'
+import { getMyOrdersApi } from '../services/api/orderApi'
 import { useAuth } from '../hooks/useAuth'
 import { useBooking } from '../hooks/useBooking'
 import { canCancelBooking } from '../hooks/booking/bookingPolicies.js'
@@ -12,7 +12,7 @@ import {
   isCancelledOrderStatus,
   ORDER_TIMELINE_STEPS,
 } from '../utils/order'
-import { getBookingStatusTone } from './internalDashboard/formatters'
+import { getBookingStatusTone } from '../features/internalDashboard/formatters'
 
 const formatDate = (value) => {
   if (!value) {
@@ -67,11 +67,11 @@ function ProfilePage() {
 
       const [bookings, orders] = await Promise.all([
         getBookingHistory(),
-        getMyOrders(),
+        getMyOrdersApi(),
       ])
 
       setLichSuDatBan(Array.isArray(bookings) ? bookings : [])
-      setLichSuDonHang(Array.isArray(orders) ? orders : [])
+      setLichSuDonHang(Array.isArray(orders?.duLieu) ? orders.duLieu : [])
       setThongBaoDatBan('')
     }
 

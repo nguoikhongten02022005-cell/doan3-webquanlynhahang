@@ -9,7 +9,7 @@ import {
   isClosedDate,
   isLargeGroupHotlineOnly,
   isValidPhoneNumber,
-} from '../utils/booking'
+} from '../utils/booking/index'
 
 export const useBookingFormState = ({ currentUser, getDraft }) => {
   const [step, setStep] = useState(1)

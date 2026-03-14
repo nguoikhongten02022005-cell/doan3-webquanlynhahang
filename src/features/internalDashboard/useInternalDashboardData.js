@@ -1,9 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useMenuDishes } from '../../hooks/useMenuDishes'
 import { BOOKING_DATA_CHANGED_EVENT, useBooking } from '../../hooks/useBooking'
-import { getOrders } from '../../services/api/ordersGateway'
-import { getTablesGateway, updateTableStatusGateway } from '../../services/api/tablesGateway'
-import { getAccountsGateway } from '../../services/api/usersGateway'
+import { getUsersApi } from '../../services/api/authApi'
+import { getOrdersApi } from '../../services/api/orderApi'
+import { getTablesApi, updateTableStatusApi } from '../../services/api/tableApi'
 import { TABLE_STATUSES } from '../../services/tableService'
 import { ACTIVE_BOOKING_STATUSES, CONFIRMED_BOOKING_STATUSES } from './constants'
 import {
@@ -37,17 +37,17 @@ export const useInternalDashboardData = () => {
   const [danhSachBan, setDanhSachBan] = useState([])
 
   const taiLaiDuLieu = useCallback(async () => {
-    const [nextBookings, nextOrders, nextAccounts, nextTables] = await Promise.all([
+    const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse] = await Promise.all([
       getHostBookings(),
-      getOrders(),
-      getAccountsGateway(),
-      getTablesGateway(),
+      getOrdersApi(),
+      getUsersApi(),
+      getTablesApi(),
     ])
 
     setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
-    setDanhSachDonHang(Array.isArray(nextOrders) ? nextOrders : [])
-    setDanhSachTaiKhoan(Array.isArray(nextAccounts) ? nextAccounts : [])
-    setDanhSachBan(Array.isArray(nextTables) ? nextTables : [])
+    setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu : [])
+    setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu : [])
+    setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu : [])
   }, [getHostBookings])
 
   useEffect(() => {
@@ -138,12 +138,12 @@ export const useInternalDashboardData = () => {
   }, [setBookingNoShow, taiLaiDuLieu])
 
   const handleMarkTableDirty = useCallback(async (tableId) => {
-    await updateTableStatusGateway(tableId, TABLE_STATUSES.DIRTY)
+    await updateTableStatusApi(tableId, TABLE_STATUSES.DIRTY)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
   const handleMarkTableReady = useCallback(async (tableId) => {
-    await updateTableStatusGateway(tableId, TABLE_STATUSES.AVAILABLE)
+    await updateTableStatusApi(tableId, TABLE_STATUSES.AVAILABLE)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 

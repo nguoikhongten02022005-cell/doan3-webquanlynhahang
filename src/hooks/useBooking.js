@@ -31,6 +31,26 @@ export const dispatchBookingDataChanged = () => {
 }
 
 export const useBooking = () => {
+  const updateBookingStatus = useCallback(async (bookingId, nextStatus, fallbackError) => {
+    try {
+      const { duLieu, thongDiep } = await updateBookingStatusApi(bookingId, nextStatus)
+      const booking = normalizeBooking(duLieu)
+
+      if (!booking) {
+        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
+      }
+
+      dispatchBookingDataChanged()
+      return {
+        success: true,
+        booking,
+        message: thongDiep,
+      }
+    } catch (error) {
+      return { success: false, error: error?.message || fallbackError }
+    }
+  }, [])
+
   const saveDraft = useCallback((draftPayload) => saveBookingDraft(STORAGE_KEYS.BOOKING_DRAFT, draftPayload), [])
 
   const getDraft = useCallback(() => getValidBookingDraft(STORAGE_KEYS.BOOKING_DRAFT), [])
@@ -114,65 +134,20 @@ export const useBooking = () => {
     }
   }, [])
 
-  const setBookingCheckedIn = useCallback(async (bookingId) => {
-    try {
-      const { duLieu, thongDiep } = await updateBookingStatusApi(bookingId, 'DA_CHECK_IN')
-      const booking = normalizeBooking(duLieu)
+  const setBookingCheckedIn = useCallback(
+    async (bookingId) => updateBookingStatus(bookingId, 'DA_CHECK_IN', 'Không thể check-in booking.'),
+    [updateBookingStatus],
+  )
 
-      if (!booking) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
-      }
+  const setBookingCompleted = useCallback(
+    async (bookingId) => updateBookingStatus(bookingId, 'DA_HOAN_THANH', 'Không thể hoàn thành booking.'),
+    [updateBookingStatus],
+  )
 
-      dispatchBookingDataChanged()
-      return {
-        success: true,
-        booking,
-        message: thongDiep,
-      }
-    } catch (error) {
-      return { success: false, error: error?.message || 'Không thể check-in booking.' }
-    }
-  }, [])
-
-  const setBookingCompleted = useCallback(async (bookingId) => {
-    try {
-      const { duLieu, thongDiep } = await updateBookingStatusApi(bookingId, 'DA_HOAN_THANH')
-      const booking = normalizeBooking(duLieu)
-
-      if (!booking) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
-      }
-
-      dispatchBookingDataChanged()
-      return {
-        success: true,
-        booking,
-        message: thongDiep,
-      }
-    } catch (error) {
-      return { success: false, error: error?.message || 'Không thể hoàn thành booking.' }
-    }
-  }, [])
-
-  const setBookingNoShow = useCallback(async (bookingId) => {
-    try {
-      const { duLieu, thongDiep } = await updateBookingStatusApi(bookingId, 'KHONG_DEN')
-      const booking = normalizeBooking(duLieu)
-
-      if (!booking) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
-      }
-
-      dispatchBookingDataChanged()
-      return {
-        success: true,
-        booking,
-        message: thongDiep,
-      }
-    } catch (error) {
-      return { success: false, error: error?.message || 'Không thể đánh dấu không đến.' }
-    }
-  }, [])
+  const setBookingNoShow = useCallback(
+    async (bookingId) => updateBookingStatus(bookingId, 'KHONG_DEN', 'Không thể đánh dấu không đến.'),
+    [updateBookingStatus],
+  )
 
   const releaseBookingTables = useCallback(() => ({
     success: false,

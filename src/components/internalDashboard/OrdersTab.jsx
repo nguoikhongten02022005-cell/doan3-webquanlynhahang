@@ -1,5 +1,5 @@
 import { formatCurrency } from '../../utils/currency'
-import { formatDate, getOrderStatusTone } from '../../pages/internalDashboard/formatters'
+import { formatDate, getOrderStatusTone } from '../../features/internalDashboard/formatters'
 import { getOrderStatusLabel, getPaymentMethodLabel } from '../../utils/order'
 
 function OrdersTab({ orders }) {

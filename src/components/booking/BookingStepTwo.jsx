@@ -1,5 +1,5 @@
 import { BOOKING_NOTE_SUGGESTIONS, BOOKING_OCCASIONS } from '../../data/bookingData'
-import { formatDateDisplay, getSeatSummaryText } from '../../utils/booking'
+import { formatDateDisplay, getSeatSummaryText } from '../../utils/booking/index'
 
 function BookingStepTwo({ formData, guestCount, inlineErrors, selectedMealDurationText, onBack, onChange, onNoteSuggestion }) {
   return (

@@ -1,5 +1,5 @@
 import { BOOKING_STATUS_LABELS } from '../../data/bookingData'
-import { formatDateDisplay, getBookingSubmissionStatus, getMealDurationText, getPolicyItems, getSeatSummaryText } from '../../utils/booking'
+import { formatDateDisplay, getBookingSubmissionStatus, getMealDurationText, getPolicyItems, getSeatSummaryText } from '../../utils/booking/index'
 
 function BookingStepThree({ formData, guestCount, selectedSeatOperationalNote }) {
   const submissionStatus = getBookingSubmissionStatus({

@@ -1,4 +1,4 @@
-import { getSeatingLabel } from '../../pages/internalDashboard/formatters'
+import { getSeatingLabel } from '../../features/internalDashboard/formatters'
 
 const TABLE_STATUS_LABELS = {
   AVAILABLE: 'Sẵn sàng',
