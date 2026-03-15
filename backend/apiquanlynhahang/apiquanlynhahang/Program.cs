@@ -1,17 +1,37 @@
+using apiquanlynhahang.Data;
+using apiquanlynhahang.Repositories;
+using apiquanlynhahang.Services;
+using Microsoft.EntityFrameworkCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+var chuoiKetNoi = builder.Configuration.GetConnectionString("DefaultConnection")
+    ?? throw new InvalidOperationException("Khong tim thay chuoi ket noi DefaultConnection.");
+
+builder.Services.AddDbContext<UngDungDbContext>(options =>
+    options.UseMySql(chuoiKetNoi, ServerVersion.AutoDetect(chuoiKetNoi)));
+
+builder.Services.AddScoped<IMonAnRepository, MonAnRepository>();
+builder.Services.AddScoped<IMonAnService, MonAnService>();
+builder.Services.AddScoped<BanAnService>();
+builder.Services.AddScoped<MaGiamGiaService>();
+builder.Services.AddScoped<DatBanService>();
+builder.Services.AddScoped<DonHangService>();
+builder.Services.AddScoped<NguoiDungService>();
+
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 
 app.UseHttpsRedirection();
