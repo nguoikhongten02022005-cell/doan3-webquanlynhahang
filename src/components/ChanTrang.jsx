@@ -22,19 +22,19 @@ function ChanTrang({ compact = false }) {
   return (
     <footer className="site-footer" id="about">
       <div className="container footer-grid">
-        <section>
+        <section className="footer-khoi footer-khoi-thuong-hieu">
           <Link to="/" className="brand footer-brand">
             <span className="brand-mark">NH</span>
             <span className="brand-name">Nhà Hàng Nguyên Vị</span>
           </Link>
           <p>Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.</p>
-          <div className="social-links">
+          <div className="social-links" aria-label="Mạng xã hội">
             <a href="#">Facebook</a>
             <a href="#">Instagram</a>
           </div>
         </section>
 
-        <section>
+        <section className="footer-khoi">
           <h3>Liên hệ</h3>
           <ul>
             <li>{SITE_CONTACT.address}</li>
@@ -47,7 +47,7 @@ function ChanTrang({ compact = false }) {
           </ul>
         </section>
 
-        <section>
+        <section className="footer-khoi">
           <h3>Giờ mở cửa</h3>
           <ul>
             {SITE_CONTACT.hours.map((item) => (

@@ -4,25 +4,14 @@ function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
   const safeDish = dish || {}
   const hasImage = typeof safeDish.image === 'string' && safeDish.image.trim().length > 0
 
-  const handleThumbKeyDown = (event) => {
-    if (!canOpenDetail) {
-      return
-    }
-
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault()
-      onOpenDetail(safeDish)
-    }
-  }
-
   return (
     <article className={`the-mon ${safeDish.tone || ''} ${isMenuVariant ? 'the-mon--menu' : ''}`}>
-      <div
+      <button
+        type="button"
         className={`the-mon-hinh ${canOpenDetail ? 'is-clickable' : ''} ${isMenuVariant ? 'the-mon-hinh--menu' : ''} ${hasImage ? 'has-image' : 'is-placeholder'}`}
-        role={canOpenDetail ? 'button' : undefined}
-        tabIndex={canOpenDetail ? 0 : undefined}
         onClick={canOpenDetail ? () => onOpenDetail(safeDish) : undefined}
-        onKeyDown={handleThumbKeyDown}
+        disabled={!canOpenDetail}
+        aria-label={canOpenDetail ? `Xem chi tiết món ${safeDish.name || 'được chọn'}` : undefined}
       >
         {hasImage ? (
           <img className="the-mon-hinh-image" src={safeDish.image} alt={safeDish.name || 'Món ăn'} loading="lazy" />
@@ -52,7 +41,7 @@ function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
             </div>
           </div>
         ) : null}
-      </div>
+      </button>
 
       <div className={`than-mon ${isMenuVariant ? 'than-mon--menu' : ''}`}>
         <div className="noi-dung-mon">

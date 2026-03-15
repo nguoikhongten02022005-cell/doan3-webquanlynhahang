@@ -17,9 +17,36 @@ const HOME_CATEGORY_NOTES = {
 }
 
 const HOME_ATMOSPHERE_NOTES = [
-  'Editorial tối giản',
-  'Tông kem ấm và nhẹ',
-  'Dễ thay ảnh món về sau',
+  'Bếp mở theo nhịp tối',
+  'Bàn ăn đủ ánh ấm',
+  'Món được kể bằng bố cục',
+]
+
+const HOME_SERVICE_POINTS = [
+  {
+    soLieu: '12',
+    nhan: 'bàn được set mỗi tối',
+  },
+  {
+    soLieu: '08',
+    nhan: 'món nổi bật xoay theo tuần',
+  },
+  {
+    soLieu: '01',
+    nhan: 'hành trình đặt bàn gọn lẹ',
+  },
+]
+
+const HOME_EDITORIAL_FACTS = [
+  'Lối đi được chia thành từng nhịp rõ ràng để khách không bị ngợp khi vừa vào trang.',
+  'Khung món nổi bật giữ nguyên luồng xem chi tiết và thêm giỏ như trải nghiệm hiện tại.',
+  'Màu sắc và độ tương phản được đẩy lên vừa đủ để trang chủ bớt giống landing page mẫu.',
+]
+
+const HOME_TRUST_POINTS = [
+  'Phù hợp nhóm nhỏ, gặp đối tác và bữa tối gia đình.',
+  'Đặt bàn trước, vào bàn nhanh, không phải gọi lại nhiều lần.',
+  'Có thể thay ảnh món thật về sau mà không cần đổi luồng trang chủ.',
 ]
 
 function TrangChuPage() {
@@ -49,22 +76,20 @@ function TrangChuPage() {
       <section className="hero" id="home">
         <div className="container mo-dau-grid">
           <div className="mo-dau-copy">
-            <p className="eyebrow">Nhà hàng nguyên vị</p>
+            <p className="eyebrow">Nhà hàng Nguyên Vị</p>
             <h1>
-              Một trang chủ
+              Không gian ấm,
               <br />
-              gọn, sang và
+              món ăn <em>lên tiếng</em>
               <br />
-              đủ chỗ để món ăn
-              <br />
-              tự kể chuyện.
+              theo một nhịp riêng.
             </h1>
-            <p>
-              Từ phần mở đầu đến khu món nổi bật, mọi nhịp trình bày được tiết chế để thực khách nhìn thấy sự chỉn chu ngay từ lần ghé đầu tiên.
+            <p className="subtitle">
+              Trang chủ được sắp lại theo hướng biên tập nhà hàng: mở đầu có chủ đề, danh mục dễ quét nhanh, món nổi bật giữ đủ thao tác và phần đặt bàn được đẩy thành một lời mời rõ ràng.
             </p>
             <div className="mo-dau-actions-group">
               <Link className="btn nut-chinh" to="/dat-ban">
-                Đặt bàn ngay
+                Giữ bàn tối nay
               </Link>
               <Link className="btn nut-phu" to="/thuc-don">
                 Xem thực đơn
@@ -75,21 +100,30 @@ function TrangChuPage() {
                 <span key={item}>{item}</span>
               ))}
             </div>
+
+            <div className="mo-dau-diem-tin-cay" aria-label="Số liệu tổng quan">
+              {HOME_SERVICE_POINTS.map((muc) => (
+                <article key={muc.nhan} className="diem-tin-cay-item">
+                  <strong>{muc.soLieu}</strong>
+                  <span>{muc.nhan}</span>
+                </article>
+              ))}
+            </div>
           </div>
 
           <div className="mo-dau-showcase">
             <article className="mo-dau-card">
               <div className="mo-dau-card-head">
-                <span className="mo-dau-tag">Khung ảnh nổi bật</span>
-                <span className="mo-dau-note-chip">Sẵn sàng thay ảnh món</span>
+                <span className="mo-dau-tag">Chuyên đề tuần này</span>
+                <span className="mo-dau-note-chip">Phong vị nhà hàng</span>
               </div>
 
               <div className="mo-dau-art">
                 <div className="mo-dau-visual-frame">
                   <div className="mo-dau-visual-copy">
-                    <span className="mo-dau-visual-kicker">Khung ảnh đặc trưng</span>
-                    <strong>Chỉ cần thay ảnh món chủ đạo tại đây.</strong>
-                    <span>Giữ bố cục sáng, gọn và đủ sang kể cả khi chưa có ảnh thật.</span>
+                    <span className="mo-dau-visual-kicker">Bàn biên tập món nổi bật</span>
+                    <strong>Miếng đầu tiên cần được thấy bằng một lý do rõ ràng.</strong>
+                    <span>Phần hero không còn chỉ là một banner đẹp, mà trở thành khung giới thiệu tính cách của quán.</span>
                   </div>
 
                   <div className="mo-dau-plate" aria-hidden="true">
@@ -103,11 +137,29 @@ function TrangChuPage() {
               </div>
 
               <div className="mo-dau-card-meta">
-                <p className="mo-dau-card-overline">Tinh thần trình bày</p>
-                 <h3>Biên tập nhẹ, sang và dễ thay đổi về sau.</h3>
-                 <p>Giữ phần hình ảnh như một khung món chủ đạo để sau này cập nhật ảnh thật mà không cần động vào luồng hiện tại.</p>
+                <p className="mo-dau-card-overline">Nhịp điệu mới</p>
+                <h3>Hero được đổi sang bố cục tạp chí, lệch nhịp và có trọng tâm rõ.</h3>
+                <p>Khung bên phải đóng vai trò như một tấm menu trình diễn, giúp tổng thể bớt giống mẫu website nhà hàng phổ biến.</p>
               </div>
             </article>
+          </div>
+        </div>
+      </section>
+
+      <section className="trai-nghiem-section" aria-labelledby="trai-nghiem-title">
+        <div className="container trai-nghiem-grid">
+          <div className="trai-nghiem-mo-dau">
+            <p className="eyebrow">Hướng biên tập trang chủ</p>
+            <h2 id="trai-nghiem-title">Trang đầu không còn trình bày kiểu khuôn mẫu.</h2>
+          </div>
+
+          <div className="trai-nghiem-danh-sach">
+            {HOME_EDITORIAL_FACTS.map((ghiChu, index) => (
+              <article key={ghiChu} className="trai-nghiem-item">
+                <span className="trai-nghiem-index">0{index + 1}</span>
+                <p>{ghiChu}</p>
+              </article>
+            ))}
           </div>
         </div>
       </section>
@@ -117,9 +169,9 @@ function TrangChuPage() {
           <div className="section-head section-head--split">
             <div className="section-head-copy">
               <p className="eyebrow">Đi nhanh vào thực đơn</p>
-              <h2>Danh mục nổi bật</h2>
+              <h2>Danh Mục Nổi Bật</h2>
             </div>
-            <p className="section-head-description">Những nhóm món được sắp gọn để người xem chọn nhanh phần mình quan tâm và tiếp tục đi sâu vào menu.</p>
+            <p className="section-head-description">Danh mục được chuyển sang dạng thẻ lớn, đọc theo hàng có nhịp để bớt cảm giác chip slider quen thuộc.</p>
           </div>
 
           <div className="danh-muc-row">
@@ -143,11 +195,11 @@ function TrangChuPage() {
         <div className="container">
           <div className="section-head section-head--split noi-bat-head">
             <div className="section-head-copy">
-               <p className="eyebrow">Món được chọn nhiều</p>
+              <p className="eyebrow">Món được chọn nhiều</p>
               <h2>Món Ngon Phải Thử</h2>
             </div>
             <div className="noi-bat-intro">
-              <p>Những món được gọi nhiều nhất trong tuần, giữ nguyên đầy đủ thao tác xem chi tiết và thêm món như luồng hiện tại.</p>
+              <p>Phần này giữ nguyên luồng xem chi tiết và thêm giỏ, nhưng được đặt trong khung sạch hơn để món ăn thật sự là trung tâm.</p>
               <Link className="noi-bat-link" to="/thuc-don">
                 Xem toàn bộ thực đơn
               </Link>
@@ -182,18 +234,18 @@ function TrangChuPage() {
         <div className="container dat-ban-inner">
           <div className="dat-ban-copy">
             <p className="eyebrow">Đặt bàn tinh gọn</p>
-            <h2>Giữ một góc bàn đẹp cho buổi hẹn tối nay.</h2>
-            <p>Chọn khung giờ phù hợp và để đội ngũ chuẩn bị sẵn không gian vừa vặn cho cuộc gặp của bạn.</p>
+            <h2>Chọn trước một bàn đẹp cho buổi hẹn tối nay.</h2>
+            <p>Phần kết được đổi thành một lời mời rõ ràng, có thêm các điểm tin cậy ngắn gọn để thao tác đặt bàn không bị chìm trong hình nền.</p>
             <div className="dat-ban-points" aria-label="Điểm nổi bật đặt bàn">
-              <span>Khung giờ rõ ràng</span>
-              <span>Xác nhận nhanh</span>
-              <span>Phù hợp cặp đôi và nhóm nhỏ</span>
+              {HOME_TRUST_POINTS.map((muc) => (
+                <span key={muc}>{muc}</span>
+              ))}
             </div>
           </div>
 
           <div className="dat-ban-cta">
             <Link className="btn nut-sang" to="/dat-ban">
-              Giữ bàn cho tối nay
+              Bắt đầu đặt bàn
             </Link>
             <span>Mở form đặt bàn chỉ trong vài bước.</span>
           </div>
