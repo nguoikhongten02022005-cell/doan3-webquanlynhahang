@@ -5,117 +5,117 @@ import { phanTichGiaThanhSo } from '../utils/giaTien'
 
 export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON }) => {
   const { hienThanhCong } = useThongBao()
-  const defaultSize = sizeOptions[0]?.value || 'M'
-  const [selectedDish, setSelectedDish] = useState(null)
-  const [isDetailOpen, setIsDetailOpen] = useState(false)
-  const [selectedSize, setSelectedSize] = useState(defaultSize)
-  const [selectedToppings, setSelectedToppings] = useState([])
-  const [specialNote, setSpecialNote] = useState('')
+  const kichCoMacDinh = sizeOptions[0]?.value || 'M'
+  const [monDaChon, setMonDaChon] = useState(null)
+  const [dangMoChiTiet, setDangMoChiTiet] = useState(false)
+  const [kichCoDaChon, setKichCoDaChon] = useState(kichCoMacDinh)
+  const [toppingDaChon, setToppingDaChon] = useState([])
+  const [ghiChuRieng, datGhiChuRieng] = useState('')
 
   useEffect(() => {
-    if (!isDetailOpen) {
+    if (!dangMoChiTiet) {
       return undefined
     }
 
     const handleEsc = (event) => {
       if (event.key === 'Escape') {
-        setIsDetailOpen(false)
+        setDangMoChiTiet(false)
       }
     }
 
     window.addEventListener('keydown', handleEsc)
     return () => window.removeEventListener('keydown', handleEsc)
-  }, [isDetailOpen])
+  }, [dangMoChiTiet])
 
   useEffect(() => {
-    const previousOverflow = document.body.style.overflow
+    const trangThaiTranCu = document.body.style.overflow
 
-    if (isDetailOpen) {
+    if (dangMoChiTiet) {
       document.body.style.overflow = 'hidden'
     } else {
       document.body.style.overflow = ''
     }
 
     return () => {
-      document.body.style.overflow = previousOverflow
+      document.body.style.overflow = trangThaiTranCu
     }
-  }, [isDetailOpen])
+  }, [dangMoChiTiet])
 
-  const getSurchargeBySize = (size) => {
-    const selectedOption = sizeOptions.find((option) => option.value === size)
-    return selectedOption ? selectedOption.surcharge : 0
+  const layPhuThuTheoKichCo = (kichCo) => {
+    const luaChonDaChon = sizeOptions.find((option) => option.value === kichCo)
+    return luaChonDaChon ? luaChonDaChon.surcharge : 0
   }
 
-  const openDetailModal = (dish) => {
-    setSelectedDish(dish)
-    setSelectedSize(defaultSize)
-    setSelectedToppings([])
-    setSpecialNote('')
-    setIsDetailOpen(true)
+  const moChiTietMon = (mon) => {
+    setMonDaChon(mon)
+    setKichCoDaChon(kichCoMacDinh)
+    setToppingDaChon([])
+    datGhiChuRieng('')
+    setDangMoChiTiet(true)
   }
 
-  const closeDetailModal = () => {
-    setIsDetailOpen(false)
-    setSelectedDish(null)
+  const dongChiTietMon = () => {
+    setDangMoChiTiet(false)
+    setMonDaChon(null)
   }
 
-  const handleToggleTopping = (topping) => {
-    setSelectedToppings((prev) => (
-      prev.includes(topping) ? prev.filter((item) => item !== topping) : [...prev, topping]
+  const xuLyBatTatTopping = (topping) => {
+    setToppingDaChon((truocDo) => (
+      truocDo.includes(topping) ? truocDo.filter((muc) => muc !== topping) : [...truocDo, topping]
     ))
   }
 
-  const handleAddToCart = (dish) => {
+  const xuLyThemMonNhanh = (mon) => {
     themVaoGio({
-      ...dish,
-      selectedSize: defaultSize,
-      selectedToppings: [],
+      ...mon,
+      kichCoDaChon: kichCoMacDinh,
+      toppingDaChon: [],
       specialNote: '',
     })
-    hienThanhCong(`Đã thêm ${dish.name} vào giỏ hàng.`)
+    hienThanhCong(`Đã thêm ${mon.name} vào giỏ hàng.`)
   }
 
-  const selectedSurcharge = getSurchargeBySize(selectedSize)
+  const phuThuDaChon = layPhuThuTheoKichCo(kichCoDaChon)
 
-  const detailPrice = useMemo(() => {
-    if (!selectedDish) {
+  const giaChiTiet = useMemo(() => {
+    if (!monDaChon) {
       return 0
     }
 
-    return phanTichGiaThanhSo(selectedDish.price) + selectedSurcharge
-  }, [selectedDish, selectedSurcharge])
+    return phanTichGiaThanhSo(monDaChon.price) + phuThuDaChon
+  }, [monDaChon, phuThuDaChon])
 
-  const handleAddConfiguredDish = () => {
-    if (!selectedDish) {
+  const xuLyThemMonDaTuyChon = () => {
+    if (!monDaChon) {
       return
     }
 
     themVaoGio({
-      ...selectedDish,
-      price: phanTichGiaThanhSo(selectedDish.price) + selectedSurcharge,
-      selectedSize,
-      selectedToppings,
-      specialNote,
+      ...monDaChon,
+      price: phanTichGiaThanhSo(monDaChon.price) + phuThuDaChon,
+      kichCoDaChon: kichCoDaChon,
+      toppingDaChon: toppingDaChon,
+      specialNote: ghiChuRieng,
     })
 
-    hienThanhCong(`Đã thêm ${selectedDish.name} vào giỏ hàng.`)
-    closeDetailModal()
+    hienThanhCong(`Đã thêm ${monDaChon.name} vào giỏ hàng.`)
+    dongChiTietMon()
   }
 
   return {
-    detailPrice,
-    handleAddConfiguredDish,
-    handleAddToCart,
-    handleToggleTopping,
-    isDetailOpen,
-    openDetailModal,
-    closeDetailModal,
-    selectedDish,
-    selectedSize,
-    selectedSurcharge,
-    selectedToppings,
-    setSelectedSize,
-    setSpecialNote,
-    specialNote,
+    giaChiTiet,
+    xuLyThemMonDaTuyChon,
+    xuLyThemMonNhanh,
+    xuLyBatTatTopping,
+    dangMoChiTiet,
+    moChiTietMon,
+    dongChiTietMon,
+    monDaChon,
+    kichCoDaChon,
+    phuThuDaChon,
+    toppingDaChon,
+    datKichCoDaChon: setKichCoDaChon,
+    datGhiChuRieng,
+    ghiChuRieng,
   }
 }

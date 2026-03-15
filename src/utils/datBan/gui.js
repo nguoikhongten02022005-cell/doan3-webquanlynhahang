@@ -8,10 +8,10 @@ export const taoMaDatBan = () => {
   return code
 }
 
-export const laNhomDongChiDatQuaHotline = (guestCount) => guestCount > SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN
+export const laNhomDongChiDatQuaHotline = (soLuongKhach) => soLuongKhach > SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN
 
-export const layThoiLuongBuaAn = (guestCount, timeValue) => {
-  const parsedGuests = Number(guestCount) || 0
+export const layThoiLuongBuaAn = (soLuongKhach, timeValue) => {
+  const parsedGuests = Number(soLuongKhach) || 0
   const timeInMinutes = timeValue ? phanTichGioThanhPhut(timeValue) : 0
   const isPeakHour = timeInMinutes >= PHUT_BAT_DAU_CAO_DIEM && timeInMinutes <= PHUT_KET_THUC_CAO_DIEM
 
@@ -20,8 +20,8 @@ export const layThoiLuongBuaAn = (guestCount, timeValue) => {
   return isPeakHour ? 120 : 135
 }
 
-export const layThoiLuongBuaAnText = (guestCount, timeValue) => {
-  const duration = layThoiLuongBuaAn(guestCount, timeValue)
+export const layThoiLuongBuaAnText = (soLuongKhach, timeValue) => {
+  const duration = layThoiLuongBuaAn(soLuongKhach, timeValue)
   const hours = Math.floor(duration / 60)
   const minutes = duration % 60
 
@@ -30,8 +30,8 @@ export const layThoiLuongBuaAnText = (guestCount, timeValue) => {
   return `${hours} giờ ${minutes} phút`
 }
 
-export const layQuyTacVanHanh = (guestCount, seatingArea, timeValue) => {
-  const parsedGuests = Number(guestCount) || 0
+export const layQuyTacVanHanh = (soLuongKhach, seatingArea, timeValue) => {
+  const parsedGuests = Number(soLuongKhach) || 0
   const items = [
     { icon: '🕒', text: 'Giữ bàn 15 phút sau giờ hẹn.' },
     { icon: '🪑', text: 'Khu vực ngồi là ưu tiên, không cam kết 100%.' },
@@ -53,8 +53,8 @@ export const layQuyTacVanHanh = (guestCount, seatingArea, timeValue) => {
   return items
 }
 
-export const layTrangThaiGuiDatBan = ({ seatingArea, guestCount, time, notes }) => {
-  const parsedGuests = Number(guestCount) || 0
+export const layTrangThaiGuiDatBan = ({ seatingArea, soLuongKhach, time, notes }) => {
+  const parsedGuests = Number(soLuongKhach) || 0
   const timeInMinutes = time ? phanTichGioThanhPhut(time) : 0
   const isPeakHour = timeInMinutes >= PHUT_BAT_DAU_CAO_DIEM && timeInMinutes <= PHUT_KET_THUC_CAO_DIEM
   const hasSpecialRequest = Boolean(notes?.trim())
@@ -88,9 +88,9 @@ export const layThongDiepTrangThaiDatBan = (status, seatingArea) => {
   return 'Yêu cầu của bạn đã được ghi nhận.'
 }
 
-export const layDanhSachChinhSach = (guestCount, seatingArea, timeValue) => ([
+export const layDanhSachChinhSach = (soLuongKhach, seatingArea, timeValue) => ([
   { icon: '📞', text: `Nhóm trên ${SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN} khách vui lòng liên hệ hotline để được hỗ trợ trực tiếp.` },
-  ...layQuyTacVanHanh(guestCount, seatingArea, timeValue),
+  ...layQuyTacVanHanh(soLuongKhach, seatingArea, timeValue),
 ])
 
 export { THONG_DIEP_HOTLINE_NHOM_DONG }

@@ -1,31 +1,31 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { layJsonLuuTru, xoaMucLuuTru, datJsonLuuTru } from './dichVuLuuTru'
 
-const normalizeCheckoutDraft = (draft) => {
-  if (!draft || typeof draft !== 'object') {
+const chuanHoaBanNhapTamThanhToan = (banNhapTam) => {
+  if (!banNhapTam || typeof banNhapTam !== 'object') {
     return null
   }
 
   return {
-    note: String(draft.note ?? ''),
-    tableNumber: String(draft.tableNumber ?? ''),
+    note: String(banNhapTam.note ?? ''),
+    tableNumber: String(banNhapTam.tableNumber ?? ''),
   }
 }
 
-export const layBanNhapTamThanhToan = () => normalizeCheckoutDraft(layJsonLuuTru(STORAGE_KEYS.CHECKOUT_DRAFT, null))
+export const layBanNhapTamThanhToan = () => chuanHoaBanNhapTamThanhToan(layJsonLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_THANH_TOAN, null))
 
-export const luuBanNhapTamThanhToan = (draft) => {
-  const normalizedDraft = normalizeCheckoutDraft(draft)
+export const luuBanNhapTamThanhToan = (banNhapTam) => {
+  const banNhapTamDaChuanHoa = chuanHoaBanNhapTamThanhToan(banNhapTam)
 
-  if (!normalizedDraft) {
-    xoaMucLuuTru(STORAGE_KEYS.CHECKOUT_DRAFT)
+  if (!banNhapTamDaChuanHoa) {
+    xoaMucLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_THANH_TOAN)
     return null
   }
 
-  datJsonLuuTru(STORAGE_KEYS.CHECKOUT_DRAFT, normalizedDraft)
-  return normalizedDraft
+  datJsonLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_THANH_TOAN, banNhapTamDaChuanHoa)
+  return banNhapTamDaChuanHoa
 }
 
 export const xoaBanNhapTamThanhToan = () => {
-  xoaMucLuuTru(STORAGE_KEYS.CHECKOUT_DRAFT)
+  xoaMucLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_THANH_TOAN)
 }

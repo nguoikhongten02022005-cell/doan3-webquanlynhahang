@@ -2,20 +2,20 @@ function GhiChuVanHanhDatBan({ bookingOperationalRules, selectedMealDurationText
   return (
     <>
       {selectedMealDurationText && (
-        <div className="booking-seat-note-banner">
+        <div className="dat-ban-seat-note-banner">
           <strong>Dự kiến sử dụng bàn:</strong> {selectedMealDurationText}
         </div>
       )}
 
       {bookingOperationalRules.length > 0 && (
-        <section className="booking-editorial-card">
-          <div className="booking-section-head">
+        <section className="dat-ban-editorial-card">
+          <div className="dat-ban-section-head">
             <div>
-              <p className="booking-side-kicker">Vận hành</p>
+              <p className="dat-ban-side-kicker">Vận hành</p>
               <h3>Thông tin cần lưu ý</h3>
             </div>
           </div>
-          <div className="booking-policy-notes booking-policy-notes-premium">
+          <div className="dat-ban-policy-notes dat-ban-policy-notes-premium">
             {bookingOperationalRules.slice(0, 3).map((item) => (
               <div className="policy-item" key={item.text}>
                 <span className="policy-icon">{item.icon}</span>
@@ -24,7 +24,7 @@ function GhiChuVanHanhDatBan({ bookingOperationalRules, selectedMealDurationText
             ))}
           </div>
           {bookingOperationalRules.length > 3 && (
-            <div className="booking-policy-notes booking-policy-notes-premium booking-policy-notes-secondary">
+            <div className="dat-ban-policy-notes dat-ban-policy-notes-premium dat-ban-policy-notes-secondary">
               {bookingOperationalRules.slice(3).map((item) => (
                 <div className="policy-item" key={item.text}>
                   <span className="policy-icon">{item.icon}</span>

@@ -58,9 +58,9 @@ Ví dụ nên dùng:
 - `tongTien`
 
 Không nên lạm dụng:
-- `HomePage`
-- `LoginPage`
-- `MenuPage`
+- `TrangChuPage`
+- `DangNhapPage`
+- `ThucDonPage`
 - `handleSubmit`
 - `fetchData`
 - `userInfo`

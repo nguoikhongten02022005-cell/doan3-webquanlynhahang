@@ -6,7 +6,7 @@ function TuyenDuongBaoVe({ children }) {
   const { daDangNhap, coTheVaoNoiBo, dangKhoiTaoXacThuc } = useXacThuc()
 
   if (dangKhoiTaoXacThuc) {
-    return <div className="booking-empty">Đang xác thực phiên đăng nhập...</div>
+    return <div className="dat-ban-empty">Đang xác thực phiên đăng nhập...</div>
   }
 
   if (!daDangNhap) {

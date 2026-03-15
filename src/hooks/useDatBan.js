@@ -12,26 +12,26 @@ import {
   ganBanChoDatBanApi,
 } from '../services/api/apiDatBan'
 import { datJsonLuuTru } from '../services/dichVuLuuTru'
-import { clearBookingDraft, getValidBookingDraft, saveBookingDraft } from '../utils/banNhapTamDatBan'
+import { xoaBanNhapTamDatBan, layBanNhapTamDatBanHopLe, luuBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
 import { TRANG_THAI_BAN } from '../services/dichVuBanAn'
 import {
   anhXaMucDatBan,
   chuanHoaDatBan,
 } from './datBan/anhXaDatBan'
 
-export const BOOKING_DATA_CHANGED_EVENT = 'booking:data-changed'
+export const SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN = 'booking:data-changed'
 
-export const dispatchBookingDataChanged = () => {
+export const phatSuKienThayDoiDuLieuDatBan = () => {
   if (typeof window === 'undefined') {
     return
   }
 
-  window.dispatchEvent(new CustomEvent(BOOKING_DATA_CHANGED_EVENT))
+  window.dispatchEvent(new CustomEvent(SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN))
 }
 
-const locBanPhuHopChoDatBan = (booking, tablesOverride = []) => {
-  const tables = Array.isArray(tablesOverride) ? tablesOverride : []
-  const guestCount = Number(booking?.guests) || 0
+const locBanPhuHopChoDatBan = (booking, danhSachBanGhiDe = []) => {
+  const tables = Array.isArray(danhSachBanGhiDe) ? danhSachBanGhiDe : []
+  const soLuongKhach = Number(booking?.guests) || 0
 
   return tables.filter((table) => {
     if (table.status === TRANG_THAI_BAN.BAN) {
@@ -46,7 +46,7 @@ const locBanPhuHopChoDatBan = (booking, tablesOverride = []) => {
       return false
     }
 
-    return table.capacity >= guestCount || guestCount <= 0
+    return table.capacity >= soLuongKhach || soLuongKhach <= 0
   })
 }
 
@@ -57,10 +57,10 @@ export const useDatBan = () => {
       const datBanDaChuanHoa = chuanHoaDatBan(duLieu)
 
       if (!datBanDaChuanHoa) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
+        return { success: false, error: 'Không nhận được dữ liệu đặt bàn hợp lệ từ máy chủ.' }
       }
 
-      dispatchBookingDataChanged()
+      phatSuKienThayDoiDuLieuDatBan()
       return {
         success: true,
         booking: datBanDaChuanHoa,
@@ -71,62 +71,62 @@ export const useDatBan = () => {
     }
   }, [])
 
-  const luuBanNhapTam = useCallback((draftPayload) => saveBookingDraft(STORAGE_KEYS.BOOKING_DRAFT, draftPayload), [])
+  const luuBanNhapTam = useCallback((duLieuNhapTam) => luuBanNhapTamDatBan(STORAGE_KEYS.BAN_NHAP_TAM_DAT_BAN, duLieuNhapTam), [])
 
-  const layBanNhapTam = useCallback(() => getValidBookingDraft(STORAGE_KEYS.BOOKING_DRAFT), [])
+  const layBanNhapTam = useCallback(() => layBanNhapTamDatBanHopLe(STORAGE_KEYS.BAN_NHAP_TAM_DAT_BAN), [])
 
   const xoaBanNhapTam = useCallback(() => {
-    clearBookingDraft(STORAGE_KEYS.BOOKING_DRAFT)
+    xoaBanNhapTamDatBan(STORAGE_KEYS.BAN_NHAP_TAM_DAT_BAN)
   }, [])
 
   const taoDatBan = useCallback(async ({ booking, confirmationPayload }) => {
     const { duLieu } = await taoDatBanApi(booking)
     const createdBooking = chuanHoaDatBan(duLieu)
 
-    datJsonLuuTru(STORAGE_KEYS.LAST_BOOKING_CONFIRMATION, {
+    datJsonLuuTru(STORAGE_KEYS.XAC_NHAN_DAT_BAN_GAN_NHAT, {
       ...confirmationPayload,
       bookingCode: createdBooking?.bookingCode || confirmationPayload?.bookingCode,
       bookingId: createdBooking?.id || confirmationPayload?.bookingId,
       status: createdBooking?.status || confirmationPayload?.status,
     })
-    clearBookingDraft(STORAGE_KEYS.BOOKING_DRAFT)
-    dispatchBookingDataChanged()
+    xoaBanNhapTamDatBan(STORAGE_KEYS.BAN_NHAP_TAM_DAT_BAN)
+    phatSuKienThayDoiDuLieuDatBan()
     return createdBooking
   }, [])
 
-  const taoDatBanNoiBo = useCallback(async (payload) => {
+  const taoDatBanNoiBo = useCallback(async (duLieuGuiDi) => {
     try {
-      const { duLieu, thongDiep } = await taoDatBanNoiBoApi(payload)
+      const { duLieu, thongDiep } = await taoDatBanNoiBoApi(duLieuGuiDi)
       const datBanDaChuanHoa = chuanHoaDatBan(duLieu)
 
       if (!datBanDaChuanHoa) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
+        return { success: false, error: 'Không nhận được dữ liệu đặt bàn hợp lệ từ máy chủ.' }
       }
 
-      dispatchBookingDataChanged()
+      phatSuKienThayDoiDuLieuDatBan()
       return {
         success: true,
         booking: datBanDaChuanHoa,
         message: thongDiep,
       }
     } catch (error) {
-      return { success: false, error: error?.message || 'Không thể tạo booking nội bộ.' }
+      return { success: false, error: error?.message || 'Không thể tạo đặt bàn nội bộ.' }
     }
   }, [])
 
-  const capNhatDatBanNoiBo = useCallback(async (bookingId, payload) => {
+  const capNhatDatBanNoiBo = useCallback(async (bookingId, duLieuGuiDi) => {
     try {
-      const { duLieu, thongDiep } = await capNhatDatBanApi(bookingId, payload)
-      const updatedBooking = chuanHoaDatBan(duLieu)
+      const { duLieu, thongDiep } = await capNhatDatBanApi(bookingId, duLieuGuiDi)
+      const datBanDaCapNhat = chuanHoaDatBan(duLieu)
 
-      if (!updatedBooking) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
+      if (!datBanDaCapNhat) {
+        return { success: false, error: 'Không nhận được dữ liệu đặt bàn hợp lệ từ máy chủ.' }
       }
 
-      dispatchBookingDataChanged()
+      phatSuKienThayDoiDuLieuDatBan()
       return {
         success: true,
-        booking: updatedBooking,
+        booking: datBanDaCapNhat,
         message: thongDiep,
       }
     } catch (error) {
@@ -134,16 +134,16 @@ export const useDatBan = () => {
     }
   }, [])
 
-  const ganBanChoDatBan = useCallback(async (bookingId, tableIds) => {
+  const ganBanChoDatBan = useCallback(async (bookingId, danhSachIdBan) => {
     try {
-      const { duLieu, thongDiep } = await ganBanChoDatBanApi(bookingId, tableIds)
+      const { duLieu, thongDiep } = await ganBanChoDatBanApi(bookingId, danhSachIdBan)
       const datBanDaChuanHoa = chuanHoaDatBan(duLieu)
 
       if (!datBanDaChuanHoa) {
-        return { success: false, error: 'Không nhận được dữ liệu booking hợp lệ từ máy chủ.' }
+        return { success: false, error: 'Không nhận được dữ liệu đặt bàn hợp lệ từ máy chủ.' }
       }
 
-      dispatchBookingDataChanged()
+      phatSuKienThayDoiDuLieuDatBan()
       return {
         success: true,
         booking: datBanDaChuanHoa,
@@ -155,7 +155,7 @@ export const useDatBan = () => {
   }, [])
 
   const danhDauDaCheckIn = useCallback(
-    async (bookingId) => updateBookingStatus(bookingId, 'DA_CHECK_IN', 'Không thể check-in booking.'),
+    async (bookingId) => updateBookingStatus(bookingId, 'DA_CHECK_IN', 'Không thể check-in đặt bàn.'),
     [updateBookingStatus],
   )
 
@@ -193,15 +193,15 @@ export const useDatBan = () => {
       .filter(Boolean)
   }, [])
 
-  const huyDatBan = useCallback(async (bookingId, bookingCode) => {
+  const huyDatBan = useCallback(async (bookingId, maDatBan) => {
     try {
       const { thongDiep } = await huyDatBanApi(bookingId)
-      const bookingHistory = await layLichSuDatBan()
-      dispatchBookingDataChanged()
+      const lichSuDatBan = await layLichSuDatBan()
+      phatSuKienThayDoiDuLieuDatBan()
       return {
         success: true,
-        message: thongDiep || `Đã hủy đặt bàn ${bookingCode} thành công.`,
-        bookingHistory,
+        message: thongDiep || `Đã hủy đặt bàn ${maDatBan} thành công.`,
+        lichSuDatBan,
       }
     } catch (error) {
       return { success: false, error: error?.message || 'Không thể hủy đặt bàn này. Vui lòng thử lại.' }
@@ -210,11 +210,11 @@ export const useDatBan = () => {
 
   const layDanhSachDatBanHost = useCallback(async () => {
     const { duLieu } = await layDanhSachDatBanApi()
-    const bookings = Array.isArray(duLieu) ? duLieu : []
-    return bookings.map(chuanHoaDatBan).filter(Boolean)
+    const danhSachDatBan = Array.isArray(duLieu) ? duLieu : []
+    return danhSachDatBan.map(chuanHoaDatBan).filter(Boolean)
   }, [])
 
-  const layBanPhuHopChoDatBan = useCallback((booking, tablesOverride = []) => locBanPhuHopChoDatBan(booking, tablesOverride), [])
+  const layBanPhuHopChoDatBan = useCallback((booking, danhSachBanGhiDe = []) => locBanPhuHopChoDatBan(booking, danhSachBanGhiDe), [])
 
   return {
     thaoTacTrangThaiDatBan: CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST,

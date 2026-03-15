@@ -9,7 +9,7 @@ function BuocMotDatBan({
   availability,
   calendar,
   formData,
-  guestCount,
+  soLuongKhach,
   guestWarning,
   handlers,
   inlineErrors,
@@ -21,11 +21,11 @@ function BuocMotDatBan({
   stepOneProgress,
 }) {
   return (
-    <div className="booking-step booking-step-premium booking-step-progressive">
-      <div className={`booking-luong-section ${activeBookingSection === 'guests' ? 'is-active' : ''}`}>
+    <div className="dat-ban-step dat-ban-step-premium dat-ban-step-progressive">
+      <div className={`dat-ban-luong-section ${activeBookingSection === 'guests' ? 'is-active' : ''}`}>
         <ChonSoKhachDatBan
           formData={formData}
-          guestCount={guestCount}
+          soLuongKhach={soLuongKhach}
           guestWarning={guestWarning}
           inlineErrors={inlineErrors}
           onGuestSelect={handlers.handleGuestSelect}
@@ -33,7 +33,7 @@ function BuocMotDatBan({
         />
       </div>
 
-      <div className={`booking-luong-section ${activeBookingSection === 'date' ? 'is-active' : ''} ${stepOneProgress.hasGuests ? '' : 'is-locked'}`}>
+      <div className={`dat-ban-luong-section ${activeBookingSection === 'date' ? 'is-active' : ''} ${stepOneProgress.hasGuests ? '' : 'is-locked'}`}>
         <MucNgayDatBan
           calendarContainerRef={calendar.calendarContainerRef}
           dateSectionRef={calendar.dateSectionRef}
@@ -61,13 +61,13 @@ function BuocMotDatBan({
         />
       </div>
 
-      <div className={`booking-luong-section ${activeBookingSection === 'time' ? 'is-active' : ''} ${stepOneProgress.hasDate ? '' : 'is-locked'} ${stepOneProgress.hasDate ? '' : 'is-waiting'}`}>
+      <div className={`dat-ban-luong-section ${activeBookingSection === 'time' ? 'is-active' : ''} ${stepOneProgress.hasDate ? '' : 'is-locked'} ${stepOneProgress.hasDate ? '' : 'is-waiting'}`}>
         <ChonKhungGioDatBan
           availabilityPanelRef={availability.availabilityPanelRef}
           firstAvailableSlotRef={availability.firstAvailableSlotRef}
           firstAvailableSlotTime={availability.firstAvailableSlotTime}
           formData={formData}
-          guestCount={guestCount}
+          soLuongKhach={soLuongKhach}
           handleSelectSuggestedTime={handlers.handleSelectSuggestedTime}
           handleTimeSelect={handlers.handleTimeSelect}
           inlineErrors={inlineErrors}
@@ -80,16 +80,16 @@ function BuocMotDatBan({
         />
       </div>
 
-      <div className={`booking-luong-section ${activeBookingSection === 'seating' ? 'is-active' : ''} ${stepOneProgress.hasTime ? '' : 'is-locked'}`}>
+      <div className={`dat-ban-luong-section ${activeBookingSection === 'seating' ? 'is-active' : ''} ${stepOneProgress.hasTime ? '' : 'is-locked'}`}>
         <ChonChoNgoiDatBan
           formData={formData}
-          guestCount={guestCount}
+          soLuongKhach={soLuongKhach}
           handleSeatingSelect={handlers.handleSeatingSelect}
           selectedSeatOperationalNote={selectedSeatOperationalNote}
         />
       </div>
 
-      <div className={`booking-luong-section ${stepOneProgress.hasTime ? '' : 'is-collapsed'}`}>
+      <div className={`dat-ban-luong-section ${stepOneProgress.hasTime ? '' : 'is-collapsed'}`}>
         <GhiChuVanHanhDatBan
           bookingOperationalRules={bookingOperationalRules}
           selectedMealDurationText={selectedMealDurationText}

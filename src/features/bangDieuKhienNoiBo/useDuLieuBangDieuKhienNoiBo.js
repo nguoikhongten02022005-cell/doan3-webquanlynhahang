@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDanhSachMonAn } from '../../hooks/useDanhSachMonAn'
-import { BOOKING_DATA_CHANGED_EVENT, useDatBan } from '../../hooks/useDatBan'
+import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../../hooks/useDatBan'
 import { layDanhSachNguoiDungApi } from '../../services/api/apiXacThuc'
 import { layDanhSachDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
@@ -53,129 +53,129 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   useEffect(() => {
     taiLaiDuLieu()
 
-    const handleStorage = () => {
+    const xuLyLuuTru = () => {
       taiLaiDuLieu()
     }
 
-    window.addEventListener('storage', handleStorage)
-    window.addEventListener(BOOKING_DATA_CHANGED_EVENT, taiLaiDuLieu)
+    window.addEventListener('storage', xuLyLuuTru)
+    window.addEventListener(SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, taiLaiDuLieu)
 
     return () => {
-      window.removeEventListener('storage', handleStorage)
-      window.removeEventListener(BOOKING_DATA_CHANGED_EVENT, taiLaiDuLieu)
+      window.removeEventListener('storage', xuLyLuuTru)
+      window.removeEventListener(SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, taiLaiDuLieu)
     }
   }, [taiLaiDuLieu])
 
-  const bookingQueue = useMemo(
+  const hangDoiDatBan = useMemo(
     () => sapXepDatBanChoVanHanh(danhSachDatBan, new Date()),
     [danhSachDatBan],
   )
-  const activeBookings = useMemo(
-    () => bookingQueue.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(booking.status)),
-    [bookingQueue],
+  const danhSachDatBanDangHoatDong = useMemo(
+    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(booking.status)),
+    [hangDoiDatBan],
   )
-  const confirmedBookings = useMemo(
-    () => activeBookings.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(booking.status)),
-    [activeBookings],
+  const danhSachDatBanDaXacNhan = useMemo(
+    () => danhSachDatBanDangHoatDong.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(booking.status)),
+    [danhSachDatBanDangHoatDong],
   )
-  const pendingBookings = useMemo(
-    () => bookingQueue.filter((booking) => booking.status === 'YEU_CAU_DAT_BAN' || booking.status === 'CAN_GOI_LAI' || booking.status === 'CHO_XAC_NHAN'),
-    [bookingQueue],
+  const danhSachDatBanChoXuLy = useMemo(
+    () => hangDoiDatBan.filter((booking) => booking.status === 'YEU_CAU_DAT_BAN' || booking.status === 'CAN_GOI_LAI' || booking.status === 'CHO_XAC_NHAN'),
+    [hangDoiDatBan],
   )
-  const upcomingSoonBookings = useMemo(() => {
+  const danhSachDatBanSapDienRa = useMemo(() => {
     const now = new Date()
-    return activeBookings.filter((booking) => laDatBanSapDienRa(booking, now))
-  }, [activeBookings])
-  const checkedInBookings = useMemo(
+    return danhSachDatBanDangHoatDong.filter((booking) => laDatBanSapDienRa(booking, now))
+  }, [danhSachDatBanDangHoatDong])
+  const soLuongDatBanDaCheckIn = useMemo(
     () => danhSachDatBan.filter((booking) => laDatBanDaCheckIn(booking)).length,
     [danhSachDatBan],
   )
-  const tableSummary = useMemo(() => layTomTatBan(danhSachBan), [danhSachBan])
-  const tableInventorySummary = useMemo(() => layTomTatTonKhoBan(danhSachBan), [danhSachBan])
-  const unassignedBookings = useMemo(() => layDatBanChuaGanBan(activeBookings), [activeBookings])
-  const ordersSummary = useMemo(() => layTomTatDonHang(danhSachDonHang), [danhSachDonHang])
-  const openOrders = useMemo(
+  const tomTatBan = useMemo(() => layTomTatBan(danhSachBan), [danhSachBan])
+  const tomTatTonKhoBan = useMemo(() => layTomTatTonKhoBan(danhSachBan), [danhSachBan])
+  const danhSachDatBanChuaGanBan = useMemo(() => layDatBanChuaGanBan(danhSachDatBanDangHoatDong), [danhSachDatBanDangHoatDong])
+  const tomTatDonHang = useMemo(() => layTomTatDonHang(danhSachDonHang), [danhSachDonHang])
+  const danhSachDonHangDangMo = useMemo(
     () => sapXepDonHangChoVanHanh(danhSachDonHang).filter((order) => laySacThaiDonHang(order.status) === 'warning'),
     [danhSachDonHang],
   )
-  const sortedOrders = useMemo(() => sapXepDonHangChoVanHanh(danhSachDonHang), [danhSachDonHang])
-  const accountsSummary = useMemo(() => layTomTatTaiKhoan(danhSachTaiKhoan), [danhSachTaiKhoan])
+  const danhSachDonHangDaSapXep = useMemo(() => sapXepDonHangChoVanHanh(danhSachDonHang), [danhSachDonHang])
+  const tomTatTaiKhoan = useMemo(() => layTomTatTaiKhoan(danhSachTaiKhoan), [danhSachTaiKhoan])
 
-  const handleCreateInternalBooking = useCallback(async (payload) => {
-    const ketQua = await taoDatBanNoiBo(payload)
-    if (result?.success) await taiLaiDuLieu()
+  const xuLyTaoDatBanNoiBo = useCallback(async (duLieuGuiDi) => {
+    const ketQua = await taoDatBanNoiBo(duLieuGuiDi)
+    if (ketQua?.success) await taiLaiDuLieu()
     return ketQua
   }, [taoDatBanNoiBo, taiLaiDuLieu])
 
-  const handleUpdateInternalBooking = useCallback(async (bookingId, payload) => {
-    const ketQua = await capNhatDatBanNoiBo(bookingId, payload)
-    if (result?.success) await taiLaiDuLieu()
+  const xuLyCapNhatDatBanNoiBo = useCallback(async (bookingId, duLieuGuiDi) => {
+    const ketQua = await capNhatDatBanNoiBo(bookingId, duLieuGuiDi)
+    if (ketQua?.success) await taiLaiDuLieu()
     return ketQua
   }, [capNhatDatBanNoiBo, taiLaiDuLieu])
 
-  const handleAssignTables = useCallback(async (bookingId, tableIds) => {
-    const ketQua = await ganBanChoDatBan(bookingId, tableIds)
-    if (result?.success) await taiLaiDuLieu()
+  const xuLyGanBan = useCallback(async (bookingId, danhSachIdBan) => {
+    const ketQua = await ganBanChoDatBan(bookingId, danhSachIdBan)
+    if (ketQua?.success) await taiLaiDuLieu()
     return ketQua
   }, [ganBanChoDatBan, taiLaiDuLieu])
 
-  const handleCheckIn = useCallback(async (bookingId) => {
+  const xuLyCheckIn = useCallback(async (bookingId) => {
     const ketQua = await danhDauDaCheckIn(bookingId)
-    if (result?.success) await taiLaiDuLieu()
+    if (ketQua?.success) await taiLaiDuLieu()
     return ketQua
   }, [danhDauDaCheckIn, taiLaiDuLieu])
 
-  const handleComplete = useCallback(async (bookingId) => {
+  const xuLyHoanThanh = useCallback(async (bookingId) => {
     const ketQua = await danhDauHoanThanh(bookingId)
-    if (result?.success) await taiLaiDuLieu()
+    if (ketQua?.success) await taiLaiDuLieu()
     return ketQua
   }, [danhDauHoanThanh, taiLaiDuLieu])
 
-  const handleNoShow = useCallback(async (bookingId) => {
+  const xuLyKhachKhongDen = useCallback(async (bookingId) => {
     const ketQua = await danhDauKhongDen(bookingId)
-    if (result?.success) await taiLaiDuLieu()
+    if (ketQua?.success) await taiLaiDuLieu()
     return ketQua
   }, [danhDauKhongDen, taiLaiDuLieu])
 
-  const handleMarkTableDirty = useCallback(async (tableId) => {
+  const xuLyDanhDauBanBan = useCallback(async (tableId) => {
     await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.BAN)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
-  const handleMarkTableReady = useCallback(async (tableId) => {
+  const xuLyDanhDauBanSanSang = useCallback(async (tableId) => {
     await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.TRONG)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
   return {
-    accountsSummary,
-    activeBookings,
-    bookingQueue,
-    checkedInBookings,
-    confirmedBookings,
+    tomTatTaiKhoan,
+    danhSachDatBanDangHoatDong,
+    hangDoiDatBan,
+    soLuongDatBanDaCheckIn,
+    danhSachDatBanDaXacNhan,
     danhSachBan,
     danhSachDatBan,
     danhSachDonHang,
     danhSachMon,
     danhSachTaiKhoan,
-    handleAssignTables,
-    handleCheckIn,
-    handleComplete,
-    handleCreateInternalBooking,
-    handleMarkTableDirty,
-    handleMarkTableReady,
-    handleNoShow,
-    handleUpdateInternalBooking,
-    getAvailableTablesForBooking: layBanPhuHopChoDatBan,
-    openOrders,
-    ordersSummary,
-    pendingBookings,
-    sortedOrders,
-    tableInventorySummary,
-    tableSummary,
+    xuLyGanBan,
+    xuLyCheckIn,
+    xuLyHoanThanh,
+    xuLyTaoDatBanNoiBo,
+    xuLyDanhDauBanBan,
+    xuLyDanhDauBanSanSang,
+    xuLyKhachKhongDen,
+    xuLyCapNhatDatBanNoiBo,
+    layBanPhuHopChoDatBan,
+    danhSachDonHangDangMo,
+    tomTatDonHang,
+    danhSachDatBanChoXuLy,
+    danhSachDonHangDaSapXep,
+    tomTatTonKhoBan,
+    tomTatBan,
     taiLaiDanhSachMon,
     taiLaiDuLieu,
-    upcomingSoonBookings,
-    unassignedBookings,
+    danhSachDatBanSapDienRa,
+    danhSachDatBanChuaGanBan,
   }
 }

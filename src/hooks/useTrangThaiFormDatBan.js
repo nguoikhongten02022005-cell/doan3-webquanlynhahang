@@ -33,35 +33,35 @@ export const useTrangThaiFormDatBan = ({ nguoiDungHienTai, getDraft }) => {
   })
   const restoredDraft = useMemo(() => getDraft(), [getDraft])
 
-  const guestCount = Number(formData.guests) || 0
+  const soLuongKhach = Number(formData.guests) || 0
   const todayString = useMemo(() => layChuoiNgayDiaPhuong(), [])
   const invalidPastDate = Boolean(formData.date && formData.date < todayString)
   const closedDate = Boolean(formData.date && laNgayDongCua(formData.date))
 
   const bookingSelectionSummary = useMemo(() => ({
-    guests: guestCount ? `${guestCount} khách` : 'Chưa chọn số khách',
+    guests: soLuongKhach ? `${soLuongKhach} khách` : 'Chưa chọn số khách',
     date: formData.date ? dinhDangNgayHienThi(formData.date) : 'Chưa chọn ngày',
     time: formData.time || 'Chưa chọn giờ',
     seatingArea: formData.time ? layVanBanTomTatChoNgoi(formData.seatingArea) : 'Chưa chọn khu vực',
-  }), [formData.date, formData.seatingArea, formData.time, guestCount])
+  }), [formData.date, formData.seatingArea, formData.time, soLuongKhach])
 
   const stepOneProgress = useMemo(() => ({
-    hasGuests: Boolean(guestCount),
+    hasGuests: Boolean(soLuongKhach),
     hasDate: Boolean(formData.date && !invalidPastDate && !closedDate),
     hasTime: Boolean(formData.time),
     hasSeating: Boolean(formData.time && formData.seatingArea),
-  }), [closedDate, formData.date, formData.seatingArea, formData.time, guestCount, invalidPastDate])
+  }), [closedDate, formData.date, formData.seatingArea, formData.time, soLuongKhach, invalidPastDate])
 
   const guestWarning = useMemo(() => {
-    if (guestCount === SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN) return 'Nhóm 10 khách có thể cần host gọi lại để xác nhận cách xếp bàn.'
-    if (guestCount >= 6) return 'Nhóm từ 6 khách nên đặt sớm để ưu tiên bàn phù hợp hơn.'
+    if (soLuongKhach === SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN) return 'Nhóm 10 khách có thể cần host gọi lại để xác nhận cách xếp bàn.'
+    if (soLuongKhach >= 6) return 'Nhóm từ 6 khách nên đặt sớm để ưu tiên bàn phù hợp hơn.'
     return ''
-  }, [guestCount])
+  }, [soLuongKhach])
 
   const nextStepHint = useMemo(() => {
     if (step === 1) {
       if (!stepOneProgress.hasGuests) return 'Chọn số khách để bắt đầu.'
-      if (laNhomDongChiDatQuaHotline(guestCount)) return THONG_DIEP_HOTLINE_NHOM_DONG
+      if (laNhomDongChiDatQuaHotline(soLuongKhach)) return THONG_DIEP_HOTLINE_NHOM_DONG
       if (!stepOneProgress.hasDate) return 'Chọn ngày dùng bữa để mở danh sách khung giờ phục vụ.'
       if (!stepOneProgress.hasTime) return 'Chọn khung giờ phù hợp trước khi tiếp tục.'
       return 'Bạn có thể tiếp tục sang bước nhập thông tin liên hệ.'
@@ -75,7 +75,7 @@ export const useTrangThaiFormDatBan = ({ nguoiDungHienTai, getDraft }) => {
     }
 
     return 'Kiểm tra lại toàn bộ thông tin rồi gửi yêu cầu đặt bàn.'
-  }, [formData.name, formData.phone, guestCount, step, stepOneProgress])
+  }, [formData.name, formData.phone, soLuongKhach, step, stepOneProgress])
 
   const activeBookingSection = useMemo(() => {
     if (!stepOneProgress.hasGuests) return 'guests'
@@ -93,7 +93,7 @@ export const useTrangThaiFormDatBan = ({ nguoiDungHienTai, getDraft }) => {
     draftRestored,
     formData,
     restoredDraft,
-    guestCount,
+    soLuongKhach,
     guestWarning,
     invalidPastDate,
     nextStepHint,

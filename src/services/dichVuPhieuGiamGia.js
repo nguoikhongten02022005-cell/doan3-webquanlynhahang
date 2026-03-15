@@ -19,20 +19,20 @@ const chuanHoaVoucher = (voucher) => {
   }
 }
 
-export const layPhieuGiamGiaDaApDung = () => chuanHoaVoucher(layJsonLuuTru(STORAGE_KEYS.APPLIED_VOUCHER, null))
+export const layPhieuGiamGiaDaApDung = () => chuanHoaVoucher(layJsonLuuTru(STORAGE_KEYS.PHIEU_GIAM_GIA_DA_AP_DUNG, null))
 
 export const luuPhieuGiamGiaDaApDung = (voucher) => {
   const voucherDaChuanHoa = chuanHoaVoucher(voucher)
 
   if (!voucherDaChuanHoa) {
-    xoaMucLuuTru(STORAGE_KEYS.APPLIED_VOUCHER)
+    xoaMucLuuTru(STORAGE_KEYS.PHIEU_GIAM_GIA_DA_AP_DUNG)
     return null
   }
 
-  datJsonLuuTru(STORAGE_KEYS.APPLIED_VOUCHER, voucherDaChuanHoa)
+  datJsonLuuTru(STORAGE_KEYS.PHIEU_GIAM_GIA_DA_AP_DUNG, voucherDaChuanHoa)
   return voucherDaChuanHoa
 }
 
 export const xoaPhieuGiamGiaDaApDung = () => {
-  xoaMucLuuTru(STORAGE_KEYS.APPLIED_VOUCHER)
+  xoaMucLuuTru(STORAGE_KEYS.PHIEU_GIAM_GIA_DA_AP_DUNG)
 }

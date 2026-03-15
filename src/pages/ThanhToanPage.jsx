@@ -35,11 +35,11 @@ function ThanhToanPage() {
     }
 
     const banNhapTam = layBanNhapTamThanhToan()
-    if (draft) {
+    if (banNhapTam) {
       setFormData((prev) => ({
         ...prev,
-        note: draft.note,
-        tableNumber: draft.tableNumber,
+        note: banNhapTam.note,
+        tableNumber: banNhapTam.tableNumber,
       }))
     }
   }, [])
@@ -122,28 +122,28 @@ function ThanhToanPage() {
   }
 
   return (
-    <div className="checkout-page checkout-page-editorial">
+    <div className="thanh-toan-page thanh-toan-page-editorial">
       <div className="container">
-        <div className="checkout-header">
-          <p className="checkout-kicker">Hoàn tất đơn gọi món</p>
+        <div className="thanh-toan-header">
+          <p className="thanh-toan-kicker">Hoàn tất đơn gọi món</p>
           <h1>Thanh toán đơn hàng</h1>
           <p>Kiểm tra thông tin liên hệ, vị trí phục vụ và phương thức thanh toán trước khi hoàn tất đơn của bạn.</p>
         </div>
 
-        <form className="checkout-layout" onSubmit={handleSubmit}>
-          <section className="checkout-form-panel">
+        <form className="thanh-toan-layout" onSubmit={handleSubmit}>
+          <section className="thanh-toan-form-panel">
             <h2>Thông tin liên hệ</h2>
 
-            <div className="checkout-form-grid">
-              <div className="form-group full">
-                <label className="form-label" htmlFor="fullName">
+            <div className="thanh-toan-form-grid">
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="fullName">
                   Họ tên
                 </label>
                 <input
                   id="fullName"
                   name="fullName"
                   type="text"
-                  className="form-input"
+                  className="truong-nhap"
                   placeholder="Nhập họ tên người đặt / nhận món"
                   value={formData.fullName}
                   onChange={handleChange}
@@ -151,15 +151,15 @@ function ThanhToanPage() {
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="phone">
+              <div className="nhom-truong">
+                <label className="nhan-truong" htmlFor="phone">
                   Số điện thoại
                 </label>
                 <input
                   id="phone"
                   name="phone"
                   type="tel"
-                  className="form-input"
+                  className="truong-nhap"
                   placeholder="0901 234 567"
                   value={formData.phone}
                   onChange={handleChange}
@@ -167,44 +167,44 @@ function ThanhToanPage() {
                 />
               </div>
 
-              <div className="form-group full">
-                <label className="form-label" htmlFor="address">
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="address">
                   Địa chỉ
                 </label>
                 <input
                   id="address"
                   name="address"
                   type="text"
-                  className="form-input"
+                  className="truong-nhap"
                   placeholder="Nhập địa chỉ nếu cần giao hoặc xác nhận vị trí phục vụ"
                   value={formData.address}
                   onChange={handleChange}
                 />
               </div>
 
-              <div className="form-group">
-                <label className="form-label" htmlFor="tableNumber">
+              <div className="nhom-truong">
+                <label className="nhan-truong" htmlFor="tableNumber">
                   Số bàn
                 </label>
                 <input
                   id="tableNumber"
                   name="tableNumber"
                   type="text"
-                  className="form-input"
+                  className="truong-nhap"
                   placeholder="Nhập số bàn (nếu có)"
                   value={formData.tableNumber}
                   onChange={handleChange}
                 />
               </div>
 
-              <div className="form-group full">
-                <label className="form-label" htmlFor="note">
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="note">
                   Ghi chú
                 </label>
                 <textarea
                   id="note"
                   name="note"
-                  className="form-textarea"
+                  className="truong-van-ban"
                   placeholder="Ví dụ: không hành, ít cay..."
                   rows="4"
                   value={formData.note}
@@ -213,9 +213,9 @@ function ThanhToanPage() {
               </div>
             </div>
 
-            <div className="checkout-payment-block">
+            <div className="thanh-toan-payment-block">
               <h3>Phương thức thanh toán</h3>
-              <div className="checkout-payment-options">
+              <div className="thanh-toan-payment-options">
                 {TUY_CHON_PHUONG_THUC_THANH_TOAN.map((method) => (
                   <label key={method.value} className="payment-option">
                     <input
@@ -235,14 +235,14 @@ function ThanhToanPage() {
             </div>
           </section>
 
-          <aside className="checkout-summary-panel">
-            <div className="checkout-summary-card">
+          <aside className="thanh-toan-tom-tat-panel">
+            <div className="thanh-toan-tom-tat-card">
               <h2>Tóm tắt đơn hàng</h2>
 
               {cartItems.length === 0 ? (
-                <div className="checkout-empty">Chưa có món nào trong giỏ hàng.</div>
+                <div className="thanh-toan-empty">Chưa có món nào trong giỏ hàng.</div>
               ) : (
-                <div className="checkout-item-list">
+                <div className="thanh-toan-item-list">
                   {cartItems.map((item, index) => {
                     const itemKey =
                         typeof layKhoaMonTrongGio === 'function'
@@ -254,17 +254,17 @@ function ThanhToanPage() {
                         : []
 
                     return (
-                      <div key={itemKey} className="checkout-item">
+                      <div key={itemKey} className="thanh-toan-item">
                         <div>
-                          <p className="checkout-item-name">{item.name}</p>
+                          <p className="thanh-toan-item-name">{item.name}</p>
                           {optionLines.length > 0 && (
-                            <div className="checkout-item-options">
+                            <div className="thanh-toan-item-options">
                               {optionLines.map((line) => (
                                 <p key={line}>{line}</p>
                               ))}
                             </div>
                           )}
-                          <p className="checkout-item-qty">x{item.quantity}</p>
+                          <p className="thanh-toan-item-qty">x{item.quantity}</p>
                         </div>
                         <strong>{dinhDangTienTe(item.price * item.quantity)}</strong>
                       </div>
@@ -273,30 +273,30 @@ function ThanhToanPage() {
                 </div>
               )}
 
-              <div className="checkout-totals">
-                <div className="summary-row">
+              <div className="thanh-toan-totals">
+                <div className="tom-tat-row">
                   <span>Tạm tính món</span>
                   <span>{dinhDangTienTe(subtotal)}</span>
                 </div>
-                <div className="summary-row">
+                <div className="tom-tat-row">
                   <span>Phí dịch vụ tham chiếu</span>
                   <span>{dinhDangTienTe(serviceFee)}</span>
                 </div>
-                <div className="summary-row summary-discount">
+                <div className="tom-tat-row tom-tat-discount">
                   <span>Ước tính giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
                   <span>-{dinhDangTienTe(discountAmount)}</span>
                 </div>
-                <div className="summary-row summary-total">
+                <div className="tom-tat-row tom-tat-total">
                   <span>Tổng ước tính</span>
-                  <strong>{dinhDangTienTe(total)}</strong>
+                  <strong>{dinhDangTienTe(tongCong)}</strong>
                 </div>
               </div>
 
-              <p className="checkout-summary-note">
+              <p className="thanh-toan-tom-tat-note">
                 Tổng tiền cuối cùng sẽ do máy chủ xác nhận khi tạo đơn hàng từ dữ liệu thực đơn hiện tại.
               </p>
 
-              <button type="submit" className="btn btn-primary w-full" disabled={cartItems.length === 0}>
+              <button type="submit" className="btn nut-chinh w-full" disabled={cartItems.length === 0}>
                 Đặt hàng ngay
               </button>
             </div>

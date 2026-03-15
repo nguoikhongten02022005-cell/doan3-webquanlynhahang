@@ -1,24 +1,24 @@
 function TaiKhoanTab({ accounts }) {
   return (
-    <article className="profile-card">
-      <div className="host-board-head">
+    <article className="ho-so-card">
+      <div className="van-hanh-board-head">
         <h2>Danh sách tài khoản nội bộ</h2>
         <span>{accounts.length} tài khoản</span>
       </div>
 
-      <p className="host-booking-note">Màn này hiện chỉ dùng để xem nhanh tài khoản và vai trò nội bộ.</p>
+      <p className="van-hanh-dat-ban-note">Màn này hiện chỉ dùng để xem nhanh tài khoản và vai trò nội bộ.</p>
 
-      <div className="profile-list internal-list-top-gap">
+      <div className="ho-so-list noi-bo-list-top-gap">
         {accounts.map((account) => (
-          <div key={`${account.username}-${account.email}`} className="profile-list-item">
-            <div className="profile-list-top">
+          <div key={`${account.username}-${account.email}`} className="ho-so-list-item">
+            <div className="ho-so-list-top">
               <strong>{account.fullName || account.username}</strong>
-              <span className={`status-chip tone-${account.role === 'admin' ? 'success' : account.role === 'staff' ? 'warning' : 'neutral'}`}>
+              <span className={`nhan-trang-thai tone-${account.role === 'admin' ? 'success' : account.role === 'staff' ? 'warning' : 'neutral'}`}>
                 {account.role === 'admin' ? 'Admin' : account.role === 'staff' ? 'Staff' : 'Customer'}
               </span>
             </div>
 
-            <div className="profile-list-meta">
+            <div className="ho-so-list-meta">
               <p><span>Tài khoản</span><strong>{account.username || '--'}</strong></p>
               <p><span>Email</span><strong>{account.email || '--'}</strong></p>
             </div>

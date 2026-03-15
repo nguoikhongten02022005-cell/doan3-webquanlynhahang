@@ -40,9 +40,9 @@ function GioHangPage() {
     }
 
     const banNhapTam = layBanNhapTamThanhToan()
-    if (draft) {
-      setGhiChu(draft.note)
-      setSoBan(draft.tableNumber)
+    if (banNhapTam) {
+      setGhiChu(banNhapTam.note)
+      setSoBan(banNhapTam.tableNumber)
     }
   }, [])
 
@@ -149,20 +149,20 @@ function GioHangPage() {
   }
 
   return (
-    <div className="cart-page cart-page-editorial">
+    <div className="gio-hang-page gio-hang-page-editorial">
       <div className="container">
-        <div className="cart-header">
-          <p className="checkout-kicker">Đơn gọi món tại bàn</p>
+        <div className="gio-hang-header">
+          <p className="thanh-toan-kicker">Đơn gọi món tại bàn</p>
           <h1>Giỏ hàng của bạn</h1>
           <p>{cartItems.length} món đang chờ được hoàn tất cho bàn ăn tối nay.</p>
         </div>
 
-        <div className="cart-layout">
-          <div className="cart-items-section">
+        <div className="gio-hang-layout">
+          <div className="gio-hang-items-section">
             {cartItems.length === 0 ? (
-              <div className="cart-empty">
+              <div className="gio-hang-empty">
                 <p>Giỏ hàng trống</p>
-                <button className="btn btn-primary" onClick={() => navigate('/thuc-don')}>
+                <button className="btn nut-chinh" onClick={() => navigate('/thuc-don')}>
                   Xem thực đơn
                 </button>
               </div>
@@ -172,15 +172,15 @@ function GioHangPage() {
                 const optionLines = typeof layTuyChonHienThiMon === 'function' ? layTuyChonHienThiMon(item) : []
 
                 return (
-                  <div key={itemKey} className="cart-item">
-                    <div className="cart-item-image" style={{ background: item.image }}></div>
+                  <div key={itemKey} className="gio-hang-item">
+                    <div className="gio-hang-item-image" style={{ background: item.image }}></div>
 
-                    <div className="cart-item-info">
-                      <p className="cart-item-kicker">Món đã chọn</p>
+                    <div className="gio-hang-item-info">
+                      <p className="gio-hang-item-kicker">Món đã chọn</p>
                       <h3>{item.name}</h3>
-                      <p className="cart-item-price">{dinhDangTienTe(item.price)}</p>
+                      <p className="gio-hang-item-price">{dinhDangTienTe(item.price)}</p>
                       {optionLines.length > 0 && (
-                        <div className="cart-item-options">
+                        <div className="gio-hang-item-options">
                           {optionLines.map((line) => (
                             <p key={line}>{line}</p>
                           ))}
@@ -188,7 +188,7 @@ function GioHangPage() {
                       )}
                     </div>
 
-                    <div className="cart-item-actions">
+                    <div className="gio-hang-item-actions">
                       <div className="quantity-control">
                         <button
                           className="qty-btn"
@@ -227,8 +227,8 @@ function GioHangPage() {
             )}
           </div>
 
-          <div className="cart-summary">
-            <div className="summary-card cart-summary-card">
+          <div className="gio-hang-summary">
+            <div className="tom-tat-card gio-hang-tom-tat-card">
               <h2>Tổng kết đơn</h2>
 
               <div className="voucher-block">
@@ -239,7 +239,7 @@ function GioHangPage() {
                 <div className="voucher-controls">
                   <input
                     type="text"
-                    className="form-input voucher-input"
+                    className="truong-nhap voucher-input"
                     placeholder="Nhập mã giảm giá"
                     value={maVoucherNhap}
                     onChange={(event) => {
@@ -249,11 +249,11 @@ function GioHangPage() {
                       }
                     }}
                   />
-                  <button type="button" className="btn btn-primary voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>
+                  <button type="button" className="btn nut-chinh voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>
                     {dangApVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}
                   </button>
                   {voucherDaApDung && (
-                    <button type="button" className="btn btn-ghost voucher-clear-btn" onClick={handleClearVoucher}>
+                    <button type="button" className="btn nut-phu voucher-clear-btn" onClick={handleClearVoucher}>
                       Bỏ mã
                     </button>
                   )}
@@ -261,48 +261,48 @@ function GioHangPage() {
                 {renderVoucherMessage()}
               </div>
 
-              <div className="summary-row">
+              <div className="tom-tat-row">
                 <span>Tạm tính</span>
                 <span>{dinhDangTienTe(tamTinh)}</span>
               </div>
 
-              <div className="summary-row">
+              <div className="tom-tat-row">
                   <span>Phí dịch vụ theo máy chủ</span>
                 <span>{dinhDangTienTe(phiDichVu)}</span>
               </div>
 
-              <div className="summary-row summary-discount">
+              <div className="tom-tat-row tom-tat-discount">
                 <span>Giảm giá {voucherDaApDung ? `(${voucherDaApDung.code})` : ''}</span>
                 <span>-{dinhDangTienTe(soTienGiam)}</span>
               </div>
 
-              <div className="summary-divider"></div>
+              <div className="tom-tat-divider"></div>
 
-              <div className="summary-row summary-total">
+              <div className="tom-tat-row tom-tat-total">
                 <span>Tổng cộng ước tính</span>
                 <strong>{dinhDangTienTe(tongTien)}</strong>
               </div>
 
-              <p className="checkout-summary-note">
+              <p className="thanh-toan-tom-tat-note">
                  Tổng tiền cuối cùng sẽ được máy chủ xác nhận khi tạo đơn hàng.
               </p>
 
-              <div className="summary-form">
-                <div className="form-group">
-                  <label className="form-label">Số bàn</label>
+              <div className="tom-tat-form">
+                <div className="nhom-truong">
+                  <label className="nhan-truong">Số bàn</label>
                   <input
                     type="text"
-                    className="form-input"
+                    className="truong-nhap"
                     placeholder="Nhập số bàn (nếu có)"
                     value={soBan}
                     onChange={(event) => setSoBan(event.target.value)}
                   />
                 </div>
 
-                <div className="form-group">
-                  <label className="form-label">Ghi chú cho quán</label>
+                <div className="nhom-truong">
+                  <label className="nhan-truong">Ghi chú cho quán</label>
                   <textarea
-                    className="form-textarea"
+                    className="truong-van-ban"
                     placeholder="Ví dụ: Không hành, ít cay..."
                     rows="3"
                     value={ghiChu}
@@ -312,7 +312,7 @@ function GioHangPage() {
               </div>
 
               <button
-                className="btn btn-primary w-full"
+                className="btn nut-chinh w-full"
                 onClick={handleGoToCheckout}
                 disabled={cartItems.length === 0}
               >

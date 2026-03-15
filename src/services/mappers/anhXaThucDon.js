@@ -11,47 +11,47 @@ import {
 import { phanTichGiaThanhSo } from '../../utils/giaTien'
 import { dinhDangTienTe } from '../../utils/tienTe'
 
-const FALLBACK_DISH_NAME = 'Món đang cập nhật'
-const FALLBACK_DISH_DESCRIPTION = 'Nhà hàng sẽ cập nhật mô tả món ăn sớm nhất.'
+const TEN_MON_DU_PHONG = 'Món đang cập nhật'
+const MO_TA_MON_DU_PHONG = 'Nhà hàng sẽ cập nhật mô tả món ăn sớm nhất.'
 
-const normalizeText = (value) => String(value ?? '').trim()
+const chuanHoaVanBan = (giaTri) => String(giaTri ?? '').trim()
 
-const slugifyCategory = (value) => normalizeText(value)
+const taoBiDanhDanhMuc = (giaTri) => chuanHoaVanBan(giaTri)
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '')
 
-const ensureCategory = (value) => {
-  if (CAC_DANH_MUC_CHUAN_THUC_DON.includes(value)) {
-    return value
+const damBaoDanhMucHopLe = (giaTri) => {
+  if (CAC_DANH_MUC_CHUAN_THUC_DON.includes(giaTri)) {
+    return giaTri
   }
 
   return DANH_MUC_MAC_DINH_THUC_DON
 }
 
-const normalizePriceValue = (rawPrice) => phanTichGiaThanhSo(rawPrice)
+const chuanHoaGiaTriGia = (giaGoc) => phanTichGiaThanhSo(giaGoc)
 
-const normalizeBadge = (value) => normalizeText(value) || NHAN_MAC_DINH_THUC_DON
-const normalizeTone = (value) => normalizeText(value) || SAC_DO_MAC_DINH_THUC_DON
-const normalizeImage = (value) => normalizeText(value) || ANH_DU_PHONG_THUC_DON
+const chuanHoaNhan = (giaTri) => chuanHoaVanBan(giaTri) || NHAN_MAC_DINH_THUC_DON
+const chuanHoaSacDo = (giaTri) => chuanHoaVanBan(giaTri) || SAC_DO_MAC_DINH_THUC_DON
+const chuanHoaAnh = (giaTri) => chuanHoaVanBan(giaTri) || ANH_DU_PHONG_THUC_DON
 
-export const normalizeMenuCategory = (rawCategory) => {
-  const normalizedCategory = normalizeText(rawCategory)
+export const chuanHoaDanhMucThucDon = (danhMucGoc) => {
+  const danhMucDaChuanHoa = chuanHoaVanBan(danhMucGoc)
 
-  if (CAC_DANH_MUC_CHUAN_THUC_DON.includes(normalizedCategory)) {
-    return normalizedCategory
+  if (CAC_DANH_MUC_CHUAN_THUC_DON.includes(danhMucDaChuanHoa)) {
+    return danhMucDaChuanHoa
   }
 
-  return BI_DANH_DANH_MUC_THUC_DON[slugifyCategory(normalizedCategory)] || DANH_MUC_MAC_DINH_THUC_DON
+  return BI_DANH_DANH_MUC_THUC_DON[taoBiDanhDanhMuc(danhMucDaChuanHoa)] || DANH_MUC_MAC_DINH_THUC_DON
 }
 
-export const normalizeMenuDish = (rawDish, fallbackIndex = 0) => {
-  if (!rawDish || typeof rawDish !== 'object') {
+export const chuanHoaMonThucDon = (monGoc, chiSoDuPhong = 0) => {
+  if (!monGoc || typeof monGoc !== 'object') {
     return {
-      id: `fallback-${fallbackIndex}`,
-      name: FALLBACK_DISH_NAME,
-      description: FALLBACK_DISH_DESCRIPTION,
+      id: `fallback-${chiSoDuPhong}`,
+      name: TEN_MON_DU_PHONG,
+      description: MO_TA_MON_DU_PHONG,
       price: dinhDangTienTe(0),
       priceValue: 0,
       category: DANH_MUC_MAC_DINH_THUC_DON,
@@ -61,69 +61,69 @@ export const normalizeMenuDish = (rawDish, fallbackIndex = 0) => {
     }
   }
 
-  const priceValue = normalizePriceValue(rawDish.price)
-  const normalizedCategory = normalizeMenuCategory(rawDish.category)
-  const normalizedId = rawDish.id ?? rawDish._id ?? rawDish.slug ?? `fallback-${fallbackIndex}`
+  const giaTriGia = chuanHoaGiaTriGia(monGoc.price)
+  const danhMucDaChuanHoa = chuanHoaDanhMucThucDon(monGoc.category)
+  const idDaChuanHoa = monGoc.id ?? monGoc._id ?? monGoc.slug ?? `fallback-${chiSoDuPhong}`
 
   return {
-    ...rawDish,
-    id: normalizedId,
-    name: normalizeText(rawDish.name) || FALLBACK_DISH_NAME,
-    description: normalizeText(rawDish.description) || FALLBACK_DISH_DESCRIPTION,
-    price: dinhDangTienTe(priceValue),
-    priceValue,
-    category: ensureCategory(normalizedCategory),
-    badge: normalizeBadge(rawDish.badge),
-    tone: normalizeTone(rawDish.tone),
-    image: normalizeImage(rawDish.image),
+    ...monGoc,
+    id: idDaChuanHoa,
+    name: chuanHoaVanBan(monGoc.name) || TEN_MON_DU_PHONG,
+    description: chuanHoaVanBan(monGoc.description) || MO_TA_MON_DU_PHONG,
+    price: dinhDangTienTe(giaTriGia),
+    priceValue: giaTriGia,
+    category: damBaoDanhMucHopLe(danhMucDaChuanHoa),
+    badge: chuanHoaNhan(monGoc.badge),
+    tone: chuanHoaSacDo(monGoc.tone),
+    image: chuanHoaAnh(monGoc.image),
   }
 }
 
-export const normalizeMenuDishes = (list) => {
-  if (!Array.isArray(list)) {
+export const chuanHoaDanhSachMonThucDon = (danhSach) => {
+  if (!Array.isArray(danhSach)) {
     return []
   }
 
-  return list.map((dish, index) => normalizeMenuDish(dish, index))
+  return danhSach.map((mon, chiSo) => chuanHoaMonThucDon(mon, chiSo))
 }
 
-export const getHomeSignatureDishes = (dishes, limit = 8) => {
-  if (!Array.isArray(dishes) || dishes.length === 0) {
+export const layDanhSachMonNoiBatTrangChu = (danhSachMon, gioiHan = 8) => {
+  if (!Array.isArray(danhSachMon) || danhSachMon.length === 0) {
     return []
   }
 
-  return [...dishes]
-    .sort((firstDish, secondDish) => {
-      if (firstDish.badge !== secondDish.badge) {
-        if (firstDish.badge === NHAN_MAC_DINH_THUC_DON) return -1
-        if (secondDish.badge === NHAN_MAC_DINH_THUC_DON) return 1
+  return [...danhSachMon]
+    .sort((monDau, monSau) => {
+      if (monDau.badge !== monSau.badge) {
+        if (monDau.badge === NHAN_MAC_DINH_THUC_DON) return -1
+        if (monSau.badge === NHAN_MAC_DINH_THUC_DON) return 1
       }
 
-      return (Number(secondDish.id) || 0) - (Number(firstDish.id) || 0)
+      return (Number(monSau.id) || 0) - (Number(monDau.id) || 0)
     })
-    .slice(0, limit)
+    .slice(0, gioiHan)
 }
 
-export const mapDishFormToPayload = (formValues) => {
-  const priceValue = normalizePriceValue(formValues?.price)
+export const anhXaFormMonThanhDuLieuGuiDi = (giaTriForm) => {
+  const giaTriGia = chuanHoaGiaTriGia(giaTriForm?.price)
 
   return {
-    name: normalizeText(formValues?.name),
-    description: normalizeText(formValues?.description),
-    price: dinhDangTienTe(priceValue),
-    category: normalizeMenuCategory(formValues?.category),
-    badge: normalizeBadge(formValues?.badge),
-    tone: normalizeTone(formValues?.tone),
-    image: normalizeImage(formValues?.image),
+    name: chuanHoaVanBan(giaTriForm?.name),
+    description: chuanHoaVanBan(giaTriForm?.description),
+    price: dinhDangTienTe(giaTriGia),
+    category: chuanHoaDanhMucThucDon(giaTriForm?.category),
+    badge: chuanHoaNhan(giaTriForm?.badge),
+    tone: chuanHoaSacDo(giaTriForm?.tone),
+    image: chuanHoaAnh(giaTriForm?.image),
   }
 }
 
-export const mapDishToFormValues = (dish) => ({
-  name: normalizeText(dish?.name),
-  description: normalizeText(dish?.description),
-  price: normalizeText(dish?.price),
-  category: normalizeMenuCategory(dish?.category),
-  badge: normalizeText(dish?.badge) || NHAN_MAC_DINH_THUC_DON,
-  tone: normalizeTone(dish?.tone),
-  image: normalizeText(dish?.image),
+export const anhXaMonThanhGiaTriForm = (mon) => ({
+  name: chuanHoaVanBan(mon?.name),
+  description: chuanHoaVanBan(mon?.description),
+  price: chuanHoaVanBan(mon?.price),
+  category: chuanHoaDanhMucThucDon(mon?.category),
+  badge: chuanHoaVanBan(mon?.badge) || NHAN_MAC_DINH_THUC_DON,
+  tone: chuanHoaSacDo(mon?.tone),
+  image: chuanHoaVanBan(mon?.image),
 })

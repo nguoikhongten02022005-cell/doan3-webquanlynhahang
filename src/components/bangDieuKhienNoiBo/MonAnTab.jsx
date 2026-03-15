@@ -6,7 +6,7 @@ import {
   xoaMonApi,
   capNhatMonApi,
 } from '../../services/api/apiThucDon'
-import { mapDishFormToPayload, mapDishToFormValues, normalizeMenuCategory } from '../../services/mappers/anhXaThucDon'
+import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../services/mappers/anhXaThucDon'
 import { phanTichGiaThanhSo } from '../../utils/giaTien'
 
 const DEFAULT_FORM_VALUES = {
@@ -59,7 +59,7 @@ function MonAnTab({ dishes, reloadDishes }) {
       return 'Vui lòng nhập giá món.'
     }
 
-    if (!CATEGORY_OPTIONS.includes(normalizeMenuCategory(formValues.category))) {
+    if (!CATEGORY_OPTIONS.includes(chuanHoaDanhMucThucDon(formValues.category))) {
       return 'Danh mục món ăn không hợp lệ.'
     }
 
@@ -79,7 +79,7 @@ function MonAnTab({ dishes, reloadDishes }) {
       return
     }
 
-    const duLieuGuiDi = mapDishFormToPayload(formValues)
+    const duLieuGuiDi = anhXaFormMonThanhDuLieuGuiDi(formValues)
 
     try {
       const { duLieu: savedDish } = cheDoForm === 'edit'
@@ -101,7 +101,7 @@ function MonAnTab({ dishes, reloadDishes }) {
   const handleEditDish = (dish) => {
     setCheDoForm('edit')
     setIdMonDangSua(dish.id)
-    setFormValues(mapDishToFormValues(dish))
+    setFormValues(anhXaMonThanhGiaTriForm(dish))
     setLoiForm('')
   }
 
@@ -130,32 +130,32 @@ function MonAnTab({ dishes, reloadDishes }) {
   }
 
   return (
-    <div className="internal-dashboard-stack">
-      <article className="profile-card">
-        <div className="host-board-head">
+    <div className="noi-bo-dashboard-stack">
+      <article className="ho-so-card">
+        <div className="van-hanh-board-head">
           <h2>{cheDoForm === 'edit' ? 'Cập nhật món ăn' : 'Thêm món ăn mới'}</h2>
           <span>{cheDoForm === 'edit' ? `Đang sửa #${idMonDangSua}` : 'Đồng bộ trực tiếp với backend menu'}</span>
         </div>
 
-        <form className="internal-dish-form" onSubmit={handleSubmit}>
-          <div className="internal-dish-form-grid">
-            <label className="form-group internal-dish-field internal-dish-field-wide" htmlFor="dish-name">
-              <span className="form-label">Tên món</span>
+        <form className="noi-bo-mon-form" onSubmit={handleSubmit}>
+          <div className="noi-bo-mon-form-grid">
+            <label className="nhom-truong noi-bo-mon-field noi-bo-mon-field-wide" htmlFor="mon-name">
+              <span className="nhan-truong">Tên món</span>
               <input
-                id="dish-name"
+                id="mon-name"
                 type="text"
-                className={`form-input ${loiForm && !formValues.name.trim() ? 'form-input-error' : ''}`}
+                className={`truong-nhap ${loiForm && !formValues.name.trim() ? 'truong-nhap-error' : ''}`}
                 placeholder="Ví dụ: Cơm chiên hải sản"
                 value={formValues.name}
                 onChange={handleChange('name')}
               />
             </label>
 
-            <label className="form-group internal-dish-field internal-dish-field-wide" htmlFor="dish-description">
-              <span className="form-label">Mô tả</span>
+            <label className="nhom-truong noi-bo-mon-field noi-bo-mon-field-wide" htmlFor="mon-description">
+              <span className="nhan-truong">Mô tả</span>
               <textarea
-                id="dish-description"
-                className={`form-textarea ${loiForm && !formValues.description.trim() ? 'form-input-error' : ''}`}
+                id="mon-description"
+                className={`truong-van-ban ${loiForm && !formValues.description.trim() ? 'truong-nhap-error' : ''}`}
                 rows="3"
                 placeholder="Mô tả ngắn về món ăn"
                 value={formValues.description}
@@ -163,23 +163,23 @@ function MonAnTab({ dishes, reloadDishes }) {
               />
             </label>
 
-            <label className="form-group internal-dish-field" htmlFor="dish-price">
-              <span className="form-label">Giá</span>
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="mon-price">
+              <span className="nhan-truong">Giá</span>
               <input
-                id="dish-price"
+                id="mon-price"
                 type="text"
-                className={`form-input ${loiForm && phanTichGiaThanhSo(formValues.price) <= 0 ? 'form-input-error' : ''}`}
+                className={`truong-nhap ${loiForm && phanTichGiaThanhSo(formValues.price) <= 0 ? 'truong-nhap-error' : ''}`}
                 placeholder="Ví dụ: 125.000đ"
                 value={formValues.price}
                 onChange={handleChange('price')}
               />
             </label>
 
-            <label className="form-group internal-dish-field" htmlFor="dish-category">
-              <span className="form-label">Danh mục</span>
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="mon-category">
+              <span className="nhan-truong">Danh mục</span>
               <select
-                id="dish-category"
-                className="form-input"
+                id="mon-category"
+                className="truong-nhap"
                 value={formValues.category}
                 onChange={handleChange('category')}
               >
@@ -191,23 +191,23 @@ function MonAnTab({ dishes, reloadDishes }) {
               </select>
             </label>
 
-            <label className="form-group internal-dish-field" htmlFor="dish-badge">
-              <span className="form-label">Badge</span>
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="mon-badge">
+              <span className="nhan-truong">Badge</span>
               <input
-                id="dish-badge"
+                id="mon-badge"
                 type="text"
-                className="form-input"
+                className="truong-nhap"
                 placeholder="Ví dụ: Best Seller"
                 value={formValues.badge}
                 onChange={handleChange('badge')}
               />
             </label>
 
-            <label className="form-group internal-dish-field" htmlFor="dish-tone">
-              <span className="form-label">Tone</span>
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="mon-tone">
+              <span className="nhan-truong">Tone</span>
               <select
-                id="dish-tone"
-                className="form-input"
+                id="mon-tone"
+                className="truong-nhap"
                 value={formValues.tone}
                 onChange={handleChange('tone')}
               >
@@ -219,12 +219,12 @@ function MonAnTab({ dishes, reloadDishes }) {
               </select>
             </label>
 
-            <label className="form-group internal-dish-field internal-dish-field-wide" htmlFor="dish-image">
-              <span className="form-label">Ảnh món</span>
+            <label className="nhom-truong noi-bo-mon-field noi-bo-mon-field-wide" htmlFor="mon-image">
+              <span className="nhan-truong">Ảnh món</span>
               <input
-                id="dish-image"
+                id="mon-image"
                 type="text"
-                className="form-input"
+                className="truong-nhap"
                 placeholder="/images/thuc-don/ten-mon.jpg"
                 value={formValues.image}
                 onChange={handleChange('image')}
@@ -232,14 +232,14 @@ function MonAnTab({ dishes, reloadDishes }) {
             </label>
           </div>
 
-          {loiForm ? <p className="form-error">{loiForm}</p> : null}
+          {loiForm ? <p className="loi-bieu-mau">{loiForm}</p> : null}
 
-          <div className="internal-dish-form-actions">
-            <button type="submit" className="btn btn-primary">
+          <div className="noi-bo-mon-form-actions">
+            <button type="submit" className="btn nut-chinh">
               {cheDoForm === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}
             </button>
             {cheDoForm === 'edit' ? (
-              <button type="button" className="btn btn-ghost" onClick={resetForm}>
+              <button type="button" className="btn nut-phu" onClick={resetForm}>
                 Hủy sửa
               </button>
             ) : null}
@@ -247,43 +247,43 @@ function MonAnTab({ dishes, reloadDishes }) {
         </form>
       </article>
 
-      <article className="profile-card">
-        <div className="host-board-head">
+      <article className="ho-so-card">
+        <div className="van-hanh-board-head">
           <h2>Danh sách món hiện có</h2>
           <span>{dishes.length} món</span>
         </div>
 
-        <div className="profile-list internal-list-top-gap">
+        <div className="ho-so-list noi-bo-list-top-gap">
           {sortedDishes.length === 0 ? (
-            <div className="profile-list-item">
-              <p className="booking-empty">Chưa có món ăn nào trong menu.</p>
+            <div className="ho-so-list-item">
+              <p className="dat-ban-empty">Chưa có món ăn nào trong menu.</p>
             </div>
           ) : null}
 
           {sortedDishes.map((dish) => (
-            <div key={dish.id} className="profile-list-item">
-              <div className="profile-list-top">
+            <div key={dish.id} className="ho-so-list-item">
+              <div className="ho-so-list-top">
                 <strong>{dish.name}</strong>
-                <span className={`status-chip tone-${dish.tone === 'tone-red' ? 'danger' : dish.tone === 'tone-green' ? 'success' : dish.tone === 'tone-amber' || dish.tone === 'tone-gold' ? 'warning' : 'neutral'}`}>
+                <span className={`nhan-trang-thai tone-${dish.tone === 'tone-red' ? 'danger' : dish.tone === 'tone-green' ? 'success' : dish.tone === 'tone-amber' || dish.tone === 'tone-gold' ? 'warning' : 'neutral'}`}>
                   {dish.badge || 'Không badge'}
                 </span>
               </div>
 
-              <div className="profile-list-meta internal-dish-meta">
+              <div className="ho-so-list-meta noi-bo-mon-meta">
                 <p><span>ID</span><strong>#{dish.id}</strong></p>
                 <p><span>Giá</span><strong>{dish.price}</strong></p>
                 <p><span>Danh mục</span><strong>{dish.category}</strong></p>
                 <p><span>Tone</span><strong>{dish.tone}</strong></p>
               </div>
 
-              <p className="host-booking-note">{dish.description}</p>
-              {dish.image ? <p className="host-booking-note">Ảnh: {dish.image}</p> : null}
+              <p className="van-hanh-dat-ban-note">{dish.description}</p>
+              {dish.image ? <p className="van-hanh-dat-ban-note">Ảnh: {dish.image}</p> : null}
 
-              <div className="internal-dish-item-actions">
-                <button type="button" className="internal-quick-btn internal-quick-btn-primary" onClick={() => handleEditDish(dish)}>
+              <div className="noi-bo-mon-item-actions">
+                <button type="button" className="noi-bo-quick-btn noi-bo-quick-nut-chinh" onClick={() => handleEditDish(dish)}>
                   Sửa
                 </button>
-                <button type="button" className="internal-quick-btn" onClick={() => handleDeleteDish(dish)}>
+                <button type="button" className="noi-bo-quick-btn" onClick={() => handleDeleteDish(dish)}>
                   Xóa
                 </button>
               </div>

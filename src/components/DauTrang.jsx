@@ -71,20 +71,20 @@ function DauTrang() {
         </nav>
 
         <div className="header-actions">
-          <Link to="/dat-ban" className="btn btn-primary header-booking-btn" onClick={handleNavLinkClick}>
+          <Link to="/dat-ban" className="btn nut-chinh header-dat-ban-btn" onClick={handleNavLinkClick}>
             Đặt bàn
           </Link>
 
-          <Link to="/gio-hang" className="icon-btn action-btn cart-btn" aria-label="Giỏ hàng" data-tooltip="Giỏ hàng" onClick={handleNavLinkClick}>
+          <Link to="/gio-hang" className="icon-btn action-btn gio-hang-btn" aria-label="Giỏ hàng" data-tooltip="Giỏ hàng" onClick={handleNavLinkClick}>
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 5h2l2.2 9.2a1 1 0 0 0 1 .8h7.9a1 1 0 0 0 1-.8L20 8H8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="10" cy="19" r="1.3" fill="currentColor" />
               <circle cx="17" cy="19" r="1.3" fill="currentColor" />
             </svg>
-            {cartCount > 0 ? <span className="cart-count">{cartCount > 99 ? '99+' : cartCount}</span> : null}
+            {cartCount > 0 ? <span className="gio-hang-count">{cartCount > 99 ? '99+' : cartCount}</span> : null}
           </Link>
 
-          <div className="user-menu-wrap desktop-only">
+          <div className="user-thuc-don-wrap desktop-only">
             <button
               type="button"
               className="icon-btn action-btn"

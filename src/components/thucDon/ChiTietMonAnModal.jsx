@@ -3,81 +3,81 @@ import { dinhDangTienTe } from '../../utils/tienTe'
 import { phanTichGiaThanhSo } from '../../utils/giaTien'
 
 function ChiTietMonAnModal({
-  detailPrice,
-  isOpen,
-  onAddToCart,
-  onClose,
-  onSelectSize,
-  onSpecialNoteChange,
-  onToggleTopping,
-  scope = 'food',
-  selectedDish,
-  selectedSize,
-  selectedSurcharge,
-  selectedToppings,
-  sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON,
-  specialNote,
-  toppingOptions = CAC_LUA_CHON_TOPPING_THUC_DON,
+  giaChiTiet,
+  dangMo,
+  xuLyThemVaoGio,
+  xuLyDong,
+  xuLyChonKichCo,
+  xuLyDoiGhiChuRieng,
+  xuLyBatTatTopping,
+  phamVi = 'food',
+  monDaChon,
+  kichCoDaChon,
+  phuThuDaChon,
+  toppingDaChon,
+  danhSachKichCo = CAC_LUA_CHON_KICH_CO_THUC_DON,
+  ghiChuRieng,
+  danhSachTopping = CAC_LUA_CHON_TOPPING_THUC_DON,
 }) {
-  if (!isOpen || !selectedDish) {
+  if (!dangMo || !monDaChon) {
     return null
   }
 
-  const safeDish = selectedDish || {}
-  const titleId = `${scope}-food-detail-title-${safeDish.id}`
-  const noteId = `${scope}-special-note`
+  const monAnAnToan = monDaChon || {}
+  const idTieuDe = `${phamVi}-chi-tiet-mon-title-${monAnAnToan.id}`
+  const idGhiChu = `${phamVi}-special-note`
 
   return (
-    <div className="food-detail-modal-overlay" role="dialog" aria-modal="true" aria-labelledby={titleId} onClick={onClose}>
-      <div className="food-detail-modal" onClick={(event) => event.stopPropagation()}>
-        <button type="button" className="food-detail-close" onClick={onClose} aria-label="Đóng chi tiết món">
+    <div className="chi-tiet-mon-hop-thoai-overlay" role="dialog" aria-modal="true" aria-labelledby={idTieuDe} onClick={xuLyDong}>
+      <div className="chi-tiet-mon-modal" onClick={(event) => event.stopPropagation()}>
+        <button type="button" className="chi-tiet-mon-close" onClick={xuLyDong} aria-label="Đóng chi tiết món">
           ×
         </button>
 
-        <div className={`food-detail-hero ${safeDish.tone || ''}`}>
-          {safeDish.image ? (
-            <img className="food-detail-hero-image" src={safeDish.image} alt={safeDish.name || 'Món ăn'} loading="lazy" />
+        <div className={`chi-tiet-mon-hero ${monAnAnToan.tone || ''}`}>
+          {monAnAnToan.image ? (
+            <img className="chi-tiet-mon-mo-dau-image" src={monAnAnToan.image} alt={monAnAnToan.name || 'Món ăn'} loading="lazy" />
           ) : (
-            <div className="food-detail-hero-fallback" aria-hidden="true">{safeDish.name?.slice(0, 1) || 'M'}</div>
+            <div className="chi-tiet-mon-mo-dau-fallback" aria-hidden="true">{monAnAnToan.name?.slice(0, 1) || 'M'}</div>
           )}
-          <div className="food-detail-hero-overlay">
-            <span className="food-badge">{safeDish.badge}</span>
+          <div className="chi-tiet-mon-mo-dau-overlay">
+            <span className="nhan-mon">{monAnAnToan.badge}</span>
           </div>
         </div>
 
-        <div className="food-detail-content">
-          <h3 id={titleId}>{safeDish.name}</h3>
-          <p>{safeDish.description}</p>
-          <strong className="food-detail-base-price">Giá gốc: {dinhDangTienTe(phanTichGiaThanhSo(safeDish.price))}</strong>
+        <div className="chi-tiet-mon-content">
+          <h3 id={idTieuDe}>{monAnAnToan.name}</h3>
+          <p>{monAnAnToan.description}</p>
+          <strong className="chi-tiet-mon-base-price">Giá gốc: {dinhDangTienTe(phanTichGiaThanhSo(monAnAnToan.price))}</strong>
 
-          <div className="food-detail-group">
-            <p className="food-detail-group-title">Chọn size</p>
-            <div className="food-detail-options two-columns">
-              {sizeOptions.map((option) => (
-                <label key={option.value} className="food-detail-option">
+          <div className="chi-tiet-mon-group">
+            <p className="chi-tiet-mon-group-title">Chọn cỡ món</p>
+            <div className="chi-tiet-mon-options two-columns">
+              {danhSachKichCo.map((luaChon) => (
+                <label key={luaChon.value} className="chi-tiet-mon-option">
                   <input
                     type="radio"
-                    name={`detail-size-${scope}`}
-                    value={option.value}
-                    checked={selectedSize === option.value}
-                    onChange={(event) => onSelectSize(event.target.value)}
+                    name={`detail-size-${phamVi}`}
+                    value={luaChon.value}
+                    checked={kichCoDaChon === luaChon.value}
+                    onChange={(event) => xuLyChonKichCo(event.target.value)}
                   />
-                  <span>{option.label}</span>
-                  <small>{option.surcharge > 0 ? `+${dinhDangTienTe(option.surcharge)}` : 'Giá gốc'}</small>
+                  <span>{luaChon.label}</span>
+                  <small>{luaChon.surcharge > 0 ? `+${dinhDangTienTe(luaChon.surcharge)}` : 'Giá gốc'}</small>
                 </label>
               ))}
             </div>
           </div>
 
-          <div className="food-detail-group">
-            <p className="food-detail-group-title">Topping thêm</p>
-            <div className="food-detail-options">
-              {toppingOptions.map((topping) => (
-                <label key={topping} className="food-detail-option">
+          <div className="chi-tiet-mon-group">
+            <p className="chi-tiet-mon-group-title">Topping thêm</p>
+            <div className="chi-tiet-mon-options">
+              {danhSachTopping.map((topping) => (
+                <label key={topping} className="chi-tiet-mon-option">
                   <input
                     type="checkbox"
-                    checked={selectedToppings.includes(topping)}
-                    onChange={() => onToggleTopping(topping)}
+                    checked={toppingDaChon.includes(topping)}
+                    onChange={() => xuLyBatTatTopping(topping)}
                   />
                   <span>{topping}</span>
                 </label>
@@ -85,28 +85,28 @@ function ChiTietMonAnModal({
             </div>
           </div>
 
-          <div className="food-detail-group">
-            <label className="food-detail-group-title" htmlFor={noteId}>
+          <div className="chi-tiet-mon-group">
+            <label className="chi-tiet-mon-group-title" htmlFor={idGhiChu}>
               Ghi chú món
             </label>
             <textarea
-              id={noteId}
-              className="form-textarea food-detail-note"
+              id={idGhiChu}
+              className="truong-van-ban chi-tiet-mon-note"
               rows="3"
               maxLength="120"
               placeholder="Ví dụ: ít cay, không hành..."
-              value={specialNote}
-              onChange={(event) => onSpecialNoteChange(event.target.value)}
+              value={ghiChuRieng}
+              onChange={(event) => xuLyDoiGhiChuRieng(event.target.value)}
             />
           </div>
 
-          <div className="food-detail-actions">
-            <div className="food-detail-total-wrap">
+          <div className="chi-tiet-mon-actions">
+            <div className="chi-tiet-mon-total-wrap">
               <span>Tạm tính món</span>
-              <strong>{dinhDangTienTe(detailPrice)}</strong>
-              {selectedSurcharge > 0 && <small>Đã gồm phụ thu size {dinhDangTienTe(selectedSurcharge)}</small>}
+              <strong>{dinhDangTienTe(giaChiTiet)}</strong>
+              {phuThuDaChon > 0 && <small>Đã gồm phụ thu cỡ món {dinhDangTienTe(phuThuDaChon)}</small>}
             </div>
-            <button type="button" className="btn btn-primary" onClick={onAddToCart}>
+            <button type="button" className="btn nut-chinh" onClick={xuLyThemVaoGio}>
               Thêm vào giỏ
             </button>
           </div>

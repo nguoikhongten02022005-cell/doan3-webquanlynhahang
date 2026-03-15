@@ -2,7 +2,7 @@ import test from 'node:test'
 import assert from 'node:assert/strict'
 import { anhXaMucDatBan, chuanHoaDatBan } from './anhXaDatBan.js'
 
-test('chuanHoaDatBan keeps canonical booking entity shape', () => {
+test('chuanHoaDatBan giu dung cau truc dat ban chuan', () => {
   const datBan = chuanHoaDatBan({
     id: '42',
     bookingCode: 'DB-000042',
@@ -47,7 +47,7 @@ test('chuanHoaDatBan keeps canonical booking entity shape', () => {
   })
 })
 
-test('anhXaMucDatBan returns profile-friendly booking history shape', () => {
+test('anhXaMucDatBan tra ve cau truc lich su dat ban than thien', () => {
   const ketQua = anhXaMucDatBan({
     id: 42,
     bookingCode: 'DB-000042',

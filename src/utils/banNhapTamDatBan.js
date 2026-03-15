@@ -1,7 +1,7 @@
 import { layJsonLuuTru, xoaMucLuuTru, datJsonLuuTru } from '../services/dichVuLuuTru'
 
-const BOOKING_DRAFT_TTL_MS = 1000 * 60 * 60 * 12
-const BOOKING_DRAFT_FIELDS = [
+const THOI_GIAN_HET_HAN_BAN_NHAP_TAM = 1000 * 60 * 60 * 12
+const CAC_TRUONG_BAN_NHAP_TAM_DAT_BAN = [
   'guests',
   'date',
   'time',
@@ -13,76 +13,76 @@ const BOOKING_DRAFT_FIELDS = [
   'email',
 ]
 
-const sanitizeDraftValue = (value) => String(value ?? '').trim()
+const chuanHoaGiaTriBanNhapTam = (giaTri) => String(giaTri ?? '').trim()
 
-const sanitizeDraft = (draft) => {
-  if (!draft || typeof draft !== 'object') {
+const chuanHoaBanNhapTam = (banNhapTam) => {
+  if (!banNhapTam || typeof banNhapTam !== 'object') {
     return null
   }
 
-  const updatedAt = typeof draft.updatedAt === 'string' ? draft.updatedAt : new Date().toISOString()
-  const sanitizedDraft = BOOKING_DRAFT_FIELDS.reduce((result, field) => {
-    result[field] = sanitizeDraftValue(draft[field])
+  const thoiDiemCapNhat = typeof banNhapTam.updatedAt === 'string' ? banNhapTam.updatedAt : new Date().toISOString()
+  const banNhapTamDaChuanHoa = CAC_TRUONG_BAN_NHAP_TAM_DAT_BAN.reduce((ketQua, truong) => {
+    ketQua[truong] = chuanHoaGiaTriBanNhapTam(banNhapTam[truong])
     return ketQua
   }, {})
 
   return {
-    ...sanitizedDraft,
-    seatingArea: sanitizedDraft.seatingArea || 'KHONG_UU_TIEN',
-    updatedAt,
+    ...banNhapTamDaChuanHoa,
+    seatingArea: banNhapTamDaChuanHoa.seatingArea || 'KHONG_UU_TIEN',
+    updatedAt: thoiDiemCapNhat,
   }
 }
 
-const isDraftExpired = (draft) => {
-  const timestamp = Date.parse(draft?.updatedAt || '')
+const laBanNhapTamDaHetHan = (banNhapTam) => {
+  const dauMocThoiGian = Date.parse(banNhapTam?.updatedAt || '')
 
-  if (Number.isNaN(timestamp)) {
+  if (Number.isNaN(dauMocThoiGian)) {
     return true
   }
 
-  return (Date.now() - timestamp) > BOOKING_DRAFT_TTL_MS
+  return (Date.now() - dauMocThoiGian) > THOI_GIAN_HET_HAN_BAN_NHAP_TAM
 }
 
-export const getValidBookingDraft = (storageKey) => {
-  const banNhapTam = sanitizeDraft(layJsonLuuTru(storageKey, null))
+export const layBanNhapTamDatBanHopLe = (khoaLuuTru) => {
+  const banNhapTam = chuanHoaBanNhapTam(layJsonLuuTru(khoaLuuTru, null))
 
-  if (!draft || isDraftExpired(draft)) {
-    xoaMucLuuTru(storageKey)
+  if (!banNhapTam || laBanNhapTamDaHetHan(banNhapTam)) {
+    xoaMucLuuTru(khoaLuuTru)
     return null
   }
 
-  return draft
+  return banNhapTam
 }
 
-export const saveBookingDraft = (storageKey, draftPayload) => {
-  const sanitizedDraft = sanitizeDraft({
-    ...draftPayload,
+export const luuBanNhapTamDatBan = (khoaLuuTru, duLieuBanNhapTam) => {
+  const banNhapTamDaChuanHoa = chuanHoaBanNhapTam({
+    ...duLieuBanNhapTam,
     updatedAt: new Date().toISOString(),
   })
 
-  if (!sanitizedDraft) {
-    xoaMucLuuTru(storageKey)
+  if (!banNhapTamDaChuanHoa) {
+    xoaMucLuuTru(khoaLuuTru)
     return null
   }
 
-  datJsonLuuTru(storageKey, sanitizedDraft)
-  return sanitizedDraft
+  datJsonLuuTru(khoaLuuTru, banNhapTamDaChuanHoa)
+  return banNhapTamDaChuanHoa
 }
 
-export const clearBookingDraft = (storageKey) => {
-  xoaMucLuuTru(storageKey)
+export const xoaBanNhapTamDatBan = (khoaLuuTru) => {
+  xoaMucLuuTru(khoaLuuTru)
 }
 
-export const createBookingDraftSnapshot = (formData) => ({
-  guests: formData?.guests,
-  date: formData?.date,
-  time: formData?.time,
-  seatingArea: formData?.seatingArea,
-  occasion: formData?.occasion,
-  notes: formData?.notes,
-  name: formData?.name,
-  phone: formData?.phone,
-  email: formData?.email,
+export const taoAnhChupBanNhapTamDatBan = (duLieuForm) => ({
+  guests: duLieuForm?.guests,
+  date: duLieuForm?.date,
+  time: duLieuForm?.time,
+  seatingArea: duLieuForm?.seatingArea,
+  occasion: duLieuForm?.occasion,
+  notes: duLieuForm?.notes,
+  name: duLieuForm?.name,
+  phone: duLieuForm?.phone,
+  email: duLieuForm?.email,
 })
 
-export const BOOKING_DRAFT_TTL = BOOKING_DRAFT_TTL_MS
+export const THOI_GIAN_HET_HAN_BAN_NHAP_TAM_DAT_BAN = THOI_GIAN_HET_HAN_BAN_NHAP_TAM

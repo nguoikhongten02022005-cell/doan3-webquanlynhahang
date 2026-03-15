@@ -85,7 +85,7 @@ export const coTheChuyenTrangThaiDatBanThuCong = (booking, nextStatus) => {
   return true
 }
 
-export const kiemTraBanDaGan = ({ assignedTableIds, tables, guestCount, preferredArea, bookingId }) => {
+export const kiemTraBanDaGan = ({ assignedTableIds, tables, soLuongKhach, preferredArea, bookingId }) => {
   const selectedTables = assignedTableIds
     .map((tableId) => tables.find((table) => table.id === tableId))
     .filter(Boolean)
@@ -105,7 +105,7 @@ export const kiemTraBanDaGan = ({ assignedTableIds, tables, guestCount, preferre
   }
 
   const totalCapacity = selectedTables.reduce((sum, table) => sum + table.capacity, 0)
-  if (guestCount > 0 && totalCapacity < guestCount) {
+  if (soLuongKhach > 0 && totalCapacity < soLuongKhach) {
     return { success: false, error: 'Tổng sức chứa bàn được chọn chưa đủ số khách.' }
   }
 

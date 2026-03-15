@@ -2,22 +2,22 @@ function GioiThieuPage() {
   return (
     <div className="about-page about-page-editorial">
       <section className="about-hero">
-        <div className="container about-hero-layout">
-          <div className="about-hero-content">
+        <div className="container about-mo-dau-layout">
+          <div className="about-mo-dau-content">
             <span className="about-label">Câu chuyện của chúng tôi</span>
-            <h1 className="about-hero-title">
+            <h1 className="about-mo-dau-title">
               Nơi hương vị
               <br />
               <span className="about-title-italic">kể chuyện</span>
             </h1>
-            <p className="about-hero-subtitle">
+            <p className="about-mo-dau-subtitle">
               Từ năm 2015, chúng tôi theo đuổi một kiểu nhà hàng ấm và chỉn chu: nơi mỗi món ăn được nhớ đến
               không chỉ vì ngon, mà vì cả cảm giác được đón tiếp.
             </p>
           </div>
 
-          <div className="about-hero-aside">
-            <div className="about-hero-note">
+          <div className="about-mo-dau-aside">
+            <div className="about-mo-dau-note">
               <p className="about-label">Tinh thần phục vụ</p>
               <strong>Ấm · tinh tế · không phô trương</strong>
               <span>Giữ nhịp bữa ăn vừa đủ để món ngon và câu chuyện riêng của mỗi bàn đều có chỗ đứng.</span>
@@ -81,19 +81,19 @@ function GioiThieuPage() {
           <div className="about-stats-row">
             <div className="about-stat-item">
               <strong className="about-stat-number">11+</strong>
-              <span className="about-stat-label">Năm kinh nghiệm</span>
+              <span className="nhan-thong-ke-gioi-thieu">Năm kinh nghiệm</span>
             </div>
             <div className="about-stat-item">
               <strong className="about-stat-number">50K+</strong>
-              <span className="about-stat-label">Khách hàng hài lòng</span>
+              <span className="nhan-thong-ke-gioi-thieu">Khách hàng hài lòng</span>
             </div>
             <div className="about-stat-item">
               <strong className="about-stat-number">200+</strong>
-              <span className="about-stat-label">Món ăn đa dạng</span>
+              <span className="nhan-thong-ke-gioi-thieu">Món ăn đa dạng</span>
             </div>
             <div className="about-stat-item">
               <strong className="about-stat-number">4.9/5</strong>
-              <span className="about-stat-label">Đánh giá trung bình</span>
+              <span className="nhan-thong-ke-gioi-thieu">Đánh giá trung bình</span>
             </div>
           </div>
         </div>
