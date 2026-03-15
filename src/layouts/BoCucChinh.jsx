@@ -8,8 +8,11 @@ function BoCucChinh() {
 
   return (
     <>
+      <a className="skip-link" href="#main-content">
+        Bỏ qua điều hướng
+      </a>
       <DauTrang />
-      <main>
+      <main id="main-content">
         <Outlet />
       </main>
       <ChanTrang compact={isDatBanPage} />

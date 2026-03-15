@@ -1,0 +1,295 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - generic [ref=e9]:
+        - link "Đặt bàn" [ref=e10] [cursor=pointer]:
+          - /url: /dat-ban
+        - link "Giỏ hàng" [ref=e11] [cursor=pointer]:
+          - /url: /gio-hang
+          - img [ref=e12]
+          - text: Giỏ hàng
+        - text: Đăng nhập
+        - button "Mở menu" [ref=e16] [cursor=pointer]:
+          - img [ref=e17]
+  - main [ref=e19]:
+    - generic [ref=e20]:
+      - generic [ref=e23]:
+        - paragraph [ref=e24]: Nhà hàng Nguyên Vị
+        - heading "Không gian ấm, món ăn lên tiếng theo một nhịp riêng." [level=1] [ref=e25]:
+          - text: Không gian ấm,
+          - text: món ăn
+          - emphasis [ref=e26]: lên tiếng
+          - text: theo một nhịp riêng.
+        - paragraph [ref=e27]: "Trang chủ được sắp lại theo hướng biên tập nhà hàng: mở đầu có chủ đề, danh mục dễ quét nhanh, món nổi bật giữ đủ thao tác và phần đặt bàn được đẩy thành một lời mời rõ ràng."
+        - generic [ref=e28]:
+          - link "Giữ bàn tối nay" [ref=e29] [cursor=pointer]:
+            - /url: /dat-ban
+          - link "Xem thực đơn" [ref=e30] [cursor=pointer]:
+            - /url: /thuc-don
+        - generic "Tinh thần trình bày" [ref=e31]:
+          - generic [ref=e32]: Bếp mở theo nhịp tối
+          - generic [ref=e33]: Bàn ăn đủ ánh ấm
+          - generic [ref=e34]: Món được kể bằng bố cục
+        - generic "Số liệu tổng quan" [ref=e35]:
+          - article [ref=e36]:
+            - strong [ref=e37]: "12"
+            - generic [ref=e38]: bàn được set mỗi tối
+          - article [ref=e39]:
+            - strong [ref=e40]: "08"
+            - generic [ref=e41]: món nổi bật xoay theo tuần
+          - article [ref=e42]:
+            - strong [ref=e43]: "01"
+            - generic [ref=e44]: hành trình đặt bàn gọn lẹ
+      - region "Trang đầu không còn trình bày kiểu khuôn mẫu." [ref=e45]:
+        - generic [ref=e46]:
+          - generic [ref=e47]:
+            - paragraph [ref=e48]: Hướng biên tập trang chủ
+            - heading "Trang đầu không còn trình bày kiểu khuôn mẫu." [level=2] [ref=e49]
+          - generic [ref=e50]:
+            - article [ref=e51]:
+              - generic [ref=e52]: "01"
+              - paragraph [ref=e53]: Lối đi được chia thành từng nhịp rõ ràng để khách không bị ngợp khi vừa vào trang.
+            - article [ref=e54]:
+              - generic [ref=e55]: "02"
+              - paragraph [ref=e56]: Khung món nổi bật giữ nguyên luồng xem chi tiết và thêm giỏ như trải nghiệm hiện tại.
+            - article [ref=e57]:
+              - generic [ref=e58]: "03"
+              - paragraph [ref=e59]: Màu sắc và độ tương phản được đẩy lên vừa đủ để trang chủ bớt giống landing page mẫu.
+      - generic [ref=e61]:
+        - generic [ref=e62]:
+          - generic [ref=e63]:
+            - paragraph [ref=e64]: Đi nhanh vào thực đơn
+            - heading "Danh Mục Nổi Bật" [level=2] [ref=e65]
+          - paragraph [ref=e66]: Danh mục được chuyển sang dạng thẻ lớn, đọc theo hàng có nhịp để bớt cảm giác chip slider quen thuộc.
+        - generic [ref=e67]:
+          - link "01 Món Chính Đậm vị, chỉn chu cho bữa chính." [ref=e68] [cursor=pointer]:
+            - /url: /thuc-don
+            - generic [ref=e69]: "01"
+            - generic [ref=e70]: 🍲
+            - generic [ref=e71]:
+              - strong [ref=e72]: Món Chính
+              - generic [ref=e73]: Đậm vị, chỉn chu cho bữa chính.
+          - link "02 Khai Vị Nhẹ nhàng để mở vị và khởi nhịp bàn ăn." [ref=e74] [cursor=pointer]:
+            - /url: /thuc-don
+            - generic [ref=e75]: "02"
+            - generic [ref=e76]: 🥗
+            - generic [ref=e77]:
+              - strong [ref=e78]: Khai Vị
+              - generic [ref=e79]: Nhẹ nhàng để mở vị và khởi nhịp bàn ăn.
+          - link "03 Đồ Uống Cocktail, trà và thức uống đi cùng món." [ref=e80] [cursor=pointer]:
+            - /url: /thuc-don
+            - generic [ref=e81]: "03"
+            - generic [ref=e82]: 🍹
+            - generic [ref=e83]:
+              - strong [ref=e84]: Đồ Uống
+              - generic [ref=e85]: Cocktail, trà và thức uống đi cùng món.
+          - link "04 Tráng Miệng Một kết thúc mềm và gọn cho bữa tối." [ref=e86] [cursor=pointer]:
+            - /url: /thuc-don
+            - generic [ref=e87]: "04"
+            - generic [ref=e88]: 🍮
+            - generic [ref=e89]:
+              - strong [ref=e90]: Tráng Miệng
+              - generic [ref=e91]: Một kết thúc mềm và gọn cho bữa tối.
+          - link "05 Combo Lựa chọn tiện cho cặp đôi và nhóm nhỏ." [ref=e92] [cursor=pointer]:
+            - /url: /thuc-don
+            - generic [ref=e93]: "05"
+            - generic [ref=e94]: 🍱
+            - generic [ref=e95]:
+              - strong [ref=e96]: Combo
+              - generic [ref=e97]: Lựa chọn tiện cho cặp đôi và nhóm nhỏ.
+      - generic [ref=e99]:
+        - generic [ref=e100]:
+          - generic [ref=e101]:
+            - paragraph [ref=e102]: Món được chọn nhiều
+            - heading "Món Ngon Phải Thử" [level=2] [ref=e103]
+          - generic [ref=e104]:
+            - paragraph [ref=e105]: Phần này giữ nguyên luồng xem chi tiết và thêm giỏ, nhưng được đặt trong khung sạch hơn để món ăn thật sự là trung tâm.
+            - link "Xem toàn bộ thực đơn →" [ref=e106] [cursor=pointer]:
+              - /url: /thuc-don
+        - generic [ref=e144]:
+          - article [ref=e145]:
+            - button "Xem chi tiết món Combo Solo" [ref=e146]:
+              - generic [ref=e147]:
+                - generic [ref=e148]: Value
+                - generic [ref=e149]: Chỗ ảnh món
+              - generic [ref=e150]:
+                - img [ref=e152]
+                - generic [ref=e154]:
+                  - strong [ref=e155]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e156]:
+              - generic [ref=e157]:
+                - heading "Combo Solo" [level=3] [ref=e158]
+                - paragraph [ref=e159]: 1 món chính + 1 khai vị + 1 đồ uống
+              - generic [ref=e160]:
+                - strong [ref=e161]: 249.000₫
+                - button "Thêm món" [ref=e162] [cursor=pointer]
+          - article [ref=e163]:
+            - button "Xem chi tiết món Combo Couple" [ref=e164]:
+              - generic [ref=e165]:
+                - generic [ref=e166]: Romantic
+                - generic [ref=e167]: Chỗ ảnh món
+              - generic [ref=e168]:
+                - img [ref=e170]
+                - generic [ref=e172]:
+                  - strong [ref=e173]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e174]:
+              - generic [ref=e175]:
+                - heading "Combo Couple" [level=3] [ref=e176]
+                - paragraph [ref=e177]: 2 món chính + 1 khai vị + 2 đồ uống
+              - generic [ref=e178]:
+                - strong [ref=e179]: 499.000₫
+                - button "Thêm món" [ref=e180] [cursor=pointer]
+          - article [ref=e181]:
+            - button "Xem chi tiết món Combo Gia Đình" [ref=e182]:
+              - generic [ref=e183]:
+                - generic [ref=e184]: Save 20%
+                - generic [ref=e185]: Chỗ ảnh món
+              - generic [ref=e186]:
+                - img [ref=e188]
+                - generic [ref=e190]:
+                  - strong [ref=e191]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e192]:
+              - generic [ref=e193]:
+                - heading "Combo Gia Đình" [level=3] [ref=e194]
+                - paragraph [ref=e195]: 2 món chính + 2 khai vị + 4 đồ uống + 1 tráng miệng
+              - generic [ref=e196]:
+                - strong [ref=e197]: 899.000₫
+                - button "Thêm món" [ref=e198] [cursor=pointer]
+          - article [ref=e199]:
+            - button "Xem chi tiết món Kem Vani" [ref=e200]:
+              - generic [ref=e201]:
+                - generic [ref=e202]: Homemade
+                - generic [ref=e203]: Chỗ ảnh món
+              - generic [ref=e204]:
+                - img [ref=e206]
+                - generic [ref=e208]:
+                  - strong [ref=e209]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e210]:
+              - generic [ref=e211]:
+                - heading "Kem Vani" [level=3] [ref=e212]
+                - paragraph [ref=e213]: Kem vani tự làm với hạt vani Madagascar
+              - generic [ref=e214]:
+                - strong [ref=e215]: 55.000₫
+                - button "Thêm món" [ref=e216] [cursor=pointer]
+          - article [ref=e217]:
+            - button "Xem chi tiết món Panna Cotta" [ref=e218]:
+              - generic [ref=e219]:
+                - generic [ref=e220]: Sweet
+                - generic [ref=e221]: Chỗ ảnh món
+              - generic [ref=e222]:
+                - img [ref=e224]
+                - generic [ref=e226]:
+                  - strong [ref=e227]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e228]:
+              - generic [ref=e229]:
+                - heading "Panna Cotta" [level=3] [ref=e230]
+                - paragraph [ref=e231]: Bánh Panna Cotta mềm mịn với sốt dâu tây
+              - generic [ref=e232]:
+                - strong [ref=e233]: 75.000₫
+                - button "Thêm món" [ref=e234] [cursor=pointer]
+          - article [ref=e235]:
+            - button "Xem chi tiết món Tiramisu" [ref=e236]:
+              - generic [ref=e237]:
+                - generic [ref=e238]: Premium
+                - generic [ref=e239]: Chỗ ảnh món
+              - generic [ref=e240]:
+                - img [ref=e242]
+                - generic [ref=e244]:
+                  - strong [ref=e245]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e246]:
+              - generic [ref=e247]:
+                - heading "Tiramisu" [level=3] [ref=e248]
+                - paragraph [ref=e249]: Bánh Tiramisu Ý truyền thống với cà phê Espresso
+              - generic [ref=e250]:
+                - strong [ref=e251]: 85.000₫
+                - button "Thêm món" [ref=e252] [cursor=pointer]
+          - article [ref=e253]:
+            - button "Xem chi tiết món Nước Ép Dưa Hấu" [ref=e254]:
+              - generic [ref=e255]:
+                - generic [ref=e256]: Fresh
+                - generic [ref=e257]: Chỗ ảnh món
+              - generic [ref=e258]:
+                - img [ref=e260]
+                - generic [ref=e262]:
+                  - strong [ref=e263]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e264]:
+              - generic [ref=e265]:
+                - heading "Nước Ép Dưa Hấu" [level=3] [ref=e266]
+                - paragraph [ref=e267]: Nước ép dưa hấu tươi mát, không đường
+              - generic [ref=e268]:
+                - strong [ref=e269]: 40.000₫
+                - button "Thêm món" [ref=e270] [cursor=pointer]
+          - article [ref=e271]:
+            - button "Xem chi tiết món Cà Phê Sữa Đá" [ref=e272]:
+              - generic [ref=e273]:
+                - generic [ref=e274]: Classic
+                - generic [ref=e275]: Chỗ ảnh món
+              - generic [ref=e276]:
+                - img [ref=e278]
+                - generic [ref=e280]:
+                  - strong [ref=e281]: Ảnh món sẽ hiển thị tại đây
+                  - text: "Giữ `dish.image` để thay ảnh thật khi cần."
+            - generic [ref=e282]:
+              - generic [ref=e283]:
+                - heading "Cà Phê Sữa Đá" [level=3] [ref=e284]
+                - paragraph [ref=e285]: Cà phê phin truyền thống pha sữa đá mát lạnh
+              - generic [ref=e286]:
+                - strong [ref=e287]: 35.000₫
+                - button "Thêm món" [ref=e288] [cursor=pointer]
+      - generic [ref=e108]:
+        - generic [ref=e109]:
+          - paragraph [ref=e110]: Đặt bàn tinh gọn
+          - heading "Chọn trước một bàn đẹp cho buổi hẹn tối nay." [level=2] [ref=e111]
+          - paragraph [ref=e112]: Phần kết được đổi thành một lời mời rõ ràng, có thêm các điểm tin cậy ngắn gọn để thao tác đặt bàn không bị chìm trong hình nền.
+          - generic "Điểm nổi bật đặt bàn" [ref=e113]:
+            - generic [ref=e114]: Phù hợp nhóm nhỏ, gặp đối tác và bữa tối gia đình.
+            - generic [ref=e115]: Đặt bàn trước, vào bàn nhanh, không phải gọi lại nhiều lần.
+            - generic [ref=e116]: Có thể thay ảnh món thật về sau mà không cần đổi luồng trang chủ.
+        - generic [ref=e117]:
+          - link "Bắt đầu đặt bàn" [ref=e118] [cursor=pointer]:
+            - /url: /dat-ban
+          - generic [ref=e119]: Mở form đặt bàn chỉ trong vài bước.
+  - contentinfo [ref=e120]:
+    - generic [ref=e121]:
+      - generic [ref=e122]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e123] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e124]: NH
+          - generic [ref=e125]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e126]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic [ref=e127]:
+          - link "Facebook" [ref=e128] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e129] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e130]:
+        - heading "Liên hệ" [level=3] [ref=e131]
+        - list [ref=e132]:
+          - listitem [ref=e133]: 28 Nguyễn Huệ, Q.1, TP. HCM
+          - listitem [ref=e134]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e135] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e136]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e137] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e138]:
+        - heading "Giờ mở cửa" [level=3] [ref=e139]
+        - list [ref=e140]:
+          - listitem [ref=e141]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e142]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e143]: Nhận đơn online đến 21:45

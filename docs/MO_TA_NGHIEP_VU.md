@@ -1,372 +1,136 @@
-# HIEN_TRANG_HE_THONG
+# HIỆN TRẠNG HỆ THỐNG
 
-## 1. Muc dich file
-File nay duoc tao de mo ta hien trang thuc te cua he thong sau khi da:
-- doc code frontend
-- doi chieu router
-- chay va ra soat giao dien bang MCP
-- kiem tra luong nghiep vu chinh tu UI va source code
+## 1. Mục đích file
+File này mô tả hiện trạng thực tế của hệ thống dựa trên mã nguồn và cấu trúc repo hiện tại.
 
-Muc tieu:
-- giup AI hieu ro bai hien tai dang co gi
-- xac dinh cac chuc nang da co
-- xac dinh cac man hinh da duoc kiem tra
-- ghi nhan cac han che hien tai cua backend
-- lam co so cho viec phat trien backend moi bang C# + ASP.NET Core Web API + MySQL
+Mục tiêu:
+- giúp hiểu dự án hiện đang có gì
+- xác định frontend đang chạy ở đâu
+- xác định backend nào là backend chính của repo hiện tại
+- tóm tắt các nhóm chức năng nghiệp vụ đã có
+- làm cơ sở để chỉnh sửa an toàn mà không hiểu sai kiến trúc hiện hành
 
----
+## 2. Kiến trúc hiện tại của repo
+Hiện trạng chính:
+- frontend chạy ở thư mục gốc của repo
+- mã nguồn giao diện chính nằm trong `src/`
+- frontend dùng React và Vite
+- backend đang dùng cho phát triển và kiểm thử hiện tại nằm trong `server/`
+- `backend/` là phần mã ASP.NET Core Web API cũ, giữ lại để tham khảo lịch sử hoặc chỉnh sửa riêng khi có yêu cầu
 
-## 2. Hien trang moi truong chay
-Frontend hien tai dang chay o:
-- `http://localhost:5173`
-- co luc co them instance o `http://localhost:5174`
+Điều quan trọng:
+- khi cần hiểu contract API đang chạy thật, ưu tiên đọc và đối chiếu `server/`
+- không xem `backend/` là nguồn sự thật chính cho hệ thống hiện hành
 
-Backend cong `4000` hien tai chua on dinh.
+## 3. Tổng quan chức năng hệ thống
 
-Tac dong:
-- mot so du lieu that tu server chua tai duoc on dinh
-- van co the xem duoc gan nhu toan bo luong nghiep vu tu giao dien va source code
-- cac man can xac minh du lieu that end-to-end can kiem tra lai sau khi backend on dinh
+### 3.1 Khu vực khách hàng
+Hệ thống hiện có các nhóm chức năng giao diện chính:
+- trang chủ
+- xem thực đơn
+- đặt bàn
+- giỏ hàng
+- thanh toán
+- giới thiệu nhà hàng
 
----
+### 3.2 Tài khoản khách hàng
+Hệ thống hiện có:
+- đăng ký
+- đăng nhập
+- xem hồ sơ cá nhân
+- xem lịch sử đơn hàng
+- xem lịch sử đặt bàn
+- hủy booking nếu trạng thái còn cho phép
 
-## 3. Tong quan chuc nang he thong
+### 3.3 Khu vực nội bộ
+Hệ thống hiện có:
+- đăng nhập nội bộ
+- dashboard vận hành
+- quản lý booking
+- quản lý bàn
+- theo dõi đơn đang mở
 
-### 3.1 Khu vuc khach hang / public
-He thong hien tai da co cac chuc nang:
-- trang chu
-- xem thuc don
-- dat ban
-- gio hang
-- thanh toan
-- gioi thieu nha hang
+### 3.4 Khu vực quản trị
+Ngoài dashboard chung, admin hiện có thêm:
+- quản lý món ăn
+- xem danh sách tài khoản nội bộ
 
-### 3.2 Tai khoan khach hang
-He thong hien tai da co:
-- dang ky
-- dang nhap
-- xem ho so ca nhan
-- xem lich su don hang
-- xem lich su dat ban
-- huy booking neu con hop le
-
-### 3.3 Khu vuc noi bo
-He thong hien tai da co:
-- dang nhap nhan su
-- dashboard van hanh
-- quan ly booking
-- quan ly ban
-- theo doi don dang mo
-
-### 3.4 Khu vuc quan tri
-Ngoai dashboard chung, admin hien tai con co:
-- quan ly mon an
-- xem danh sach tai khoan noi bo
-
----
-
-## 4. Cac man hinh da duoc mo va kiem tra bang MCP
-
-### 4.1 Trang chu
-Route: `/`
-
-Noi dung chinh:
-- CTA dat ban ngay
-- CTA xem thuc don
-- khu mon noi bat
-- them mon nhanh
-
-### 4.2 Trang thuc don
-Route: `/thuc-don`
-
-Chuc nang:
-- tim kiem mon an
-- loc theo danh muc
-- sap xep
-- mo chi tiet mon
-- them vao gio
-
-### 4.3 Trang dat ban
-Route: `/dat-ban`
-
-Chuc nang:
-- quy trinh dat ban 3 buoc
-- chon so khach
-- chon ngay
-- chon gio
-- chon khu vuc
-- nhap lien he
-- xac nhan dat
-
-### 4.4 Trang gio hang
-Route: `/gio-hang`
-
-Chuc nang:
-- xem gio hang
-- ap ma giam gia
-- nhap so ban
-- nhap ghi chu cho quan
-- chuyen sang thanh toan
-
-### 4.5 Trang thanh toan
-Route: `/thanh-toan`
-
-Chuc nang:
-- nhap thong tin lien he
-- nhap so ban
-- nhap ghi chu
-- chon phuong thuc thanh toan
-- hoan tat dat hang
-
-### 4.6 Trang ho so
-Route: `/ho-so`
-
-Chuc nang:
-- thong tin ca nhan
-- lich su don hang
-- lich su dat ban
-
-### 4.7 Dang nhap va dang ky
-Routes:
-- `/dang-nhap`
-- `/dang-ky`
-
-### 4.8 Gioi thieu nha hang
-Route:
-- `/gioi-thieu`
-
-### 4.9 Dang nhap noi bo
-Route:
-- `/noi-bo/dang-nhap`
-
-### 4.10 Dashboard noi bo
-Route:
-- `/noi-bo/bang-dieu-khien`
-
-Ghi chu:
-- co bao ve dang nhap
-- hien tai chua vao on dinh vi backend/auth dang loi
-
----
-
-## 5. Nghiep vu chi tiet theo vai tro
-
-## 5.1 Khach hang
-Khach hang hien tai co the:
-- xem menu mon an theo danh muc:
-  - Mon Chinh
-  - Khai Vi
-  - Do Uong
-  - Trang Mieng
-  - Combo
-- tim mon theo ten hoac mo ta
-- sap xep theo:
-  - noi bat
-  - gia tang
-  - gia giam
-  - mon moi
-- mo modal chi tiet mon
-- chon cau hinh mon
-- them mon vao gio
-- quan ly gio hang
-- nhap voucher
-- them ghi chu mon hoac don
-- gan so ban
-- tao don hang tu gio
-- chon phuong thuc thanh toan
-- dat ban online theo luong tung buoc
-- bi gioi han online toi da 10 khach moi luot
-- theo doi ho so
-- theo doi lich su order
-- theo doi timeline trang thai don
-- theo doi lich su booking
-- huy booking neu trang thai con cho phep
-
-## 5.2 Nhan su van hanh / host / staff
-Nhan su hien tai co the:
-- dang nhap khu vuc noi bo
-- xem dashboard van hanh tong quan
-- xem booking dang theo doi
-- xem booking cho xac nhan
-- xem ban dang phuc vu
-- xem ban dang giu cho
-- xem don dang mo
-- loc dashboard theo ngay
-- loc dashboard theo ca
-- xem cac canh bao can xu ly ngay:
-  - booking cho xac nhan
-  - booking chua gan ban
-  - khach sap den
-  - ban can don
-- tao booking noi bo thu cong
-- sua booking noi bo
-- gan mot hoac nhieu ban cho booking
-- check-in khach
-- danh dau hoan thanh booking
-- danh dau no-show
-- xem tinh trang ban:
-  - san sang
-  - giu cho
-  - dang phuc vu
-  - dang don
-- danh dau ban dang don
-- danh dau ban san sang lai
-- xem don dang mo
-- xem thong tin thanh toan
-- xem tong tien don
-
-## 5.3 Quan tri vien
-Quan tri vien hien tai co:
-- toan bo quyen cua staff
-- quan ly mon an:
-  - them mon moi
-  - sua mon
-  - xoa mon
-  - chinh ten
-  - chinh mo ta
-  - chinh gia
-  - chinh danh muc
-  - chinh badge
-  - chinh tone
-  - chinh anh
-- xem danh sach tai khoan noi bo
-- xem vai tro:
-  - Admin
-  - Staff
-  - Customer
-- xem tong quan to chuc noi bo tren dashboard
-
----
-
-## 6. Route va chuc nang xac nhan tu code
-
-Router chinh nam tai:
-- `src/App.jsx`
-
-### 6.1 Route public
+## 4. Các route giao diện chính
+Các route chính được tổ chức trong frontend hiện tại, bao gồm:
 - `/`
 - `/thuc-don`
 - `/dat-ban`
-- `/gioi-thieu`
 - `/gio-hang`
 - `/thanh-toan`
+- `/gioi-thieu`
 - `/ho-so`
 - `/dang-nhap`
 - `/dang-ky`
-
-### 6.2 Route noi bo
-- `/internal`
 - `/noi-bo/dang-nhap`
 - `/noi-bo/bang-dieu-khien`
 
-Ghi chu:
-- dashboard noi bo dang duoc bao ve dang nhap
-- neu khong xac thuc duoc thi se quay ve trang dang nhap noi bo
+## 5. Backend chính đang dùng
+Backend chính của repo hiện tại nằm trong `server/`.
 
----
+Stack của backend này:
+- Node.js
+- TypeScript
+- Express
+- MySQL
+- Prisma
 
-## 7. Tinh trang thuc te khi chay
-Frontend:
-- chay duoc
-- render on
-- cac man hinh chinh da xem duoc
+Các ghi chú quan trọng:
+- frontend hiện tại được đối chiếu và tích hợp chủ yếu theo contract từ `server/`
+- khi cần kiểm tra schema, route, mapper hoặc hành vi API, ưu tiên xem mã nguồn trong `server/`
+- `server/README.md` là tài liệu ngắn gọn phản ánh backend đang chạy thật
 
-Backend `localhost:4000`:
-- dang loi ket noi
-- khong giu tien trinh on dinh
-- mot so man lay du lieu that chua hoat dong on dinh
+## 6. Vai trò của `backend/`
+Thư mục `backend/` không phải backend chính đang chạy hằng ngày của repo hiện tại.
 
-Cac hien tuong da gap:
-- `/thuc-don` luc dau hien `Failed to fetch`
-- auth `/auth/me` bi `Unauthorized` hoac `connection refused`
-- dashboard noi bo bi tra ve trang dang nhap
+Nó được giữ lại để:
+- tham khảo lịch sử triển khai C#
+- đọc lại cấu trúc hoặc nghiệp vụ cũ khi cần
+- chỉnh sửa cục bộ nếu có yêu cầu riêng liên quan đến mã ASP.NET Core cũ
 
----
+Khi làm việc với `backend/`, không nên mặc định rằng:
+- contract trong đó còn đúng với hệ thống đang chạy
+- frontend hiện tại đang nối trực tiếp vào đó
+- thay đổi ở đó sẽ tự động tác động tới `server/`
 
-## 8. Danh gia muc do hoan thien hien tai
-Frontend hien tai:
-- da co cau truc nghiep vu kha ro
-- da co nhieu man hinh chinh
-- da co luong khach hang
-- da co luong noi bo
-- da co phan quyen co ban theo vai tro
-- da du lam nen de viet backend moi bam theo
+## 7. Ý nghĩa khi chỉnh sửa hệ thống
+Để sửa đúng theo hiện trạng repo:
+- sửa giao diện thì ưu tiên đọc `src/`, `README.md`, `server/README.md`
+- sửa backend đang chạy thật thì ưu tiên làm trong `server/`
+- chỉ sửa `backend/` khi yêu cầu thật sự liên quan đến phần mã C# cũ
 
-Tuy nhien:
-- chua xac minh du lieu that end-to-end day du vi backend chua on dinh
-- cac luong can API that van can test lai sau khi backend moi hoat dong on
+Nếu đổi contract API trong `server/`, cần kiểm tra ảnh hưởng tới:
+- thực đơn
+- giỏ hàng
+- thanh toán
+- hồ sơ người dùng
+- lịch sử đơn hàng
+- lịch sử đặt bàn
+- dashboard nội bộ
 
----
+## 8. Ghi chú nghiệp vụ
+Về mặt nghiệp vụ, hệ thống hiện không chỉ có giao diện public mà còn bao gồm:
+- xác thực người dùng
+- đơn hàng
+- đặt bàn
+- bàn ăn
+- dashboard nội bộ
+- món ăn
+- tài khoản và vai trò người dùng
 
-## 9. Y nghia doi voi backend moi
-Backend moi viet bang C# + ASP.NET Core Web API + MySQL can hieu ro:
+Điều này có nghĩa là mọi thay đổi backend hoặc frontend nên bám sát nghiệp vụ nhà hàng hiện có, tránh hiểu quá đơn giản rằng dự án chỉ gồm menu và giỏ hàng.
 
-- frontend hien tai khong phai chi co giao dien public
-- he thong con co:
-  - auth
-  - orders
-  - bookings
-  - tables
-  - dashboard noi bo
-  - mon an
-  - tai khoan
-- backend moi nen bam sat nghiep vu hien tai
-- neu doi contract API qua nhieu thi frontend se phai sua lai rat nhieu
+## 9. Kết luận
+Hiện trạng repo nên được hiểu theo thứ tự ưu tiên sau:
+- frontend chính: `src/` ở root, dùng React + Vite
+- backend chính đang chạy: `server/`
+- backend C# cũ tham khảo: `backend/`
 
----
-
-## 10. Nhom API nen uu tien lam truoc
-De noi frontend nhanh va an toan, nen uu tien theo thu tu:
-
-### Giai doan 1
-- menu items
-- loai mon
-- mon an
-- API hien thi thuc don
-
-### Giai doan 2
-- dang nhap
-- dang ky
-- auth me
-- dang xuat
-
-### Giai doan 3
-- orders
-- checkout
-- lich su don hang
-
-### Giai doan 4
-- bookings
-- tables
-- dashboard noi bo
-
-### Giai doan 5
-- users
-- quan ly admin
-- thong ke mo rong
-
----
-
-## 11. Ghi chu danh cho AI
-AI khi doc file nay can hieu:
-- day la hien trang he thong sau khi da chay va ra soat giao dien
-- frontend da kha day du ve nghiep vu
-- backend hien tai chua on dinh nen chua test duoc het end-to-end
-- backend moi can bam sat he thong hien tai de tranh sua lai frontend qua nhieu
-- can uu tien nghiep vu nha hang tai Viet Nam
-- khong duoc hieu bai nay qua don gian chi la menu va gio hang
-
----
-
-## 12. Ket luan
-He thong hien tai da co:
-- nhom chuc nang khach hang
-- nhom chuc nang tai khoan
-- nhom chuc nang noi bo
-- nhom chuc nang quan tri
-
-Frontend da du ro de lam co so xay dung backend moi.
-Phan viec tiep theo hop ly la:
-- on dinh backend moi
-- noi lai API theo thu tu uu tien
-- test lai tung luong nghiep vu end-to-end
+Khi cần chỉnh sửa an toàn và đúng thực tế:
+- lấy `README.md` làm điểm bắt đầu
+- lấy `server/` làm nguồn sự thật cho backend hiện hành
+- chỉ dùng `backend/` như tài liệu tham khảo hoặc khu vực sửa riêng khi có yêu cầu rõ ràng
