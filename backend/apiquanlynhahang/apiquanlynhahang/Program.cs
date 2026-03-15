@@ -21,6 +21,7 @@ builder.Services.AddScoped<MaGiamGiaService>();
 builder.Services.AddScoped<DatBanService>();
 builder.Services.AddScoped<DonHangService>();
 builder.Services.AddScoped<NguoiDungService>();
+builder.Services.AddScoped<AuthService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
