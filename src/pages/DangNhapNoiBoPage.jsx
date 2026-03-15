@@ -37,24 +37,24 @@ function DangNhapNoiBoPage() {
   }
 
   return (
-    <section className="auth-page internal-login-page">
-      <div className="auth-card internal-login-card">
-        <p className="profile-kicker">Khu vực nội bộ</p>
-        <h1 className="auth-title">Đăng nhập nhân sự</h1>
-        <p className="auth-subtitle">
+    <section className="xac-thuc-page noi-bo-login-page">
+      <div className="xac-thuc-card noi-bo-login-card">
+        <p className="ho-so-kicker">Khu vực nội bộ</p>
+        <h1 className="xac-thuc-title">Đăng nhập nhân sự</h1>
+        <p className="xac-thuc-subtitle">
           Dành cho quản trị viên và nhân viên vận hành truy cập bảng điều khiển nội bộ.
         </p>
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="internal-login-identifier" className="form-label">
+        <form onSubmit={handleSubmit} className="xac-thuc-form">
+          <div className="nhom-truong">
+            <label htmlFor="noi-bo-login-identifier" className="nhan-truong">
               Tên tài khoản hoặc Email
             </label>
             <input
-              id="internal-login-identifier"
+              id="noi-bo-login-identifier"
               name="identifier"
               type="text"
-              className="form-input"
+              className="truong-nhap"
               placeholder="Nhập tài khoản nội bộ"
               autoComplete="username"
               value={tenDangNhapHoacEmail}
@@ -68,15 +68,15 @@ function DangNhapNoiBoPage() {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="internal-login-password" className="form-label">
+          <div className="nhom-truong">
+            <label htmlFor="noi-bo-login-password" className="nhan-truong">
               Mật khẩu
             </label>
             <input
-              id="internal-login-password"
+              id="noi-bo-login-password"
               name="password"
               type="password"
-              className="form-input"
+              className="truong-nhap"
               placeholder="Nhập mật khẩu"
               autoComplete="current-password"
               value={matKhau}
@@ -91,19 +91,19 @@ function DangNhapNoiBoPage() {
           </div>
 
           {loiDangNhap && (
-            <p className="form-error" role="alert">
+            <p className="loi-bieu-mau" role="alert">
               {loiDangNhap}
             </p>
           )}
 
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn nut-chinh">
             Vào khu vực nội bộ
           </button>
         </form>
 
-        <p className="auth-switch-text">
+        <p className="xac-thuc-switch-text">
           Bạn là khách hàng?{' '}
-          <Link to="/dang-nhap" className="auth-switch-link">
+          <Link to="/dang-nhap" className="xac-thuc-switch-link">
             Đăng nhập tại đây
           </Link>
         </p>

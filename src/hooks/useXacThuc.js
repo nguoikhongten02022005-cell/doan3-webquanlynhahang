@@ -15,7 +15,7 @@ const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.accessToken || ''
 
 export const useXacThuc = () => {
   const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => layNguoiDungHienTai())
-  const [isAuthBootstrapping, setIsAuthBootstrapping] = useState(true)
+  const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(true)
 
   useEffect(() => {
     const dongBoNguoiDungHienTai = () => {
@@ -184,7 +184,7 @@ export const useXacThuc = () => {
     laNhanVien,
     coTheVaoNoiBo,
     daDangNhap: Boolean(nguoiDungHienTai),
-    dangKhoiTaoXacThuc: isAuthBootstrapping,
+    dangKhoiTaoXacThuc: dangKhoiTaoXacThuc,
     dangNhap,
     dangNhapNoiBo,
     dangKy,

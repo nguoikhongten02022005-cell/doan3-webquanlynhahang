@@ -25,7 +25,7 @@ export const layUrlGocApi = () => {
 }
 
 const layDauTrangXacThuc = () => {
-  const maXacThuc = layMucLuuTru(STORAGE_KEYS.AUTH_TOKEN)
+  const maXacThuc = layMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
 
   if (!maXacThuc) {
     return {}

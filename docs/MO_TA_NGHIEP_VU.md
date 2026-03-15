@@ -77,7 +77,7 @@ Noi dung chinh:
 - them mon nhanh
 
 ### 4.2 Trang thuc don
-Route: `/menu`
+Route: `/thuc-don`
 
 Chuc nang:
 - tim kiem mon an
@@ -87,7 +87,7 @@ Chuc nang:
 - them vao gio
 
 ### 4.3 Trang dat ban
-Route: `/booking`
+Route: `/dat-ban`
 
 Chuc nang:
 - quy trinh dat ban 3 buoc
@@ -99,7 +99,7 @@ Chuc nang:
 - xac nhan dat
 
 ### 4.4 Trang gio hang
-Route: `/cart`
+Route: `/gio-hang`
 
 Chuc nang:
 - xem gio hang
@@ -109,7 +109,7 @@ Chuc nang:
 - chuyen sang thanh toan
 
 ### 4.5 Trang thanh toan
-Route: `/checkout`
+Route: `/thanh-toan`
 
 Chuc nang:
 - nhap thong tin lien he
@@ -119,7 +119,7 @@ Chuc nang:
 - hoan tat dat hang
 
 ### 4.6 Trang ho so
-Route: `/profile`
+Route: `/ho-so`
 
 Chuc nang:
 - thong tin ca nhan
@@ -128,20 +128,20 @@ Chuc nang:
 
 ### 4.7 Dang nhap va dang ky
 Routes:
-- `/login`
-- `/register`
+- `/dang-nhap`
+- `/dang-ky`
 
 ### 4.8 Gioi thieu nha hang
 Route:
-- `/about`
+- `/gioi-thieu`
 
 ### 4.9 Dang nhap noi bo
 Route:
-- `/internal/login`
+- `/noi-bo/dang-nhap`
 
 ### 4.10 Dashboard noi bo
 Route:
-- `/internal/dashboard`
+- `/noi-bo/bang-dieu-khien`
 
 Ghi chu:
 - co bao ve dang nhap
@@ -174,7 +174,7 @@ Khach hang hien tai co the:
 - gan so ban
 - tao don hang tu gio
 - chon phuong thuc thanh toan
-- dat ban online theo flow tung buoc
+- dat ban online theo luong tung buoc
 - bi gioi han online toi da 10 khach moi luot
 - theo doi ho so
 - theo doi lich su order
@@ -245,19 +245,19 @@ Router chinh nam tai:
 
 ### 6.1 Route public
 - `/`
-- `/menu`
-- `/booking`
-- `/about`
-- `/cart`
-- `/checkout`
-- `/profile`
-- `/login`
-- `/register`
+- `/thuc-don`
+- `/dat-ban`
+- `/gioi-thieu`
+- `/gio-hang`
+- `/thanh-toan`
+- `/ho-so`
+- `/dang-nhap`
+- `/dang-ky`
 
 ### 6.2 Route noi bo
 - `/internal`
-- `/internal/login`
-- `/internal/dashboard`
+- `/noi-bo/dang-nhap`
+- `/noi-bo/bang-dieu-khien`
 
 Ghi chu:
 - dashboard noi bo dang duoc bao ve dang nhap
@@ -277,7 +277,7 @@ Backend `localhost:4000`:
 - mot so man lay du lieu that chua hoat dong on dinh
 
 Cac hien tuong da gap:
-- `/menu` luc dau hien `Failed to fetch`
+- `/thuc-don` luc dau hien `Failed to fetch`
 - auth `/auth/me` bi `Unauthorized` hoac `connection refused`
 - dashboard noi bo bi tra ve trang dang nhap
 

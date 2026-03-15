@@ -9,7 +9,7 @@ import {
 
 const AVAILABILITY_DELAY = 550
 
-export const useKhaDungDatBan = ({ closedDate, formData, guestCount, invalidPastDate, laNhomDongChiDatQuaHotline }) => {
+export const useKhaDungDatBan = ({ closedDate, formData, soLuongKhach, invalidPastDate, laNhomDongChiDatQuaHotline }) => {
   const [slotsLoading, setSlotsLoading] = useState(false)
   const [slotData, setSlotData] = useState({ available: [], unavailable: [] })
   const availabilityPanelRef = useRef(null)
@@ -35,20 +35,20 @@ export const useKhaDungDatBan = ({ closedDate, formData, guestCount, invalidPast
   }, [formData.date, slotData, slotsLoading])
 
   useEffect(() => {
-    if (!formData.guests || !formData.date || invalidPastDate || closedDate || laNhomDongChiDatQuaHotline(guestCount)) {
+    if (!formData.guests || !formData.date || invalidPastDate || closedDate || laNhomDongChiDatQuaHotline(soLuongKhach)) {
       setSlotsLoading(false)
-      setSlotData(giaLapKhaDungKhungGio(formData.date, guestCount))
+      setSlotData(giaLapKhaDungKhungGio(formData.date, soLuongKhach))
       return
     }
 
     setSlotsLoading(true)
     const timeoutId = window.setTimeout(() => {
-      setSlotData(giaLapKhaDungKhungGio(formData.date, guestCount))
+      setSlotData(giaLapKhaDungKhungGio(formData.date, soLuongKhach))
       setSlotsLoading(false)
     }, AVAILABILITY_DELAY)
 
     return () => window.clearTimeout(timeoutId)
-  }, [closedDate, formData.date, formData.guests, guestCount, invalidPastDate, laNhomDongChiDatQuaHotline])
+  }, [closedDate, formData.date, formData.guests, soLuongKhach, invalidPastDate, laNhomDongChiDatQuaHotline])
 
   const slotGroups = useMemo(() => taoNhomKhungGio(slotData), [slotData])
 
@@ -69,8 +69,8 @@ export const useKhaDungDatBan = ({ closedDate, formData, guestCount, invalidPast
   }, [firstAvailableSlotTime, slotGroups])
 
   const selectedTimeSuggestions = useMemo(() => timKhungGioKhaDungGanNhat(formData.time, slotData), [formData.time, slotData])
-  const selectedMealDurationText = useMemo(() => (formData.time ? layThoiLuongBuaAnText(guestCount, formData.time) : ''), [formData.time, guestCount])
-  const bookingOperationalRules = useMemo(() => layQuyTacVanHanh(guestCount, formData.seatingArea, formData.time), [formData.seatingArea, formData.time, guestCount])
+  const selectedMealDurationText = useMemo(() => (formData.time ? layThoiLuongBuaAnText(soLuongKhach, formData.time) : ''), [formData.time, soLuongKhach])
+  const bookingOperationalRules = useMemo(() => layQuyTacVanHanh(soLuongKhach, formData.seatingArea, formData.time), [formData.seatingArea, formData.time, soLuongKhach])
 
   const requestScrollToAvailability = () => {
     shouldScrollToAvailabilityRef.current = true

@@ -45,14 +45,14 @@ const ACTION_CONFIRMATION_COPY = {
 }
 
 function DatBanTab({
-  bookingQueue,
+  hangDoiDatBan,
   handleCreateInternalBooking,
   handleUpdateInternalBooking,
   handleAssignTables,
   handleCheckIn,
   handleComplete,
-  handleNoShow,
-  scopeLabel,
+  xuLyKhachKhongDen,
+  phamViLabel,
   getAvailableTablesForBooking,
 }) {
   const [searchQuery, setSearchQuery] = useState('')
@@ -66,8 +66,8 @@ function DatBanTab({
   const [pendingAction, setPendingAction] = useState(null)
 
   const visibleBookings = useMemo(
-    () => bookingQueue.filter((booking) => khopTimKiemDatBan(booking, searchQuery)),
-    [bookingQueue, searchQuery],
+    () => hangDoiDatBan.filter((booking) => khopTimKiemDatBan(booking, searchQuery)),
+    [hangDoiDatBan, searchQuery],
   )
 
   const assignableTables = useMemo(
@@ -143,7 +143,7 @@ function DatBanTab({
       : await handleCreateInternalBooking(payload)
 
     if (!result?.success) {
-      setFormError(result?.error || 'Không thể lưu booking nội bộ.')
+      setFormError(result?.error || 'Không thể lưu đặt bàn nội bộ.')
       return
     }
 
@@ -233,7 +233,7 @@ function DatBanTab({
     }
 
     if (type === 'noShow') {
-      ketQua = await handleNoShow(booking.id)
+      ketQua = await xuLyKhachKhongDen(booking.id)
     }
 
     if (!ketQua?.success) {
@@ -248,60 +248,60 @@ function DatBanTab({
   const pendingActionCopy = pendingAction ? ACTION_CONFIRMATION_COPY[pendingAction.type] : null
 
   return (
-    <section className="host-board-card">
-      <div className="host-board-head">
+    <section className="van-hanh-board-card">
+      <div className="van-hanh-board-head">
         <h2>Danh sách booking</h2>
-        <span>{visibleBookings.length} yêu cầu · {scopeLabel}</span>
+        <span>{visibleBookings.length} yêu cầu · {phamViLabel}</span>
       </div>
 
-      <div className="internal-booking-toolbar">
+      <div className="noi-bo-dat-ban-toolbar">
         <input
           type="text"
-          className="form-input"
+          className="truong-nhap"
           placeholder="Tìm theo mã booking, tên khách hoặc SĐT"
           value={searchQuery}
           onChange={(event) => setSearchQuery(event.target.value)}
         />
-        <button type="button" className="btn btn-ghost" onClick={resetForm}>
+        <button type="button" className="btn nut-phu" onClick={resetForm}>
           {formMode === 'edit' ? 'Tạo booking mới' : 'Làm mới form'}
         </button>
       </div>
 
-      <article className="profile-card internal-booking-form-card">
-        <div className="host-board-head">
-          <h2>{formMode === 'edit' ? `Sửa booking #${editingBookingId}` : 'Tạo booking nội bộ'}</h2>
+      <article className="ho-so-card noi-bo-dat-ban-form-card">
+        <div className="van-hanh-board-head">
+          <h2>{formMode === 'edit' ? `Sửa booking #${editingBookingId}` : 'Tạo đặt bàn nội bộ'}</h2>
           <span>{formMode === 'edit' ? 'Cập nhật nhanh cho lễ tân/host' : 'Dành cho staff/admin'}</span>
         </div>
 
-        <form className="internal-dish-form" onSubmit={handleSubmit}>
-          <div className="internal-dish-form-grid">
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-name">
-              <span className="form-label">Tên khách</span>
-              <input id="internal-booking-name" type="text" className="form-input" value={formValues.name} onChange={handleChange('name')} />
+        <form className="noi-bo-mon-form" onSubmit={handleSubmit}>
+          <div className="noi-bo-mon-form-grid">
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-name">
+              <span className="nhan-truong">Tên khách</span>
+              <input id="noi-bo-dat-ban-name" type="text" className="truong-nhap" value={formValues.name} onChange={handleChange('name')} />
             </label>
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-phone">
-              <span className="form-label">Số điện thoại</span>
-              <input id="internal-booking-phone" type="text" className="form-input" value={formValues.phone} onChange={handleChange('phone')} />
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-phone">
+              <span className="nhan-truong">Số điện thoại</span>
+              <input id="noi-bo-dat-ban-phone" type="text" className="truong-nhap" value={formValues.phone} onChange={handleChange('phone')} />
             </label>
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-email">
-              <span className="form-label">Email</span>
-              <input id="internal-booking-email" type="email" className="form-input" value={formValues.email} onChange={handleChange('email')} />
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-email">
+              <span className="nhan-truong">Email</span>
+              <input id="noi-bo-dat-ban-email" type="email" className="truong-nhap" value={formValues.email} onChange={handleChange('email')} />
             </label>
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-guests">
-              <span className="form-label">Số khách</span>
-              <input id="internal-booking-guests" type="number" min="1" className="form-input" value={formValues.guests} onChange={handleChange('guests')} />
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-guests">
+              <span className="nhan-truong">Số khách</span>
+              <input id="noi-bo-dat-ban-guests" type="number" min="1" className="truong-nhap" value={formValues.guests} onChange={handleChange('guests')} />
             </label>
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-date">
-              <span className="form-label">Ngày</span>
-              <input id="internal-booking-date" type="date" className="form-input" value={formValues.date} onChange={handleChange('date')} />
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-date">
+              <span className="nhan-truong">Ngày</span>
+              <input id="noi-bo-dat-ban-date" type="date" className="truong-nhap" value={formValues.date} onChange={handleChange('date')} />
             </label>
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-time">
-              <span className="form-label">Giờ</span>
-              <input id="internal-booking-time" type="time" className="form-input" value={formValues.time} onChange={handleChange('time')} />
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-time">
+              <span className="nhan-truong">Giờ</span>
+              <input id="noi-bo-dat-ban-time" type="time" className="truong-nhap" value={formValues.time} onChange={handleChange('time')} />
             </label>
-            <label className="form-group internal-dish-field" htmlFor="internal-booking-area">
-              <span className="form-label">Khu vực</span>
-              <select id="internal-booking-area" className="form-input" value={formValues.seatingArea} onChange={handleChange('seatingArea')}>
+            <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-area">
+              <span className="nhan-truong">Khu vực</span>
+              <select id="noi-bo-dat-ban-area" className="truong-nhap" value={formValues.seatingArea} onChange={handleChange('seatingArea')}>
                 <option value="KHONG_UU_TIEN">Không ưu tiên</option>
                 <option value="SANH_CHINH">Sảnh chính</option>
                 <option value="PHONG_VIP">Phòng VIP</option>
@@ -310,33 +310,33 @@ function DatBanTab({
               </select>
             </label>
             {formMode === 'create' ? (
-              <label className="form-group internal-dish-field" htmlFor="internal-booking-status">
-                <span className="form-label">Trạng thái ban đầu</span>
-                <select id="internal-booking-status" className="form-input" value={formValues.status} onChange={handleChange('status')}>
+              <label className="nhom-truong noi-bo-mon-field" htmlFor="noi-bo-dat-ban-status">
+                <span className="nhan-truong">Trạng thái ban đầu</span>
+                <select id="noi-bo-dat-ban-status" className="truong-nhap" value={formValues.status} onChange={handleChange('status')}>
                   {CREATE_STATUS_OPTIONS.map((status) => (
                     <option key={status} value={status}>{HOST_NHAN_TRANG_THAI_DAT_BAN[status]}</option>
                   ))}
                 </select>
               </label>
             ) : null}
-            <label className="form-group internal-dish-field internal-dish-field-wide" htmlFor="internal-booking-notes">
-              <span className="form-label">Ghi chú khách</span>
-              <textarea id="internal-booking-notes" className="form-textarea" rows="2" value={formValues.notes} onChange={handleChange('notes')} />
+            <label className="nhom-truong noi-bo-mon-field noi-bo-mon-field-wide" htmlFor="noi-bo-dat-ban-notes">
+              <span className="nhan-truong">Ghi chú khách</span>
+              <textarea id="noi-bo-dat-ban-notes" className="truong-van-ban" rows="2" value={formValues.notes} onChange={handleChange('notes')} />
             </label>
-            <label className="form-group internal-dish-field internal-dish-field-wide" htmlFor="internal-booking-internal-note">
-              <span className="form-label">Ghi chú nội bộ</span>
-              <textarea id="internal-booking-internal-note" className="form-textarea" rows="2" value={formValues.internalNote} onChange={handleChange('internalNote')} />
+            <label className="nhom-truong noi-bo-mon-field noi-bo-mon-field-wide" htmlFor="noi-bo-dat-ban-noi-bo-note">
+              <span className="nhan-truong">Ghi chú nội bộ</span>
+              <textarea id="noi-bo-dat-ban-noi-bo-note" className="truong-van-ban" rows="2" value={formValues.internalNote} onChange={handleChange('internalNote')} />
             </label>
           </div>
 
-          {formError ? <p className="form-error">{formError}</p> : null}
+          {formError ? <p className="loi-bieu-mau">{formError}</p> : null}
 
-          <div className="internal-dish-form-actions">
-            <button type="submit" className="btn btn-primary">
+          <div className="noi-bo-mon-form-actions">
+            <button type="submit" className="btn nut-chinh">
               {formMode === 'edit' ? 'Lưu cập nhật' : 'Tạo booking'}
             </button>
             {formMode === 'edit' ? (
-              <button type="button" className="btn btn-ghost" onClick={resetForm}>
+              <button type="button" className="btn nut-phu" onClick={resetForm}>
                 Hủy sửa
               </button>
             ) : null}
@@ -345,9 +345,9 @@ function DatBanTab({
       </article>
 
       {visibleBookings.length === 0 ? (
-        <div className="host-empty-state">Chưa có booking phù hợp với bộ lọc hiện tại.</div>
+        <div className="van-hanh-empty-state">Chưa có booking phù hợp với bộ lọc hiện tại.</div>
       ) : (
-        <div className="host-booking-list internal-list-top-gap">
+        <div className="van-hanh-dat-ban-list noi-bo-list-top-gap">
           {visibleBookings.map((booking) => {
             const assignedTables = booking.assignedTables || []
             const canAssignTables = coTheGanBanChoDatBan(booking)
@@ -356,25 +356,25 @@ function DatBanTab({
             const canNoShow = coTheDanhDauKhongDen(booking)
 
             return (
-              <article key={booking.id} className="host-booking-card">
-                <div className="host-booking-top">
+              <article key={booking.id} className="van-hanh-dat-ban-card">
+                <div className="van-hanh-dat-ban-top">
                   <div>
                     <strong>{booking.bookingCode || `DB-${booking.id}`}</strong>
                     <p>{booking.name} · {booking.phone}</p>
                   </div>
-                  <span className={`status-chip tone-${laySacThaiTrangThaiDatBan(booking.status)}`}>
+                  <span className={`nhan-trang-thai tone-${laySacThaiTrangThaiDatBan(booking.status)}`}>
                     {HOST_NHAN_TRANG_THAI_DAT_BAN[booking.status] || booking.status}
                   </span>
                 </div>
 
-                <div className="host-booking-meta">
+                <div className="van-hanh-dat-ban-meta">
                   <p><span>Ngày giờ</span><strong>{dinhDangNgayGio(booking.date, booking.time)}</strong></p>
                   <p><span>Số khách</span><strong>{dinhDangSoKhach(booking.guests)}</strong></p>
                   <p><span>Khu vực</span><strong>{layNhanChoNgoi(booking.seatingArea)}</strong></p>
                   <p><span>Kênh xác nhận</span><strong>{layNhanKenhXacNhan(booking.confirmationChannel)}</strong></p>
                 </div>
 
-                <div className="host-booking-meta internal-booking-meta-extended">
+                <div className="van-hanh-dat-ban-meta noi-bo-dat-ban-meta-extended">
                   <p>
                     <span>Bàn đã gán</span>
                     <strong>{assignedTables.length > 0 ? assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</strong>
@@ -386,20 +386,20 @@ function DatBanTab({
                 </div>
 
                 {canXacNhanThuCong(booking) && (
-                  <p className="host-booking-note host-booking-note-priority">
+                  <p className="van-hanh-dat-ban-note van-hanh-dat-ban-note-priority">
                     {layGhiChuUuTienDatBan(booking) || 'Booking này cần host xác nhận trước khi chốt bàn.'}
                   </p>
                 )}
-                {booking.notes && <p className="host-booking-note">Ghi chú: {booking.notes}</p>}
-                {booking.internalNote && <p className="host-booking-note">Nội bộ: {booking.internalNote}</p>}
+                {booking.notes && <p className="van-hanh-dat-ban-note">Ghi chú: {booking.notes}</p>}
+                {booking.internalNote && <p className="van-hanh-dat-ban-note">Nội bộ: {booking.internalNote}</p>}
 
-                <div className="host-booking-actions">
-                  <button type="button" className="host-action-btn" onClick={() => handleEditBooking(booking)}>
+                <div className="van-hanh-dat-ban-actions">
+                  <button type="button" className="van-hanh-action-btn" onClick={() => handleEditBooking(booking)}>
                     Sửa
                   </button>
                   <button
                     type="button"
-                    className="host-action-btn"
+                    className="van-hanh-action-btn"
                     onClick={() => openAssignModal(booking)}
                     disabled={!canAssignTables}
                   >
@@ -407,7 +407,7 @@ function DatBanTab({
                   </button>
                   <button
                     type="button"
-                    className="host-action-btn"
+                    className="van-hanh-action-btn"
                     onClick={() => openConfirmAction('checkIn', booking)}
                     disabled={!canCheckIn}
                   >
@@ -415,7 +415,7 @@ function DatBanTab({
                   </button>
                   <button
                     type="button"
-                    className="host-action-btn"
+                    className="van-hanh-action-btn"
                     onClick={() => openConfirmAction('complete', booking)}
                     disabled={!canComplete}
                   >
@@ -423,7 +423,7 @@ function DatBanTab({
                   </button>
                   <button
                     type="button"
-                    className="host-action-btn"
+                    className="van-hanh-action-btn"
                     onClick={() => openConfirmAction('noShow', booking)}
                     disabled={!canNoShow}
                   >
@@ -437,26 +437,26 @@ function DatBanTab({
       )}
 
       {assigningBooking ? (
-        <div className="internal-booking-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="booking-assign-modal-title" onClick={resetAssignModal}>
-          <div className="internal-booking-modal profile-card" onClick={(event) => event.stopPropagation()}>
-            <div className="host-board-head internal-booking-modal-head">
+        <div className="noi-bo-dat-ban-hop-thoai-overlay" role="dialog" aria-modal="true" aria-labelledby="dat-ban-assign-hop-thoai-title" onClick={resetAssignModal}>
+          <div className="noi-bo-dat-ban-modal ho-so-card" onClick={(event) => event.stopPropagation()}>
+            <div className="van-hanh-board-head noi-bo-dat-ban-hop-thoai-head">
               <div>
-                <h2 id="booking-assign-modal-title">Gán bàn cho booking</h2>
+                <h2 id="dat-ban-assign-hop-thoai-title">Gán bàn cho booking</h2>
                 <span>{assigningBooking.bookingCode}</span>
               </div>
-              <button type="button" className="internal-booking-modal-close" onClick={resetAssignModal} aria-label="Đóng modal gán bàn">
+              <button type="button" className="noi-bo-dat-ban-hop-thoai-close" onClick={resetAssignModal} aria-label="Đóng modal gán bàn">
                 ×
               </button>
             </div>
 
-            <div className="host-booking-meta internal-booking-modal-meta">
+            <div className="van-hanh-dat-ban-meta noi-bo-dat-ban-hop-thoai-meta">
               <p><span>Khách</span><strong>{assigningBooking.name}</strong></p>
               <p><span>Số khách</span><strong>{dinhDangSoKhach(assigningBooking.guests)}</strong></p>
               <p><span>Khu vực ưu tiên</span><strong>{layNhanChoNgoi(assigningBooking.seatingArea)}</strong></p>
               <p><span>Thời gian</span><strong>{dinhDangNgayGio(assigningBooking.date, assigningBooking.time)}</strong></p>
             </div>
 
-            <div className="internal-booking-assign-summary">
+            <div className="noi-bo-dat-ban-assign-summary">
               <div>
                 <span>Đang gán</span>
                 <strong>
@@ -473,7 +473,7 @@ function DatBanTab({
               </div>
             </div>
 
-            <div className="internal-booking-table-list" aria-label="Danh sách bàn hợp lệ">
+            <div className="noi-bo-dat-ban-ban-list" aria-label="Danh sách bàn hợp lệ">
               {assignableTables.map((table) => {
                 const isSelected = selectedTableIds.includes(table.id)
                 const isCurrent = Array.isArray(assigningBooking.assignedTableIds) && assigningBooking.assignedTableIds.includes(table.id)
@@ -482,7 +482,7 @@ function DatBanTab({
                   <button
                     key={table.id}
                     type="button"
-                    className={`internal-booking-table-option ${isSelected ? 'selected' : ''}`}
+                    className={`noi-bo-dat-ban-ban-option ${isSelected ? 'selected' : ''}`}
                     onClick={() => toggleTableSelection(table.id)}
                   >
                     <div>
@@ -495,13 +495,13 @@ function DatBanTab({
               })}
             </div>
 
-            {assignModalError ? <p className="form-error">{assignModalError}</p> : null}
+            {assignModalError ? <p className="loi-bieu-mau">{assignModalError}</p> : null}
 
-            <div className="internal-booking-modal-actions">
-              <button type="button" className="btn btn-ghost" onClick={resetAssignModal}>
+            <div className="noi-bo-dat-ban-hop-thoai-actions">
+              <button type="button" className="btn nut-phu" onClick={resetAssignModal}>
                 Hủy
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleAssignSubmit}>
+              <button type="button" className="btn nut-chinh" onClick={handleAssignSubmit}>
                 Lưu gán bàn
               </button>
             </div>
@@ -510,22 +510,22 @@ function DatBanTab({
       ) : null}
 
       {pendingAction && pendingActionCopy ? (
-        <div className="internal-booking-modal-overlay" role="dialog" aria-modal="true" aria-labelledby="booking-confirm-modal-title" onClick={resetPendingAction}>
-          <div className="internal-booking-modal internal-booking-confirm-modal profile-card" onClick={(event) => event.stopPropagation()}>
-            <div className="host-board-head internal-booking-modal-head">
+        <div className="noi-bo-dat-ban-hop-thoai-overlay" role="dialog" aria-modal="true" aria-labelledby="dat-ban-confirm-hop-thoai-title" onClick={resetPendingAction}>
+          <div className="noi-bo-dat-ban-modal noi-bo-dat-ban-confirm-modal ho-so-card" onClick={(event) => event.stopPropagation()}>
+            <div className="van-hanh-board-head noi-bo-dat-ban-hop-thoai-head">
               <div>
-                <h2 id="booking-confirm-modal-title">{pendingActionCopy.title}</h2>
+                <h2 id="dat-ban-confirm-hop-thoai-title">{pendingActionCopy.title}</h2>
                 <span>{pendingAction.booking.bookingCode}</span>
               </div>
             </div>
 
-            <p className="internal-booking-confirm-text">{pendingActionCopy.getMessage(pendingAction.booking)}</p>
+            <p className="noi-bo-dat-ban-confirm-text">{pendingActionCopy.getMessage(pendingAction.booking)}</p>
 
-            <div className="internal-booking-modal-actions">
-              <button type="button" className="btn btn-ghost" onClick={resetPendingAction}>
+            <div className="noi-bo-dat-ban-hop-thoai-actions">
+              <button type="button" className="btn nut-phu" onClick={resetPendingAction}>
                 Hủy
               </button>
-              <button type="button" className="btn btn-primary" onClick={handleConfirmAction}>
+              <button type="button" className="btn nut-chinh" onClick={handleConfirmAction}>
                 {pendingActionCopy.confirmLabel}
               </button>
             </div>

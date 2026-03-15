@@ -33,7 +33,7 @@ const sampleTables = [
   },
 ]
 
-test('CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO only allows configured initial statuses', () => {
+test('CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO chi cho phep trang thai khoi tao da cau hinh', () => {
   assert.equal(CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.has('CHO_XAC_NHAN'), true)
   assert.equal(CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.has('DA_XAC_NHAN'), true)
   assert.equal(CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.has('CAN_GOI_LAI'), true)
@@ -41,11 +41,11 @@ test('CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO only allows configured initial statuses'
   assert.equal(CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.has('DA_HOAN_THANH'), false)
 })
 
-test('kiemTraBanDaGan accepts matching area and sufficient combined capacity', () => {
+test('kiemTraBanDaGan chap nhan khu vuc khop va du suc chua tong hop', () => {
   const ketQua = kiemTraBanDaGan({
     assignedTableIds: ['VIP-01'],
     tables: sampleTables,
-    guestCount: 4,
+    soLuongKhach: 4,
     preferredArea: 'PHONG_VIP',
     bookingId: 99,
   })
@@ -53,11 +53,11 @@ test('kiemTraBanDaGan accepts matching area and sufficient combined capacity', (
   assert.deepEqual(ketQua, { success: true })
 })
 
-test('kiemTraBanDaGan rejects dirty or wrong-area table assignments', () => {
+test('kiemTraBanDaGan tu choi ban dang ban hoac sai khu vuc', () => {
   const dirtyResult = kiemTraBanDaGan({
     assignedTableIds: ['VIP-02'],
     tables: sampleTables,
-    guestCount: 2,
+    soLuongKhach: 2,
     preferredArea: 'PHONG_VIP',
     bookingId: 99,
   })
@@ -68,7 +68,7 @@ test('kiemTraBanDaGan rejects dirty or wrong-area table assignments', () => {
   const wrongAreaResult = kiemTraBanDaGan({
     assignedTableIds: ['SC-01'],
     tables: sampleTables,
-    guestCount: 4,
+    soLuongKhach: 4,
     preferredArea: 'PHONG_VIP',
     bookingId: 99,
   })
@@ -77,7 +77,7 @@ test('kiemTraBanDaGan rejects dirty or wrong-area table assignments', () => {
   assert.match(wrongAreaResult.error, /không khớp khu vực/i)
 })
 
-test('coTheChuyenTrangThaiDatBanThuCong only allows valid transitions and blocks check-in without tables', () => {
+test('coTheChuyenTrangThaiDatBanThuCong chi cho phep chuyen hop le va chan check in khi chua co ban', () => {
   const confirmedBooking = {
     status: 'DA_XAC_NHAN',
     assignedTableIds: ['VIP-01'],

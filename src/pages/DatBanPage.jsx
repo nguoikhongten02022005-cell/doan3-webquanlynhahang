@@ -1,6 +1,6 @@
 import { useNavigate } from 'react-router-dom'
 import { CAC_BUOC_DAT_BAN } from '../data/duLieuDatBan'
-import { BOOKING_DRAFT_BANNER, BOOKING_HERO_CONTENT } from '../constants/giaoDienDatBan'
+import { BANG_THONG_BAO_BAN_NHAP_TAM_DAT_BAN, NOI_DUNG_MO_DAU_DAT_BAN } from '../constants/giaoDienDatBan'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 import ThanhBenDatBan from '../components/datBan/ThanhBenDatBan'
 import BuocMotDatBan from '../components/datBan/BuocMotDatBan'
@@ -34,7 +34,7 @@ function DatBanPage() {
     firstAvailableSlotRef,
     firstAvailableSlotTime,
     formData,
-    guestCount,
+    soLuongKhach,
     guestWarning,
     goToStep,
     handleCalendarDayKeyDown,
@@ -85,27 +85,27 @@ function DatBanPage() {
   const primaryAction = step === 1 ? handleStepOneContinue : step === 2 ? handleStepTwoContinue : handleSubmit
 
   return (
-    <div className="booking-page booking-page-fullbleed">
-      <section className="booking-hero booking-hero-premium booking-hero-premium-tight">
-        <div className="booking-hero-shell booking-hero-shell-full">
-          <div className="booking-hero-copy booking-hero-copy-compact">
-            <span className="booking-label">{BOOKING_HERO_CONTENT.label}</span>
-            <h1 className="booking-title booking-title-premium">Đặt bàn tinh gọn cho một buổi dùng bữa chỉn chu</h1>
-            <p className="booking-subtitle booking-subtitle-premium">Chọn số khách, ngày và khung giờ trong trải nghiệm đặt chỗ nhẹ nhàng, rõ ràng và đúng nhịp của một nhà hàng.</p>
+    <div className="dat-ban-page dat-ban-page-fullbleed">
+      <section className="dat-ban-hero dat-ban-mo-dau-premium dat-ban-mo-dau-premium-tight">
+        <div className="dat-ban-mo-dau-shell dat-ban-mo-dau-shell-full">
+          <div className="dat-ban-mo-dau-copy dat-ban-mo-dau-copy-compact">
+            <span className="dat-ban-label">{NOI_DUNG_MO_DAU_DAT_BAN.label}</span>
+            <h1 className="dat-ban-title dat-ban-title-premium">Đặt bàn tinh gọn cho một buổi dùng bữa chỉn chu</h1>
+            <p className="dat-ban-subtitle dat-ban-subtitle-premium">Chọn số khách, ngày và khung giờ trong trải nghiệm đặt chỗ nhẹ nhàng, rõ ràng và đúng nhịp của một nhà hàng.</p>
           </div>
 
-          <div className="booking-hero-note-inline booking-hero-note-panel">
+          <div className="dat-ban-mo-dau-note-inline dat-ban-mo-dau-note-panel">
             <div>
-              <span className="booking-hero-note-label">{BOOKING_HERO_CONTENT.noteLabel}</span>
+              <span className="dat-ban-mo-dau-note-label">{NOI_DUNG_MO_DAU_DAT_BAN.noteLabel}</span>
               <strong>Tối đa {SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN} khách / lượt</strong>
             </div>
-            <p>{BOOKING_HERO_CONTENT.noteText}</p>
+            <p>{NOI_DUNG_MO_DAU_DAT_BAN.noteText}</p>
           </div>
         </div>
       </section>
 
-      <section className="booking-form-section booking-form-section-premium">
-        <div className="booking-layout-premium booking-layout-premium-full">
+      <section className="dat-ban-form-section dat-ban-form-section-premium">
+        <div className="dat-ban-layout-premium dat-ban-layout-premium-full">
           <ThanhBenDatBan
             bookingSelectionSummary={bookingSelectionSummary}
             onPrimaryAction={primaryAction}
@@ -120,38 +120,38 @@ function DatBanPage() {
             submitError={step === 3 ? submitError : ''}
           />
 
-          <div className="booking-main-premium">
+          <div className="dat-ban-main-premium">
               {submitted ? (
                 <DatBanThanhCong
                   bookingCode={bookingCode}
                   bookingStatus={bookingStatus}
                   formData={formData}
-                  guestCount={guestCount}
+                  soLuongKhach={soLuongKhach}
                   successHeading={successHeading}
                   successStatusLabel={successStatusLabel}
                   onGoHome={() => navigate('/')}
                   onGoProfile={() => navigate('/ho-so')}
                 />
               ) : (
-                <form id="booking-form" className="booking-shell-premium" onSubmit={handleSubmit}>
+                <form id="dat-ban-form" className="dat-ban-shell-premium" onSubmit={handleSubmit}>
                   {draftRestored && (
-                    <div className="booking-draft-banner">
+                    <div className="dat-ban-draft-banner">
                       <div>
-                        <strong>{BOOKING_DRAFT_BANNER.title}</strong>
-                        <p>{BOOKING_DRAFT_BANNER.description}</p>
+                        <strong>{BANG_THONG_BAO_BAN_NHAP_TAM_DAT_BAN.title}</strong>
+                        <p>{BANG_THONG_BAO_BAN_NHAP_TAM_DAT_BAN.description}</p>
                       </div>
-                      <button type="button" className="summary-edit-btn" onClick={() => setDraftRestored(false)}>
-                        {BOOKING_DRAFT_BANNER.actionLabel}
+                      <button type="button" className="tom-tat-edit-btn" onClick={() => setDraftRestored(false)}>
+                        {BANG_THONG_BAO_BAN_NHAP_TAM_DAT_BAN.actionLabel}
                       </button>
                     </div>
                   )}
 
-                  <header className="booking-panel-header booking-panel-header-compact">
+                  <header className="dat-ban-panel-header dat-ban-panel-header-compact">
                     <div>
-                      <p className="booking-side-kicker">Đặt bàn trực tuyến</p>
+                      <p className="dat-ban-side-kicker">Đặt bàn trực tuyến</p>
                       <h2>{CAC_BUOC_DAT_BAN.find((item) => item.id === step)?.title}</h2>
                     </div>
-                    <div className="booking-panel-progress booking-panel-progress-compact">{nextStepHint}</div>
+                    <div className="dat-ban-panel-progress dat-ban-panel-progress-compact">{nextStepHint}</div>
                   </header>
 
                   {step === 1 && (
@@ -186,7 +186,7 @@ function DatBanPage() {
                         toggleCalendar,
                       }}
                       formData={formData}
-                      guestCount={guestCount}
+                      soLuongKhach={soLuongKhach}
                       guestWarning={guestWarning}
                       handlers={{
                         handleCalendarDayKeyDown,
@@ -210,7 +210,7 @@ function DatBanPage() {
                   {step === 2 && (
                     <BuocHaiDatBan
                       formData={formData}
-                      guestCount={guestCount}
+                      soLuongKhach={soLuongKhach}
                       inlineErrors={inlineErrors}
                       selectedMealDurationText={selectedMealDurationText}
                       onBack={() => goToStep(1)}
@@ -222,19 +222,19 @@ function DatBanPage() {
                   {step === 3 && (
                     <BuocBaDatBan
                       formData={formData}
-                      guestCount={guestCount}
+                      soLuongKhach={soLuongKhach}
                       selectedSeatOperationalNote={selectedSeatOperationalNote}
                     />
                   )}
 
-                  <div className="booking-mobile-sticky-bar">
-                    <div className="booking-mobile-sticky-meta">
+                  <div className="dat-ban-mobile-sticky-bar">
+                    <div className="dat-ban-mobile-sticky-meta">
                       <strong>{bookingSelectionSummary.guests}</strong>
                       <span>{bookingSelectionSummary.time}</span>
                     </div>
                     <button
                       type="button"
-                      className="booking-primary-btn booking-mobile-sticky-btn"
+                      className="dat-ban-primary-btn dat-ban-mobile-sticky-btn"
                       onClick={primaryAction}
                       disabled={step === 3 ? isSubmitting : primaryCtaDisabled}
                     >

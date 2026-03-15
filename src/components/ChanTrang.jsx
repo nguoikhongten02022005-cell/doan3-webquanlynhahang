@@ -4,7 +4,7 @@ import { SITE_CONTACT } from '../constants/lienHeTrang'
 function ChanTrang({ compact = false }) {
   if (compact) {
     return (
-      <footer className="site-footer site-footer-compact booking-footer-compact" id="about">
+      <footer className="site-footer site-footer-compact dat-ban-footer-compact" id="about">
         <div className="footer-compact-bar footer-compact-bar-full">
           <Link to="/" className="brand footer-brand">
             <span className="brand-mark">NH</span>

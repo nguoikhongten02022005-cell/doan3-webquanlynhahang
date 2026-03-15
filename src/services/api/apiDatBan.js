@@ -6,5 +6,5 @@ export const taoDatBanApi = async (payload) => tachPhanHoiApi(await trinhKhachAp
 export const taoDatBanNoiBoApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.post('/dat-bans/internal', payload))
 export const capNhatDatBanApi = async (id, payload) => tachPhanHoiApi(await trinhKhachApi.patch(`/dat-bans/${id}`, payload))
 export const capNhatTrangThaiDatBanApi = async (id, status) => tachPhanHoiApi(await trinhKhachApi.patch(`/dat-bans/${id}/status`, { status }))
-export const ganBanChoDatBanApi = async (id, tableIds) => tachPhanHoiApi(await trinhKhachApi.patch(`/dat-bans/${id}/assign-tables`, { tableIds }))
+export const ganBanChoDatBanApi = async (id, danhSachIdBan) => tachPhanHoiApi(await trinhKhachApi.patch(`/dat-bans/${id}/assign-tables`, { danhSachIdBan }))
 export const huyDatBanApi = async (id) => tachPhanHoiApi(await trinhKhachApi.patch(`/dat-bans/${id}/cancel`, {}))

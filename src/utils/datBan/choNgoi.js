@@ -1,15 +1,15 @@
 import { CAC_KHU_VUC_DAT_BAN } from '../../data/duLieuDatBan'
 
-export const nenVoHieuHoaLuaChonChoNgoi = (areaValue, guestCount) => {
-  if (!guestCount) return false
+export const nenVoHieuHoaLuaChonChoNgoi = (areaValue, soLuongKhach) => {
+  if (!soLuongKhach) return false
   const area = CAC_KHU_VUC_DAT_BAN.find((item) => item.value === areaValue)
   if (!area) return true
-  return guestCount > area.maxGuests
+  return soLuongKhach > area.maxGuests
 }
 
-export const layGoiYVoHieuHoaChoNgoi = (areaValue, guestCount) => {
+export const layGoiYVoHieuHoaChoNgoi = (areaValue, soLuongKhach) => {
   const area = CAC_KHU_VUC_DAT_BAN.find((item) => item.value === areaValue)
-  if (!area || !guestCount || guestCount <= area.maxGuests) return ''
+  if (!area || !soLuongKhach || soLuongKhach <= area.maxGuests) return ''
   return `Phù hợp tối đa ${area.maxGuests} khách`
 }
 

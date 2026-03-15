@@ -53,7 +53,7 @@ const chuanHoaNguoiDungHienTai = (nguoiDung) => {
   }
 }
 
-export const layNguoiDungHienTai = () => chuanHoaNguoiDungHienTai(layJsonLuuTru(STORAGE_KEYS.CURRENT_USER, null))
+export const layNguoiDungHienTai = () => chuanHoaNguoiDungHienTai(layJsonLuuTru(STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI, null))
 
 export const luuNguoiDungHienTai = (nguoiDung) => {
   const nguoiDungHienTai = chuanHoaNguoiDungHienTai(nguoiDung)
@@ -62,17 +62,17 @@ export const luuNguoiDungHienTai = (nguoiDung) => {
     return
   }
 
-  datJsonLuuTru(STORAGE_KEYS.CURRENT_USER, nguoiDungHienTai)
+  datJsonLuuTru(STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI, nguoiDungHienTai)
   phatSuKienThayDoiNguoiDung()
 }
 
 export const xoaNguoiDungHienTai = () => {
-  xoaMucLuuTru(STORAGE_KEYS.CURRENT_USER)
+  xoaMucLuuTru(STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI)
   phatSuKienThayDoiNguoiDung()
 }
 
 export const layMaXacThuc = () => {
-  const maXacThuc = layMucLuuTru(STORAGE_KEYS.AUTH_TOKEN)
+  const maXacThuc = layMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
   return typeof maXacThuc === 'string' && maXacThuc.trim() ? maXacThuc : ''
 }
 
@@ -81,11 +81,11 @@ export const luuMaXacThuc = (token) => {
     return
   }
 
-  datMucLuuTru(STORAGE_KEYS.AUTH_TOKEN, token)
+  datMucLuuTru(STORAGE_KEYS.MA_XAC_THUC, token)
 }
 
 export const xoaMaXacThuc = () => {
-  xoaMucLuuTru(STORAGE_KEYS.AUTH_TOKEN)
+  xoaMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
 }
 
 export const luuPhienXacThuc = ({ user, accessToken }) => {

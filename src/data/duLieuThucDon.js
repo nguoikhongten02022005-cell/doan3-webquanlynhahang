@@ -3,7 +3,7 @@ import { CAC_LUA_CHON_KICH_CO_THUC_DON, CAC_LUA_CHON_SAP_XEP_THUC_DON, CAC_LUA_C
 
 export { CAC_DANH_MUC_THUC_DON, MO_TA_DANH_MUC_THUC_DON, CAC_LUA_CHON_SAP_XEP_THUC_DON, CAC_LUA_CHON_TOPPING_THUC_DON, CAC_LUA_CHON_KICH_CO_THUC_DON }
 
-export const MENU_DISHES = Object.freeze([
+export const DANH_SACH_MON = Object.freeze([
   {
     id: 1,
     name: 'Bò Bít Tết Úc',
@@ -172,9 +172,9 @@ export const MENU_DISHES = Object.freeze([
   },
 ])
 
-export const HOME_CATEGORIES = HOME_CAC_DANH_MUC_THUC_DON
+export const DANH_MUC_TRANG_CHU = HOME_CAC_DANH_MUC_THUC_DON
 
-export const HOME_SIGNATURE_DISHES = Object.freeze([
+export const DANH_SACH_MON_NOI_BAT_TRANG_CHU = Object.freeze([
   {
     id: 1,
     name: 'Bò Nướng Tảng Sốt Tiêu Xanh',

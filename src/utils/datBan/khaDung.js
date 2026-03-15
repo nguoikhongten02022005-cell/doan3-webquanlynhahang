@@ -7,10 +7,10 @@ export const phanTichGioThanhPhut = (value) => {
   return hours * 60 + minutes
 }
 
-export const giaLapKhaDungKhungGio = (dateValue, guestCount) => {
+export const giaLapKhaDungKhungGio = (dateValue, soLuongKhach) => {
   if (!dateValue) return { available: [], unavailable: [] }
 
-  if (guestCount > SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN) {
+  if (soLuongKhach > SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN) {
     return {
       available: [],
       unavailable: CAC_KHUNG_GIO_DAT_BAN.map((time) => ({ time, reason: 'group_limit' })),
@@ -38,7 +38,7 @@ export const giaLapKhaDungKhungGio = (dateValue, guestCount) => {
     }
 
     const seed = dateValue.split('-').reduce((a, b) => a + Number(b), 0) + phanTichGioThanhPhut(slot)
-    const isFull = guestCount >= 6 && seed % 7 === 0
+    const isFull = soLuongKhach >= 6 && seed % 7 === 0
     const isAlmostFull = seed % 11 === 0
 
     if (isFull) {

@@ -19,20 +19,20 @@ function ThucDonPage() {
   } = useDanhSachMonAn()
   const { themVaoGio } = useGioHang()
   const {
-    closeDetailModal,
-    detailPrice,
-    handleAddConfiguredDish,
-    handleAddToCart,
-    handleToggleTopping,
-    isDetailOpen,
-    openDetailModal,
-    selectedDish,
-    selectedSize,
-    selectedSurcharge,
-    selectedToppings,
-    setSelectedSize,
-    setSpecialNote,
-    specialNote,
+    dongChiTietMon,
+    giaChiTiet,
+    xuLyThemMonDaTuyChon,
+    xuLyThemVaoGio,
+    xuLyBatTatTopping,
+    dangMoChiTiet,
+    moChiTietMon,
+    monDaChon,
+    kichCoDaChon,
+    phuThuDaChon,
+    toppingDaChon,
+    datKichCoDaChon,
+    datGhiChuRieng,
+    ghiChuRieng,
   } = useChiTietMonAnModal({ themVaoGio })
 
   const normalizedQuery = searchQuery.trim().toLowerCase()
@@ -85,31 +85,31 @@ function ThucDonPage() {
   const searchLabel = normalizedQuery ? `· Từ khóa “${searchQuery.trim()}”` : ''
 
   return (
-    <div className="menu-page">
+    <div className="thuc-don-page">
       <div className="container">
-        <div className="menu-layout">
-          <aside className="menu-sidebar">
-            <div className="menu-search">
+        <div className="thuc-don-layout">
+          <aside className="thuc-don-sidebar">
+            <div className="thuc-don-search">
               <input
                 type="text"
-                className="menu-search-input"
+                className="thuc-don-search-input"
                 placeholder="Tìm kiếm món ăn..."
                 value={searchQuery}
                 onChange={(event) => setSearchQuery(event.target.value)}
               />
             </div>
 
-            <div className="menu-categories">
-              <div className="menu-sidebar-head">
-                <h3 className="menu-categories-title">Danh mục</h3>
-                <span className="menu-sidebar-count">{CAC_DANH_MUC_THUC_DON.length - 1} nhóm món</span>
+            <div className="thuc-don-categories">
+              <div className="thuc-don-sidebar-head">
+                <h3 className="thuc-don-categories-title">Danh mục</h3>
+                <span className="thuc-don-sidebar-count">{CAC_DANH_MUC_THUC_DON.length - 1} nhóm món</span>
               </div>
-              <div className="menu-category-list">
+              <div className="thuc-don-danh-muc-list">
                 {CAC_DANH_MUC_THUC_DON.map((category) => (
                   <button
                     key={category}
                     type="button"
-                    className={`menu-category-btn ${activeCategory === category ? 'active' : ''}`}
+                    className={`thuc-don-danh-muc-btn ${activeCategory === category ? 'active' : ''}`}
                     onClick={() => setActiveCategory(category)}
                   >
                     <span>{category}</span>
@@ -120,22 +120,22 @@ function ThucDonPage() {
             </div>
           </aside>
 
-          <main className="menu-main">
-            <div className="menu-toolbar">
-              <div className="menu-toolbar-copy">
-                <p className="menu-toolbar-eyebrow">Thực đơn trong ngày</p>
-                <h1 className="menu-toolbar-title">{activeCategoryLabel}</h1>
-                <p className="menu-toolbar-summary">
+          <main className="thuc-don-main">
+            <div className="thuc-don-toolbar">
+              <div className="thuc-don-toolbar-copy">
+                <p className="thuc-don-toolbar-eyebrow">Thực đơn trong ngày</p>
+                <h1 className="thuc-don-toolbar-title">{activeCategoryLabel}</h1>
+                <p className="thuc-don-toolbar-summary">
                   {loading ? 'Đang tải thực đơn...' : `${filteredDishes.length} món ${searchLabel}`}
                 </p>
-                <p className="menu-toolbar-description">{activeCategoryDescription}</p>
+                <p className="thuc-don-toolbar-description">{activeCategoryDescription}</p>
               </div>
 
-              <label className="menu-sort" htmlFor="menu-sort-select">
+              <label className="thuc-don-sort" htmlFor="thuc-don-sort-select">
                 <span>Sắp xếp</span>
                 <select
-                  id="menu-sort-select"
-                  className="menu-sort-select"
+                  id="thuc-don-sort-select"
+                  className="thuc-don-sort-select"
                   value={sortOption}
                   onChange={(event) => setSortOption(event.target.value)}
                 >
@@ -149,41 +149,41 @@ function ThucDonPage() {
             </div>
 
             {loading ? (
-              <div className="menu-empty">
+              <div className="thuc-don-empty">
                 <p>Đang tải thực đơn...</p>
               </div>
             ) : null}
 
             {!loading && hasLoadError ? (
-              <div className="menu-empty">
+              <div className="thuc-don-empty">
                 <p>{error}</p>
-                <button type="button" className="btn btn-primary" onClick={reloadDishes}>
+                <button type="button" className="btn nut-chinh" onClick={reloadDishes}>
                   Tải lại
                 </button>
               </div>
             ) : null}
 
             {isEmptyState ? (
-              <div className="menu-empty">
+              <div className="thuc-don-empty">
                 <p>Hiện chưa có món nào trong thực đơn.</p>
               </div>
             ) : null}
 
             {isNoResultState ? (
-              <div className="menu-empty">
+              <div className="thuc-don-empty">
                 <p>Không tìm thấy món ăn phù hợp với bộ lọc hiện tại.</p>
               </div>
             ) : null}
 
             {!loading && !hasLoadError && !isEmptyState && !isNoResultState ? (
-              <div className="menu-grid">
+              <div className="thuc-don-grid">
                 {filteredDishes.map((dish) => (
                   <TheMonAn
                     key={dish.id}
                     dish={dish}
                     variant="menu"
-                    onAddToCart={handleAddToCart}
-                    onOpenDetail={openDetailModal}
+                    xuLyThemVaoGio={xuLyThemVaoGio}
+                    onOpenDetail={moChiTietMon}
                   />
                 ))}
               </div>
@@ -193,19 +193,19 @@ function ThucDonPage() {
       </div>
 
       <ChiTietMonAnModal
-        detailPrice={detailPrice}
-        isOpen={isDetailOpen}
-        onAddToCart={handleAddConfiguredDish}
-        onClose={closeDetailModal}
-        onSelectSize={setSelectedSize}
-        onSpecialNoteChange={setSpecialNote}
-        onToggleTopping={handleToggleTopping}
-        scope="menu"
-        selectedDish={selectedDish}
-        selectedSize={selectedSize}
-        selectedSurcharge={selectedSurcharge}
-        selectedToppings={selectedToppings}
-        specialNote={specialNote}
+        giaChiTiet={giaChiTiet}
+        dangMo={dangMoChiTiet}
+        xuLyThemVaoGio={xuLyThemMonDaTuyChon}
+        xuLyDong={dongChiTietMon}
+        xuLyChonKichCo={datKichCoDaChon}
+        xuLyDoiGhiChuRieng={datGhiChuRieng}
+        xuLyBatTatTopping={xuLyBatTatTopping}
+        phamVi="menu"
+        monDaChon={monDaChon}
+        kichCoDaChon={kichCoDaChon}
+        phuThuDaChon={phuThuDaChon}
+        toppingDaChon={toppingDaChon}
+        ghiChuRieng={ghiChuRieng}
       />
     </div>
   )

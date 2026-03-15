@@ -27,23 +27,23 @@ function DangNhapPage() {
   }
 
   return (
-    <section className="auth-page">
-      <div className="auth-card">
-        <h1 className="auth-title">Đăng nhập</h1>
-        <p className="auth-subtitle">Chào mừng bạn quay trở lại nhà hàng của chúng tôi.</p>
+    <section className="xac-thuc-page">
+      <div className="xac-thuc-card">
+        <h1 className="xac-thuc-title">Đăng nhập</h1>
+        <p className="xac-thuc-subtitle">Chào mừng bạn quay trở lại nhà hàng của chúng tôi.</p>
 
         {location.state?.registered && <p className="form-success">Đăng ký thành công. Vui lòng đăng nhập.</p>}
 
-        <form onSubmit={handleSubmit} className="auth-form">
-          <div className="form-group">
-            <label htmlFor="login-identifier" className="form-label">
+        <form onSubmit={handleSubmit} className="xac-thuc-form">
+          <div className="nhom-truong">
+            <label htmlFor="login-identifier" className="nhan-truong">
               Tên tài khoản hoặc Email
             </label>
             <input
               id="login-identifier"
               name="identifier"
               type="text"
-              className="form-input"
+              className="truong-nhap"
               placeholder="Nhập tên tài khoản hoặc email"
               autoComplete="username"
               value={identifier}
@@ -57,15 +57,15 @@ function DangNhapPage() {
             />
           </div>
 
-          <div className="form-group">
-            <label htmlFor="login-password" className="form-label">
+          <div className="nhom-truong">
+            <label htmlFor="login-password" className="nhan-truong">
               Mật khẩu
             </label>
             <input
               id="login-password"
               name="password"
               type="password"
-              className="form-input"
+              className="truong-nhap"
               placeholder="Nhập mật khẩu"
               autoComplete="current-password"
               value={password}
@@ -80,19 +80,19 @@ function DangNhapPage() {
           </div>
 
           {loginError && (
-            <p className="form-error" role="alert">
+            <p className="loi-bieu-mau" role="alert">
               {loginError}
             </p>
           )}
 
-          <button type="submit" className="btn btn-primary">
+          <button type="submit" className="btn nut-chinh">
             Đăng nhập
           </button>
         </form>
 
-        <p className="auth-switch-text">
+        <p className="xac-thuc-switch-text">
           Chưa có tài khoản?{' '}
-          <Link to="/dang-ky" className="auth-switch-link">
+          <Link to="/dang-ky" className="xac-thuc-switch-link">
             Đăng ký ngay
           </Link>
         </p>

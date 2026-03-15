@@ -14,7 +14,7 @@ import {
   laSoDienThoaiHopLe,
 } from '../utils/datBan/index'
 
-export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, guestCount, invalidPastDate, closedDate, slotData, step }) => {
+export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuongKhach, invalidPastDate, closedDate, slotData, step }) => {
   const [submitted, setSubmitted] = useState(false)
   const [bookingCode, setBookingCode] = useState('')
   const [bookingStatus, setBookingStatus] = useState('YEU_CAU_DAT_BAN')
@@ -23,14 +23,14 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, guestC
   const [isSubmitting, setIsSubmitting] = useState(false)
 
   const step1Complete = Boolean(
-    formData.guests && formData.date && formData.time && !invalidPastDate && !closedDate && !laNhomDongChiDatQuaHotline(guestCount),
+    formData.guests && formData.date && formData.time && !invalidPastDate && !closedDate && !laNhomDongChiDatQuaHotline(soLuongKhach),
   )
   const step2Complete = Boolean(formData.name.trim() && formData.phone.trim() && laSoDienThoaiHopLe(formData.phone))
   const primaryCtaDisabled = isSubmitting || (step === 1 && !step1Complete) || (step === 2 && !step2Complete)
 
   const defaultPrimaryCtaLabel = layNhanHanhDongChinh({
     step,
-    guestCount,
+    soLuongKhach,
     date: formData.date,
     time: formData.time,
     step1Complete,
@@ -54,7 +54,7 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, guestC
     })
   }
 
-  const validateStepOne = () => layLoiBuocMot({ guestCount, date: formData.date, time: formData.time, invalidPastDate, closedDate })
+  const validateStepOne = () => layLoiBuocMot({ soLuongKhach, date: formData.date, time: formData.time, invalidPastDate, closedDate })
   const validateStepTwo = () => layLoiBuocHai({ name: formData.name, phone: formData.phone })
 
   const submitBooking = async ({ goToStep, saveDraft }) => {
@@ -103,7 +103,7 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, guestC
     const submissionTime = new Date().toISOString()
     const trangThai = layTrangThaiGuiDatBan({
       seatingArea: formData.seatingArea,
-      guestCount,
+      soLuongKhach,
       time: formData.time,
       notes: formData.notes,
     })
@@ -137,7 +137,7 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, guestC
           status: trangThai,
           confirmationChannel: duLieuDatBan.confirmationChannel,
           createdAt: submissionTime,
-          mealDurationMinutes: layThoiLuongBuaAn(guestCount, formData.time),
+          mealDurationMinutes: layThoiLuongBuaAn(soLuongKhach, formData.time),
           sms: { to: formData.phone, sentAt: submissionTime, bookingCode: code, status: trangThai },
           email: formData.email ? { to: formData.email, sentAt: submissionTime, bookingCode: code, status: trangThai } : null,
         },

@@ -21,10 +21,10 @@ const normalizeNote = (note) =>
     .trim()
     .replace(/\s+/g, ' ')
 
-const createVariantKey = ({ id, selectedSize, selectedToppings, specialNote }) => {
-  const sizePart = String(selectedSize || 'M').trim().toUpperCase()
-  const toppingsPart = normalizeToppings(selectedToppings).join('|') || 'none'
-  const notePart = normalizeNote(specialNote) || 'none'
+const createVariantKey = ({ id, kichCoDaChon, toppingDaChon, ghiChuRieng }) => {
+  const sizePart = String(kichCoDaChon || 'M').trim().toUpperCase()
+  const toppingsPart = normalizeToppings(toppingDaChon).join('|') || 'none'
+  const notePart = normalizeNote(ghiChuRieng) || 'none'
 
   return `${id}__${sizePart}__${toppingsPart}__${notePart}`
 }
@@ -34,29 +34,29 @@ const getItemKey = (item) => item.variantKey || createVariantKey(item)
 const isVariantKey = (value) => typeof value === 'string' && value.includes('__')
 
 const normalizeCartItem = (item) => {
-  const normalizedSize = String(item?.selectedSize || 'M').trim().toUpperCase() || 'M'
-  const normalizedToppings = normalizeToppings(item?.selectedToppings)
-  const normalizedNote = normalizeNote(item?.specialNote)
+  const normalizedSize = String(item?.kichCoDaChon || 'M').trim().toUpperCase() || 'M'
+  const normalizedToppings = normalizeToppings(item?.toppingDaChon)
+  const normalizedNote = normalizeNote(item?.ghiChuRieng)
 
   return {
     ...item,
     price: phanTichGiaThanhSo(item?.price),
     quantity: Math.max(1, Number(item?.quantity) || 1),
-    selectedSize: normalizedSize,
-    selectedToppings: normalizedToppings,
-    specialNote: normalizedNote,
+    kichCoDaChon: normalizedSize,
+    toppingDaChon: normalizedToppings,
+    ghiChuRieng: normalizedNote,
     variantKey: item?.variantKey || createVariantKey({
       id: item?.id,
-      selectedSize: normalizedSize,
-      selectedToppings: normalizedToppings,
-      specialNote: normalizedNote,
+      kichCoDaChon: normalizedSize,
+      toppingDaChon: normalizedToppings,
+      ghiChuRieng: normalizedNote,
     }),
   }
 }
 
 const getInitialCartItems = () => {
   try {
-    const parsedCart = layJsonLuuTru(STORAGE_KEYS.CART, [])
+    const parsedCart = layJsonLuuTru(STORAGE_KEYS.GIO_HANG, [])
     if (!Array.isArray(parsedCart)) {
       return []
     }
@@ -71,7 +71,7 @@ export function GioHangProvider({ children }) {
   const [cartItems, setCartItems] = useState(getInitialCartItems)
 
   useEffect(() => {
-    datJsonLuuTru(STORAGE_KEYS.CART, cartItems)
+    datJsonLuuTru(STORAGE_KEYS.GIO_HANG, cartItems)
   }, [cartItems])
 
   const themVaoGio = (dish) => {
@@ -132,16 +132,16 @@ export function GioHangProvider({ children }) {
   const layTuyChonHienThiMon = (item) => {
     const details = []
 
-    if (item?.selectedSize) {
-      details.push(`Size ${item.selectedSize}`)
+    if (item?.kichCoDaChon) {
+      details.push(`Size ${item.kichCoDaChon}`)
     }
 
-    if (Array.isArray(item?.selectedToppings) && item.selectedToppings.length > 0) {
-      details.push(`Topping: ${item.selectedToppings.join(', ')}`)
+    if (Array.isArray(item?.toppingDaChon) && item.toppingDaChon.length > 0) {
+      details.push(`Topping: ${item.toppingDaChon.join(', ')}`)
     }
 
-    if (item?.specialNote) {
-      details.push(`Ghi chú: ${item.specialNote}`)
+    if (item?.ghiChuRieng) {
+      details.push(`Ghi chú: ${item.ghiChuRieng}`)
     }
 
     return details

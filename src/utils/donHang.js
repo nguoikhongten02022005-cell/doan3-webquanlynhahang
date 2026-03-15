@@ -107,9 +107,9 @@ export const layNhanPhuongThucThanhToan = (phuongThucThanhToan) => (
 export const anhXaMonTrongGioThanhMonDonHang = (monTrongGio) => ({
   menuItemId: chuanHoaIdMonAn(monTrongGio?.menuItemId ?? monTrongGio?.id),
   quantity: Math.max(1, Number(monTrongGio?.quantity) || 1),
-  selectedSize: chuanHoaKichCoDaChon(monTrongGio?.selectedSize),
-  selectedToppings: chuanHoaToppingDaChon(monTrongGio?.selectedToppings),
-  specialNote: chuanHoaVanBan(monTrongGio?.specialNote),
+  kichCoDaChon: chuanHoaKichCoDaChon(monTrongGio?.kichCoDaChon),
+  toppingDaChon: chuanHoaToppingDaChon(monTrongGio?.toppingDaChon),
+  ghiChuRieng: chuanHoaVanBan(monTrongGio?.ghiChuRieng),
   variantKey: chuanHoaVanBan(monTrongGio?.variantKey),
 })
 

@@ -1,5 +1,5 @@
 import { CAC_BUOC_DAT_BAN } from '../../data/duLieuDatBan'
-import { BOOKING_SIDEBAR_CONTENT } from '../../constants/giaoDienDatBan'
+import { NOI_DUNG_THANH_BEN_DAT_BAN } from '../../constants/giaoDienDatBan'
 
 function ThanhBenDatBan({
   bookingSelectionSummary,
@@ -16,14 +16,14 @@ function ThanhBenDatBan({
   submitError,
 }) {
   return (
-    <aside className="booking-sidebar-premium">
-      <div className="booking-stepper-card booking-stepper-card-compact">
-        <div className="booking-side-card-head booking-side-card-head-tight">
-          <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.progressTitle}</p>
-          <span className="booking-progress-pill">Bước {step}/3</span>
+    <aside className="dat-ban-sidebar-premium">
+      <div className="dat-ban-stepper-card dat-ban-stepper-card-compact">
+        <div className="dat-ban-side-card-head dat-ban-side-card-head-tight">
+          <p className="dat-ban-side-kicker">{NOI_DUNG_THANH_BEN_DAT_BAN.progressTitle}</p>
+          <span className="dat-ban-progress-pill">Bước {step}/3</span>
         </div>
 
-        <div className="booking-stepper-list booking-stepper-list-compact">
+        <div className="dat-ban-stepper-list dat-ban-stepper-list-compact">
           {CAC_BUOC_DAT_BAN.map((item) => {
             const isActive = step === item.id
             const isCompleted = step > item.id
@@ -31,9 +31,9 @@ function ThanhBenDatBan({
             return (
               <div
                 key={item.id}
-                className={`booking-stepper-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
+                className={`dat-ban-stepper-item ${isActive ? 'active' : ''} ${isCompleted ? 'completed' : ''}`}
               >
-                <span className="booking-stepper-index">{isCompleted ? '✓' : item.id}</span>
+                <span className="dat-ban-stepper-index">{isCompleted ? '✓' : item.id}</span>
                 <div>
                   <p>{item.eyebrow}</p>
                   <strong>{item.title}</strong>
@@ -44,63 +44,63 @@ function ThanhBenDatBan({
         </div>
       </div>
 
-      <div className="booking-side-card booking-summary-rail-card">
-        <div className="booking-side-card-head">
+      <div className="dat-ban-side-card dat-ban-tom-tat-rail-card">
+        <div className="dat-ban-side-card-head">
           <div>
-            <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.summaryTitle}</p>
+            <p className="dat-ban-side-kicker">{NOI_DUNG_THANH_BEN_DAT_BAN.summaryTitle}</p>
             <h3>Lựa chọn hiện tại</h3>
           </div>
         </div>
 
-        <div className="booking-summary-rail-list">
-          <div className="booking-summary-rail-item">
+        <div className="dat-ban-tom-tat-rail-list">
+          <div className="dat-ban-tom-tat-rail-item">
             <span>Số khách</span>
             <strong>{bookingSelectionSummary.guests}</strong>
           </div>
-          <div className="booking-summary-rail-item">
+          <div className="dat-ban-tom-tat-rail-item">
             <span>Ngày</span>
             <strong>{bookingSelectionSummary.date}</strong>
           </div>
-          <div className="booking-summary-rail-item">
+          <div className="dat-ban-tom-tat-rail-item">
             <span>Giờ</span>
             <strong>{bookingSelectionSummary.time}</strong>
           </div>
-          <div className="booking-summary-rail-item">
+          <div className="dat-ban-tom-tat-rail-item">
             <span>Khu vực</span>
             <strong>{bookingSelectionSummary.seatingArea}</strong>
           </div>
         </div>
 
-        {submitError && <p className="form-error booking-rail-error" role="alert">{submitError}</p>}
+        {submitError && <p className="loi-bieu-mau dat-ban-rail-error" role="alert">{submitError}</p>}
 
-        <div className="booking-rail-actions">
+        <div className="dat-ban-rail-actions">
           <button
             type={primaryActionType}
             form={primaryActionForm}
-            className="booking-primary-btn booking-rail-primary-btn"
+            className="dat-ban-primary-btn dat-ban-rail-primary-btn"
             onClick={onPrimaryAction}
             disabled={primaryCtaDisabled}
           >
             {primaryCtaLabel}
           </button>
           {secondaryCtaLabel ? (
-            <button type="button" className="booking-secondary-btn" onClick={onSecondaryAction}>
+            <button type="button" className="dat-ban-secondary-btn" onClick={onSecondaryAction}>
               {secondaryCtaLabel}
             </button>
           ) : null}
         </div>
       </div>
 
-      <div className="booking-side-card booking-side-card-dark booking-side-service-card">
-        <div className="booking-side-service-topline">
-          <p className="booking-side-kicker">{BOOKING_SIDEBAR_CONTENT.quickContactTitle}</p>
-          <p className="booking-side-service-hotline">
+      <div className="dat-ban-side-card dat-ban-side-card-dark dat-ban-side-service-card">
+        <div className="dat-ban-side-service-topline">
+          <p className="dat-ban-side-kicker">{NOI_DUNG_THANH_BEN_DAT_BAN.quickContactTitle}</p>
+          <p className="dat-ban-side-service-hotline">
             📞 <a href={serviceHotlineLink}>{serviceHotline}</a>
           </p>
         </div>
 
-        <div className="booking-side-hours booking-side-hours-compact">
-          {BOOKING_SIDEBAR_CONTENT.hours.map((item) => (
+        <div className="dat-ban-side-hours dat-ban-side-hours-compact">
+          {NOI_DUNG_THANH_BEN_DAT_BAN.hours.map((item) => (
             <div key={item.label}>
               <strong>{item.label}</strong>
               <span>{item.value}</span>
@@ -108,8 +108,8 @@ function ThanhBenDatBan({
           ))}
         </div>
 
-        <div className="booking-side-contact booking-side-contact-compact">
-          {BOOKING_SIDEBAR_CONTENT.contacts.map((item) => <p key={item}>{item}</p>)}
+        <div className="dat-ban-side-contact dat-ban-side-contact-compact">
+          {NOI_DUNG_THANH_BEN_DAT_BAN.contacts.map((item) => <p key={item}>{item}</p>)}
         </div>
       </div>
     </aside>

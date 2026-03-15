@@ -17,9 +17,9 @@ test('anhXaMonTrongGioThanhMonDonHang anh xa dung cau truc DTO may chu khong kem
   const ketQua = anhXaMonTrongGioThanhMonDonHang({
     id: '12',
     quantity: 2,
-    selectedSize: 'l',
-    selectedToppings: ['Trân châu', '  Kem cheese '],
-    specialNote: ' ít đá ',
+    kichCoDaChon: 'l',
+    toppingDaChon: ['Trân châu', '  Kem cheese '],
+    ghiChuRieng: ' ít đá ',
     variantKey: '12__L__Kem cheese|Trân châu__ít đá',
     subtotal: 999,
     total: 1234,
@@ -28,9 +28,9 @@ test('anhXaMonTrongGioThanhMonDonHang anh xa dung cau truc DTO may chu khong kem
   assert.deepEqual(ketQua, {
     menuItemId: 12,
     quantity: 2,
-    selectedSize: 'L',
-    selectedToppings: ['Trân châu', 'Kem cheese'],
-    specialNote: 'ít đá',
+    kichCoDaChon: 'L',
+    toppingDaChon: ['Trân châu', 'Kem cheese'],
+    ghiChuRieng: 'ít đá',
     variantKey: '12__L__Kem cheese|Trân châu__ít đá',
   })
 
@@ -44,9 +44,9 @@ test('taoDuLieuTaoDonHang chi gom truong chuan duoc may chu chap nhan', () => {
       {
         id: 5,
         quantity: 1,
-        selectedSize: 'M',
-        selectedToppings: ['Bò viên'],
-        specialNote: 'không hành',
+        kichCoDaChon: 'M',
+        toppingDaChon: ['Bò viên'],
+        ghiChuRieng: 'không hành',
         variantKey: '5__M__Bò viên__không hành',
       },
     ],
@@ -67,9 +67,9 @@ test('taoDuLieuTaoDonHang chi gom truong chuan duoc may chu chap nhan', () => {
       {
         menuItemId: 5,
         quantity: 1,
-        selectedSize: 'M',
-        selectedToppings: ['Bò viên'],
-        specialNote: 'không hành',
+        kichCoDaChon: 'M',
+        toppingDaChon: ['Bò viên'],
+        ghiChuRieng: 'không hành',
         variantKey: '5__M__Bò viên__không hành',
       },
     ],

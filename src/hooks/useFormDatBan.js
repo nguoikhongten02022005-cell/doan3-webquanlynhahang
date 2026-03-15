@@ -22,7 +22,7 @@ export const useFormDatBan = ({ nguoiDungHienTai, createBooking, getDraft, saveD
     draftRestored,
     formData,
     restoredDraft,
-    guestCount,
+    soLuongKhach,
     guestWarning,
     invalidPastDate,
     nextStepHint,
@@ -47,7 +47,7 @@ export const useFormDatBan = ({ nguoiDungHienTai, createBooking, getDraft, saveD
     slotData,
     slotGroups,
     slotsLoading,
-  } = useKhaDungDatBan({ closedDate, formData, guestCount, invalidPastDate, laNhomDongChiDatQuaHotline })
+  } = useKhaDungDatBan({ closedDate, formData, soLuongKhach, invalidPastDate, laNhomDongChiDatQuaHotline })
 
   const {
     calendarContainerRef,
@@ -93,7 +93,7 @@ export const useFormDatBan = ({ nguoiDungHienTai, createBooking, getDraft, saveD
     successStatusLabel,
     validateStepOne,
     validateStepTwo,
-  } = useGuiDatBan({ createBooking, nguoiDungHienTai, formData, guestCount, invalidPastDate, closedDate, slotData, step })
+  } = useGuiDatBan({ createBooking, nguoiDungHienTai, formData, soLuongKhach, invalidPastDate, closedDate, slotData, step })
 
   function applyDateSelection(value, closeCalendarHandler) {
     setSubmitError('')
@@ -264,7 +264,7 @@ export const useFormDatBan = ({ nguoiDungHienTai, createBooking, getDraft, saveD
 
   const handleSeatingSelect = (areaValue) => {
     const area = CAC_KHU_VUC_DAT_BAN.find((item) => item.value === areaValue)
-    if (!area || guestCount > area.maxGuests) {
+    if (!area || soLuongKhach > area.maxGuests) {
       return
     }
 
@@ -281,7 +281,7 @@ export const useFormDatBan = ({ nguoiDungHienTai, createBooking, getDraft, saveD
 
     if (Object.keys(errors).length > 0) {
       setInlineErrors((prev) => ({ ...prev, ...errors }))
-      if (errors.guests && laNhomDongChiDatQuaHotline(guestCount)) {
+      if (errors.guests && laNhomDongChiDatQuaHotline(soLuongKhach)) {
         setSubmitError(THONG_DIEP_HOTLINE_NHOM_DONG)
       }
       return
@@ -320,7 +320,7 @@ export const useFormDatBan = ({ nguoiDungHienTai, createBooking, getDraft, saveD
     firstAvailableSlotRef,
     firstAvailableSlotTime,
     formData,
-    guestCount,
+    soLuongKhach,
     guestWarning,
     handleCalendarDayKeyDown,
     handleCalendarMonthChange,

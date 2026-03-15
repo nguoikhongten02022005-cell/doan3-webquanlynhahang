@@ -5,15 +5,15 @@ const normalizePhone = (value) => value.replace(/\s+/g, '').replace(/[^\d+]/g, '
 
 export const laSoDienThoaiHopLe = (value) => /^(0\d{9,10}|\+84\d{9,10})$/.test(normalizePhone(value))
 
-export const layLoiBuocMot = ({ guestCount, date, time, invalidPastDate, closedDate }) => {
+export const layLoiBuocMot = ({ soLuongKhach, date, time, invalidPastDate, closedDate }) => {
   const errors = {}
 
-  if (!guestCount) {
+  if (!soLuongKhach) {
     errors.guests = 'Vui lòng chọn số khách'
     return errors
   }
 
-  if (laNhomDongChiDatQuaHotline(guestCount)) {
+  if (laNhomDongChiDatQuaHotline(soLuongKhach)) {
     errors.guests = THONG_DIEP_HOTLINE_NHOM_DONG
     return errors
   }
@@ -37,10 +37,10 @@ export const layLoiBuocHai = ({ name, phone }) => {
   return errors
 }
 
-export const layNhanHanhDongChinh = ({ step, guestCount, date, time, step1Complete, step2Complete, closedDate, seatingArea, notes }) => {
+export const layNhanHanhDongChinh = ({ step, soLuongKhach, date, time, step1Complete, step2Complete, closedDate, seatingArea, notes }) => {
   if (step === 1) {
-    if (!guestCount) return 'Chọn số khách'
-    if (laNhomDongChiDatQuaHotline(guestCount)) return 'Gọi hotline để đặt nhóm đông'
+    if (!soLuongKhach) return 'Chọn số khách'
+    if (laNhomDongChiDatQuaHotline(soLuongKhach)) return 'Gọi hotline để đặt nhóm đông'
     if (!date) return 'Chọn ngày'
     if (closedDate) return 'Vui lòng chọn ngày khác'
     if (!time) return 'Chọn giờ'
@@ -52,7 +52,7 @@ export const layNhanHanhDongChinh = ({ step, guestCount, date, time, step1Comple
     return 'Hoàn tất thông tin liên hệ'
   }
 
-  return layTrangThaiGuiDatBan({ seatingArea, guestCount, time, notes }) === 'DA_XAC_NHAN'
+  return layTrangThaiGuiDatBan({ seatingArea, soLuongKhach, time, notes }) === 'DA_XAC_NHAN'
     ? 'Xác nhận đặt bàn'
     : 'Gửi yêu cầu đặt bàn'
 }

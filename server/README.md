@@ -42,35 +42,35 @@ npm run dev
 
 ## Endpoint chính
 ### Auth
-- `POST /api/auth/login`
+- `POST /api/auth/dang-nhap`
 - `POST /api/auth/internal-login`
-- `POST /api/auth/register`
+- `POST /api/auth/dang-ky`
 - `GET /api/auth/me`
 - `POST /api/auth/refresh`
 - `POST /api/auth/logout`
 
 ### Public/customer
-- `GET /api/menu-items`
-- `POST /api/bookings`
-- `GET /api/bookings/history`
+- `GET /api/thuc-don-items`
+- `POST /api/dat-bans`
+- `GET /api/dat-bans/history`
 - `POST /api/orders`
-- `POST /api/orders/checkout`
+- `POST /api/orders/thanh-toan`
 - `GET /api/orders/me`
 - `GET /api/vouchers/:code`
 - `POST /api/vouchers/validate`
 
 ### Internal
-- `GET /api/v1/internal/dashboard/stats`
+- `GET /api/v1/noi-bo/bang-dieu-khien/stats`
 - `GET /api/v1/internal/users`
-- `GET /api/v1/internal/bookings`
+- `GET /api/v1/internal/dat-bans`
 - `GET /api/v1/internal/tables`
 - `GET /api/v1/internal/orders`
 - `GET /api/v1/internal/vouchers`
-- `GET /api/v1/internal/menu`
+- `GET /api/v1/internal/thuc-don`
 
 ## Ghi chú tương thích frontend
 Backend giữ contract cho frontend hiện tại:
 - auth response có `accessToken`, `user`, `currentUser`
 - lỗi giữ field `message`
-- booking history vẫn trả item đã map cho ProfilePage
+- booking history vẫn trả item đã map cho HoSoPage
 - menu trả `price` dạng chuỗi VND qua mapper
