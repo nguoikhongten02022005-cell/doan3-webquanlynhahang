@@ -85,7 +85,7 @@ Bearer <accessToken>
 ## Luu y
 - Mot so route da duoc bao ve bang JWT va role.
 - `refresh token` chua hoan chinh nhu phien ban production.
-- Backend nay nam trong `backend/`, khong tu dong co nghia la da thay the `server/` trong moi luong cua repo.
+- Backend nay la backend C# chinh dang duoc dung cho du an trong hien trang hien tai.
 
 ## Thu muc quan trong
 - `Controllers/`: dinh nghia endpoint

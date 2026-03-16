@@ -61,6 +61,6 @@ Backend C# trong `backend/apiquanlynhahang/apiquanlynhahang` da duoc nang cap tu
 - Frontend local co the goi qua `http://localhost:5011/api` ma khong bi redirect HTTPS trong Development
 
 ## Anh huong voi repo tong
-- Backend C# nay da duoc nang cap dang ke trong `backend/`
-- Tuy nhien `server/` van la backend chinh cua luong phat trien hien tai neu chua chuyen doi chinh thuc
-- Can thong nhat ro neu sau nay quyet dinh chuyen frontend sang backend C# nay
+- Backend C# nay la backend chinh dang duoc su dung trong repo.
+- Frontend dang duoc cau hinh de ket noi truc tiep voi backend C# qua `http://localhost:5011/api`.
+- Cac tai lieu va huong dan van hanh can uu tien backend nay.

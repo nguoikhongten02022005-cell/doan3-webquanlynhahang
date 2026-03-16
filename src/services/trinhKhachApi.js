@@ -4,6 +4,7 @@ import { layMucLuuTru } from './dichVuLuuTru'
 
 const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
+const DANH_SACH_DUONG_DAN_CONG_KHAI = ['/mon-an', '/ma-giam-gia/validate']
 
 export const coSuDungMayChu = () => String(import.meta.env.VITE_USE_BACKEND || 'false').toLowerCase() === 'true'
 
@@ -32,6 +33,8 @@ const layDauTrangXacThuc = () => {
     Authorization: `Bearer ${maXacThuc}`,
   }
 }
+
+const laDuongDanCongKhai = (duongDan) => DANH_SACH_DUONG_DAN_CONG_KHAI.some((muc) => duongDan === muc || duongDan.startsWith(`${muc}/`))
 
 const laPhanHoiBao = (phanHoi) => (
   Boolean(phanHoi)
@@ -82,8 +85,9 @@ const guiYeuCauTho = async (duongDan, tuyChon = {}) => {
   } = tuyChon
 
   const canDatNoiDungJson = body !== undefined && !(body instanceof FormData)
+  const coMaXacThuc = Boolean(layMucLuuTru(STORAGE_KEYS.MA_XAC_THUC))
   const dauTrang = {
-    ...(includeAuthDauTrang ? layDauTrangXacThuc() : {}),
+    ...((includeAuthDauTrang && (coMaXacThuc || !laDuongDanCongKhai(duongDan))) ? layDauTrangXacThuc() : {}),
     ...(canDatNoiDungJson ? { 'Content-Type': 'application/json' } : {}),
     ...dauTrangTuyChinh,
   }

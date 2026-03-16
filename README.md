@@ -147,7 +147,6 @@ doan3-webquanlynhahang/
 ├── backend/
 │   └── apiquanlynhahang/
 │       └── apiquanlynhahang/                 # Backend C# chính dùng cho bài
-├── server/                                   # Mã backend khác để tham khảo
 └── README.md
 ```
 
@@ -186,6 +185,5 @@ dotnet run
 
 ## Ghi chú
 
-- Backend C# + MySQL là phần đang dùng để phát triển và demo bài.
-- `server/` không phải luồng backend chính trong hiện trạng bài này.
+- Backend C# + MySQL là phần backend duy nhất dùng để phát triển và demo bài.
 - Nếu frontend gọi API local, cần đảm bảo backend C# đang chạy đúng cổng và CORS được cấu hình phù hợp.

@@ -26,10 +26,9 @@ Khi chỉnh sửa frontend:
 Hiện trạng repo:
 - frontend chạy ở thư mục gốc
 - mã nguồn giao diện chính nằm trong `src/`
-- backend đang dùng thật cho phát triển và kiểm thử nằm trong `server/`
-- `backend/` là mã C# cũ để tham khảo, không phải backend chính đang chạy hằng ngày
+- backend đang dùng thật cho phát triển và kiểm thử nằm trong `backend/apiquanlynhahang/apiquanlynhahang`
 
-Khi cần đối chiếu API đang chạy thật, ưu tiên đọc `README.md`, `server/README.md` và mã nguồn trong `server/`.
+Khi cần đối chiếu API đang chạy thật, ưu tiên đọc `README.md`, `backend/apiquanlynhahang/apiquanlynhahang/README.md` và mã nguồn trong `backend/apiquanlynhahang/apiquanlynhahang/`.
 
 ## Công nghệ
 - Ngôn ngữ chính: JavaScript hoặc JSX theo code hiện có
@@ -66,7 +65,7 @@ Không tự ý đổi tên hoặc di chuyển file hàng loạt nếu không có
 - Không tự ý thêm thư viện nếu chưa thật sự cần.
 - Không hard-code URL API, token, mật khẩu, hoặc khóa bí mật.
 - Không sửa cấu hình môi trường nếu chưa được yêu cầu rõ.
-- Không lấy `backend/` làm nguồn sự thật chính để suy luận contract API hiện hành.
+- Không tự ý suy luận contract API ngoài backend C# đang dùng thật.
 
 ## Quy tắc code
 - Ưu tiên sửa ít nhất có thể nhưng đúng bản chất lỗi.
@@ -99,5 +98,5 @@ Luôn báo rõ:
 - sửa gì
 - lý do sửa
 - có ảnh hưởng API, dữ liệu, hoặc hành vi giao diện hay không
-- có cần kiểm tra lại với `server/` hay không
+- có cần kiểm tra lại với backend C# hay không
 - cần kiểm tra thêm gì sau khi sửa

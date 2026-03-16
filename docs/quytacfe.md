@@ -7,14 +7,13 @@ Mục tiêu:
 - xây dựng giao diện quản lý nhà hàng rõ ràng, dễ dùng
 - bám sát ngữ cảnh nhà hàng tại Việt Nam
 - giữ code dễ đọc, dễ bảo trì, phù hợp đồ án
-- tương thích với backend đang dùng thật trong `server/`
+- tương thích với backend C# đang dùng thật trong `backend/apiquanlynhahang/apiquanlynhahang`
 
 ## 2. Hiện trạng repo
 Trong repo hiện tại:
 - frontend chạy ở thư mục gốc
 - mã nguồn giao diện chính nằm trong `src/`
-- backend đang dùng cho phát triển và kiểm thử hiện tại nằm trong `server/`
-- thư mục `backend/` là mã C# cũ để tham khảo, không phải backend chính đang chạy hằng ngày
+- backend đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/apiquanlynhahang/apiquanlynhahang`
 
 Khi sửa frontend, cần ưu tiên hiểu đúng hiện trạng này trước khi thay đổi code.
 
@@ -89,10 +88,8 @@ Yêu cầu cơ bản khi sửa màn hình:
 
 Khi đối chiếu API đang chạy thật, ưu tiên đọc:
 - `README.md`
-- `server/README.md`
-- mã nguồn trong `server/`
-
-Không lấy `backend/` làm nguồn sự thật chính cho contract hiện hành.
+- `backend/apiquanlynhahang/apiquanlynhahang/README.md`
+- mã nguồn trong `backend/apiquanlynhahang/apiquanlynhahang/`
 
 ## 9. Quy tắc trải nghiệm người dùng
 Các màn hình chính hiện có cần được ưu tiên giữ ổn định, ví dụ:
@@ -137,5 +134,5 @@ Toàn bộ frontend hiện tại cần bám theo các nguyên tắc sau:
 - ưu tiên tiếng Việt không dấu khi đặt tên mới nếu phù hợp
 - giữ cấu trúc hiện có của repo
 - không tự ý đổi contract API
-- ưu tiên bám backend thật trong `server/`
+- ưu tiên bám backend C# thật trong `backend/apiquanlynhahang/apiquanlynhahang`
 - giao diện thực tế, rõ ràng, phù hợp ngữ cảnh Việt Nam

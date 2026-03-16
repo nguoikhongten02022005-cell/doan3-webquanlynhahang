@@ -15,12 +15,11 @@ Hiện trạng chính:
 - frontend chạy ở thư mục gốc của repo
 - mã nguồn giao diện chính nằm trong `src/`
 - frontend dùng React và Vite
-- backend đang dùng cho phát triển và kiểm thử hiện tại nằm trong `server/`
-- `backend/` là phần mã ASP.NET Core Web API cũ, giữ lại để tham khảo lịch sử hoặc chỉnh sửa riêng khi có yêu cầu
+- backend chính đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/apiquanlynhahang/apiquanlynhahang`
 
 Điều quan trọng:
-- khi cần hiểu contract API đang chạy thật, ưu tiên đọc và đối chiếu `server/`
-- không xem `backend/` là nguồn sự thật chính cho hệ thống hiện hành
+- khi cần hiểu contract API đang chạy thật, ưu tiên đọc và đối chiếu `backend/apiquanlynhahang/apiquanlynhahang`
+- xem backend C# là nguồn sự thật chính cho hệ thống hiện hành
 
 ## 3. Tổng quan chức năng hệ thống
 
@@ -70,40 +69,34 @@ Các route chính được tổ chức trong frontend hiện tại, bao gồm:
 - `/noi-bo/bang-dieu-khien`
 
 ## 5. Backend chính đang dùng
-Backend chính của repo hiện tại nằm trong `server/`.
+Backend chính của repo hiện tại nằm trong `backend/apiquanlynhahang/apiquanlynhahang/`.
 
 Stack của backend này:
-- Node.js
-- TypeScript
-- Express
+- C#
+- ASP.NET Core Web API
+- Entity Framework Core
 - MySQL
-- Prisma
+- JWT
+- Swagger
 
 Các ghi chú quan trọng:
-- frontend hiện tại được đối chiếu và tích hợp chủ yếu theo contract từ `server/`
-- khi cần kiểm tra schema, route, mapper hoặc hành vi API, ưu tiên xem mã nguồn trong `server/`
-- `server/README.md` là tài liệu ngắn gọn phản ánh backend đang chạy thật
+- frontend hiện tại được đối chiếu và tích hợp theo contract từ backend C#
+- khi cần kiểm tra schema, route hoặc hành vi API, ưu tiên xem mã nguồn trong `backend/apiquanlynhahang/apiquanlynhahang/`
+- `backend/apiquanlynhahang/apiquanlynhahang/README.md` là tài liệu ngắn gọn phản ánh backend đang chạy thật
 
 ## 6. Vai trò của `backend/`
-Thư mục `backend/` không phải backend chính đang chạy hằng ngày của repo hiện tại.
+Thư mục `backend/` là backend chính đang chạy hằng ngày của repo hiện tại.
 
-Nó được giữ lại để:
-- tham khảo lịch sử triển khai C#
-- đọc lại cấu trúc hoặc nghiệp vụ cũ khi cần
-- chỉnh sửa cục bộ nếu có yêu cầu riêng liên quan đến mã ASP.NET Core cũ
-
-Khi làm việc với `backend/`, không nên mặc định rằng:
-- contract trong đó còn đúng với hệ thống đang chạy
-- frontend hiện tại đang nối trực tiếp vào đó
-- thay đổi ở đó sẽ tự động tác động tới `server/`
+Trong đó:
+- `backend/apiquanlynhahang/apiquanlynhahang` là khu vực backend C# chính
+- frontend hiện tại đang kết nối trực tiếp vào backend này
 
 ## 7. Ý nghĩa khi chỉnh sửa hệ thống
 Để sửa đúng theo hiện trạng repo:
-- sửa giao diện thì ưu tiên đọc `src/`, `README.md`, `server/README.md`
-- sửa backend đang chạy thật thì ưu tiên làm trong `server/`
-- chỉ sửa `backend/` khi yêu cầu thật sự liên quan đến phần mã C# cũ
+- sửa giao diện thì ưu tiên đọc `src/`, `README.md`, `backend/apiquanlynhahang/apiquanlynhahang/README.md`
+- sửa backend đang chạy thật thì ưu tiên làm trong `backend/apiquanlynhahang/apiquanlynhahang`
 
-Nếu đổi contract API trong `server/`, cần kiểm tra ảnh hưởng tới:
+Nếu đổi contract API trong backend C#, cần kiểm tra ảnh hưởng tới:
 - thực đơn
 - giỏ hàng
 - thanh toán
@@ -127,10 +120,8 @@ Về mặt nghiệp vụ, hệ thống hiện không chỉ có giao diện publi
 ## 9. Kết luận
 Hiện trạng repo nên được hiểu theo thứ tự ưu tiên sau:
 - frontend chính: `src/` ở root, dùng React + Vite
-- backend chính đang chạy: `server/`
-- backend C# cũ tham khảo: `backend/`
+- backend chính đang chạy: `backend/apiquanlynhahang/apiquanlynhahang/`
 
 Khi cần chỉnh sửa an toàn và đúng thực tế:
 - lấy `README.md` làm điểm bắt đầu
-- lấy `server/` làm nguồn sự thật cho backend hiện hành
-- chỉ dùng `backend/` như tài liệu tham khảo hoặc khu vực sửa riêng khi có yêu cầu rõ ràng
+- lấy `backend/apiquanlynhahang/apiquanlynhahang/` làm nguồn sự thật cho backend hiện hành

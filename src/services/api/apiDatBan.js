@@ -13,7 +13,9 @@ const chuanHoaDatBanPayload = (payload = {}) => ({
   nguonTao: payload.source || payload.nguonTao || 'web',
   emailNguoiDung: payload.userEmail || payload.emailNguoiDung || payload.email || '',
   dipDacBiet: payload.occasion || payload.dipDacBiet || '',
-  kenhXacNhan: payload.confirmationChannel || payload.kenhXacNhan || '',
+  kenhXacNhan: Array.isArray(payload.confirmationChannel)
+    ? payload.confirmationChannel.join(', ')
+    : (payload.confirmationChannel || payload.kenhXacNhan || ''),
   ghiChuNoiBo: payload.internalNote || payload.ghiChuNoiBo || '',
   taoBoi: payload.createdBy || payload.taoBoi || 'frontend',
 })

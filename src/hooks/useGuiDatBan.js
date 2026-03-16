@@ -2,7 +2,6 @@ import { useMemo, useState } from 'react'
 import { NHAN_TRANG_THAI_DAT_BAN } from '../data/duLieuDatBan'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import {
-  taoMaDatBan,
   layTieuDeTrangThaiDatBan,
   layTrangThaiGuiDatBan,
   layThoiLuongBuaAn,
@@ -99,7 +98,6 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
       return { success: false }
     }
 
-    const code = taoMaDatBan()
     const submissionTime = new Date().toISOString()
     const trangThai = layTrangThaiGuiDatBan({
       seatingArea: formData.seatingArea,
@@ -121,7 +119,6 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
       email: formData.email,
       status: trangThai,
       source: 'web',
-      bookingCode: code,
       userEmail: linkedUserEmail,
       occasion: formData.occasion,
       confirmationChannel: formData.email ? ['SMS', 'Email'] : ['SMS'],
@@ -133,17 +130,17 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
       const datBanDaTao = await createBooking({
         booking: duLieuDatBan,
         confirmationPayload: {
-          bookingCode: code,
+          bookingCode: null,
           status: trangThai,
           confirmationChannel: duLieuDatBan.confirmationChannel,
           createdAt: submissionTime,
           mealDurationMinutes: layThoiLuongBuaAn(soLuongKhach, formData.time),
-          sms: { to: formData.phone, sentAt: submissionTime, bookingCode: code, status: trangThai },
-          email: formData.email ? { to: formData.email, sentAt: submissionTime, bookingCode: code, status: trangThai } : null,
+          sms: { to: formData.phone, sentAt: submissionTime, bookingCode: null, status: trangThai },
+          email: formData.email ? { to: formData.email, sentAt: submissionTime, bookingCode: null, status: trangThai } : null,
         },
       })
 
-      setBookingCode(datBanDaTao?.bookingCode || code)
+      setBookingCode(datBanDaTao?.bookingCode || '')
       setBookingStatus(datBanDaTao?.status || trangThai)
       setSubmitted(true)
       window.scrollTo({ top: 0, behavior: 'smooth' })

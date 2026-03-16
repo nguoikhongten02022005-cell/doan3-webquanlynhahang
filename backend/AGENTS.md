@@ -6,20 +6,17 @@ File này áp dụng cho toàn bộ thư mục `backend/`.
 Ngoài các quy tắc trong file này, cần tiếp tục tôn trọng tinh thần từ `AGENTS.md` ở root: ưu tiên đặt tên mới rõ nghĩa theo nghiệp vụ, ưu tiên tiếng Việt không dấu khi phù hợp, và giữ tính nhất quán với convention đang có trong từng file.
 
 ## Vị trí của `backend/` trong repo hiện tại
-Thư mục `backend/` ban đầu là phần mã ASP.NET Core Web API cũ, được giữ lại chủ yếu để tham khảo lịch sử hoặc chỉnh sửa cục bộ khi có yêu cầu rõ ràng.
+Thu muc `backend/` la backend ASP.NET Core Web API chinh cua du an trong hien trang hien tai.
 
-Backend đang dùng cho luồng phát triển và kiểm thử hiện tại của dự án nhìn chung vẫn nằm ở `server/`.
+Trong do, `backend/apiquanlynhahang/apiquanlynhahang` la backend C# + MySQL dang duoc dung de phat trien, kiem thu va demo.
 
-Tuy nhiên, hiện trong `backend/apiquanlynhahang/apiquanlynhahang` da co mot backend C# duoc bo sung them schema MySQL, Swagger, auth JWT va cac API nghiep vu co the chay local de kiem thu va phat trien tiep.
-
-Vì vậy khi làm việc trong `backend/`:
-- không xem đây là nguồn sự thật chính cho contract đang chạy hằng ngày
-- uu tien phan biet ro giua backend C# trong `backend/apiquanlynhahang/apiquanlynhahang` va backend Node trong `server/`
-- chỉ chỉnh khi yêu cầu thật sự liên quan đến phần mã C# cũ, backend C# dang duoc mo rong, hoặc cần đối chiếu lịch sử
-- không tự suy diễn rằng mọi thay đổi trong `backend/` sẽ tự động áp dụng cho hệ thống đang chạy bằng `server/`
+Vi vay khi lam viec trong `backend/`:
+- xem day la nguon su that chinh cho contract backend hien tai
+- uu tien sua dung backend C# trong `backend/apiquanlynhahang/apiquanlynhahang`
+- giu tinh on dinh cho frontend dang ket noi vao backend nay
 
 ## Mục tiêu
-Đây là backend ASP.NET Core Web API dùng C# và MySQL cho dự án quản lý nhà hàng. O mot so khu vuc, no van dong vai tro ma cu de tham khao; rieng thu muc `backend/apiquanlynhahang/apiquanlynhahang` da duoc cap nhat de co the chay local va kiem thu nghiep vu.
+Đây là backend ASP.NET Core Web API dùng C# và MySQL cho dự án quản lý nhà hàng. Thu muc `backend/apiquanlynhahang/apiquanlynhahang` la backend chinh dang duoc su dung.
 
 Khi chỉnh sửa backend:
 - ưu tiên sửa đúng chức năng được yêu cầu
@@ -58,7 +55,7 @@ Không tự ý đổi tên hoặc di chuyển file hàng loạt nếu không có
 - Không hard-code chuỗi kết nối database, mật khẩu, token, hoặc khóa bí mật.
 - Không sửa `appsettings.json` hoặc cấu hình môi trường nếu chưa được yêu cầu rõ.
 - Không tự ý xóa log, file cấu hình, hoặc code đang dùng chỉ vì thấy chưa đẹp.
-- Nếu cần đối chiếu với backend đang chạy thật, ưu tiên kiểm tra `server/` thay vì suy luận từ `backend/`.
+- Neu can doi chieu backend dang chay that, uu tien kiem tra trong `backend/apiquanlynhahang/apiquanlynhahang`.
 
 ## Quy tắc code
 - Ưu tiên sửa ít nhất có thể nhưng đúng bản chất lỗi.
@@ -81,7 +78,7 @@ Không tự ý đổi tên hoặc di chuyển file hàng loạt nếu không có
 - Không tự ý đổi cấu trúc thư mục lớn.
 - Không tự ý thêm package nếu chưa thật cần.
 - Không tự ý đổi cấu hình môi trường production/development.
-- Không tự ý coi `backend/` là backend chính của repo hiện tại.
+- Khong tu y tao them backend song song khac roi coi la luong.
 
 ## Khi hoàn thành
 Luôn báo rõ:
@@ -89,5 +86,5 @@ Luôn báo rõ:
 - sửa gì
 - lý do sửa
 - có ảnh hưởng API, database, hoặc dữ liệu hay không
-- có ảnh hưởng gì đến `server/` hay không
+- có ảnh hưởng gì đến backend C# chính hay frontend hay không
 - cần kiểm tra thêm gì sau khi sửa
