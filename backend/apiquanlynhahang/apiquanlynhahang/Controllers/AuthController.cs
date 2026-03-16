@@ -1,6 +1,8 @@
 using apiquanlynhahang.DTOs;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.Models;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiquanlynhahang.Controllers;
@@ -22,7 +24,7 @@ public class AuthController : ControllerBase
         var (nguoiDung, loi) = await _authService.DangNhapAsync(dto, null, cancellationToken);
         return nguoiDung is null
             ? BadRequest(new { message = loi })
-            : Ok(new { message = "Dang nhap thanh cong", data = TaoDuLieuAuth(nguoiDung) });
+            : Ok(new { message = "Dang nhap thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
     }
 
     [HttpPost("internal-login")]
@@ -31,7 +33,7 @@ public class AuthController : ControllerBase
         var (nguoiDung, loi) = await _authService.DangNhapAsync(dto, "staff", cancellationToken);
         return nguoiDung is null
             ? BadRequest(new { message = loi })
-            : Ok(new { message = "Dang nhap noi bo thanh cong", data = TaoDuLieuAuth(nguoiDung) });
+            : Ok(new { message = "Dang nhap noi bo thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
     }
 
     [HttpPost("register")]
@@ -40,25 +42,39 @@ public class AuthController : ControllerBase
         var (nguoiDung, loi) = await _authService.DangKyAsync(dto, cancellationToken);
         return nguoiDung is null
             ? BadRequest(new { message = loi })
-            : StatusCode(201, new { message = "Dang ky tai khoan thanh cong", data = TaoDuLieuAuth(nguoiDung) });
+            : StatusCode(201, new { message = "Dang ky tai khoan thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
     }
 
+    [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> LayToi([FromQuery] string email, CancellationToken cancellationToken)
+    public async Task<IActionResult> LayToi(CancellationToken cancellationToken)
     {
-        var nguoiDung = await _authService.LayTheoEmailAsync(email, cancellationToken);
+        var currentUser = User.LayNguoiDungHienTai();
+        if (currentUser is null)
+        {
+            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        }
+
+        var nguoiDung = await _authService.LayTheoEmailAsync(currentUser.Email, cancellationToken);
         return nguoiDung is null
             ? NotFound(new { message = "Khong tim thay nguoi dung" })
-            : Ok(new { message = "Lay thong tin nguoi dung thanh cong", data = TaoDuLieuAuth(nguoiDung) });
+            : Ok(new { message = "Lay thong tin nguoi dung thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
     }
 
+    [Authorize]
     [HttpPatch("me")]
-    public async Task<IActionResult> CapNhatToi([FromQuery] string email, [FromBody] CapNhatHoSoDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> CapNhatToi([FromBody] CapNhatHoSoDto dto, CancellationToken cancellationToken)
     {
-        var (nguoiDung, loi) = await _authService.CapNhatHoSoAsync(email, dto, cancellationToken);
+        var currentUser = User.LayNguoiDungHienTai();
+        if (currentUser is null)
+        {
+            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        }
+
+        var (nguoiDung, loi) = await _authService.CapNhatHoSoAsync(currentUser.Email, dto, cancellationToken);
         return nguoiDung is null
             ? NotFound(new { message = loi })
-            : Ok(new { message = "Cap nhat ho so thanh cong", data = TaoDuLieuAuth(nguoiDung) });
+            : Ok(new { message = "Cap nhat ho so thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
     }
 
     [HttpPost("refresh")]
@@ -73,9 +89,9 @@ public class AuthController : ControllerBase
         return Ok(new { message = "Dang xuat thanh cong", data = (object?)null });
     }
 
-    private static object TaoDuLieuAuth(NguoiDung nguoiDung) => new
+    private static object TaoDuLieuAuth(NguoiDung nguoiDung, string accessToken) => new
     {
-        accessToken = $"demo-token-{nguoiDung.Id}",
+        accessToken,
         tokenType = "Bearer",
         user = new
         {

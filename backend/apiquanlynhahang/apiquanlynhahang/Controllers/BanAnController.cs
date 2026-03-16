@@ -1,12 +1,14 @@
 using apiquanlynhahang.DTOs;
 using apiquanlynhahang.Models;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiquanlynhahang.Controllers;
 
 [ApiController]
 [Route("api/ban-an")]
+[Authorize]
 public class BanAnController : ControllerBase
 {
     private readonly BanAnService _banAnService;

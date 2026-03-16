@@ -5,6 +5,7 @@ import {
   VAI_TRO_XAC_THUC,
   SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC,
   xoaPhienXacThuc,
+  layMaXacThuc,
   layNguoiDungHienTai,
   luuPhienXacThuc,
   luuNguoiDungHienTai,
@@ -27,6 +28,12 @@ export const useXacThuc = () => {
 
       if (!coSuDungMayChu()) {
         dongBoNguoiDungHienTai()
+        setIsAuthBootstrapping(false)
+        return
+      }
+
+      if (!layMaXacThuc()) {
+        setNguoiDungHienTai(null)
         setIsAuthBootstrapping(false)
         return
       }

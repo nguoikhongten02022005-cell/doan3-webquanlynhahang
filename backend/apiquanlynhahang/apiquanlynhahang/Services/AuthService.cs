@@ -8,10 +8,12 @@ namespace apiquanlynhahang.Services;
 public class AuthService
 {
     private readonly UngDungDbContext _dbContext;
+    private readonly JwtService _jwtService;
 
-    public AuthService(UngDungDbContext dbContext)
+    public AuthService(UngDungDbContext dbContext, JwtService jwtService)
     {
         _dbContext = dbContext;
+        _jwtService = jwtService;
     }
 
     public async Task<(NguoiDung? NguoiDung, string? Loi)> DangNhapAsync(DangNhapDto dto, string? vaiTroBatBuoc = null, CancellationToken cancellationToken = default)
@@ -84,6 +86,8 @@ public class AuthService
 
     public Task<NguoiDung?> LayTheoEmailAsync(string email, CancellationToken cancellationToken = default)
         => _dbContext.NguoiDung.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
+
+    public string TaoAccessToken(NguoiDung nguoiDung) => _jwtService.TaoAccessToken(nguoiDung);
 
     public async Task<(NguoiDung? NguoiDung, string? Loi)> CapNhatHoSoAsync(string email, CapNhatHoSoDto dto, CancellationToken cancellationToken = default)
     {

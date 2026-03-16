@@ -1,4 +1,5 @@
 using apiquanlynhahang.Data;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.DTOs;
 using apiquanlynhahang.Models;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,16 @@ public class DatBanService
 
     public async Task<DatBan> TaoAsync(TaoDatBanDto dto, CancellationToken cancellationToken = default)
     {
+        if (dto.SoKhach == 0)
+        {
+            throw new ApiException(400, "So khach phai lon hon 0");
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.TenKhach) || string.IsNullOrWhiteSpace(dto.SoDienThoaiKhach))
+        {
+            throw new ApiException(400, "Ten khach va so dien thoai khach la bat buoc");
+        }
+
         var ma = $"BK-{DateTime.UtcNow:yyyyMMddHHmmss}";
         var entity = new DatBan
         {
@@ -86,6 +97,11 @@ public class DatBanService
             return null;
         }
 
+        if (string.IsNullOrWhiteSpace(trangThai))
+        {
+            throw new ApiException(400, "Trang thai dat ban khong hop le");
+        }
+
         entity.TrangThai = trangThai;
         var hienTai = DateTime.UtcNow;
         if (trangThai == "DA_CHECK_IN") entity.CheckInLuc = hienTai;
@@ -110,12 +126,27 @@ public class DatBanService
             return null;
         }
 
+        if (danhSachBanAnId.Count == 0)
+        {
+            throw new ApiException(400, "Danh sach ban an khong duoc de trong");
+        }
+
         var chiTietCu = await _dbContext.ChiTietDatBan.Where(x => x.DatBanId == datBan.Id).ToListAsync(cancellationToken);
         _dbContext.ChiTietDatBan.RemoveRange(chiTietCu);
 
         var danhSachBan = await _dbContext.BanAn.Where(x => danhSachBanAnId.Contains(x.Id)).ToListAsync(cancellationToken);
+        if (danhSachBan.Count != danhSachBanAnId.Count)
+        {
+            throw new ApiException(400, "Co ban an khong ton tai");
+        }
+
         foreach (var ban in danhSachBan)
         {
+            if (ban.TrangThai != "AVAILABLE" && ban.DatBanHienTaiId != datBan.Id)
+            {
+                throw new ApiException(409, $"Ban {ban.MaBan} hien khong kha dung");
+            }
+
             _dbContext.ChiTietDatBan.Add(new ChiTietDatBan
             {
                 DatBanId = datBan.Id,

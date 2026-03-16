@@ -1,5 +1,6 @@
 using System.Text.Json;
 using apiquanlynhahang.Data;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.DTOs;
 using apiquanlynhahang.Models;
 using Microsoft.EntityFrameworkCore;
@@ -36,8 +37,22 @@ public class DonHangService
             return (null, "Don hang phai co it nhat 1 mon");
         }
 
+        if (dto.KhachHang is null || string.IsNullOrWhiteSpace(dto.KhachHang.TenKhachHang) || string.IsNullOrWhiteSpace(dto.KhachHang.SoDienThoaiKhachHang))
+        {
+            return (null, "Thong tin khach hang khong hop le");
+        }
+
         var danhSachId = dto.DanhSachMon.Where(x => x.MonAnId.HasValue).Select(x => (uint)x.MonAnId!.Value).ToList();
         var monAns = await _dbContext.MonAn.Where(x => danhSachId.Contains(x.Id) && x.DangKinhDoanh).ToListAsync(cancellationToken);
+
+        if (!string.IsNullOrWhiteSpace(dto.MaBan))
+        {
+            var banTonTai = await _dbContext.BanAn.AnyAsync(x => x.MaBan == dto.MaBan || x.Id == dto.MaBan, cancellationToken);
+            if (!banTonTai)
+            {
+                return (null, "Ban an khong ton tai");
+            }
+        }
 
         decimal tamTinh = 0;
         var chiTiets = new List<ChiTietDonHang>();
@@ -132,6 +147,11 @@ public class DonHangService
         if (donHang is null)
         {
             return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(trangThai))
+        {
+            throw new ApiException(400, "Trang thai don hang khong hop le");
         }
 
         donHang.TrangThai = trangThai;

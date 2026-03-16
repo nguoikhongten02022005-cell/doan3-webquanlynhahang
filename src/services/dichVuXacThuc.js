@@ -46,6 +46,7 @@ const chuanHoaNguoiDungHienTai = (nguoiDung) => {
 
   return {
     fullName: nguoiDungDaChuanHoa.fullName,
+    id: nguoiDungDaChuanHoa.id ?? null,
     username: nguoiDungDaChuanHoa.username,
     email: nguoiDungDaChuanHoa.email,
     phone: nguoiDungDaChuanHoa.phone,

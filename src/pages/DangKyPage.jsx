@@ -25,8 +25,8 @@ function DangKyPage() {
     ;(async () => {
       const ketQua = await dangKy({ fullName, username, email, password })
 
-      if (!result.success) {
-        setRegisterError(result.error)
+      if (!ketQua.success) {
+        setRegisterError(ketQua.error)
         return
       }
 

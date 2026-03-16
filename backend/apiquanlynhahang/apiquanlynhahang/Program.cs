@@ -1,18 +1,79 @@
+using System.Security.Cryptography;
+using System.Text;
 using apiquanlynhahang.Data;
+using apiquanlynhahang.Middleware;
+using apiquanlynhahang.Options;
 using apiquanlynhahang.Repositories;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
+var cacNguonGocFrontend = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
+    ?? new[]
+    {
+        "http://localhost:5173",
+        "http://127.0.0.1:5173",
+        "http://localhost:5174",
+        "http://127.0.0.1:5174",
+        "http://localhost:4173",
+        "http://127.0.0.1:4173",
+    };
 
 // Add services to the container.
 
 builder.Services.AddControllers();
 var chuoiKetNoi = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Khong tim thay chuoi ket noi DefaultConnection.");
+var jwtSecret = builder.Configuration["Jwt:Secret"];
+
+if (string.IsNullOrWhiteSpace(jwtSecret))
+{
+    jwtSecret = builder.Environment.IsDevelopment()
+        ? Convert.ToBase64String(RandomNumberGenerator.GetBytes(64))
+        : throw new InvalidOperationException("Khong tim thay Jwt:Secret hoac bien moi truong Jwt__Secret.");
+}
+
+builder.Services.Configure<JwtTuyChon>(options =>
+{
+    builder.Configuration.GetSection("Jwt").Bind(options);
+    options.Secret = jwtSecret;
+});
 
 builder.Services.AddDbContext<UngDungDbContext>(options =>
     options.UseMySql(chuoiKetNoi, ServerVersion.AutoDetect(chuoiKetNoi)));
+
+builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(options =>
+    {
+        options.TokenValidationParameters = new TokenValidationParameters
+        {
+            ValidateIssuer = true,
+            ValidateAudience = true,
+            ValidateLifetime = true,
+            ValidateIssuerSigningKey = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"],
+            ValidAudience = builder.Configuration["Jwt:Audience"],
+            IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtSecret)),
+            NameClaimType = System.Security.Claims.ClaimTypes.Name,
+            RoleClaimType = System.Security.Claims.ClaimTypes.Role,
+            ClockSkew = TimeSpan.Zero,
+        };
+    });
+
+builder.Services.AddAuthorization();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("FrontendLocal", policy =>
+    {
+        policy.WithOrigins(cacNguonGocFrontend)
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddScoped<IMonAnRepository, MonAnRepository>();
 builder.Services.AddScoped<IMonAnService, MonAnService>();
@@ -22,9 +83,36 @@ builder.Services.AddScoped<DatBanService>();
 builder.Services.AddScoped<DonHangService>();
 builder.Services.AddScoped<NguoiDungService>();
 builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JwtService>();
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options =>
+{
+    options.AddSecurityDefinition("Bearer", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Name = "Authorization",
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.Http,
+        Scheme = "bearer",
+        BearerFormat = "JWT",
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Description = "Nhap token dang Bearer {token}"
+    });
+
+    options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "Bearer"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -35,8 +123,16 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-app.UseHttpsRedirection();
+app.UseMiddleware<ApiExceptionMiddleware>();
 
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
+
+app.UseCors("FrontendLocal");
+
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();

@@ -1,12 +1,15 @@
 using apiquanlynhahang.DTOs;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.Models;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiquanlynhahang.Controllers;
 
 [ApiController]
 [Route("api/nguoi-dung")]
+[Authorize(Roles = "admin,staff")]
 public class NguoiDungController : ControllerBase
 {
     private readonly NguoiDungService _service;
@@ -23,10 +26,17 @@ public class NguoiDungController : ControllerBase
         return Ok(new { data = danhSach.Select(Map), meta = new { total = danhSach.Count } });
     }
 
+    [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> LayNguoiDungHienTai([FromQuery] string email, CancellationToken cancellationToken)
+    public async Task<IActionResult> LayNguoiDungHienTai(CancellationToken cancellationToken)
     {
-        var nguoiDung = await _service.LayTheoEmailAsync(email, cancellationToken);
+        var currentUser = User.LayNguoiDungHienTai();
+        if (currentUser is null)
+        {
+            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        }
+
+        var nguoiDung = await _service.LayTheoEmailAsync(currentUser.Email, cancellationToken);
         return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { data = Map(nguoiDung) });
     }
 

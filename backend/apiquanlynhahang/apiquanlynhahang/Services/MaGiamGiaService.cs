@@ -1,4 +1,5 @@
 using apiquanlynhahang.Data;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.DTOs;
 using apiquanlynhahang.Models;
 using Microsoft.EntityFrameworkCore;
@@ -55,6 +56,17 @@ public class MaGiamGiaService
 
     public async Task<MaGiamGia> TaoAsync(TaoMaGiamGiaDto dto, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(dto.MaGiam) || string.IsNullOrWhiteSpace(dto.TenMaGiam))
+        {
+            throw new ApiException(400, "Ma giam va ten ma giam la bat buoc");
+        }
+
+        var daTonTai = await _dbContext.MaGiamGia.AnyAsync(x => x.MaGiam == dto.MaGiam, cancellationToken);
+        if (daTonTai)
+        {
+            throw new ApiException(409, "Ma giam gia da ton tai");
+        }
+
         var entity = new MaGiamGia
         {
             MaGiam = dto.MaGiam,
@@ -84,6 +96,11 @@ public class MaGiamGiaService
         if (entity is null)
         {
             return null;
+        }
+
+        if (string.IsNullOrWhiteSpace(dto.MaGiam) || string.IsNullOrWhiteSpace(dto.TenMaGiam))
+        {
+            throw new ApiException(400, "Ma giam va ten ma giam la bat buoc");
         }
 
         entity.MaGiam = dto.MaGiam;

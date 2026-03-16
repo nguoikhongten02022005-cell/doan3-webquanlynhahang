@@ -1,6 +1,8 @@
 using apiquanlynhahang.DTOs;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.Models;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiquanlynhahang.Controllers;
@@ -16,6 +18,7 @@ public class DonHangController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpGet]
     public async Task<IActionResult> LayDanhSach(CancellationToken cancellationToken)
     {
@@ -23,13 +26,21 @@ public class DonHangController : ControllerBase
         return Ok(new { data = danhSach.Select(Map), meta = new { total = danhSach.Count } });
     }
 
+    [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> LayDonHangCuaToi([FromQuery] string email, CancellationToken cancellationToken)
+    public async Task<IActionResult> LayDonHangCuaToi(CancellationToken cancellationToken)
     {
-        var danhSach = await _service.LayDonHangCuaToiAsync(email, cancellationToken);
+        var currentUser = User.LayNguoiDungHienTai();
+        if (currentUser is null)
+        {
+            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        }
+
+        var danhSach = await _service.LayDonHangCuaToiAsync(currentUser.Email, cancellationToken);
         return Ok(new { data = danhSach.Select(Map), meta = new { total = danhSach.Count } });
     }
 
+    [Authorize]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> LayTheoId(int id, CancellationToken cancellationToken)
     {
@@ -51,6 +62,7 @@ public class DonHangController : ControllerBase
         return donHang is null ? BadRequest(new { message = loi }) : StatusCode(201, new { message = "Tao don hang thanh cong", data = Map(donHang) });
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}/status")]
     public async Task<IActionResult> CapNhatTrangThai(int id, [FromBody] CapNhatTrangThaiDonHangDto dto, CancellationToken cancellationToken)
     {

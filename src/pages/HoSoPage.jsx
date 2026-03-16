@@ -19,12 +19,12 @@ const dinhDangNgay = (value) => {
     return '--'
   }
 
-  const ngay = new Date(giaTri)
-  if (Number.isNaN(date.getTime())) {
+  const ngay = new Date(value)
+  if (Number.isNaN(ngay.getTime())) {
     return '--'
   }
 
-  return date.toLocaleDateString('vi-VN')
+  return ngay.toLocaleDateString('vi-VN')
 }
 
 function HoSoPage() {
@@ -81,13 +81,13 @@ function HoSoPage() {
   const handleCancelBooking = async (bookingId, bookingCode) => {
     const ketQua = await huyDatBan(bookingId, bookingCode)
 
-    if (!result.success) {
-      setThongBaoDatBan(result.error)
+    if (!ketQua.success) {
+      setThongBaoDatBan(ketQua.error)
       return
     }
 
-    setLichSuDatBan(result.lichSuDatBan)
-    setThongBaoDatBan(result.message)
+    setLichSuDatBan(ketQua.lichSuDatBan)
+    setThongBaoDatBan(ketQua.message)
   }
 
   return (

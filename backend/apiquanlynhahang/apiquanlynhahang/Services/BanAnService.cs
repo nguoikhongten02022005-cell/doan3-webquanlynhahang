@@ -1,4 +1,5 @@
 using apiquanlynhahang.Data;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.DTOs;
 using apiquanlynhahang.Models;
 using Microsoft.EntityFrameworkCore;
@@ -41,6 +42,28 @@ public class BanAnService
 
     public async Task<BanAn> TaoAsync(TaoBanAnDto dto, CancellationToken cancellationToken = default)
     {
+        if (string.IsNullOrWhiteSpace(dto.Id) || string.IsNullOrWhiteSpace(dto.MaBan) || string.IsNullOrWhiteSpace(dto.TenBan))
+        {
+            throw new ApiException(400, "Id, ma ban va ten ban la bat buoc");
+        }
+
+        if (dto.SucChua == 0)
+        {
+            throw new ApiException(400, "Suc chua phai lon hon 0");
+        }
+
+        var khuVucTonTai = await _dbContext.KhuVucBan.AnyAsync(x => x.Id == dto.KhuVucId, cancellationToken);
+        if (!khuVucTonTai)
+        {
+            throw new ApiException(400, "Khu vuc ban khong ton tai");
+        }
+
+        var maBanDaTonTai = await _dbContext.BanAn.AnyAsync(x => x.Id == dto.Id || x.MaBan == dto.MaBan, cancellationToken);
+        if (maBanDaTonTai)
+        {
+            throw new ApiException(409, "Ban an hoac ma ban da ton tai");
+        }
+
         var banAn = new BanAn
         {
             Id = dto.Id,
@@ -66,6 +89,15 @@ public class BanAnService
         if (banAn is null)
         {
             return null;
+        }
+
+        if (!string.IsNullOrWhiteSpace(dto.KhuVucId))
+        {
+            var khuVucTonTai = await _dbContext.KhuVucBan.AnyAsync(x => x.Id == dto.KhuVucId, cancellationToken);
+            if (!khuVucTonTai)
+            {
+                throw new ApiException(400, "Khu vuc ban khong ton tai");
+            }
         }
 
         if (!string.IsNullOrWhiteSpace(dto.MaBan)) banAn.MaBan = dto.MaBan;

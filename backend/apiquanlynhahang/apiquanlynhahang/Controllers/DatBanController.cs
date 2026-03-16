@@ -1,6 +1,8 @@
 using apiquanlynhahang.DTOs;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.Models;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiquanlynhahang.Controllers;
@@ -16,6 +18,7 @@ public class DatBanController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpGet]
     public async Task<IActionResult> LayDanhSach(CancellationToken cancellationToken)
     {
@@ -23,13 +26,21 @@ public class DatBanController : ControllerBase
         return Ok(new { data = danhSach.Select(Map), meta = new { total = danhSach.Count } });
     }
 
+    [Authorize]
     [HttpGet("history")]
-    public async Task<IActionResult> LayLichSu([FromQuery] string email, CancellationToken cancellationToken)
+    public async Task<IActionResult> LayLichSu(CancellationToken cancellationToken)
     {
-        var danhSach = await _service.LayLichSuTheoEmailAsync(email, cancellationToken);
+        var currentUser = User.LayNguoiDungHienTai();
+        if (currentUser is null)
+        {
+            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        }
+
+        var danhSach = await _service.LayLichSuTheoEmailAsync(currentUser.Email, cancellationToken);
         return Ok(new { data = danhSach.Select(Map), meta = new { total = danhSach.Count } });
     }
 
+    [Authorize]
     [HttpGet("{id:int}")]
     public async Task<IActionResult> LayTheoId(int id, CancellationToken cancellationToken)
     {
@@ -44,6 +55,7 @@ public class DatBanController : ControllerBase
         return StatusCode(201, new { message = "Tao dat ban thanh cong", data = Map(entity) });
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}")]
     public async Task<IActionResult> CapNhat(int id, [FromBody] CapNhatDatBanDto dto, CancellationToken cancellationToken)
     {
@@ -51,6 +63,7 @@ public class DatBanController : ControllerBase
         return entity is null ? NotFound(new { message = "Khong tim thay dat ban" }) : Ok(new { message = "Cap nhat dat ban thanh cong", data = Map(entity) });
     }
 
+    [Authorize]
     [HttpPatch("{id:int}/cancel")]
     public async Task<IActionResult> Huy(int id, CancellationToken cancellationToken)
     {
@@ -58,6 +71,7 @@ public class DatBanController : ControllerBase
         return entity is null ? NotFound(new { message = "Khong tim thay dat ban" }) : Ok(new { message = "Huy dat ban thanh cong", data = Map(entity) });
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}/status")]
     public async Task<IActionResult> CapNhatTrangThai(int id, [FromBody] CapNhatTrangThaiDatBanDto dto, CancellationToken cancellationToken)
     {
@@ -65,6 +79,7 @@ public class DatBanController : ControllerBase
         return entity is null ? NotFound(new { message = "Khong tim thay dat ban" }) : Ok(new { message = "Cap nhat trang thai dat ban thanh cong", data = Map(entity) });
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}/assign-tables")]
     public async Task<IActionResult> GanBan(int id, [FromBody] GanBanChoDatBanDto dto, CancellationToken cancellationToken)
     {
@@ -72,14 +87,17 @@ public class DatBanController : ControllerBase
         return entity is null ? NotFound(new { message = "Khong tim thay dat ban" }) : Ok(new { message = "Gan ban thanh cong", data = Map(entity) });
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}/check-in")]
     public Task<IActionResult> CheckIn(int id, CancellationToken cancellationToken)
         => CapNhatTrangThai(id, new CapNhatTrangThaiDatBanDto { TrangThai = "DA_CHECK_IN" }, cancellationToken);
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}/complete")]
     public Task<IActionResult> HoanThanh(int id, CancellationToken cancellationToken)
         => CapNhatTrangThai(id, new CapNhatTrangThaiDatBanDto { TrangThai = "DA_HOAN_THANH" }, cancellationToken);
 
+    [Authorize(Roles = "admin,staff")]
     [HttpPatch("{id:int}/no-show")]
     public Task<IActionResult> KhongDen(int id, CancellationToken cancellationToken)
         => CapNhatTrangThai(id, new CapNhatTrangThaiDatBanDto { TrangThai = "KHONG_DEN" }, cancellationToken);

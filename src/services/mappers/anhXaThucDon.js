@@ -61,21 +61,21 @@ export const chuanHoaMonThucDon = (monGoc, chiSoDuPhong = 0) => {
     }
   }
 
-  const giaTriGia = chuanHoaGiaTriGia(monGoc.price)
-  const danhMucDaChuanHoa = chuanHoaDanhMucThucDon(monGoc.category)
+  const giaTriGia = chuanHoaGiaTriGia(monGoc.price ?? monGoc.gia)
+  const danhMucDaChuanHoa = chuanHoaDanhMucThucDon(monGoc.category ?? monGoc.danhMuc)
   const idDaChuanHoa = monGoc.id ?? monGoc._id ?? monGoc.slug ?? `fallback-${chiSoDuPhong}`
 
   return {
     ...monGoc,
     id: idDaChuanHoa,
-    name: chuanHoaVanBan(monGoc.name) || TEN_MON_DU_PHONG,
-    description: chuanHoaVanBan(monGoc.description) || MO_TA_MON_DU_PHONG,
+    name: chuanHoaVanBan(monGoc.name ?? monGoc.tenMon) || TEN_MON_DU_PHONG,
+    description: chuanHoaVanBan(monGoc.description ?? monGoc.moTa) || MO_TA_MON_DU_PHONG,
     price: dinhDangTienTe(giaTriGia),
     priceValue: giaTriGia,
     category: damBaoDanhMucHopLe(danhMucDaChuanHoa),
-    badge: chuanHoaNhan(monGoc.badge),
-    tone: chuanHoaSacDo(monGoc.tone),
-    image: chuanHoaAnh(monGoc.image),
+    badge: chuanHoaNhan(monGoc.badge ?? monGoc.nhanMon),
+    tone: chuanHoaSacDo(monGoc.tone ?? monGoc.toneMau),
+    image: chuanHoaAnh(monGoc.image ?? monGoc.hinhAnh),
   }
 }
 

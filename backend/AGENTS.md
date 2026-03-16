@@ -6,23 +6,27 @@ File này áp dụng cho toàn bộ thư mục `backend/`.
 Ngoài các quy tắc trong file này, cần tiếp tục tôn trọng tinh thần từ `AGENTS.md` ở root: ưu tiên đặt tên mới rõ nghĩa theo nghiệp vụ, ưu tiên tiếng Việt không dấu khi phù hợp, và giữ tính nhất quán với convention đang có trong từng file.
 
 ## Vị trí của `backend/` trong repo hiện tại
-Thư mục `backend/` là phần mã ASP.NET Core Web API cũ, được giữ lại chủ yếu để tham khảo lịch sử hoặc chỉnh sửa cục bộ khi có yêu cầu rõ ràng.
+Thư mục `backend/` ban đầu là phần mã ASP.NET Core Web API cũ, được giữ lại chủ yếu để tham khảo lịch sử hoặc chỉnh sửa cục bộ khi có yêu cầu rõ ràng.
 
-Backend đang dùng cho luồng phát triển và kiểm thử hiện tại của dự án nằm ở `server/`.
+Backend đang dùng cho luồng phát triển và kiểm thử hiện tại của dự án nhìn chung vẫn nằm ở `server/`.
+
+Tuy nhiên, hiện trong `backend/apiquanlynhahang/apiquanlynhahang` da co mot backend C# duoc bo sung them schema MySQL, Swagger, auth JWT va cac API nghiep vu co the chay local de kiem thu va phat trien tiep.
 
 Vì vậy khi làm việc trong `backend/`:
 - không xem đây là nguồn sự thật chính cho contract đang chạy hằng ngày
-- chỉ chỉnh khi yêu cầu thật sự liên quan đến phần mã C# cũ hoặc cần đối chiếu lịch sử
+- uu tien phan biet ro giua backend C# trong `backend/apiquanlynhahang/apiquanlynhahang` va backend Node trong `server/`
+- chỉ chỉnh khi yêu cầu thật sự liên quan đến phần mã C# cũ, backend C# dang duoc mo rong, hoặc cần đối chiếu lịch sử
 - không tự suy diễn rằng mọi thay đổi trong `backend/` sẽ tự động áp dụng cho hệ thống đang chạy bằng `server/`
 
 ## Mục tiêu
-Đây là backend ASP.NET Core Web API dùng C# và MySQL cho dự án quản lý nhà hàng, nhưng ở trạng thái hiện tại nó đóng vai trò mã cũ để tham khảo là chính.
+Đây là backend ASP.NET Core Web API dùng C# và MySQL cho dự án quản lý nhà hàng. O mot so khu vuc, no van dong vai tro ma cu de tham khao; rieng thu muc `backend/apiquanlynhahang/apiquanlynhahang` da duoc cap nhat de co the chay local va kiem thu nghiep vu.
 
 Khi chỉnh sửa backend:
 - ưu tiên sửa đúng chức năng được yêu cầu
 - không sửa lan sang frontend nếu không thật sự cần
 - không refactor lớn nếu chưa được yêu cầu
 - giữ hệ thống chạy ổn định và tương thích với code hiện có trong chính `backend/`
+- neu sua trong `backend/apiquanlynhahang/apiquanlynhahang`, can uu tien cap nhat tai lieu trang thai backend de nguoi sau nam duoc boi canh hien tai
 
 ## Công nghệ
 - Ngôn ngữ: C#

@@ -1,6 +1,7 @@
 using apiquanlynhahang.DTOs;
 using apiquanlynhahang.Models;
 using apiquanlynhahang.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace apiquanlynhahang.Controllers;
@@ -16,6 +17,7 @@ public class MaGiamGiaController : ControllerBase
         _service = service;
     }
 
+    [Authorize(Roles = "admin,staff")]
     [HttpGet]
     public async Task<IActionResult> LayDanhSach(CancellationToken cancellationToken)
     {
@@ -37,6 +39,7 @@ public class MaGiamGiaController : ControllerBase
         return voucher is null ? BadRequest(new { message = loi }) : Ok(new { message = "Kiem tra ma giam gia thanh cong", data = Map(voucher) });
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPost]
     public async Task<IActionResult> Tao([FromBody] TaoMaGiamGiaDto dto, CancellationToken cancellationToken)
     {
@@ -44,6 +47,7 @@ public class MaGiamGiaController : ControllerBase
         return StatusCode(201, new { message = "Tao ma giam gia thanh cong", data = Map(voucher) });
     }
 
+    [Authorize(Roles = "admin")]
     [HttpPatch("{id:int}")]
     public async Task<IActionResult> CapNhat(int id, [FromBody] CapNhatMaGiamGiaDto dto, CancellationToken cancellationToken)
     {
@@ -51,6 +55,7 @@ public class MaGiamGiaController : ControllerBase
         return voucher is null ? NotFound(new { message = "Khong tim thay ma giam gia" }) : Ok(new { message = "Cap nhat ma giam gia thanh cong", data = Map(voucher) });
     }
 
+    [Authorize(Roles = "admin")]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> Xoa(int id, CancellationToken cancellationToken)
     {

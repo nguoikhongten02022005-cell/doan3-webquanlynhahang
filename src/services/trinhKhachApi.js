@@ -2,11 +2,8 @@ import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { xoaPhienXacThuc, luuPhienXacThuc } from './dichVuXacThuc'
 import { layMucLuuTru } from './dichVuLuuTru'
 
-const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:4000/api'
-const DUONG_DAN_LAM_MOI_XAC_THUC = '/auth/refresh'
+const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
-
-let refreshDangChay = null
 
 export const coSuDungMayChu = () => String(import.meta.env.VITE_USE_BACKEND || 'false').toLowerCase() === 'true'
 
@@ -106,41 +103,6 @@ const guiYeuCauTho = async (duongDan, tuyChon = {}) => {
   }
 }
 
-const luuPhienMoiTuLamMoi = (duLieuPhanHoi) => {
-  const duLieu = layDuLieu(duLieuPhanHoi)
-  const nguoiDung = duLieu?.currentUser || duLieu?.user || null
-  const maTruyCap = String(duLieu?.accessToken || '').trim()
-
-  if (!nguoiDung || !maTruyCap) {
-    throw new Error('Phiên đăng nhập mới không hợp lệ.')
-  }
-
-  luuPhienXacThuc({ user: nguoiDung, accessToken: maTruyCap })
-  return duLieu
-}
-
-const lamMoiMaTruyCap = async () => {
-  if (!refreshDangChay) {
-    refreshDangChay = (async () => {
-      const { phanHoi, duLieu } = await guiYeuCauTho(DUONG_DAN_LAM_MOI_XAC_THUC, {
-        method: 'POST',
-        body: JSON.stringify({}),
-        includeAuthDauTrang: false,
-      })
-
-      if (!phanHoi.ok) {
-        throw taoLoiTuPhanHoiApi(phanHoi, duLieu)
-      }
-
-      return luuPhienMoiTuLamMoi(duLieu)
-    })().finally(() => {
-      refreshDangChay = null
-    })
-  }
-
-  return refreshDangChay
-}
-
 const coTheThuLamMoiPhien = (duongDan, tuyChon) => {
   if (!coSuDungMayChu()) {
     return false
@@ -150,7 +112,7 @@ const coTheThuLamMoiPhien = (duongDan, tuyChon) => {
     return false
   }
 
-  return duongDan !== DUONG_DAN_LAM_MOI_XAC_THUC && duongDan !== DUONG_DAN_DANG_XUAT_XAC_THUC
+  return duongDan !== DUONG_DAN_DANG_XUAT_XAC_THUC
 }
 
 const guiYeuCau = async (duongDan, tuyChon = {}) => {
@@ -160,17 +122,8 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
     return duLieu
   }
 
-  if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon) && !tuyChon._retriedAfterRefresh) {
-    try {
-      await lamMoiMaTruyCap()
-      return guiYeuCau(duongDan, {
-        ...tuyChon,
-        _retriedAfterRefresh: true,
-      })
-    } catch (loiLamMoi) {
-      xoaPhienXacThuc()
-      throw loiLamMoi
-    }
+  if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon)) {
+    xoaPhienXacThuc()
   }
 
   throw taoLoiTuPhanHoiApi(phanHoi, duLieu)

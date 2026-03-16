@@ -1,4 +1,5 @@
 using apiquanlynhahang.Data;
+using apiquanlynhahang.Common;
 using apiquanlynhahang.Models;
 using Microsoft.EntityFrameworkCore;
 
@@ -30,6 +31,11 @@ public class NguoiDungService
             return null;
         }
 
+        if (vaiTro != "admin" && vaiTro != "staff" && vaiTro != "customer")
+        {
+            throw new ApiException(400, "Vai tro khong hop le");
+        }
+
         entity.VaiTro = vaiTro;
         entity.CapNhatLuc = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
@@ -42,6 +48,11 @@ public class NguoiDungService
         if (entity is null)
         {
             return null;
+        }
+
+        if (trangThai != "ACTIVE" && trangThai != "INACTIVE")
+        {
+            throw new ApiException(400, "Trang thai khong hop le");
         }
 
         entity.TrangThai = trangThai;

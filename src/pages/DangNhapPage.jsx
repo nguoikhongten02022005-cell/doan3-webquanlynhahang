@@ -16,8 +16,8 @@ function DangNhapPage() {
     ;(async () => {
       const ketQua = await dangNhap(identifier, password)
 
-      if (!result.success) {
-        setLoginError(result.error)
+      if (!ketQua.success) {
+        setLoginError(ketQua.error)
         return
       }
 
