@@ -11,11 +11,13 @@ public class DonHangService
 {
     private readonly UngDungDbContext _dbContext;
     private readonly MaGiamGiaService _maGiamGiaService;
+    private readonly KhoService _khoService;
 
-    public DonHangService(UngDungDbContext dbContext, MaGiamGiaService maGiamGiaService)
+    public DonHangService(UngDungDbContext dbContext, MaGiamGiaService maGiamGiaService, KhoService khoService)
     {
         _dbContext = dbContext;
         _maGiamGiaService = maGiamGiaService;
+        _khoService = khoService;
     }
 
     public Task<List<DonHang>> LayDanhSachAsync(CancellationToken cancellationToken = default)
@@ -157,6 +159,12 @@ public class DonHangService
         donHang.TrangThai = trangThai;
         donHang.CapNhatLuc = DateTime.UtcNow;
         await _dbContext.SaveChangesAsync(cancellationToken);
+
+        if (trangThai == "DA_HOAN_THANH")
+        {
+            await _khoService.TruKhoTheoDonHangHoanThanhAsync(donHang.Id, cancellationToken);
+        }
+
         return donHang;
     }
 }

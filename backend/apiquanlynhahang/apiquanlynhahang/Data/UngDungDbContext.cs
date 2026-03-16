@@ -18,6 +18,11 @@ public class UngDungDbContext : DbContext
     public DbSet<MaGiamGia> MaGiamGia { get; set; }
     public DbSet<DonHang> DonHang { get; set; }
     public DbSet<ChiTietDonHang> ChiTietDonHang { get; set; }
+    public DbSet<NguyenLieu> NguyenLieu { get; set; }
+    public DbSet<PhieuNhapKho> PhieuNhapKho { get; set; }
+    public DbSet<ChiTietNhapKho> ChiTietNhapKho { get; set; }
+    public DbSet<CongThucMonAn> CongThucMonAn { get; set; }
+    public DbSet<BienDongKho> BienDongKho { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -79,6 +84,9 @@ public class UngDungDbContext : DbContext
 
             entity.Property(x => x.Id).HasColumnName("id");
             entity.Property(x => x.MaBan).HasColumnName("ma_ban");
+            entity.Property(x => x.MaQr).HasColumnName("ma_qr");
+            entity.Property(x => x.TokenQr).HasColumnName("token_qr");
+            entity.Property(x => x.KichHoatQr).HasColumnName("kich_hoat_qr");
             entity.Property(x => x.TenBan).HasColumnName("ten_ban");
             entity.Property(x => x.KhuVucId).HasColumnName("khu_vuc_id");
             entity.Property(x => x.SucChua).HasColumnName("suc_chua");
@@ -201,6 +209,85 @@ public class UngDungDbContext : DbContext
             entity.Property(x => x.GhiChuMon).HasColumnName("ghi_chu_mon");
             entity.Property(x => x.MaBienThe).HasColumnName("ma_bien_the");
             entity.Property(x => x.ThongTinMon).HasColumnName("thong_tin_mon");
+        });
+
+        modelBuilder.Entity<NguyenLieu>(entity =>
+        {
+            entity.ToTable("nguyen_lieu");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.MaNguyenLieu).HasColumnName("ma_nguyen_lieu");
+            entity.Property(x => x.TenNguyenLieu).HasColumnName("ten_nguyen_lieu");
+            entity.Property(x => x.DonViTinh).HasColumnName("don_vi_tinh");
+            entity.Property(x => x.SoLuongTon).HasColumnName("so_luong_ton").HasPrecision(12, 3);
+            entity.Property(x => x.MucCanhBaoToiThieu).HasColumnName("muc_canh_bao_toi_thieu").HasPrecision(12, 3);
+            entity.Property(x => x.TrangThai).HasColumnName("trang_thai");
+            entity.Property(x => x.GhiChu).HasColumnName("ghi_chu");
+            entity.Property(x => x.TaoLuc).HasColumnName("tao_luc");
+            entity.Property(x => x.CapNhatLuc).HasColumnName("cap_nhat_luc");
+        });
+
+        modelBuilder.Entity<PhieuNhapKho>(entity =>
+        {
+            entity.ToTable("phieu_nhap_kho");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.MaPhieuNhap).HasColumnName("ma_phieu_nhap");
+            entity.Property(x => x.NgayNhap).HasColumnName("ngay_nhap");
+            entity.Property(x => x.NhaCungCap).HasColumnName("nha_cung_cap");
+            entity.Property(x => x.GhiChu).HasColumnName("ghi_chu");
+            entity.Property(x => x.TongTien).HasColumnName("tong_tien").HasPrecision(12, 2);
+            entity.Property(x => x.NguoiTaoId).HasColumnName("nguoi_tao_id");
+            entity.Property(x => x.TaoLuc).HasColumnName("tao_luc");
+            entity.Property(x => x.CapNhatLuc).HasColumnName("cap_nhat_luc");
+        });
+
+        modelBuilder.Entity<ChiTietNhapKho>(entity =>
+        {
+            entity.ToTable("chi_tiet_nhap_kho");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.PhieuNhapKhoId).HasColumnName("phieu_nhap_kho_id");
+            entity.Property(x => x.NguyenLieuId).HasColumnName("nguyen_lieu_id");
+            entity.Property(x => x.SoLuongNhap).HasColumnName("so_luong_nhap").HasPrecision(12, 3);
+            entity.Property(x => x.DonGiaNhap).HasColumnName("don_gia_nhap").HasPrecision(12, 2);
+            entity.Property(x => x.ThanhTien).HasColumnName("thanh_tien").HasPrecision(12, 2);
+            entity.Property(x => x.GhiChu).HasColumnName("ghi_chu");
+        });
+
+        modelBuilder.Entity<CongThucMonAn>(entity =>
+        {
+            entity.ToTable("cong_thuc_mon_an");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.MonAnId).HasColumnName("mon_an_id");
+            entity.Property(x => x.NguyenLieuId).HasColumnName("nguyen_lieu_id");
+            entity.Property(x => x.DinhLuong).HasColumnName("dinh_luong").HasPrecision(12, 3);
+            entity.Property(x => x.DonViTinh).HasColumnName("don_vi_tinh");
+            entity.Property(x => x.GhiChu).HasColumnName("ghi_chu");
+            entity.Property(x => x.TaoLuc).HasColumnName("tao_luc");
+            entity.Property(x => x.CapNhatLuc).HasColumnName("cap_nhat_luc");
+        });
+
+        modelBuilder.Entity<BienDongKho>(entity =>
+        {
+            entity.ToTable("bien_dong_kho");
+            entity.HasKey(x => x.Id);
+
+            entity.Property(x => x.Id).HasColumnName("id");
+            entity.Property(x => x.NguyenLieuId).HasColumnName("nguyen_lieu_id");
+            entity.Property(x => x.LoaiBienDong).HasColumnName("loai_bien_dong");
+            entity.Property(x => x.SoLuongThayDoi).HasColumnName("so_luong_thay_doi").HasPrecision(12, 3);
+            entity.Property(x => x.SoLuongTruoc).HasColumnName("so_luong_truoc").HasPrecision(12, 3);
+            entity.Property(x => x.SoLuongSau).HasColumnName("so_luong_sau").HasPrecision(12, 3);
+            entity.Property(x => x.ThamChieuLoai).HasColumnName("tham_chieu_loai");
+            entity.Property(x => x.ThamChieuId).HasColumnName("tham_chieu_id");
+            entity.Property(x => x.GhiChu).HasColumnName("ghi_chu");
+            entity.Property(x => x.TaoLuc).HasColumnName("tao_luc");
         });
     }
 }

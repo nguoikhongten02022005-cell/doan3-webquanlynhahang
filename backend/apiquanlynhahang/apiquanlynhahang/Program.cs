@@ -84,6 +84,8 @@ builder.Services.AddScoped<DonHangService>();
 builder.Services.AddScoped<NguoiDungService>();
 builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<KhoService>();
+builder.Services.AddScoped<BaoCaoService>();
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(options =>

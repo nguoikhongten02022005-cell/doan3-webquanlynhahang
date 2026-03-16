@@ -1,5 +1,0 @@
-Total messages: 4 (Errors: 2, Warnings: 0)
-Returning 2 messages for level "error"
-
-Unexpected identifier 'trung'
-Unexpected identifier 'trung'

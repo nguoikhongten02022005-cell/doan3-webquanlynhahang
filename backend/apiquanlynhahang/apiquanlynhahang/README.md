@@ -36,6 +36,15 @@ dotnet build
 dotnet run
 ```
 
+## Ghi chu ve file SQL
+Tat ca schema va du lieu mau hien duoc giu trong 1 file duy nhat:
+
+```text
+Data/mysql_init_doan3quanlynhahang.sql
+```
+
+Phan mo rong cho kho nguyen lieu va QR theo ban da duoc bo sung o cuoi file nay de tranh tach nho CSDL thanh nhieu file.
+
 ## Dia chi local
 - HTTP: `http://localhost:5011`
 - HTTPS: `https://localhost:7038`
@@ -76,6 +85,85 @@ Bearer <accessToken>
 - `api/don-hang`
 - `api/ma-giam-gia`
 - `api/nguoi-dung`
+
+## Danh sach API chinh
+
+### Auth
+- `POST /api/auth/register`
+- `POST /api/auth/login`
+- `POST /api/auth/internal-login`
+- `POST /api/auth/logout`
+- `GET /api/auth/me`
+- `PUT /api/auth/me`
+
+### Nguoi dung
+- `GET /api/nguoi-dung`
+- `GET /api/nguoi-dung/{id}`
+- `PATCH /api/nguoi-dung/{id}`
+
+### Mon an
+- `GET /api/mon-an`
+- `GET /api/mon-an/{id}`
+- `POST /api/mon-an`
+- `PUT /api/mon-an/{id}`
+- `DELETE /api/mon-an/{id}`
+
+### Ban an
+- `GET /api/ban-an`
+- `GET /api/ban-an/{id}`
+- `POST /api/ban-an`
+- `PUT /api/ban-an/{id}`
+- `PATCH /api/ban-an/{id}/trang-thai`
+
+### Bao cao
+- `GET /api/bao-cao/tong-quan`
+- `GET /api/bao-cao/top-mon-ban-chay`
+- `GET /api/bao-cao/canh-bao-kho`
+
+### Dat ban
+- `POST /api/dat-ban`
+- `GET /api/dat-ban`
+- `GET /api/dat-ban/{id}`
+- `GET /api/dat-ban/history`
+- `PATCH /api/dat-ban/{id}`
+- `PATCH /api/dat-ban/{id}/status`
+- `PATCH /api/dat-ban/{id}/assign-tables`
+- `PATCH /api/dat-ban/{id}/cancel`
+
+### Don hang
+- `POST /api/don-hang`
+- `GET /api/don-hang`
+- `GET /api/don-hang/{id}`
+- `GET /api/don-hang/me`
+- `PATCH /api/don-hang/{id}/status`
+
+### Ma giam gia
+- `GET /api/ma-giam-gia`
+- `GET /api/ma-giam-gia/{code}`
+- `POST /api/ma-giam-gia`
+- `POST /api/ma-giam-gia/validate`
+- `PUT /api/ma-giam-gia/{id}`
+- `DELETE /api/ma-giam-gia/{id}`
+
+### Kho nguyen lieu
+- `GET /api/nguyen-lieu`
+- `GET /api/nguyen-lieu/{id}`
+- `GET /api/nguyen-lieu/canh-bao`
+- `POST /api/nguyen-lieu`
+- `PATCH /api/nguyen-lieu/{id}`
+- `DELETE /api/nguyen-lieu/{id}`
+- `GET /api/phieu-nhap-kho`
+- `GET /api/phieu-nhap-kho/{id}`
+- `POST /api/phieu-nhap-kho`
+- `GET /api/cong-thuc-mon/{monAnId}`
+- `POST /api/cong-thuc-mon`
+- `PATCH /api/cong-thuc-mon/{id}`
+- `DELETE /api/cong-thuc-mon/{id}`
+
+### QR theo ban
+- `GET /api/qr/ban/{tokenQr}`
+- `GET /api/qr/ban/{tokenQr}/mon-an`
+- `POST /api/qr/ban/{tokenQr}/don-hang`
 
 ## Phan quyen hien tai
 - `customer`: dang ky, dang nhap, xem ho so cua minh, xem lich su dat ban, xem don hang cua minh

@@ -64,6 +64,9 @@ public class BanAnController : ControllerBase
     {
         ban.Id,
         ban.MaBan,
+        ban.MaQr,
+        ban.TokenQr,
+        ban.KichHoatQr,
         ban.TenBan,
         ban.KhuVucId,
         ban.SucChua,

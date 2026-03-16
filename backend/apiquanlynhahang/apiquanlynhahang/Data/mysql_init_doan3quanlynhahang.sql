@@ -563,3 +563,269 @@ WHERE dh.ma_don_hang = 'DH-20260315-000003'
   AND NOT EXISTS (
     SELECT 1 FROM chi_tiet_don_hang ctdh WHERE ctdh.don_hang_id = dh.id AND ctdh.ma_bien_the = 'tiramisu_M'
   );
+
+-- =====================================================
+-- PHAN MO RONG DO AN: KHO NGUYEN LIEU VA QR THEO BAN
+-- Neu da co du lieu cu, cac lenh ben duoi uu tien IF NOT EXISTS
+-- va WHERE NOT EXISTS de tranh pha vo CSDL hien tai.
+-- =====================================================
+
+SET @co_ma_qr := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ban_an'
+    AND COLUMN_NAME = 'ma_qr'
+);
+SET @sql_ma_qr := IF(
+  @co_ma_qr = 0,
+  'ALTER TABLE ban_an ADD COLUMN ma_qr VARCHAR(60) NOT NULL DEFAULT '''' AFTER ma_ban',
+  'SELECT ''bo qua cot ma_qr'''
+);
+PREPARE stmt FROM @sql_ma_qr;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @co_token_qr := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ban_an'
+    AND COLUMN_NAME = 'token_qr'
+);
+SET @sql_token_qr := IF(
+  @co_token_qr = 0,
+  'ALTER TABLE ban_an ADD COLUMN token_qr VARCHAR(120) NOT NULL DEFAULT '''' AFTER ma_qr',
+  'SELECT ''bo qua cot token_qr'''
+);
+PREPARE stmt FROM @sql_token_qr;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @co_kich_hoat_qr := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.COLUMNS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ban_an'
+    AND COLUMN_NAME = 'kich_hoat_qr'
+);
+SET @sql_kich_hoat_qr := IF(
+  @co_kich_hoat_qr = 0,
+  'ALTER TABLE ban_an ADD COLUMN kich_hoat_qr TINYINT(1) NOT NULL DEFAULT 1 AFTER token_qr',
+  'SELECT ''bo qua cot kich_hoat_qr'''
+);
+PREPARE stmt FROM @sql_kich_hoat_qr;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @co_idx_ma_qr := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ban_an'
+    AND INDEX_NAME = 'uq_ban_an_ma_qr'
+);
+SET @sql_idx_ma_qr := IF(
+  @co_idx_ma_qr = 0,
+  'ALTER TABLE ban_an ADD UNIQUE KEY uq_ban_an_ma_qr (ma_qr)',
+  'SELECT ''bo qua index uq_ban_an_ma_qr'''
+);
+PREPARE stmt FROM @sql_idx_ma_qr;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+ALTER TABLE ban_an ADD UNIQUE KEY uq_ban_an_ma_qr (ma_qr);
+ALTER TABLE ban_an ADD UNIQUE KEY uq_ban_an_token_qr (token_qr);
+ALTER TABLE ban_an ADD KEY idx_ban_an_kich_hoat_qr (kich_hoat_qr);
+
+
+
+
+SET @co_idx_token_qr := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ban_an'
+    AND INDEX_NAME = 'uq_ban_an_token_qr'
+);
+SET @sql_idx_token_qr := IF(
+  @co_idx_token_qr = 0,
+  'ALTER TABLE ban_an ADD UNIQUE KEY uq_ban_an_token_qr (token_qr)',
+  'SELECT ''bo qua index uq_ban_an_token_qr'''
+);
+PREPARE stmt FROM @sql_idx_token_qr;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+SET @co_idx_kich_hoat_qr := (
+  SELECT COUNT(*)
+  FROM INFORMATION_SCHEMA.STATISTICS
+  WHERE TABLE_SCHEMA = DATABASE()
+    AND TABLE_NAME = 'ban_an'
+    AND INDEX_NAME = 'idx_ban_an_kich_hoat_qr'
+);
+SET @sql_idx_kich_hoat_qr := IF(
+  @co_idx_kich_hoat_qr = 0,
+  'ALTER TABLE ban_an ADD KEY idx_ban_an_kich_hoat_qr (kich_hoat_qr)',
+  'SELECT ''bo qua index idx_ban_an_kich_hoat_qr'''
+);
+PREPARE stmt FROM @sql_idx_kich_hoat_qr;
+EXECUTE stmt;
+DEALLOCATE PREPARE stmt;
+
+UPDATE ban_an
+SET ma_qr = IF(ma_qr = '', CONCAT('QR-', ma_ban), ma_qr),
+    token_qr = IF(token_qr = '', CONCAT('TABLE-', LOWER(REPLACE(ma_ban, '-', ''))), token_qr)
+WHERE ma_qr = '' OR token_qr = '';
+
+CREATE TABLE IF NOT EXISTS nguyen_lieu (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  ma_nguyen_lieu VARCHAR(30) NOT NULL,
+  ten_nguyen_lieu VARCHAR(150) NOT NULL,
+  don_vi_tinh VARCHAR(30) NOT NULL,
+  so_luong_ton DECIMAL(12, 3) NOT NULL DEFAULT 0,
+  muc_canh_bao_toi_thieu DECIMAL(12, 3) NOT NULL DEFAULT 0,
+  trang_thai ENUM('CON_HANG', 'SAP_HET', 'HET_HANG') NOT NULL DEFAULT 'CON_HANG',
+  ghi_chu VARCHAR(255) NOT NULL DEFAULT '',
+  tao_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  cap_nhat_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_nguyen_lieu_ma (ma_nguyen_lieu),
+  KEY idx_nguyen_lieu_trang_thai (trang_thai)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS phieu_nhap_kho (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  ma_phieu_nhap VARCHAR(30) NOT NULL,
+  ngay_nhap DATETIME NOT NULL,
+  nha_cung_cap VARCHAR(150) NOT NULL DEFAULT '',
+  ghi_chu VARCHAR(255) NOT NULL DEFAULT '',
+  tong_tien DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  nguoi_tao_id INT UNSIGNED NULL,
+  tao_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  cap_nhat_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_phieu_nhap_kho_ma (ma_phieu_nhap),
+  KEY idx_phieu_nhap_kho_ngay_nhap (ngay_nhap),
+  KEY idx_phieu_nhap_kho_nguoi_tao (nguoi_tao_id),
+  CONSTRAINT fk_phieu_nhap_kho_nguoi_tao FOREIGN KEY (nguoi_tao_id) REFERENCES nguoi_dung(id) ON DELETE SET NULL ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS chi_tiet_nhap_kho (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  phieu_nhap_kho_id INT UNSIGNED NOT NULL,
+  nguyen_lieu_id INT UNSIGNED NOT NULL,
+  so_luong_nhap DECIMAL(12, 3) NOT NULL,
+  don_gia_nhap DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  thanh_tien DECIMAL(12, 2) NOT NULL DEFAULT 0,
+  ghi_chu VARCHAR(255) NOT NULL DEFAULT '',
+  PRIMARY KEY (id),
+  KEY idx_chi_tiet_nhap_kho_phieu (phieu_nhap_kho_id),
+  KEY idx_chi_tiet_nhap_kho_nguyen_lieu (nguyen_lieu_id),
+  CONSTRAINT fk_chi_tiet_nhap_kho_phieu FOREIGN KEY (phieu_nhap_kho_id) REFERENCES phieu_nhap_kho(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_chi_tiet_nhap_kho_nguyen_lieu FOREIGN KEY (nguyen_lieu_id) REFERENCES nguyen_lieu(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS cong_thuc_mon_an (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  mon_an_id INT UNSIGNED NOT NULL,
+  nguyen_lieu_id INT UNSIGNED NOT NULL,
+  dinh_luong DECIMAL(12, 3) NOT NULL,
+  don_vi_tinh VARCHAR(30) NOT NULL,
+  ghi_chu VARCHAR(255) NOT NULL DEFAULT '',
+  tao_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  cap_nhat_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  UNIQUE KEY uq_cong_thuc_mon_nguyen_lieu (mon_an_id, nguyen_lieu_id),
+  KEY idx_cong_thuc_mon_an_mon (mon_an_id),
+  KEY idx_cong_thuc_mon_an_nguyen_lieu (nguyen_lieu_id),
+  CONSTRAINT fk_cong_thuc_mon_an_mon FOREIGN KEY (mon_an_id) REFERENCES mon_an(id) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT fk_cong_thuc_mon_an_nguyen_lieu FOREIGN KEY (nguyen_lieu_id) REFERENCES nguyen_lieu(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+CREATE TABLE IF NOT EXISTS bien_dong_kho (
+  id INT UNSIGNED NOT NULL AUTO_INCREMENT,
+  nguyen_lieu_id INT UNSIGNED NOT NULL,
+  loai_bien_dong ENUM('NHAP_KHO', 'TRU_KHO_DON_HANG', 'DIEU_CHINH') NOT NULL,
+  so_luong_thay_doi DECIMAL(12, 3) NOT NULL,
+  so_luong_truoc DECIMAL(12, 3) NOT NULL,
+  so_luong_sau DECIMAL(12, 3) NOT NULL,
+  tham_chieu_loai VARCHAR(50) NOT NULL DEFAULT '',
+  tham_chieu_id INT UNSIGNED NULL,
+  ghi_chu VARCHAR(255) NOT NULL DEFAULT '',
+  tao_luc DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+  PRIMARY KEY (id),
+  KEY idx_bien_dong_kho_nguyen_lieu_tao_luc (nguyen_lieu_id, tao_luc),
+  KEY idx_bien_dong_kho_tham_chieu (tham_chieu_loai, tham_chieu_id),
+  CONSTRAINT fk_bien_dong_kho_nguyen_lieu FOREIGN KEY (nguyen_lieu_id) REFERENCES nguyen_lieu(id) ON DELETE RESTRICT ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+INSERT INTO nguyen_lieu (ma_nguyen_lieu, ten_nguyen_lieu, don_vi_tinh, so_luong_ton, muc_canh_bao_toi_thieu, trang_thai, ghi_chu)
+SELECT mau.ma_nguyen_lieu, mau.ten_nguyen_lieu, mau.don_vi_tinh, mau.so_luong_ton, mau.muc_canh_bao_toi_thieu, mau.trang_thai, mau.ghi_chu
+FROM (
+  SELECT 'NL-BO-001' AS ma_nguyen_lieu, 'Thit bo Uc' AS ten_nguyen_lieu, 'kg' AS don_vi_tinh, 18.500 AS so_luong_ton, 5.000 AS muc_canh_bao_toi_thieu, 'CON_HANG' AS trang_thai, 'Dung cho mon bo bit tet' AS ghi_chu
+  UNION ALL SELECT 'NL-CA-001', 'Ca hoi phi le', 'kg', 12.000, 4.000, 'CON_HANG', 'Dung cho mon ca hoi nuong'
+  UNION ALL SELECT 'NL-RAU-001', 'Xa lach romaine', 'kg', 6.500, 2.000, 'CON_HANG', 'Dung cho cac mon salad'
+  UNION ALL SELECT 'NL-SOT-001', 'Sot teriyaki', 'lit', 3.200, 1.000, 'CON_HANG', 'Dung cho mon nuong'
+  UNION ALL SELECT 'NL-TRA-001', 'Tra den', 'kg', 1.800, 0.500, 'CON_HANG', 'Dung cho do uong'
+  UNION ALL SELECT 'NL-DAO-001', 'Dao ngam', 'hop', 8.000, 3.000, 'CON_HANG', 'Dung cho tra dao'
+  UNION ALL SELECT 'NL-BANH-001', 'Pho mai mascarpone', 'kg', 1.200, 0.800, 'SAP_HET', 'Dung cho tiramisu'
+) AS mau
+WHERE NOT EXISTS (
+  SELECT 1 FROM nguyen_lieu nl WHERE nl.ma_nguyen_lieu = mau.ma_nguyen_lieu
+);
+
+INSERT INTO cong_thuc_mon_an (mon_an_id, nguyen_lieu_id, dinh_luong, don_vi_tinh, ghi_chu)
+SELECT ma.id, nl.id, ct.dinh_luong, ct.don_vi_tinh, ct.ghi_chu
+FROM (
+  SELECT 'bo-bit-tet-uc' AS slug, 'NL-BO-001' AS ma_nguyen_lieu, 0.250 AS dinh_luong, 'kg' AS don_vi_tinh, '1 phan bo bit tet' AS ghi_chu
+  UNION ALL SELECT 'ca-hoi-nuong-teriyaki', 'NL-CA-001', 0.220, 'kg', '1 phan ca hoi nuong'
+  UNION ALL SELECT 'ca-hoi-nuong-teriyaki', 'NL-SOT-001', 0.050, 'lit', 'Sot teriyaki'
+  UNION ALL SELECT 'salad-caesar', 'NL-RAU-001', 0.120, 'kg', '1 phan salad'
+  UNION ALL SELECT 'tra-dao-cam-sa', 'NL-TRA-001', 0.010, 'kg', '1 ly tra dao'
+  UNION ALL SELECT 'tra-dao-cam-sa', 'NL-DAO-001', 0.100, 'hop', 'Dao ngam cho 1 ly'
+  UNION ALL SELECT 'tiramisu', 'NL-BANH-001', 0.080, 'kg', '1 phan tiramisu'
+) AS ct
+JOIN mon_an ma ON ma.slug = ct.slug
+JOIN nguyen_lieu nl ON nl.ma_nguyen_lieu = ct.ma_nguyen_lieu
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM cong_thuc_mon_an ctm
+  WHERE ctm.mon_an_id = ma.id AND ctm.nguyen_lieu_id = nl.id
+);
+
+INSERT INTO phieu_nhap_kho (ma_phieu_nhap, ngay_nhap, nha_cung_cap, ghi_chu, tong_tien, nguoi_tao_id)
+SELECT 'NK-20260316-0001', TIMESTAMP('2026-03-16 08:30:00'), 'Cong ty thuc pham Hung Yen', 'Nhap kho dau ngay', 4250000.00, 1
+WHERE NOT EXISTS (
+  SELECT 1 FROM phieu_nhap_kho pnk WHERE pnk.ma_phieu_nhap = 'NK-20260316-0001'
+);
+
+INSERT INTO chi_tiet_nhap_kho (phieu_nhap_kho_id, nguyen_lieu_id, so_luong_nhap, don_gia_nhap, thanh_tien, ghi_chu)
+SELECT pnk.id, nl.id, ct.so_luong_nhap, ct.don_gia_nhap, ct.thanh_tien, ct.ghi_chu
+FROM (
+  SELECT 'NL-BO-001' AS ma_nguyen_lieu, 5.000 AS so_luong_nhap, 320000.00 AS don_gia_nhap, 1600000.00 AS thanh_tien, 'Nhap bo Uc loai 1' AS ghi_chu
+  UNION ALL SELECT 'NL-CA-001', 4.000, 280000.00, 1120000.00, 'Nhap ca hoi tuoi'
+  UNION ALL SELECT 'NL-RAU-001', 10.000, 35000.00, 350000.00, 'Nhap rau sach'
+  UNION ALL SELECT 'NL-BANH-001', 2.000, 590000.00, 1180000.00, 'Nhap mascarpone'
+) AS ct
+JOIN phieu_nhap_kho pnk ON pnk.ma_phieu_nhap = 'NK-20260316-0001'
+JOIN nguyen_lieu nl ON nl.ma_nguyen_lieu = ct.ma_nguyen_lieu
+WHERE NOT EXISTS (
+  SELECT 1 FROM chi_tiet_nhap_kho ctnk WHERE ctnk.phieu_nhap_kho_id = pnk.id AND ctnk.nguyen_lieu_id = nl.id
+);
+
+INSERT INTO bien_dong_kho (nguyen_lieu_id, loai_bien_dong, so_luong_thay_doi, so_luong_truoc, so_luong_sau, tham_chieu_loai, tham_chieu_id, ghi_chu)
+SELECT nl.id, 'NHAP_KHO', bd.so_luong_thay_doi, bd.so_luong_truoc, bd.so_luong_sau, 'PHIEU_NHAP_KHO', pnk.id, bd.ghi_chu
+FROM (
+  SELECT 'NL-BO-001' AS ma_nguyen_lieu, 5.000 AS so_luong_thay_doi, 13.500 AS so_luong_truoc, 18.500 AS so_luong_sau, 'Nhap kho bo Uc' AS ghi_chu
+  UNION ALL SELECT 'NL-CA-001', 4.000, 8.000, 12.000, 'Nhap kho ca hoi'
+  UNION ALL SELECT 'NL-RAU-001', 10.000, -3.500, 6.500, 'Nhap kho rau'
+  UNION ALL SELECT 'NL-BANH-001', 2.000, -0.800, 1.200, 'Nhap pho mai mascarpone'
+) AS bd
+JOIN nguyen_lieu nl ON nl.ma_nguyen_lieu = bd.ma_nguyen_lieu
+JOIN phieu_nhap_kho pnk ON pnk.ma_phieu_nhap = 'NK-20260316-0001'
+WHERE NOT EXISTS (
+  SELECT 1
+  FROM bien_dong_kho bdk
+  WHERE bdk.nguyen_lieu_id = nl.id AND bdk.tham_chieu_loai = 'PHIEU_NHAP_KHO' AND bdk.tham_chieu_id = pnk.id
+);

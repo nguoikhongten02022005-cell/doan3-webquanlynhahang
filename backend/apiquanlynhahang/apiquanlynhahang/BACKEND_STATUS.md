@@ -39,6 +39,49 @@ Backend C# trong `backend/apiquanlynhahang/apiquanlynhahang` da duoc nang cap tu
   - tao dat ban -> cap nhat trang thai -> gan ban
   - validate voucher -> tao don hang -> cap nhat trang thai
 
+## Hien trang MySQL
+- CSDL hien da du de chay cac nghiep vu cot loi cua bai:
+  - `nguoi_dung`
+  - `token_lam_moi`
+  - `khu_vuc_ban`
+  - `ban_an`
+  - `dat_ban`
+  - `chi_tiet_dat_ban`
+  - `mon_an`
+  - `ma_giam_gia`
+  - `don_hang`
+  - `chi_tiet_don_hang`
+- Cac bang tren da du cho auth, menu, table, booking, order va voucher.
+- Hien chua co bang rieng cho bao cao thong ke, kho nguyen lieu va QR goi mon theo ban.
+
+## De xuat mo rong MySQL
+- De phu hop huong mo rong cua bai, nen bo sung theo nhom bang nho gon nhu sau:
+
+### Bao cao thong ke
+- Khong can tao bang bao cao rieng o giai doan dau.
+- Uu tien dung truy van tong hop tu `don_hang`, `chi_tiet_don_hang`, `dat_ban`, `ban_an`, `ma_giam_gia`.
+- Khi du lieu lon hon moi can tinh den bang tong hop ngay.
+
+### Kho nguyen lieu
+- `nguyen_lieu`: thong tin nguyen lieu, don vi tinh, ton kho, muc canh bao
+- `phieu_nhap_kho`: phieu nhap tong
+- `chi_tiet_nhap_kho`: danh sach nguyen lieu trong tung phieu nhap
+- `cong_thuc_mon_an`: dinh luong nguyen lieu theo mon
+- `bien_dong_kho`: lich su cong tru ton kho de de doi chieu va debug
+
+### QR goi mon theo ban
+- Uu tien mo rong tren bang `ban_an` hien co bang cach them:
+  - `ma_qr`
+  - `token_qr`
+  - `kich_hoat_qr`
+- Khong can tao bang order rieng cho QR neu van tai su dung `don_hang`.
+- Neu can theo doi nhat ky yeu cau tai ban, co the them `yeu_cau_tai_ban` o buoc sau.
+
+## Danh gia hien tai
+- MySQL da du cho phan nghiep vu cot loi hien co.
+- MySQL chua day du neu muon noi he thong theo huong bao cao, kho va QR mot cach tron ven.
+- Huong hop ly nhat la giu cac bang cot loi hien tai, sau do mo rong them bang nho gon theo tung module, tranh sua lon vao schema dang chay.
+
 ## Nhung han che hien tai
 - Chua co test tu dong unit/integration
 - Chua co refresh token day du trong `token_lam_moi`

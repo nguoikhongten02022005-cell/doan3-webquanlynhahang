@@ -34,12 +34,6 @@ Hệ thống cung cấp giao diện web thân thiện, dễ sử dụng cho từ
 - áp dụng voucher
 - theo dõi lịch sử đặt bàn và đơn hàng
 
-### Khách quét QR tại bàn
-
-- xem thực đơn theo bàn
-- gọi món trực tiếp bằng mã QR
-- tạo đơn hàng gắn với bàn tương ứng
-
 ## Chức năng chính
 
 ### Quản lý tài khoản và phân quyền
@@ -80,46 +74,13 @@ Hệ thống cung cấp giao diện web thân thiện, dễ sử dụng cho từ
 - áp dụng voucher cho đơn hàng
 - kiểm soát điều kiện sử dụng, giá trị tối thiểu, số lượt dùng
 
-### Báo cáo thống kê
-
-- thống kê doanh thu theo ngày, tuần, tháng
-- thống kê số lượng đơn hàng và booking
-- thống kê trạng thái bàn và trạng thái booking
-- thống kê voucher đã sử dụng
-- top món bán chạy
-
-### Quản lý kho nguyên liệu
-
-- quản lý nguyên liệu
-- theo dõi tồn kho
-- quản lý nhập kho
-- cấu hình định lượng nguyên liệu theo món
-- cảnh báo nguyên liệu sắp hết
-
-### QR gọi món theo bàn
-
-- mỗi bàn có mã QR riêng
-- quét QR để mở menu theo bàn
-- gọi món trực tiếp từ điện thoại
-- tạo đơn hàng gắn đúng với bàn
-
 ## Kiến trúc hệ thống
 
 ```text
-┌─────────────────┐    ┌──────────────────────────────┐    ┌──────────────────────────┐
-│   React App     │    │  ASP.NET Core Web API        │    │     Business Modules     │
-│   (Frontend)    │◄──►│  JWT Authentication          │◄──►│                          │
-└─────────────────┘    └──────────────────────────────┘    │ • Auth                   │
-                                                           │ • Users                  │
-                                                           │ • Bookings               │
-                                                           │ • Tables                 │
-                                                           │ • Menu Items             │
-                                                           │ • Orders                 │
-                                                           │ • Vouchers               │
-                                                           │ • Reports                │
-                                                           │ • Inventory              │
-                                                           │ • QR Ordering            │
-                                                           └──────────────────────────┘
+┌─────────────────┐    ┌──────────────────────────────┐    ┌──────────────────────┐
+│   React App     │    │  ASP.NET Core Web API        │    │       MySQL          │
+│   (Frontend)    │◄──►│  JWT Authentication          │◄──►│      Database        │
+└─────────────────┘    └──────────────────────────────┘    └──────────────────────┘
 ```
 
 ## Công nghệ sử dụng
@@ -187,3 +148,4 @@ dotnet run
 
 - Backend C# + MySQL là phần backend duy nhất dùng để phát triển và demo bài.
 - Nếu frontend gọi API local, cần đảm bảo backend C# đang chạy đúng cổng và CORS được cấu hình phù hợp.
+- Danh sách API nên xem trực tiếp trong `backend/apiquanlynhahang/apiquanlynhahang/README.md` hoặc qua Swagger tại `http://localhost:5011/swagger`.

@@ -40,6 +40,9 @@ public class BanAnService
     public Task<BanAn?> LayTheoIdAsync(string id, CancellationToken cancellationToken = default)
         => _dbContext.BanAn.AsNoTracking().FirstOrDefaultAsync(x => x.Id == id, cancellationToken);
 
+    public Task<BanAn?> LayTheoTokenQrAsync(string tokenQr, CancellationToken cancellationToken = default)
+        => _dbContext.BanAn.AsNoTracking().FirstOrDefaultAsync(x => x.TokenQr == tokenQr, cancellationToken);
+
     public async Task<BanAn> TaoAsync(TaoBanAnDto dto, CancellationToken cancellationToken = default)
     {
         if (string.IsNullOrWhiteSpace(dto.Id) || string.IsNullOrWhiteSpace(dto.MaBan) || string.IsNullOrWhiteSpace(dto.TenBan))

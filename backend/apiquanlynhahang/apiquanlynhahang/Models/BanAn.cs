@@ -4,6 +4,9 @@ public class BanAn
 {
     public string Id { get; set; } = string.Empty;
     public string MaBan { get; set; } = string.Empty;
+    public string MaQr { get; set; } = string.Empty;
+    public string TokenQr { get; set; } = string.Empty;
+    public bool KichHoatQr { get; set; }
     public string TenBan { get; set; } = string.Empty;
     public string KhuVucId { get; set; } = string.Empty;
     public uint SucChua { get; set; }
