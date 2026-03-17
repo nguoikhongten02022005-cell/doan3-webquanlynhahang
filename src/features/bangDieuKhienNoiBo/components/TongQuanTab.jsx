@@ -1,5 +1,5 @@
-import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../data/duLieuDatBan'
-import { dinhDangTienTe } from '../../utils/tienTe'
+import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../../data/duLieuDatBan'
+import { dinhDangTienTe } from '../../../utils/tienTe'
 import {
   dinhDangNgay,
   dinhDangNgayGio,
@@ -7,9 +7,9 @@ import {
   laySacThaiTrangThaiDatBan,
   laySacThaiDonHang,
   layNhanChoNgoi,
-} from '../../features/bangDieuKhienNoiBo/dinhDang'
-import { layNhanTrangThaiDonHang } from '../../utils/donHang'
-import { layGhiChuUuTienDatBan } from '../../features/bangDieuKhienNoiBo/boChon'
+} from '../dinhDang'
+import { layNhanTrangThaiDonHang } from '../../../utils/donHang'
+import { layGhiChuUuTienDatBan } from '../boChon'
 
 function TongQuanTab({
   danhSachDatBanDangHoatDong,

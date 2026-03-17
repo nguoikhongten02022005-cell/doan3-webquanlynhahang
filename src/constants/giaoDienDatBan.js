@@ -1,4 +1,4 @@
-import { SITE_CONTACT } from './lienHeTrang'
+import { SITE_CONTACT } from './thongTinTrang'
 
 export const NOI_DUNG_MO_DAU_DAT_BAN = {
   label: 'Đặt bàn trực tuyến',

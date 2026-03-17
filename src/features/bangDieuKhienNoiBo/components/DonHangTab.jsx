@@ -1,6 +1,6 @@
-import { dinhDangTienTe } from '../../utils/tienTe'
-import { dinhDangNgay, laySacThaiDonHang } from '../../features/bangDieuKhienNoiBo/dinhDang'
-import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../utils/donHang'
+import { dinhDangTienTe } from '../../../utils/tienTe'
+import { dinhDangNgay, laySacThaiDonHang } from '../dinhDang'
+import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../../utils/donHang'
 
 function DonHangTab({ orders }) {
   return (

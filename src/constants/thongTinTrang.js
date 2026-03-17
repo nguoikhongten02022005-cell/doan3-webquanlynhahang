@@ -1,7 +1,20 @@
 export const SITE_CONTACT = Object.freeze({
   address: '28 Nguyễn Huệ, Q.1, TP. HCM',
-  phoneDisplay: '(028) 1234 5678',
-  phoneHref: 'tel:02812345678',
+  phoneDisplay: '(028) 3825 6789',
+  phoneHref: 'tel:02838256789',
   email: 'hello@nguyenvi.vn',
+  emailDisplay: 'hello@nguyenvi.vn',
+  emailHref: 'mailto:hello@nguyenvi.vn',
   bookingEmail: 'hello@nguyenvi.vn',
+  hours: [
+    {
+      label: 'Thứ 2 - Thứ 6',
+      value: '11:00 - 14:00 · 17:00 - 22:00',
+    },
+    {
+      label: 'Thứ 7 - Chủ nhật',
+      value: '11:00 - 22:00',
+    },
+  ],
+  onlineOrderCutoff: 'Nhận đơn online đến 21:45',
 })

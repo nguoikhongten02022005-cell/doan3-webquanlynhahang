@@ -48,8 +48,8 @@ export const layNhanHanhDongChinh = ({ step, soLuongKhach, date, time, step1Comp
   }
 
   if (step === 2) {
-    if (step2Complete) return 'Xem lại thông tin đặt bàn'
-    return 'Hoàn tất thông tin liên hệ'
+    if (step2Complete) return 'Sang bước xác nhận'
+    return 'Điền đủ thông tin liên hệ'
   }
 
   return layTrangThaiGuiDatBan({ seatingArea, soLuongKhach, time, notes }) === 'DA_XAC_NHAN'

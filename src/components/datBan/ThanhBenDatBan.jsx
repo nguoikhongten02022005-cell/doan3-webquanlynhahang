@@ -44,6 +44,20 @@ function ThanhBenDatBan({
         </div>
       </div>
 
+      <div className="dat-ban-side-card dat-ban-side-quiet-card">
+        <p className="dat-ban-side-kicker">Nhịp đặt bàn</p>
+        <div className="dat-ban-side-quiet-list">
+          <div className="dat-ban-side-quiet-item">
+            <strong>Chọn nhanh trong 3 bước</strong>
+            <span>Giữ flow gọn, không tạo cảm giác form dài.</span>
+          </div>
+          <div className="dat-ban-side-quiet-item">
+            <strong>Xác nhận theo tình trạng thật</strong>
+            <span>Nhà hàng ưu tiên đúng khung giờ và số khách đã chọn.</span>
+          </div>
+        </div>
+      </div>
+
       <div className="dat-ban-side-card dat-ban-tom-tat-rail-card">
         <div className="dat-ban-side-card-head">
           <div>
@@ -51,6 +65,10 @@ function ThanhBenDatBan({
             <h3>Lựa chọn hiện tại</h3>
           </div>
         </div>
+
+        <p className="dat-ban-rail-note">
+          Mỗi bước sẽ mở ra phần tiếp theo để giữ nhịp đặt bàn ngắn gọn và dễ theo dõi.
+        </p>
 
         <div className="dat-ban-tom-tat-rail-list">
           <div className="dat-ban-tom-tat-rail-item">

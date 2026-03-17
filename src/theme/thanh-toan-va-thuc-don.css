@@ -1,0 +1,119 @@
+/* CHECKOUT PAGE */
+.thanh-toan-page { padding: 2rem 0 4rem; min-height: 70vh; }
+.thanh-toan-page h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 600; color: var(--dark); margin-bottom: 1.5rem;
+}
+.thanh-toan-layout {
+  display: grid; grid-template-columns: 1fr 380px; gap: 2rem; align-items: start;
+}
+.thanh-toan-form-panel {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius-xl); padding: 1.8rem;
+}
+.thanh-toan-form-panel h2 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.3rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem;
+}
+.thanh-toan-form-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
+}
+.thanh-toan-form-grid .nhom-truong.full { grid-column: 1 / -1; }
+.payment-options { display: flex; flex-direction: column; gap: 0.6rem; margin-top: 1rem; }
+.payment-option {
+  display: flex; align-items: center; gap: 0.8rem;
+  padding: 0.8rem 1rem; border: 1.5px solid var(--line);
+  border-radius: var(--radius-md); cursor: pointer; transition: all 0.2s;
+}
+.payment-option:hover { border-color: var(--primary-light); }
+.payment-option.selected {
+  border-color: var(--primary); background: var(--primary-bg);
+}
+.payment-option input[type="radio"] { accent-color: var(--primary); }
+.payment-option span { font-size: 0.88rem; font-weight: 500; }
+
+/* Checkout summary card */
+.thanh-toan-tom-tat-card {
+  background: #fff; border: 1px solid var(--line);
+  border-radius: var(--radius-xl); padding: 1.5rem;
+  position: sticky; top: 90px;
+}
+.thanh-toan-tom-tat-card h3 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.15rem; font-weight: 700; color: var(--dark);
+  margin-bottom: 1rem; padding-bottom: 0.7rem;
+  border-bottom: 1px solid var(--line-light);
+}
+.thanh-toan-item-row {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 0.5rem 0; font-size: 0.85rem;
+}
+.thanh-toan-item-name { color: var(--text-secondary); }
+.thanh-toan-item-price { font-weight: 600; color: var(--text-primary); }
+.thanh-toan-item-qty { font-size: 0.75rem; color: var(--text-muted); }
+.thanh-toan-total-row {
+  display: flex; justify-content: space-between;
+  padding-top: 0.8rem; margin-top: 0.5rem;
+  border-top: 1px solid var(--line-light);
+  font-weight: 700; font-size: 1.05rem; color: var(--dark);
+}
+.thanh-toan-tom-tat-card .btn { width: 100%; margin-top: 1.2rem; }
+
+/* MENU PAGE */
+.thuc-don-page { padding: 2rem 0 4rem; min-height: 70vh; }
+.thuc-don-page h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem; font-weight: 600; color: var(--dark); margin-bottom: 1.5rem;
+}
+.thuc-don-layout {
+  display: grid; grid-template-columns: 220px 1fr; gap: 2rem;
+}
+.thuc-don-sidebar {
+  position: sticky; top: 90px; align-self: start;
+}
+.thuc-don-search { position: relative; margin-bottom: 1rem; }
+.thuc-don-search-input {
+  width: 100%; padding: 0.6rem 0.8rem 0.6rem 2.2rem;
+  border: 1.5px solid var(--line); border-radius: var(--radius-md);
+  font-size: 0.85rem; background: #fff;
+}
+.thuc-don-search-input:focus { outline: none; border-color: var(--primary); }
+.thuc-don-search::before {
+  content: '\1F50D'; position: absolute; left: 0.7rem; top: 50%;
+  transform: translateY(-50%); font-size: 0.85rem; opacity: 0.4;
+}
+.thuc-don-categories h3 {
+  font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
+  color: var(--text-muted); font-weight: 700; margin-bottom: 0.6rem;
+}
+.thuc-don-danh-muc-list { display: flex; flex-direction: column; gap: 0.15rem; }
+.thuc-don-danh-muc-btn {
+  width: 100%; text-align: left; padding: 0.55rem 0.8rem;
+  border: none; background: transparent; border-radius: var(--radius-md);
+  font-size: 0.85rem; color: var(--text-secondary); cursor: pointer;
+  transition: all 0.2s; font-weight: 500;
+}
+.thuc-don-danh-muc-btn:hover { background: var(--surface-soft); color: var(--text-primary); }
+.thuc-don-danh-muc-btn.active {
+  background: var(--primary-bg); color: var(--primary); font-weight: 600;
+  border-left: 3px solid var(--primary);
+}
+.thuc-don-main { min-width: 0; }
+.thuc-don-toolbar {
+  display: flex; justify-content: space-between; align-items: center;
+  margin-bottom: 1.2rem; flex-wrap: wrap; gap: 0.8rem;
+}
+.thuc-don-sort { display: flex; align-items: center; gap: 0.5rem; }
+.thuc-don-sort label { font-size: 0.8rem; color: var(--text-muted); }
+.thuc-don-sort-select {
+  padding: 0.4rem 0.7rem; border: 1px solid var(--line);
+  border-radius: var(--radius-md); font-size: 0.82rem; background: #fff;
+}
+.thuc-don-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+  gap: 1.2rem;
+}
+.thuc-don-empty {
+  grid-column: 1 / -1; text-align: center; padding: 3rem;
+  color: var(--text-muted); font-size: 0.95rem;
+}

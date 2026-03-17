@@ -33,6 +33,17 @@ function BuocMotDatBan({
         />
       </div>
 
+      <div className="dat-ban-step-intro-compact">
+        <div className="dat-ban-step-intro-item">
+          <span>01</span>
+          <p>Chọn số khách trước để mở ngày và giờ phù hợp.</p>
+        </div>
+        <div className="dat-ban-step-intro-item">
+          <span>02</span>
+          <p>Hệ thống chỉ giữ lại các lựa chọn khả dụng theo nhịp phục vụ.</p>
+        </div>
+      </div>
+
       <div className={`dat-ban-luong-section ${activeBookingSection === 'date' ? 'is-active' : ''} ${stepOneProgress.hasGuests ? '' : 'is-locked'}`}>
         <MucNgayDatBan
           calendarContainerRef={calendar.calendarContainerRef}

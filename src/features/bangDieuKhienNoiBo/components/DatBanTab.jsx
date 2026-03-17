@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
-import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../data/duLieuDatBan'
-import { dinhDangNgayGio, dinhDangSoKhach, laySacThaiTrangThaiDatBan, layNhanKenhXacNhan, layNhanChoNgoi } from '../../features/bangDieuKhienNoiBo/dinhDang'
+import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../../data/duLieuDatBan'
+import { dinhDangNgayGio, dinhDangSoKhach, laySacThaiTrangThaiDatBan, layNhanKenhXacNhan, layNhanChoNgoi } from '../dinhDang'
 import {
   coTheGanBanChoDatBan,
   coTheCheckInDatBan,
@@ -9,7 +9,7 @@ import {
   layGhiChuUuTienDatBan,
   khopTimKiemDatBan,
   canXacNhanThuCong,
-} from '../../features/bangDieuKhienNoiBo/boChon'
+} from '../boChon'
 
 const DEFAULT_FORM_VALUES = {
   name: '',
@@ -124,7 +124,7 @@ function DatBanTab({
       return
     }
 
-    const payload = {
+    const duLieuGuiDi = {
       ...formValues,
       name: formValues.name.trim(),
       phone: formValues.phone.trim(),
@@ -139,8 +139,8 @@ function DatBanTab({
     }
 
     const result = formMode === 'edit'
-      ? await handleUpdateInternalBooking(editingBookingId, payload)
-      : await handleCreateInternalBooking(payload)
+      ? await handleUpdateInternalBooking(editingBookingId, duLieuGuiDi)
+      : await handleCreateInternalBooking(duLieuGuiDi)
 
     if (!result?.success) {
       setFormError(result?.error || 'Không thể lưu đặt bàn nội bộ.')
