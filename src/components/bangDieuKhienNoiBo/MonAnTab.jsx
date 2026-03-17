@@ -79,7 +79,7 @@ function MonAnTab({ dishes, reloadDishes }) {
       return
     }
 
-    const duLieuGuiDi = anhXaFormMonThanhDuLieuGuiDi(formValues)
+    const payload = anhXaFormMonThanhDuLieuGuiDi(formValues)
 
     try {
       const { duLieu: savedDish } = cheDoForm === 'edit'

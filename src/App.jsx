@@ -1,51 +1,76 @@
+import { Suspense, lazy } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import './App.css'
 import TuyenDuongBaoVe from './components/TuyenDuongBaoVe'
 import BoCucNoiBo from './layouts/BoCucNoiBo'
 import BoCucChinh from './layouts/BoCucChinh'
-import GioiThieuPage from './pages/GioiThieuPage'
-import DatBanPage from './pages/DatBanPage'
-import GioHangPage from './pages/GioHangPage'
-import ThanhToanPage from './pages/ThanhToanPage'
-import TrangChuPage from './pages/TrangChuPage'
-import BangDieuKhienNoiBoPage from './pages/BangDieuKhienNoiBoPage'
-import DangNhapNoiBoPage from './pages/DangNhapNoiBoPage'
-import DangNhapPage from './pages/DangNhapPage'
-import ThucDonPage from './pages/ThucDonPage'
-import HoSoPage from './pages/HoSoPage'
-import DangKyPage from './pages/DangKyPage'
+import {
+  taiBangDieuKhienNoiBoPage,
+  taiDangKyPage,
+  taiDangNhapNoiBoPage,
+  taiDangNhapPage,
+  taiDatBanPage,
+  taiGioHangPage,
+  taiGioiThieuPage,
+  taiHoSoPage,
+  taiThanhToanPage,
+  taiThucDonPage,
+  taiTrangChuPage,
+} from './services/prefetch/taiTuyenTrang'
+
+const GioiThieuPage = lazy(taiGioiThieuPage)
+const DatBanPage = lazy(taiDatBanPage)
+const GioHangPage = lazy(taiGioHangPage)
+const ThanhToanPage = lazy(taiThanhToanPage)
+const TrangChuPage = lazy(taiTrangChuPage)
+const BangDieuKhienNoiBoPage = lazy(taiBangDieuKhienNoiBoPage)
+const DangNhapNoiBoPage = lazy(taiDangNhapNoiBoPage)
+const DangNhapPage = lazy(taiDangNhapPage)
+const ThucDonPage = lazy(taiThucDonPage)
+const HoSoPage = lazy(taiHoSoPage)
+const DangKyPage = lazy(taiDangKyPage)
+
+function ManHinhTaiTuyen() {
+  return (
+    <div className="dat-ban-empty" role="status" aria-live="polite">
+      Đang tải nội dung...
+    </div>
+  )
+}
 
 function App() {
   return (
     <BrowserRouter>
-      <Routes>
-        <Route element={<BoCucChinh />}>
-          <Route path="/" element={<TrangChuPage />} />
-          <Route path="/thuc-don" element={<ThucDonPage />} />
-          <Route path="/dat-ban" element={<DatBanPage />} />
-          <Route path="/gioi-thieu" element={<GioiThieuPage />} />
-          <Route path="/gio-hang" element={<GioHangPage />} />
-          <Route path="/thanh-toan" element={<ThanhToanPage />} />
-          <Route path="/ho-so" element={<HoSoPage />} />
-          <Route path="/dang-nhap" element={<DangNhapPage />} />
-          <Route path="/dang-ky" element={<DangKyPage />} />
-        </Route>
+      <Suspense fallback={<ManHinhTaiTuyen />}>
+        <Routes>
+          <Route element={<BoCucChinh />}>
+            <Route path="/" element={<TrangChuPage />} />
+            <Route path="/thuc-don" element={<ThucDonPage />} />
+            <Route path="/dat-ban" element={<DatBanPage />} />
+            <Route path="/gioi-thieu" element={<GioiThieuPage />} />
+            <Route path="/gio-hang" element={<GioHangPage />} />
+            <Route path="/thanh-toan" element={<ThanhToanPage />} />
+            <Route path="/ho-so" element={<HoSoPage />} />
+            <Route path="/dang-nhap" element={<DangNhapPage />} />
+            <Route path="/dang-ky" element={<DangKyPage />} />
+          </Route>
 
-        <Route path="/noi-bo" element={<BoCucNoiBo />}>
-          <Route index element={<Navigate to="/noi-bo/bang-dieu-khien" replace />} />
-          <Route path="dang-nhap" element={<DangNhapNoiBoPage />} />
-          <Route
-            path="bang-dieu-khien"
-            element={(
-              <TuyenDuongBaoVe>
-                <BangDieuKhienNoiBoPage />
-              </TuyenDuongBaoVe>
-            )}
-          />
-        </Route>
+          <Route path="/noi-bo" element={<BoCucNoiBo />}>
+            <Route index element={<Navigate to="/noi-bo/bang-dieu-khien" replace />} />
+            <Route path="dang-nhap" element={<DangNhapNoiBoPage />} />
+            <Route
+              path="bang-dieu-khien"
+              element={(
+                <TuyenDuongBaoVe>
+                  <BangDieuKhienNoiBoPage />
+                </TuyenDuongBaoVe>
+              )}
+            />
+          </Route>
 
-        <Route path="/bang-dieu-khien-host" element={<Navigate to="/noi-bo/bang-dieu-khien" replace />} />
-      </Routes>
+          <Route path="/bang-dieu-khien-host" element={<Navigate to="/noi-bo/bang-dieu-khien" replace />} />
+        </Routes>
+      </Suspense>
     </BrowserRouter>
   )
 }

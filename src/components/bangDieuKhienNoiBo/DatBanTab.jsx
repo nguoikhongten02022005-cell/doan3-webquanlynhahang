@@ -124,7 +124,7 @@ function DatBanTab({
       return
     }
 
-    const duLieuGuiDi = {
+    const payload = {
       ...formValues,
       name: formValues.name.trim(),
       phone: formValues.phone.trim(),
@@ -138,7 +138,7 @@ function DatBanTab({
       ...(formMode === 'create' ? { status: formValues.status } : {}),
     }
 
-    const ketQua = formMode === 'edit'
+    const result = formMode === 'edit'
       ? await handleUpdateInternalBooking(editingBookingId, payload)
       : await handleCreateInternalBooking(payload)
 

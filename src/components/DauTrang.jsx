@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useGioHang } from '../context/GioHangContext'
 import { useXacThuc } from '../hooks/useXacThuc'
+import { prefetchTrangTheoDuongDan } from '../services/prefetch/taiTuyenTrang'
 
 const navItems = [
   { label: 'Trang chủ', to: '/' },
@@ -29,6 +30,10 @@ function DauTrang() {
 
   const handleNavLinkClick = () => {
     closeMenus()
+  }
+
+  const handlePrefetchTuyen = (duongDan) => {
+    prefetchTrangTheoDuongDan(duongDan)
   }
 
   const handleToggleUserMenu = () => {
@@ -64,6 +69,8 @@ function DauTrang() {
               to={item.to}
               className={isActive(item.to) ? 'active' : ''}
               onClick={handleNavLinkClick}
+              onMouseEnter={() => handlePrefetchTuyen(item.to)}
+              onFocus={() => handlePrefetchTuyen(item.to)}
             >
               <span>{item.label}</span>
             </Link>
@@ -71,11 +78,25 @@ function DauTrang() {
         </nav>
 
         <div className="header-actions">
-          <Link to="/dat-ban" className="btn nut-chinh header-dat-ban-btn" onClick={handleNavLinkClick}>
+          <Link
+            to="/dat-ban"
+            className="btn nut-chinh header-dat-ban-btn"
+            onClick={handleNavLinkClick}
+            onMouseEnter={() => handlePrefetchTuyen('/dat-ban')}
+            onFocus={() => handlePrefetchTuyen('/dat-ban')}
+          >
             Đặt bàn
           </Link>
 
-          <Link to="/gio-hang" className="icon-btn action-btn gio-hang-btn" aria-label="Giỏ hàng" data-tooltip="Giỏ hàng" onClick={handleNavLinkClick}>
+          <Link
+            to="/gio-hang"
+            className="icon-btn action-btn gio-hang-btn"
+            aria-label="Giỏ hàng"
+            data-tooltip="Giỏ hàng"
+            onClick={handleNavLinkClick}
+            onMouseEnter={() => handlePrefetchTuyen('/gio-hang')}
+            onFocus={() => handlePrefetchTuyen('/gio-hang')}
+          >
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
               <path d="M4 5h2l2.2 9.2a1 1 0 0 0 1 .8h7.9a1 1 0 0 0 1-.8L20 8H8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
               <circle cx="10" cy="19" r="1.3" fill="currentColor" />
@@ -106,11 +127,23 @@ function DauTrang() {
                       Xin chào, <strong>{displayName}</strong>
                     </div>
                     {coTheVaoNoiBo && (
-                      <Link to="/noi-bo/bang-dieu-khien" role="menuitem" onClick={handleNavLinkClick}>
+                      <Link
+                        to="/noi-bo/bang-dieu-khien"
+                        role="menuitem"
+                        onClick={handleNavLinkClick}
+                        onMouseEnter={() => handlePrefetchTuyen('/noi-bo/bang-dieu-khien')}
+                        onFocus={() => handlePrefetchTuyen('/noi-bo/bang-dieu-khien')}
+                      >
                         Bảng điều khiển nội bộ
                       </Link>
                     )}
-                    <Link to="/ho-so" role="menuitem" onClick={handleNavLinkClick}>
+                    <Link
+                      to="/ho-so"
+                      role="menuitem"
+                      onClick={handleNavLinkClick}
+                      onMouseEnter={() => handlePrefetchTuyen('/ho-so')}
+                      onFocus={() => handlePrefetchTuyen('/ho-so')}
+                    >
                       Hồ sơ cá nhân
                     </Link>
                     <button className="logout-btn" onClick={handleLogout} role="menuitem">
@@ -119,10 +152,22 @@ function DauTrang() {
                   </>
                 ) : (
                   <>
-                    <Link to="/dang-nhap" role="menuitem" onClick={handleNavLinkClick}>
+                    <Link
+                      to="/dang-nhap"
+                      role="menuitem"
+                      onClick={handleNavLinkClick}
+                      onMouseEnter={() => handlePrefetchTuyen('/dang-nhap')}
+                      onFocus={() => handlePrefetchTuyen('/dang-nhap')}
+                    >
                       Đăng nhập
                     </Link>
-                    <Link to="/ho-so" role="menuitem" onClick={handleNavLinkClick}>
+                    <Link
+                      to="/ho-so"
+                      role="menuitem"
+                      onClick={handleNavLinkClick}
+                      onMouseEnter={() => handlePrefetchTuyen('/ho-so')}
+                      onFocus={() => handlePrefetchTuyen('/ho-so')}
+                    >
                       Hồ sơ cá nhân
                     </Link>
                   </>
@@ -152,6 +197,8 @@ function DauTrang() {
               to={item.to}
               className={isActive(item.to) ? 'active' : ''}
               onClick={handleNavLinkClick}
+              onMouseEnter={() => handlePrefetchTuyen(item.to)}
+              onFocus={() => handlePrefetchTuyen(item.to)}
             >
               {item.label}
             </Link>
@@ -162,11 +209,21 @@ function DauTrang() {
                 Xin chào, <strong>{displayName}</strong>
               </div>
               {coTheVaoNoiBo && (
-                <Link to="/noi-bo/bang-dieu-khien" onClick={handleNavLinkClick}>
+                <Link
+                  to="/noi-bo/bang-dieu-khien"
+                  onClick={handleNavLinkClick}
+                  onMouseEnter={() => handlePrefetchTuyen('/noi-bo/bang-dieu-khien')}
+                  onFocus={() => handlePrefetchTuyen('/noi-bo/bang-dieu-khien')}
+                >
                   Bảng điều khiển nội bộ
                 </Link>
               )}
-              <Link to="/ho-so" onClick={handleNavLinkClick}>
+              <Link
+                to="/ho-so"
+                onClick={handleNavLinkClick}
+                onMouseEnter={() => handlePrefetchTuyen('/ho-so')}
+                onFocus={() => handlePrefetchTuyen('/ho-so')}
+              >
                 Hồ sơ cá nhân
               </Link>
               <button className="mobile-logout-btn" onClick={handleLogout}>
@@ -175,10 +232,20 @@ function DauTrang() {
             </>
           ) : (
             <>
-              <Link to="/dang-nhap" onClick={handleNavLinkClick}>
+              <Link
+                to="/dang-nhap"
+                onClick={handleNavLinkClick}
+                onMouseEnter={() => handlePrefetchTuyen('/dang-nhap')}
+                onFocus={() => handlePrefetchTuyen('/dang-nhap')}
+              >
                 Đăng nhập
               </Link>
-              <Link to="/ho-so" onClick={handleNavLinkClick}>
+              <Link
+                to="/ho-so"
+                onClick={handleNavLinkClick}
+                onMouseEnter={() => handlePrefetchTuyen('/ho-so')}
+                onFocus={() => handlePrefetchTuyen('/ho-so')}
+              >
                 Hồ sơ cá nhân
               </Link>
             </>

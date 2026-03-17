@@ -1,35 +1,26 @@
-import { createContext, useCallback, useContext, useMemo, useRef, useState } from 'react'
+import { useCallback, useMemo } from 'react'
+import { App as UngDungAntd } from 'antd'
 
-const ThongBaoContext = createContext(null)
+const THOI_GIAN_THONG_BAO = 2.6
 
-const NOTIFICATION_DURATION = 2600
+export function useThongBao() {
+  const { notification } = UngDungAntd.useApp()
 
-export function ThongBaoProvider({ children }) {
-  const [notifications, setNotifications] = useState([])
-  const timeoutMapRef = useRef(new Map())
+  const hienThongBao = useCallback(({ message, tone = 'neutral', duration = THOI_GIAN_THONG_BAO, title = '' }) => {
+    const loaiThongBao = {
+      success: 'success',
+      danger: 'error',
+      warning: 'warning',
+      neutral: 'info',
+    }[tone] || 'info'
 
-  const removeNotification = useCallback((id) => {
-    const timeoutId = timeoutMapRef.current.get(id)
-
-    if (timeoutId) {
-      window.clearTimeout(timeoutId)
-      timeoutMapRef.current.delete(id)
-    }
-
-    setNotifications((prev) => prev.filter((item) => item.id !== id))
-  }, [])
-
-  const hienThongBao = useCallback(({ message, tone = 'neutral', duration = NOTIFICATION_DURATION, title = '' }) => {
-    const id = `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`
-
-    setNotifications((prev) => [...prev, { id, message, tone, title }])
-
-    const timeoutId = window.setTimeout(() => {
-      removeNotification(id)
-    }, duration)
-
-    timeoutMapRef.current.set(id, timeoutId)
-  }, [removeNotification])
+    notification[loaiThongBao]({
+      message: title || 'Thong bao',
+      description: message,
+      duration,
+      placement: 'topRight',
+    })
+  }, [notification])
 
   const giaTriBoiCanh = useMemo(() => ({
     hienThongBao,
@@ -39,39 +30,5 @@ export function ThongBaoProvider({ children }) {
     hienThongTin: (message, title = 'Thông báo') => hienThongBao({ message, tone: 'neutral', title }),
   }), [hienThongBao])
 
-  return (
-    <ThongBaoContext.Provider value={giaTriBoiCanh}>
-      {children}
-
-      <div className="notification-stack" aria-live="polite" aria-atomic="true">
-        {notifications.map((notification) => (
-          <div key={notification.id} className={`notification-card tone-${notification.tone}`} role="status">
-            <div className="notification-copy">
-              {notification.title ? <strong>{notification.title}</strong> : null}
-              <p>{notification.message}</p>
-            </div>
-
-            <button
-              type="button"
-              className="notification-close"
-              onClick={() => removeNotification(notification.id)}
-              aria-label="Đóng thông báo"
-            >
-              ×
-            </button>
-          </div>
-        ))}
-      </div>
-    </ThongBaoContext.Provider>
-  )
-}
-
-export function useThongBao() {
-  const context = useContext(ThongBaoContext)
-
-  if (!context) {
-    throw new Error('useThongBao phai duoc dung ben trong ThongBaoProvider')
-  }
-
-  return context
+  return giaTriBoiCanh
 }
