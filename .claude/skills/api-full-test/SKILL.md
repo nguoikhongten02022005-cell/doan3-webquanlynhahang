@@ -1,13 +1,19 @@
 ---
 name: api-full-test
-description: this skill should be used when testing or regression-checking a csharp api repo with postman, backend code scanning, mysql verification, safe auto-fix, and one retest cycle.
+description: Run full local/dev C# API verification with repo discovery, Postman/MySQL checks, small safe fixes, and one retest cycle
+argument-hint: [backend-target-or-base-url]
+allowed-tools: [Read, Glob, Grep, Bash, Edit, Write]
 ---
 
-# Api Full Test
+# API Full Test
 
-## Overview
+This skill runs a structured end-to-end API verification workflow for local or dev C# backends. Inspect the repo first, prefer existing runners and collections, verify MySQL side effects when feasible, apply only small safe fixes, and write a markdown report to `./reports/api-full-test-report.md`.
 
-Run an end-to-end API verification workflow for local or dev C# backends. Inspect the repo first, prefer existing runners and collections, verify MySQL side effects, apply only small safe fixes, retest once, and write a markdown report to `./reports/api-full-test-report.md`.
+## Arguments
+
+The user invoked this skill with: $ARGUMENTS
+
+Treat any provided arguments as hints for backend target, startup path, base URL, collection path, environment name, or scope. If no arguments are provided, discover the best local/dev setup from the repo before asking follow-up questions.
 
 ## Use This Skill When
 
@@ -19,22 +25,30 @@ Run an end-to-end API verification workflow for local or dev C# backends. Inspec
 ## Operating Rules
 
 - Inspect the repo before running anything.
-- Prefer existing commands, docker compose files, test runners, migrations, seeds, and Postman collections before inventing new flow.
+- Prefer existing commands, docker compose files, test runners, migrations, seeds, and Postman collections before inventing a new flow.
 - Start with smoke coverage before full regression.
-- Verify `baseUrl`, auth token, headers, environment variables, and request payloads before concluding backend is broken.
+- Verify `baseUrl`, auth token, headers, environment variables, and request payloads before concluding the backend is broken.
 - Verify MySQL side effects for write endpoints when feasible.
 - Keep changes minimal and local-dev only.
 - Do not change production config, secrets, remote services, or real data.
 - Do not perform large refactors or business-logic rewrites as auto-fix.
-- Retest only once after fixes: first targeted retest for touched area, then one full retest.
+- Retest only once after fixes: first targeted retest for the touched area, then one full retest.
 
-## Primary Tools
+## Preferred Tools
 
-- Use `bash` as the main execution path for discovery, startup, builds, health checks, and local runners.
-- Use `postman` tools to inspect collections, environments, mocks, monitors, or run a collection when the repo or user points to Postman assets.
-- Use `mysql` to confirm schema presence, seed/reset assumptions, and DB side effects.
-- Use `context7` to check framework or library behavior when root cause depends on ASP.NET Core, authentication, or tool conventions.
-- Use `playwright` only when browser-based auth is required to obtain a token or complete a forced web login flow.
+- Use `Bash` as the main execution path for discovery, startup, builds, health checks, and local runners.
+- Use Postman tools to inspect collections, environments, mocks, monitors, or run a collection when the repo or user points to Postman assets.
+- Use MySQL tools to confirm schema presence, seed/reset assumptions, and DB side effects.
+- Use Context7 when root cause depends on ASP.NET Core, authentication, or tool behavior.
+- Use Playwright only when browser-based auth is required to obtain a token or complete a forced web login flow.
+
+## Required References
+
+Read these files before final execution decisions or report writing:
+
+- `references/test-strategy.md`
+- `references/failure-classification.md`
+- `references/report-format.md`
 
 ## Sequential Workflow
 
@@ -77,7 +91,7 @@ Determine and record:
 - Backend startup command.
 - Working environment name.
 - DB host, schema, and test-safe credentials source.
-- Collection/environment files or Postman identifiers.
+- Collection or environment files, or Postman identifiers.
 
 Then prepare the system:
 
@@ -141,7 +155,7 @@ Auto-fix only when the change is small, explicit, and low-risk. Allowed examples
 - Simple DTO request or response mismatch.
 - Missing small validation rule.
 - Test header, token, field name, or URL error.
-- Local Postman collection/environment correction.
+- Local Postman collection or environment correction.
 
 Do not auto-fix:
 
@@ -195,13 +209,7 @@ Keep the report concrete:
 ## Decision Heuristics
 
 - If repo startup options conflict, choose the one documented in repo files over guesswork.
-- If both `docker compose` and direct `dotnet run` are viable, prefer the lighter path unless DB/service dependencies clearly require compose.
+- If both `docker compose` and direct `dotnet run` are viable, prefer the lighter path unless DB or service dependencies clearly require compose.
 - If collection assertions disagree with backend contract and code clearly supports one side, classify whether the bug is in the test asset or backend implementation before fixing.
 - If DB verification is impossible due to missing safe credentials, continue API validation and call out DB verification as a remaining risk.
-- If browser login is required for token issuance, use `playwright` only to obtain a local test token; do not broaden into UI testing.
-
-## References
-
-- Read `references/test-strategy.md` for coverage planning and gap filling.
-- Read `references/failure-classification.md` for failure triage and safe auto-fix boundaries.
-- Read `references/report-format.md` before writing the final markdown report.
+- If browser login is required for token issuance, use Playwright only to obtain a local test token; do not broaden into UI testing.
