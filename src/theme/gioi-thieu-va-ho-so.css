@@ -191,7 +191,7 @@
 }
 .nhan-trang-thai.pending { background: #fef3c7; color: #92400e; }
 .nhan-trang-thai.confirmed { background: var(--primary-bg); color: var(--primary); }
-.nhan-trang-thai.completed { background: #d1fae5; color: #065f46; }
+.nhan-trang-thai.completed { background: #fdf0ea; color: #d86445; }
 .nhan-trang-thai.cancelled { background: #fee2e2; color: #991b1b; }
 
 /* Order progress */

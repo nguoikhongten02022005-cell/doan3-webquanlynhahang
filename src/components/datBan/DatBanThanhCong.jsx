@@ -6,9 +6,6 @@ function DatBanThanhCong({ bookingCode, bookingStatus, formData, soLuongKhach, s
       <div className="success-icon">✓</div>
       <p className="dat-ban-side-kicker">Kết quả booking</p>
       <h3>{successHeading}</h3>
-      <p className="dat-ban-success-lead">
-        Yêu cầu của bạn đã được ghi nhận. Nhà hàng sẽ giữ liên hệ theo trạng thái xác nhận tương ứng với khung giờ và khu vực đã chọn.
-      </p>
       <div className="success-dat-ban-code">
         <span className="code-label">Mã đặt bàn</span>
         <span className="code-value">{bookingCode}</span>

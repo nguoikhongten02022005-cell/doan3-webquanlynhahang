@@ -1,28 +1,42 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import TheMonAn from '../components/TheMonAn'
 import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
-import { DANH_MUC_TAT_CA_THUC_DON, CAC_DANH_MUC_THUC_DON, MO_TA_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
-import { CAC_LUA_CHON_SAP_XEP_THUC_DON } from '../constants/tuyChonThucDon'
+import {
+  GHI_CHU_DANH_MUC_THUC_DON,
+  HOME_CAC_DANH_MUC_THUC_DON,
+} from '../constants/danhMucThucDon'
+import { layAnhMonTheoTen } from '../constants/anhMonAn'
 import { useGioHang } from '../context/GioHangContext'
 import { useChiTietMonAnModal } from '../hooks/useChiTietMonAnModal'
 import { useDanhSachMonAn } from '../hooks/useDanhSachMonAn'
 
+const MENU_CATEGORY_META = Object.freeze(
+  HOME_CAC_DANH_MUC_THUC_DON.reduce(
+    (mapping, category, index) => {
+      mapping[category.name] = {
+        ...category,
+        index: String(index + 1).padStart(2, '0'),
+      }
+      return mapping
+    },
+    {},
+  ),
+)
+
+const layMetaDanhMuc = (category) => MENU_CATEGORY_META[category] || HOME_CAC_DANH_MUC_THUC_DON[0]
+const CAC_TAB_THUC_DON = HOME_CAC_DANH_MUC_THUC_DON.map((category) => category.name)
+const KHOANG_CAN_DINH_TAB = 120
+
 function ThucDonPage() {
-  const [searchQuery, setSearchQuery] = useState('')
-  const [activeCategory, setActiveCategory] = useState(DANH_MUC_TAT_CA_THUC_DON)
-  const [sortOption, setSortOption] = useState('featured')
-  const {
-    dishes,
-    loading,
-    error,
-    reloadDishes,
-  } = useDanhSachMonAn()
+  const [activeCategory, setActiveCategory] = useState(CAC_TAB_THUC_DON[0])
+  const { dishes, loading, error, reloadDishes } = useDanhSachMonAn()
   const { themVaoGio } = useGioHang()
+  const danhMucRefs = useRef({})
   const {
     dongChiTietMon,
     giaChiTiet,
     xuLyThemMonDaTuyChon,
-    xuLyThemVaoGio,
+    xuLyThemMonNhanh,
     xuLyBatTatTopping,
     dangMoChiTiet,
     moChiTietMon,
@@ -35,162 +49,207 @@ function ThucDonPage() {
     ghiChuRieng,
   } = useChiTietMonAnModal({ themVaoGio })
 
-  const normalizedQuery = searchQuery.trim().toLowerCase()
+  const categoryTabs = useMemo(
+    () => CAC_TAB_THUC_DON.map((category) => ({
+      category,
+      label: category,
+      ...layMetaDanhMuc(category),
+      shortNote: GHI_CHU_DANH_MUC_THUC_DON[category] || 'Chọn nhanh theo khẩu vị bạn muốn.',
+    })),
+    [],
+  )
 
-  const categoryCounts = useMemo(
-    () => CAC_DANH_MUC_THUC_DON.reduce((counts, category) => {
-      counts[category] = category === DANH_MUC_TAT_CA_THUC_DON
-        ? dishes.length
-        : dishes.filter((dish) => dish.category === category).length
-      return counts
-    }, {}),
+  const danhSachMonDaCoAnh = useMemo(
+    () => dishes.map((mon) => ({
+      ...mon,
+      image: layAnhMonTheoTen(mon.name) || mon.image,
+    })),
     [dishes],
   )
 
   const filteredDishes = useMemo(
-    () => dishes
-      .filter((dish) => {
-        const matchesCategory = activeCategory === DANH_MUC_TAT_CA_THUC_DON || dish.category === activeCategory
-        const searchableName = String(dish?.name || '').toLowerCase()
-        const searchableDescription = String(dish?.description || '').toLowerCase()
-        const matchesSearch = !normalizedQuery
-          || searchableName.includes(normalizedQuery)
-          || searchableDescription.includes(normalizedQuery)
-        return matchesCategory && matchesSearch
-      })
-      .sort((firstDish, secondDish) => {
-        if (sortOption === 'price-asc') {
-          return (firstDish.priceValue || 0) - (secondDish.priceValue || 0)
-        }
+    () => danhSachMonDaCoAnh
+      .toSorted((firstDish, secondDish) => (Number(firstDish.id) || 0) - (Number(secondDish.id) || 0)),
+    [danhSachMonDaCoAnh],
+  )
 
-        if (sortOption === 'price-desc') {
-          return (secondDish.priceValue || 0) - (firstDish.priceValue || 0)
-        }
-
-        if (sortOption === 'newest') {
-          return (Number(secondDish.id) || 0) - (Number(firstDish.id) || 0)
-        }
-
-        return 0
-      }),
-    [activeCategory, dishes, normalizedQuery, sortOption],
+  const cacSectionDanhMuc = useMemo(
+    () => categoryTabs
+      .map((categoryTab) => ({
+        ...categoryTab,
+        dishes: filteredDishes.filter((dish) => dish.category === categoryTab.category),
+      }))
+      .filter((categoryTab) => categoryTab.dishes.length > 0),
+    [categoryTabs, filteredDishes],
   )
 
   const hasSourceDishes = dishes.length > 0
   const hasLoadError = Boolean(error)
   const isEmptyState = !loading && !hasLoadError && !hasSourceDishes
-  const isNoResultState = !loading && !hasLoadError && hasSourceDishes && filteredDishes.length === 0
-  const activeCategoryLabel = activeCategory === DANH_MUC_TAT_CA_THUC_DON ? 'Tất cả danh mục' : activeCategory
-  const activeCategoryDescription = MO_TA_DANH_MUC_THUC_DON[activeCategory] || MO_TA_DANH_MUC_THUC_DON[DANH_MUC_TAT_CA_THUC_DON]
-  const searchLabel = normalizedQuery ? `· Từ khóa “${searchQuery.trim()}”` : ''
+  const isNoResultState = !loading && !hasLoadError && hasSourceDishes && cacSectionDanhMuc.length === 0
+
+  useEffect(() => {
+    if (!cacSectionDanhMuc.length) {
+      return
+    }
+
+    const activeStillVisible = cacSectionDanhMuc.some((section) => section.category === activeCategory)
+
+    if (!activeStillVisible) {
+      setActiveCategory(cacSectionDanhMuc[0].category)
+    }
+  }, [activeCategory, cacSectionDanhMuc])
+
+  useEffect(() => {
+    if (!cacSectionDanhMuc.length) {
+      return undefined
+    }
+
+    const xuLyCuon = () => {
+      let danhMucGanNhat = cacSectionDanhMuc[0].category
+      let khoangCachGanNhat = Number.POSITIVE_INFINITY
+
+      cacSectionDanhMuc.forEach((section) => {
+        const phanTu = danhMucRefs.current[section.category]
+
+        if (!phanTu) {
+          return
+        }
+
+        const khoangCach = Math.abs(phanTu.getBoundingClientRect().top - KHOANG_CAN_DINH_TAB)
+
+        if (khoangCach < khoangCachGanNhat) {
+          khoangCachGanNhat = khoangCach
+          danhMucGanNhat = section.category
+        }
+      })
+
+      setActiveCategory((giaTriCu) => (giaTriCu === danhMucGanNhat ? giaTriCu : danhMucGanNhat))
+    }
+
+    xuLyCuon()
+    window.addEventListener('scroll', xuLyCuon, { passive: true })
+
+    return () => window.removeEventListener('scroll', xuLyCuon)
+  }, [cacSectionDanhMuc])
+
+  const xuLyChonDanhMuc = (category) => {
+    setActiveCategory(category)
+    const phanTu = danhMucRefs.current[category]
+
+    if (!phanTu) {
+      return
+    }
+
+    const viTriCuon = window.scrollY + phanTu.getBoundingClientRect().top - KHOANG_CAN_DINH_TAB
+    window.scrollTo({ top: viTriCuon, behavior: 'smooth' })
+  }
 
   return (
     <div className="thuc-don-page">
-      <div className="container">
-        <div className="thuc-don-layout">
-          <aside className="thuc-don-sidebar">
-            <div className="thuc-don-search">
-              <input
-                type="text"
-                className="thuc-don-search-input"
-                placeholder="Tìm kiếm món ăn..."
-                value={searchQuery}
-                onChange={(event) => setSearchQuery(event.target.value)}
-              />
-            </div>
-
-            <div className="thuc-don-categories">
-              <div className="thuc-don-sidebar-head">
-                <h3 className="thuc-don-categories-title">Danh mục</h3>
-                <span className="thuc-don-sidebar-count">{CAC_DANH_MUC_THUC_DON.length - 1} nhóm món</span>
-              </div>
-              <div className="thuc-don-danh-muc-list">
-                {CAC_DANH_MUC_THUC_DON.map((category) => (
+      <section className="thuc-don-list-section thuc-don-list-section--reworked">
+        <div className="container">
+          <div className="thuc-don-toolbar-shell thuc-don-toolbar-shell--sticky">
+            <div className="thuc-don-tabs-row" role="tablist" aria-label="Danh mục thực đơn">
+              {categoryTabs.map((categoryTab) => {
+                const isActive = activeCategory === categoryTab.category
+                return (
                   <button
-                    key={category}
+                    key={categoryTab.category}
                     type="button"
-                    className={`thuc-don-danh-muc-btn ${activeCategory === category ? 'active' : ''}`}
-                    onClick={() => setActiveCategory(category)}
+                    role="tab"
+                    aria-selected={isActive}
+                    className={`thuc-don-tab ${isActive ? 'active' : ''}`}
+                    onClick={() => xuLyChonDanhMuc(categoryTab.category)}
                   >
-                    <span>{category}</span>
-                    <small>{categoryCounts[category] ?? 0}</small>
-                  </button>
-                ))}
-              </div>
-            </div>
-          </aside>
-
-          <main className="thuc-don-main">
-            <div className="thuc-don-toolbar">
-              <div className="thuc-don-toolbar-copy">
-                <p className="thuc-don-toolbar-eyebrow">Thực đơn trong ngày</p>
-                <h1 className="thuc-don-toolbar-title">{activeCategoryLabel}</h1>
-                <p className="thuc-don-toolbar-summary">
-                  {loading ? 'Đang tải thực đơn...' : `${filteredDishes.length} món ${searchLabel}`}
-                </p>
-                <p className="thuc-don-toolbar-description">{activeCategoryDescription}</p>
-              </div>
-
-              <label className="thuc-don-sort" htmlFor="thuc-don-sort-select">
-                <span>Sắp xếp</span>
-                <select
-                  id="thuc-don-sort-select"
-                  className="thuc-don-sort-select"
-                  value={sortOption}
-                  onChange={(event) => setSortOption(event.target.value)}
-                >
-                  {CAC_LUA_CHON_SAP_XEP_THUC_DON.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
+                      <span className="thuc-don-tab-icon" aria-hidden="true">{categoryTab.icon}</span>
+                      <span className="thuc-don-tab-copy">
+                        <strong>{categoryTab.label}</strong>
+                      </span>
+                    </button>
+                  )
+              })}
             </div>
 
-            {loading ? (
-              <div className="thuc-don-empty">
-                <p>Đang tải thực đơn...</p>
-              </div>
-            ) : null}
+          </div>
 
-            {!loading && hasLoadError ? (
-              <div className="thuc-don-empty">
-                <p>{error}</p>
-                <button type="button" className="btn nut-chinh" onClick={reloadDishes}>
-                  Tải lại
-                </button>
+          {loading ? (
+            <div className="thuc-don-empty thuc-don-state-card thuc-don-state-card--loading" aria-label="Trạng thái thực đơn">
+              <div className="thuc-don-state-skeleton" aria-hidden="true">
+                <span />
+                <span />
+                <span />
               </div>
-            ) : null}
+              <p className="thuc-don-state-kicker">Đang tải dữ liệu</p>
+              <h3>Thực đơn đang được chuẩn bị.</h3>
+              <p>Chúng tôi đang sắp xếp danh sách món để bạn xem thuận mắt hơn.</p>
+            </div>
+          ) : null}
 
-            {isEmptyState ? (
-              <div className="thuc-don-empty">
-                <p>Hiện chưa có món nào trong thực đơn.</p>
-              </div>
-            ) : null}
+          {!loading && hasLoadError ? (
+            <div className="thuc-don-empty thuc-don-state-card" aria-label="Trạng thái thực đơn">
+              <p className="thuc-don-state-kicker">Không thể tải thực đơn</p>
+              <h3>{error}</h3>
+              <p>Vui lòng thử lại để cập nhật danh sách món đang phục vụ.</p>
+              <button type="button" className="btn nut-chinh" onClick={reloadDishes}>
+                Tải lại
+              </button>
+            </div>
+          ) : null}
 
-            {isNoResultState ? (
-              <div className="thuc-don-empty">
-                <p>Không tìm thấy món ăn phù hợp với bộ lọc hiện tại.</p>
-              </div>
-            ) : null}
+          {isEmptyState ? (
+            <div className="thuc-don-empty thuc-don-state-card" aria-label="Trạng thái thực đơn">
+              <p className="thuc-don-state-kicker">Thực đơn đang trống</p>
+              <h3>Hiện chưa có món nào để hiển thị.</h3>
+              <p>Hãy quay lại sau khi danh sách món được cập nhật đầy đủ hơn.</p>
+            </div>
+          ) : null}
 
-            {!loading && !hasLoadError && !isEmptyState && !isNoResultState ? (
-              <div className="thuc-don-grid">
-                {filteredDishes.map((dish) => (
-                  <TheMonAn
-                    key={dish.id}
-                    dish={dish}
-                    variant="menu"
-                    xuLyThemVaoGio={xuLyThemVaoGio}
-                    onOpenDetail={moChiTietMon}
-                  />
+          {isNoResultState ? (
+            <div className="thuc-don-empty thuc-don-state-card" aria-label="Trạng thái thực đơn">
+              <p className="thuc-don-state-kicker">Không có kết quả phù hợp</p>
+              <h3>Chưa tìm thấy món ăn đúng với lựa chọn hiện tại.</h3>
+              <p>Hãy thử đổi danh mục hoặc nhập từ khóa ngắn hơn.</p>
+            </div>
+          ) : null}
+
+          {!loading && !hasLoadError && !isEmptyState && !isNoResultState ? (
+            <>
+              <div className="thuc-don-sections" aria-label="Danh sách món ăn theo danh mục">
+                {cacSectionDanhMuc.map((section) => (
+                  <section
+                    key={section.category}
+                    ref={(phanTu) => {
+                      danhMucRefs.current[section.category] = phanTu
+                    }}
+                    className="thuc-don-category-section"
+                    data-category={section.category}
+                  >
+                    <div className="thuc-don-results-head thuc-don-results-head--minimal thuc-don-results-head--section">
+                      <div>
+                        <p className="thuc-don-results-kicker">Danh mục</p>
+                        <h3>{section.label}</h3>
+                      </div>
+                    </div>
+
+                    <div className="thuc-don-grid thuc-don-grid--menu-showcase">
+                      {section.dishes.map((dish) => (
+                        <TheMonAn
+                          key={dish.id}
+                          dish={dish}
+                          variant="menu"
+                          xuLyThemVaoGio={xuLyThemMonNhanh}
+                          onOpenDetail={moChiTietMon}
+                        />
+                      ))}
+                    </div>
+                  </section>
                 ))}
               </div>
-            ) : null}
-          </main>
+            </>
+          ) : null}
         </div>
-      </div>
+      </section>
 
       <ChiTietMonAnModal
         giaChiTiet={giaChiTiet}

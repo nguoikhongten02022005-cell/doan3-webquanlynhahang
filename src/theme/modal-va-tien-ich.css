@@ -118,6 +118,20 @@
   .thanh-toan-layout { grid-template-columns: 1fr 340px; }
 }
 
+@media (max-width: 1100px) {
+  .trang-chu-page .mo-dau-grid {
+    text-align: left;
+  }
+
+  .trang-chu-page .mo-dau-copy {
+    align-items: center;
+  }
+
+  .trang-chu-page .mo-dau-showcase {
+    display: flex;
+  }
+}
+
 @media (max-width: 900px) {
   .main-nav { display: none; }
   .mobile-toggle {
@@ -623,7 +637,7 @@
 }
 
 /* Dynamic tone variants for nhan-trang-thai */
-.nhan-trang-thai.tone-success { background: #d1fae5; color: #065f46; }
+.nhan-trang-thai.tone-success { background: #fdf0ea; color: #d86445; }
 .nhan-trang-thai.tone-warning { background: #fef3c7; color: #92400e; }
 .nhan-trang-thai.tone-danger { background: #fee2e2; color: #991b1b; }
 .nhan-trang-thai.tone-neutral { background: var(--surface-soft); color: var(--text-muted); }
@@ -1005,7 +1019,9 @@
   line-height: 1.5;
 }
 .dat-ban-side-card-dark {
-  background: var(--dark); color: #fff; border: none;
+  background: linear-gradient(180deg, rgba(255, 251, 245, 0.98), rgba(245, 237, 226, 0.96));
+  color: var(--text-primary);
+  border: 1px solid rgba(130, 108, 84, 0.12);
 }
 .dat-ban-side-head {
   font-family: 'Cormorant Garamond', serif; font-size: 1.1rem;
@@ -1477,10 +1493,12 @@
 /* HOME PAGE REFINEMENT */
 .trang-chu-page .hero {
   position: relative;
-  padding: 5.75rem 0 4.35rem;
+  padding: 6.5rem 0 5.6rem;
   background:
-    radial-gradient(circle at top left, rgba(220, 194, 158, 0.28), transparent 34%),
-    linear-gradient(180deg, #fcf8f2 0%, #f5ede3 56%, #f7f1e8 100%);
+    radial-gradient(circle at 14% 18%, rgba(226, 180, 122, 0.16), transparent 22%),
+    radial-gradient(circle at 82% 20%, rgba(201, 107, 74, 0.12), transparent 24%),
+    linear-gradient(135deg, #fbf6ef 0%, #f3e8d9 52%, #efe1cf 100%);
+  overflow: hidden;
 }
 
 .trang-chu-page .hero::before {
@@ -1488,50 +1506,114 @@
   position: absolute;
   inset: 0;
   background:
-    linear-gradient(90deg, rgba(255, 255, 255, 0.42) 0, rgba(255, 255, 255, 0.42) 1px, transparent 1px, transparent 100%),
-    linear-gradient(rgba(255, 255, 255, 0.22) 0, rgba(255, 255, 255, 0.22) 1px, transparent 1px, transparent 100%);
-  background-size: 72px 72px;
-  mask-image: linear-gradient(180deg, rgba(0, 0, 0, 0.35), transparent 82%);
+    linear-gradient(90deg, rgba(255, 255, 255, 0.24), transparent 34%),
+    radial-gradient(circle at 76% 42%, rgba(216, 193, 120, 0.12), transparent 24%);
   pointer-events: none;
 }
 
 .trang-chu-page .mo-dau-grid {
   position: relative;
   z-index: 1;
-  grid-template-columns: minmax(0, 1fr) minmax(340px, 0.86fr);
-  gap: clamp(3rem, 5vw, 6.25rem);
+  grid-template-columns: minmax(0, 1.08fr) minmax(0, 35rem);
+  gap: clamp(3rem, 5vw, 6.5rem);
   align-items: center;
 }
 
 .trang-chu-page .mo-dau-copy {
-  gap: 1.55rem;
+  position: relative;
+  z-index: 2;
+  gap: 1.7rem;
+  padding-top: 0;
 }
 
 .trang-chu-page .mo-dau-copy h1 {
   max-width: 9ch;
   margin: 0;
-  font-size: clamp(4rem, 6.1vw, 6.25rem);
-  line-height: 0.86;
-  letter-spacing: -0.055em;
-  color: #2a1c15;
-  text-wrap: balance;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(4.5rem, 5.8vw, 6.8rem);
+  line-height: 0.94;
+  font-weight: 500;
+  letter-spacing: -0.04em;
+  color: #2b1b14;
+}
+
+.trang-chu-page .hero-kicker-tham-chieu {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.9rem;
+  font-weight: 600;
+  line-height: 1;
+  color: #cc684d;
+  position: relative;
+  padding-bottom: 1.45rem;
+}
+
+.trang-chu-page .hero-kicker-tham-chieu::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  bottom: 0.15rem;
+  width: 1.95rem;
+  height: 1px;
+  background: #de7a5e;
+  box-shadow: 2.28rem 0 0 0 #de7a5e;
+}
+
+.trang-chu-page .hero-kicker-tham-chieu::after {
+  content: '';
+  position: absolute;
+  left: 2.38rem;
+  bottom: -0.08rem;
+  width: 0.82rem;
+  height: 0.82rem;
+  border: 1px solid #de7a5e;
+  border-radius: 50%;
 }
 
 .trang-chu-page .mo-dau-copy > p:not(.eyebrow) {
-  max-width: 32rem;
+  max-width: 43rem;
   margin: 0;
-  font-size: 0.98rem;
-  line-height: 1.98;
-  color: #8a7c6b;
+  font-size: 1.02rem;
+  line-height: 1.8;
+  color: rgba(75, 54, 40, 0.82);
 }
 
 .trang-chu-page .mo-dau-actions-group {
-  gap: 0.9rem;
+  gap: 1rem;
+  padding-top: 0.35rem;
+  justify-content: flex-start;
+}
+
+.trang-chu-page .mo-dau-actions-group .btn {
+  min-width: 10.75rem;
+  min-height: 3.35rem;
+  border-radius: 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0;
+}
+
+.trang-chu-page .mo-dau-actions-group .nut-chinh {
+  background: linear-gradient(135deg, #e57a5f 0%, #db6548 100%);
+  border-color: #e57a5f;
+  color: #fff;
+  box-shadow: 0 16px 28px rgba(227, 111, 86, 0.22);
+}
+
+.trang-chu-page .mo-dau-actions-group .nut-chinh:hover {
+  background: linear-gradient(135deg, #dc6b4f 0%, #cf593e 100%);
+  border-color: #dc6b4f;
+  color: #fff;
+  transform: translateY(-1px);
 }
 
 .trang-chu-page .mo-dau-showcase {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 35rem;
   justify-content: flex-end;
-  padding-right: 0.35rem;
+  padding-right: 0;
 }
 
 .trang-chu-page .mo-dau-card {
@@ -1570,14 +1652,66 @@
 .trang-chu-page .mo-dau-tag {
   position: static;
   background: rgba(255, 251, 245, 0.96);
-  color: #b48745;
-  border: 1px solid rgba(153, 116, 74, 0.16);
+  color: #d86445;
+  border: 1px solid rgba(216, 100, 69, 0.16);
 }
 
 .trang-chu-page .mo-dau-note-chip {
   color: rgba(95, 74, 53, 0.78);
   border: 1px solid rgba(123, 101, 79, 0.12);
   background: rgba(245, 238, 228, 0.84);
+}
+
+.trang-chu-page .hero-tham-chieu-mon {
+  position: relative;
+  width: 100%;
+  max-width: 35rem;
+  min-height: 38rem;
+  display: block;
+  margin-left: auto;
+}
+
+.trang-chu-page .hero-tham-chieu-nen {
+  position: absolute;
+  display: block;
+  background: #efb08b;
+  z-index: 0;
+}
+
+.trang-chu-page .hero-tham-chieu-nen--tren {
+  width: 11rem;
+  height: 1rem;
+  top: 0.9rem;
+  right: -1.1rem;
+  left: auto;
+}
+
+.trang-chu-page .hero-tham-chieu-nen--duoi {
+  width: 24rem;
+  height: 11.5rem;
+  bottom: -1.2rem;
+  left: -1.5rem;
+}
+
+.trang-chu-page .hero-tham-chieu-khung-anh {
+  position: relative;
+  z-index: 1;
+  width: 100%;
+  max-width: 31rem;
+  aspect-ratio: 0.86;
+  overflow: hidden;
+  margin: 0 0 0 auto;
+  background: transparent;
+  border: 0.95rem solid #efb08b;
+  box-shadow: 0 28px 60px rgba(216, 100, 69, 0.18);
+}
+
+.trang-chu-page .hero-tham-chieu-anh {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .trang-chu-page .mo-dau-art {
@@ -1826,19 +1960,22 @@
   padding: 1rem 1.05rem 1.15rem;
 }
 
-.trang-chu-page .noi-dung-mon h3 {
+.trang-chu-page .noi-dung-mon h3,
+.thuc-don-page .noi-dung-mon h3 {
   font-size: 1.5rem;
   line-height: 0.98;
   letter-spacing: -0.025em;
   margin-bottom: 0.35rem;
 }
 
-.trang-chu-page .noi-dung-mon p {
+.trang-chu-page .noi-dung-mon p,
+.thuc-don-page .noi-dung-mon p {
   font-size: 0.79rem;
   line-height: 1.8;
 }
 
-.trang-chu-page .chan-mon .price {
+.trang-chu-page .chan-mon .price,
+.thuc-don-page .chan-mon .price {
   font-size: 1.42rem;
   letter-spacing: -0.02em;
 }
@@ -1935,14 +2072,14 @@
 .trang-chu-page .dat-ban-banner .nut-sang {
   min-width: 14rem;
   justify-content: center;
-  background: linear-gradient(135deg, #1a6b4a 0%, #16583d 100%);
+  background: linear-gradient(135deg, #e6785a 0%, #d86445 100%);
   color: #fff;
-  border-color: rgba(21, 90, 61, 0.2);
-  box-shadow: 0 14px 24px rgba(26, 107, 74, 0.16);
+  border-color: rgba(216, 100, 69, 0.22);
+  box-shadow: 0 14px 24px rgba(230, 120, 90, 0.22);
 }
 
 .trang-chu-page .dat-ban-banner .nut-sang:hover {
-  background: linear-gradient(135deg, #155c3f 0%, #124b34 100%);
+  background: linear-gradient(135deg, #dc6b4f 0%, #cf593e 100%);
   color: #fff;
   transform: none;
 }
@@ -1971,8 +2108,38 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
     grid-template-columns: 1fr;
   }
 
+  .trang-chu-page .mo-dau-copy {
+    max-width: 44rem;
+    margin: 0 auto;
+  }
+
   .trang-chu-page .mo-dau-showcase {
     justify-content: center;
+  }
+
+  .trang-chu-page .hero-tham-chieu-mon {
+    position: relative;
+    top: 0;
+    width: 100%;
+    max-width: 31rem;
+    min-height: auto;
+  }
+
+  .trang-chu-page .hero-tham-chieu-nen--tren {
+    width: 9rem;
+    right: 0.8rem;
+  }
+
+  .trang-chu-page .hero-tham-chieu-nen--duoi {
+    width: 21rem;
+    height: 9rem;
+    bottom: 2rem;
+  }
+
+  .trang-chu-page .hero-tham-chieu-khung-anh {
+    width: 100%;
+    max-width: 28rem;
+    margin: 0 auto;
   }
 
   .trang-chu-page .danh-muc-row {
@@ -1991,11 +2158,21 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
   }
 
   .trang-chu-page .hero {
-    padding-top: 4.2rem;
+    padding-top: 4.6rem;
+  }
+
+  .trang-chu-page .mo-dau-copy {
+    text-align: center;
+    align-items: center;
+  }
+
+  .trang-chu-page .mo-dau-actions-group {
+    justify-content: center;
   }
 
   .trang-chu-page .mo-dau-copy h1 {
-    max-width: 10ch;
+    max-width: 9ch;
+    font-size: clamp(4rem, 10vw, 5.6rem);
   }
 
   .trang-chu-page .section-head--split {
@@ -2013,17 +2190,29 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
 }
 
 @media (max-width: 680px) {
-  .trang-chu-page .mo-dau-diem-tin-cay {
-    gap: 0.8rem;
-  }
-
-  .trang-chu-page .diem-tin-cay-item {
-    text-align: left;
-  }
-
   .trang-chu-page .mo-dau-actions-group {
-    flex-direction: column;
-    align-items: stretch;
+    align-items: center;
+  }
+
+  .trang-chu-page .hero-tham-chieu-mon {
+    width: 100%;
+    min-height: 19rem;
+  }
+
+  .trang-chu-page .hero-tham-chieu-khung-anh {
+    width: 100%;
+    max-width: 22rem;
+    margin: 0 auto;
+    border-width: 0.65rem;
+  }
+
+  .trang-chu-page .hero-tham-chieu-nen--tren {
+    width: 7rem;
+  }
+
+  .trang-chu-page .hero-tham-chieu-nen--duoi {
+    width: 15rem;
+    height: 6rem;
   }
 
   .trang-chu-page .danh-muc-row {
@@ -2051,12 +2240,16 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
 @media (max-width: 560px) {
   .trang-chu-page .hero {
     padding-top: 3.25rem;
-    padding-bottom: 2.4rem;
+    padding-bottom: 2.9rem;
   }
 
   .trang-chu-page .mo-dau-copy h1 {
     max-width: 100%;
-    font-size: 2.55rem;
+    font-size: 2.7rem;
+  }
+
+  .trang-chu-page .hero-kicker-tham-chieu {
+    font-size: 1.28rem;
   }
 
   .trang-chu-page .section-head h2 {
@@ -2064,12 +2257,7 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
   }
 
   .trang-chu-page .mo-dau-copy .subtitle {
-    font-size: 0.95rem;
-  }
-
-  .trang-chu-page .mo-dau-atmosphere span,
-  .trang-chu-page .dat-ban-points span {
-    letter-spacing: 0;
+    font-size: 0.98rem;
   }
 
   .trang-chu-page .trai-nghiem-section {
@@ -2091,13 +2279,9 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
     align-items: flex-start;
   }
 
-  .trang-chu-page .mo-dau-visual-frame {
-    min-height: 21.5rem;
-  }
-
-  .trang-chu-page .mo-dau-plate {
-    width: 10.5rem;
-    height: 10.5rem;
+  .trang-chu-page .hero-tham-chieu-khung-anh {
+    width: 100%;
+    max-width: 17.5rem;
   }
 
   .trang-chu-page .dat-ban-banner .nut-sang {

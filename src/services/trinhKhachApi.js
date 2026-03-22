@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { xoaPhienXacThuc } from './dichVuXacThuc'
+import { xoaPhienXacThuc, luuPhienXacThuc } from './dichVuXacThuc'
 import { layMucLuuTru } from './dichVuLuuTru'
 
 const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'

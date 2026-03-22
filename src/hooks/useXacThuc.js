@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import { layThongTinToiApi, dangNhapNoiBoApi, dangNhapApi, dangXuatApi, dangKyApi } from '../services/api/apiXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 import {
@@ -10,35 +10,31 @@ import {
   luuPhienXacThuc,
   luuNguoiDungHienTai,
 } from '../services/dichVuXacThuc'
-import { useXacThucStore } from '../stores/xacThucStore'
 
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.accessToken || ''
 
 export const useXacThuc = () => {
-  const nguoiDungHienTai = useXacThucStore((trangThai) => trangThai.nguoiDungHienTai)
-  const dangKhoiTaoXacThuc = useXacThucStore((trangThai) => trangThai.dangKhoiTaoXacThuc)
-  const datNguoiDungHienTai = useXacThucStore((trangThai) => trangThai.datNguoiDungHienTai)
-  const datDangKhoiTaoXacThuc = useXacThucStore((trangThai) => trangThai.datDangKhoiTaoXacThuc)
-  const xoaPhienHienTai = useXacThucStore((trangThai) => trangThai.xoaPhienHienTai)
+  const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => layNguoiDungHienTai())
+  const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(true)
 
   useEffect(() => {
     const dongBoNguoiDungHienTai = () => {
-      datNguoiDungHienTai(layNguoiDungHienTai())
+      setNguoiDungHienTai(layNguoiDungHienTai())
     }
 
     const dongBoNguoiDungTuBackend = async () => {
-      datDangKhoiTaoXacThuc(true)
+      setIsAuthBootstrapping(true)
 
       if (!coSuDungMayChu()) {
         dongBoNguoiDungHienTai()
-        datDangKhoiTaoXacThuc(false)
+        setIsAuthBootstrapping(false)
         return
       }
 
       if (!layMaXacThuc()) {
-        datNguoiDungHienTai(null)
-        datDangKhoiTaoXacThuc(false)
+        setNguoiDungHienTai(null)
+        setIsAuthBootstrapping(false)
         return
       }
 
@@ -48,16 +44,16 @@ export const useXacThuc = () => {
 
         if (nguoiDung) {
           luuNguoiDungHienTai(nguoiDung)
-          datNguoiDungHienTai(layNguoiDungHienTai())
+          setNguoiDungHienTai(layNguoiDungHienTai())
         } else {
           xoaPhienXacThuc()
-          xoaPhienHienTai()
+          setNguoiDungHienTai(null)
         }
       } catch {
         xoaPhienXacThuc()
-        xoaPhienHienTai()
+        setNguoiDungHienTai(null)
       } finally {
-        datDangKhoiTaoXacThuc(false)
+        setIsAuthBootstrapping(false)
       }
     }
 
@@ -77,7 +73,7 @@ export const useXacThuc = () => {
       window.removeEventListener('storage', xuLyStorage)
       window.removeEventListener(SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC, dongBoNguoiDungHienTai)
     }
-  }, [datDangKhoiTaoXacThuc, datNguoiDungHienTai, xoaPhienHienTai])
+  }, [])
 
   const dangNhapBangApi = useCallback(async (hamDangNhap, identifier, password, thongDiepLoiMacDinh) => {
     if (!coSuDungMayChu()) {
@@ -94,7 +90,6 @@ export const useXacThuc = () => {
 
       if (!nguoiDung || !accessToken) {
         xoaPhienXacThuc()
-        xoaPhienHienTai()
         return {
           success: false,
           error: thongDiepLoiMacDinh,
@@ -105,7 +100,6 @@ export const useXacThuc = () => {
         user: nguoiDung,
         accessToken,
       })
-      datNguoiDungHienTai(layNguoiDungHienTai())
 
       return {
         success: true,
@@ -113,13 +107,12 @@ export const useXacThuc = () => {
       }
     } catch (error) {
       xoaPhienXacThuc()
-      xoaPhienHienTai()
       return {
         success: false,
         error: error?.message || thongDiepLoiMacDinh,
       }
     }
-  }, [datNguoiDungHienTai, xoaPhienHienTai])
+  }, [])
 
   const dangNhap = useCallback((identifier, password) => dangNhapBangApi(
     dangNhapApi,
@@ -150,7 +143,6 @@ export const useXacThuc = () => {
 
       if (!nguoiDung || !accessToken) {
         xoaPhienXacThuc()
-        xoaPhienHienTai()
         return {
           success: false,
           error: 'Đăng ký thất bại.',
@@ -161,7 +153,6 @@ export const useXacThuc = () => {
         user: nguoiDung,
         accessToken,
       })
-      datNguoiDungHienTai(layNguoiDungHienTai())
 
       return {
         success: true,
@@ -169,13 +160,12 @@ export const useXacThuc = () => {
       }
     } catch (error) {
       xoaPhienXacThuc()
-      xoaPhienHienTai()
       return {
         success: false,
         error: error?.message || 'Đăng ký thất bại.',
       }
     }
-  }, [datNguoiDungHienTai, xoaPhienHienTai])
+  }, [])
 
   const dangXuat = useCallback(async () => {
     if (coSuDungMayChu()) {
@@ -187,8 +177,7 @@ export const useXacThuc = () => {
     }
 
     xoaPhienXacThuc()
-    xoaPhienHienTai()
-  }, [xoaPhienHienTai])
+  }, [])
 
   const vaiTro = nguoiDungHienTai?.role ?? VAI_TRO_XAC_THUC.KHACH_HANG
   const laAdmin = vaiTro === VAI_TRO_XAC_THUC.QUAN_TRI

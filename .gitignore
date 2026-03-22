@@ -30,6 +30,12 @@ dist-ssr
 bin/
 obj/
 
-# Local generated reports
-reports/
-tmp-kiem-tra.png
+# Local scratch files
+.opencode/
+NUL
+console-*.txt
+network-*.txt
+hero-*.png
+kiem-tra-*.png
+trang-chu-preview*.png
+trang-chu-mobile*.png

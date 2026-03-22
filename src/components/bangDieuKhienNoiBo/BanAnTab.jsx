@@ -1,4 +1,4 @@
-import { layNhanChoNgoi } from '../dinhDang'
+import { layNhanChoNgoi } from '../../features/bangDieuKhienNoiBo/dinhDang'
 
 const TABLE_STATUS_LABELS = {
   AVAILABLE: 'Sẵn sàng',

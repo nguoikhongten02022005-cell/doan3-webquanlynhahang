@@ -1,12 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useGioHang } from '../context/GioHangContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useThongBao } from '../context/ThongBaoContext'
-import { thucHienTaoDonHang } from '../services/queries/dotBienDonHang'
 import { dinhDangTienTe } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
+import { taoDonHangApi } from '../services/api/apiDonHang'
 import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung } from '../services/dichVuPhieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
@@ -54,24 +53,6 @@ function ThanhToanPage() {
   const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal) : 0
   const tongCong = Math.max(0, subtotal + serviceFee - discountAmount)
 
-  const taoDonHangMutation = useMutation({
-    mutationFn: async (orderPayload) => thucHienTaoDonHang(orderPayload),
-    onSuccess: () => {
-      xoaPhieuGiamGiaDaApDung()
-      xoaBanNhapTamThanhToan()
-
-      if (typeof xoaToanBoGio === 'function') {
-        xoaToanBoGio()
-      }
-
-      hienThanhCong('Đặt hàng thành công. Bạn có thể theo dõi đơn trong hồ sơ cá nhân.')
-      navigate('/ho-so')
-    },
-    onError: (error) => {
-      hienLoi(error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.')
-    },
-  })
-
   const handleChange = (event) => {
     const { name, value } = event.target
     setFormData((prev) => {
@@ -109,21 +90,35 @@ function ThanhToanPage() {
       return
     }
 
-    const orderPayload = taoDuLieuTaoDonHang({
-      cartItems,
-      voucherCode: appliedVoucher?.code,
-      customer: {
-        fullName: formData.fullName,
-        phone: formData.phone,
-        email: nguoiDungHienTai?.email ?? '',
-        address: formData.address,
-      },
-      note: formData.note,
-      tableNumber: formData.tableNumber,
-      paymentMethod: formData.paymentMethod,
-    })
+    try {
+      const orderPayload = taoDuLieuTaoDonHang({
+        cartItems,
+        voucherCode: appliedVoucher?.code,
+        customer: {
+          fullName: formData.fullName,
+          phone: formData.phone,
+          email: nguoiDungHienTai?.email ?? '',
+          address: formData.address,
+        },
+        note: formData.note,
+        tableNumber: formData.tableNumber,
+        paymentMethod: formData.paymentMethod,
+      })
 
-    await taoDonHangMutation.mutateAsync(orderPayload)
+      await taoDonHangApi(orderPayload)
+
+      xoaPhieuGiamGiaDaApDung()
+      xoaBanNhapTamThanhToan()
+
+      if (typeof xoaToanBoGio === 'function') {
+        xoaToanBoGio()
+      }
+
+      hienThanhCong('Đặt hàng thành công. Bạn có thể theo dõi đơn trong hồ sơ cá nhân.')
+      navigate('/ho-so')
+    } catch (error) {
+      hienLoi(error?.message || 'Không thể tạo đơn hàng. Vui lòng thử lại.')
+    }
   }
 
   return (
@@ -301,8 +296,8 @@ function ThanhToanPage() {
                 Tổng tiền cuối cùng sẽ do máy chủ xác nhận khi tạo đơn hàng từ dữ liệu thực đơn hiện tại.
               </p>
 
-              <button type="submit" className="btn nut-chinh w-full" disabled={cartItems.length === 0 || taoDonHangMutation.isPending}>
-                {taoDonHangMutation.isPending ? 'Đang gửi đơn...' : 'Đặt hàng ngay'}
+              <button type="submit" className="btn nut-chinh w-full" disabled={cartItems.length === 0}>
+                Đặt hàng ngay
               </button>
             </div>
           </aside>

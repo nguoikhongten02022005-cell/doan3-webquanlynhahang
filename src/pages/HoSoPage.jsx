@@ -1,12 +1,7 @@
-import { useMemo, useState } from 'react'
-import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { useEffect, useMemo, useState } from 'react'
 import { PROFILE_TABS } from '../data/duLieuHoSo'
-import { khoaQuery } from '../services/queries/khoaQuery'
-import {
-  taoTuyChonQueryLichSuDatBanHoSo,
-  taoTuyChonQueryLichSuDonHangHoSo,
-} from '../services/queries/truyVanHoSo'
 import { dinhDangTienTe } from '../utils/tienTe'
+import { layDonHangCuaToiApi } from '../services/api/apiDonHang'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useDatBan } from '../hooks/useDatBan'
 import { coTheHuyDatBan } from '../hooks/datBan/chinhSachDatBan.js'
@@ -33,25 +28,18 @@ const dinhDangNgay = (value) => {
 }
 
 function HoSoPage() {
-  const queryClient = useQueryClient()
   const { nguoiDungHienTai } = useXacThuc()
   const { huyDatBan, layLichSuDatBan } = useDatBan()
   const [tabDangMo, setTabDangMo] = useState('personal')
+  const [lichSuDatBan, setLichSuDatBan] = useState([])
+  const [lichSuDonHang, setLichSuDonHang] = useState([])
   const [thongBaoDatBan, setThongBaoDatBan] = useState('')
-  const khoaQueryLichSuDatBan = khoaQuery.hoSo.lichSuDatBan(nguoiDungHienTai?.id)
 
   const thongTinHoSo = useMemo(() => ({
     name: String(nguoiDungHienTai?.fullName ?? nguoiDungHienTai?.name ?? ''),
     email: String(nguoiDungHienTai?.email ?? ''),
     phone: String(nguoiDungHienTai?.phone ?? ''),
   }), [nguoiDungHienTai])
-
-  const truyVanLichSuDatBan = useQuery(taoTuyChonQueryLichSuDatBanHoSo(nguoiDungHienTai?.id, layLichSuDatBan, nguoiDungHienTai))
-  const truyVanLichSuDonHang = useQuery(taoTuyChonQueryLichSuDonHangHoSo(nguoiDungHienTai?.id, nguoiDungHienTai))
-
-  const lichSuDatBan = useMemo(() => truyVanLichSuDatBan.data ?? [], [truyVanLichSuDatBan.data])
-  const lichSuDonHang = useMemo(() => truyVanLichSuDonHang.data ?? [], [truyVanLichSuDonHang.data])
-  const dangTaiHoSo = truyVanLichSuDatBan.isLoading || truyVanLichSuDonHang.isLoading
 
   const lichSuDonHangDaChuanHoa = useMemo(() => lichSuDonHang.map((order) => {
     const rawStatus = String(order?.status || '').trim()
@@ -68,22 +56,38 @@ function HoSoPage() {
     }
   }), [lichSuDonHang])
 
-  const huyDatBanMutation = useMutation({
-    mutationFn: async ({ bookingId, bookingCode }) => huyDatBan(bookingId, bookingCode),
-    onSuccess: async (ketQua) => {
-      if (!ketQua.success) {
-        setThongBaoDatBan(ketQua.error)
+  useEffect(() => {
+    const loadProfileData = async () => {
+      if (!nguoiDungHienTai) {
+        setLichSuDatBan([])
+        setLichSuDonHang([])
+        setThongBaoDatBan('')
         return
       }
 
-      setThongBaoDatBan(ketQua.message)
-      queryClient.setQueryData(khoaQueryLichSuDatBan, ketQua.lichSuDatBan)
-      await queryClient.invalidateQueries({ queryKey: khoaQueryLichSuDatBan })
-    },
-  })
+      const [bookings, orders] = await Promise.all([
+        layLichSuDatBan(),
+        layDonHangCuaToiApi(),
+      ])
+
+      setLichSuDatBan(Array.isArray(bookings) ? bookings : [])
+      setLichSuDonHang(Array.isArray(orders?.duLieu) ? orders.duLieu : [])
+      setThongBaoDatBan('')
+    }
+
+    loadProfileData()
+  }, [nguoiDungHienTai, layLichSuDatBan])
 
   const handleCancelBooking = async (bookingId, bookingCode) => {
-    await huyDatBanMutation.mutateAsync({ bookingId, bookingCode })
+    const ketQua = await huyDatBan(bookingId, bookingCode)
+
+    if (!ketQua.success) {
+      setThongBaoDatBan(ketQua.error)
+      return
+    }
+
+    setLichSuDatBan(ketQua.lichSuDatBan)
+    setThongBaoDatBan(ketQua.message)
   }
 
   return (
@@ -143,13 +147,7 @@ function HoSoPage() {
                 <h2>Lịch sử đơn hàng</h2>
 
                 <div className="ho-so-list">
-                  {dangTaiHoSo && (
-                    <div className="ho-so-list-item">
-                      <p className="dat-ban-empty">Đang tải lịch sử đơn hàng...</p>
-                    </div>
-                  )}
-
-                  {!dangTaiHoSo && lichSuDonHangDaChuanHoa.length === 0 && (
+                  {lichSuDonHangDaChuanHoa.length === 0 && (
                     <div className="ho-so-list-item">
                       <p className="dat-ban-empty">Chưa có lịch sử đơn hàng nào.</p>
                     </div>
@@ -208,13 +206,7 @@ function HoSoPage() {
                 {thongBaoDatBan && <p className="dat-ban-feedback">{thongBaoDatBan}</p>}
 
                 <div className="ho-so-list">
-                  {dangTaiHoSo && (
-                    <div className="ho-so-list-item">
-                      <p className="dat-ban-empty">Đang tải lịch sử đặt bàn...</p>
-                    </div>
-                  )}
-
-                  {!dangTaiHoSo && lichSuDatBan.length === 0 && (
+                  {lichSuDatBan.length === 0 && (
                     <div className="ho-so-list-item">
                       <p className="dat-ban-empty">Chưa có lịch sử đặt bàn nào.</p>
                     </div>

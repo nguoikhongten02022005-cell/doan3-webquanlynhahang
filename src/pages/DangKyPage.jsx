@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { Link, useNavigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { thucHienDangKy } from '../services/queries/dotBienXacThuc'
 
 function DangKyPage() {
   const [fullName, setFullName] = useState('')
@@ -17,9 +15,16 @@ function DangKyPage() {
   const isPasswordMismatch = password !== confirmPassword
   const showPasswordMismatch = confirmPassword.length > 0 && isPasswordMismatch
 
-  const dangKyMutation = useMutation({
-    mutationFn: async (thongTinDangKy) => thucHienDangKy(dangKy, thongTinDangKy),
-    onSuccess: (ketQua) => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    if (isPasswordMismatch) {
+      return
+    }
+
+    ;(async () => {
+      const ketQua = await dangKy({ fullName, username, email, password })
+
       if (!ketQua.success) {
         setRegisterError(ketQua.error)
         return
@@ -27,17 +32,7 @@ function DangKyPage() {
 
       setRegisterError('')
       navigate('/dang-nhap', { state: { registered: true } })
-    },
-  })
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    if (isPasswordMismatch) {
-      return
-    }
-
-    await dangKyMutation.mutateAsync({ fullName, username, email, password })
+    })()
   }
 
   return (
@@ -184,8 +179,8 @@ function DangKyPage() {
               </p>
             )}
 
-            <button type="submit" className="btn nut-chinh" disabled={isPasswordMismatch || dangKyMutation.isPending}>
-              {dangKyMutation.isPending ? 'Đang tạo tài khoản...' : 'Đăng ký'}
+            <button type="submit" className="btn nut-chinh" disabled={isPasswordMismatch}>
+              Đăng ký
             </button>
           </form>
 

@@ -1,16 +1,10 @@
-import { useCallback, useEffect, useMemo } from 'react'
-import { useQuery, useQueryClient } from '@tanstack/react-query'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDanhSachMonAn } from '../../hooks/useDanhSachMonAn'
 import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../../hooks/useDatBan'
-import { capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
+import { layDanhSachNguoiDungApi } from '../../services/api/apiXacThuc'
+import { layDanhSachDonHangApi } from '../../services/api/apiDonHang'
+import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
 import { TRANG_THAI_BAN } from '../../services/dichVuBanAn'
-import { khoaQuery } from '../../services/queries/khoaQuery'
-import {
-  taoTuyChonQueryDanhSachBanNoiBo,
-  taoTuyChonQueryDanhSachDatBanNoiBo,
-  taoTuyChonQueryDanhSachDonHangNoiBo,
-  taoTuyChonQueryDanhSachTaiKhoanNoiBo,
-} from '../../services/queries/truyVanNoiBo'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN } from './hangSo'
 import {
   layTomTatTaiKhoan,
@@ -26,7 +20,6 @@ import {
 import { laySacThaiDonHang } from './dinhDang'
 
 export const useDuLieuBangDieuKhienNoiBo = () => {
-  const queryClient = useQueryClient()
   const {
     ganBanChoDatBan,
     taoDatBanNoiBo,
@@ -38,27 +31,28 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     capNhatDatBanNoiBo,
   } = useDatBan()
   const { dishes: danhSachMon, reloadDishes: taiLaiDanhSachMon } = useDanhSachMonAn()
-
-  const truyVanDanhSachDatBan = useQuery(taoTuyChonQueryDanhSachDatBanNoiBo(layDanhSachDatBanHost))
-  const truyVanDanhSachDonHang = useQuery(taoTuyChonQueryDanhSachDonHangNoiBo())
-  const truyVanDanhSachTaiKhoan = useQuery(taoTuyChonQueryDanhSachTaiKhoanNoiBo())
-  const truyVanDanhSachBan = useQuery(taoTuyChonQueryDanhSachBanNoiBo())
-
-  const danhSachDatBan = useMemo(() => truyVanDanhSachDatBan.data ?? [], [truyVanDanhSachDatBan.data])
-  const danhSachDonHang = useMemo(() => truyVanDanhSachDonHang.data ?? [], [truyVanDanhSachDonHang.data])
-  const danhSachTaiKhoan = useMemo(() => truyVanDanhSachTaiKhoan.data ?? [], [truyVanDanhSachTaiKhoan.data])
-  const danhSachBan = useMemo(() => truyVanDanhSachBan.data ?? [], [truyVanDanhSachBan.data])
+  const [danhSachDatBan, setDanhSachDatBan] = useState([])
+  const [danhSachDonHang, setDanhSachDonHang] = useState([])
+  const [danhSachTaiKhoan, setDanhSachTaiKhoan] = useState([])
+  const [danhSachBan, setDanhSachBan] = useState([])
 
   const taiLaiDuLieu = useCallback(async () => {
-    await Promise.all([
-      queryClient.invalidateQueries({ queryKey: khoaQuery.noiBo.danhSachDatBan() }),
-      queryClient.invalidateQueries({ queryKey: khoaQuery.noiBo.danhSachDonHang() }),
-      queryClient.invalidateQueries({ queryKey: khoaQuery.noiBo.danhSachTaiKhoan() }),
-      queryClient.invalidateQueries({ queryKey: khoaQuery.noiBo.danhSachBan() }),
+    const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse] = await Promise.all([
+      layDanhSachDatBanHost(),
+      layDanhSachDonHangApi(),
+      layDanhSachNguoiDungApi(),
+      layDanhSachBanApi(),
     ])
-  }, [queryClient])
+
+    setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
+    setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu : [])
+    setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu : [])
+    setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu : [])
+  }, [layDanhSachDatBanHost])
 
   useEffect(() => {
+    taiLaiDuLieu()
+
     const xuLyLuuTru = () => {
       taiLaiDuLieu()
     }

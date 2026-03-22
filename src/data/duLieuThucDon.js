@@ -1,4 +1,9 @@
-export const DANH_SACH_MON_DU_PHONG = Object.freeze([
+import { HOME_CAC_DANH_MUC_THUC_DON, CAC_DANH_MUC_THUC_DON, MO_TA_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
+import { CAC_LUA_CHON_KICH_CO_THUC_DON, CAC_LUA_CHON_SAP_XEP_THUC_DON, CAC_LUA_CHON_TOPPING_THUC_DON } from '../constants/tuyChonThucDon'
+
+export { CAC_DANH_MUC_THUC_DON, MO_TA_DANH_MUC_THUC_DON, CAC_LUA_CHON_SAP_XEP_THUC_DON, CAC_LUA_CHON_TOPPING_THUC_DON, CAC_LUA_CHON_KICH_CO_THUC_DON }
+
+export const DANH_SACH_MON = Object.freeze([
   {
     id: 1,
     name: 'Bò Bít Tết Úc',
@@ -164,5 +169,74 @@ export const DANH_SACH_MON_DU_PHONG = Object.freeze([
     category: 'Combo',
     badge: 'Value',
     tone: 'tone-cool',
+  },
+])
+
+export const DANH_MUC_TRANG_CHU = HOME_CAC_DANH_MUC_THUC_DON
+
+export const DANH_SACH_MON_NOI_BAT_TRANG_CHU = Object.freeze([
+  {
+    id: 1,
+    name: 'Bò Nướng Tảng Sốt Tiêu Xanh',
+    description: 'Thăn bò áp chảo lửa lớn, mềm mọng và đậm vị.',
+    price: '289.000đ',
+    badge: 'Best Seller',
+    tone: 'tone-amber',
+  },
+  {
+    id: 2,
+    name: 'Cá Hồi Nướng Lá Chanh',
+    description: 'Cá hồi sốt bơ chanh, dùng cùng rau củ hấp tươi.',
+    price: '245.000đ',
+    badge: 'Mới',
+    tone: 'tone-green',
+  },
+  {
+    id: 3,
+    name: 'Mì Ý Hải Sản Sốt Cà Chua',
+    description: 'Mực, tôm và nghêu tươi hòa quyện cùng sốt đặc trưng.',
+    price: '198.000đ',
+    badge: 'Best Seller',
+    tone: 'tone-red',
+  },
+  {
+    id: 4,
+    name: 'Gà Nướng Mật Ong Thảo Mộc',
+    description: 'Da giòn thơm, thịt mềm ngọt, ăn kèm khoai nghiền mịn.',
+    price: '179.000đ',
+    badge: 'Mới',
+    tone: 'tone-gold',
+  },
+  {
+    id: 5,
+    name: 'Sườn Nướng BBQ Khói Nhẹ',
+    description: 'Sườn heo nướng chậm, sốt BBQ cay nhẹ dễ ăn.',
+    price: '229.000đ',
+    badge: 'Best Seller',
+    tone: 'tone-brown',
+  },
+  {
+    id: 6,
+    name: 'Lẩu Nấm Thanh Vị',
+    description: 'Nước dùng ngọt tự nhiên, nhiều loại nấm theo mùa.',
+    price: '319.000đ',
+    badge: 'Mới',
+    tone: 'tone-cool',
+  },
+  {
+    id: 7,
+    name: 'Cơm Trộn Bò Nhật',
+    description: 'Cơm dẻo, bò xào thơm và rau củ giòn cân bằng vị giác.',
+    price: '169.000đ',
+    badge: 'Best Seller',
+    tone: 'tone-violet',
+  },
+  {
+    id: 8,
+    name: 'Salad Trái Cây Sốt Sữa Chua',
+    description: 'Món nhẹ thanh mát với trái cây tươi cắt trong ngày.',
+    price: '119.000đ',
+    badge: 'Mới',
+    tone: 'tone-mint',
   },
 ])

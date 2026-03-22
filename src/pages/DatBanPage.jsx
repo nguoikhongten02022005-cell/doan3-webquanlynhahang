@@ -1,7 +1,7 @@
 import { useNavigate } from 'react-router-dom'
 import { CAC_BUOC_DAT_BAN } from '../data/duLieuDatBan'
-import { BANG_THONG_BAO_BAN_NHAP_TAM_DAT_BAN, NOI_DUNG_MO_DAU_DAT_BAN } from '../constants/giaoDienDatBan'
-import { SITE_CONTACT } from '../constants/thongTinTrang'
+import { BANG_THONG_BAO_BAN_NHAP_TAM_DAT_BAN } from '../constants/giaoDienDatBan'
+import { SITE_CONTACT } from '../constants/lienHeTrang'
 import ThanhBenDatBan from '../components/datBan/ThanhBenDatBan'
 import BuocMotDatBan from '../components/datBan/BuocMotDatBan'
 import BuocHaiDatBan from '../components/datBan/BuocHaiDatBan'
@@ -10,7 +10,6 @@ import DatBanThanhCong from '../components/datBan/DatBanThanhCong'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useDatBan } from '../hooks/useDatBan'
 import { useFormDatBan } from '../hooks/useFormDatBan'
-import { SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN } from '../utils/datBan/index'
 
 function DatBanPage() {
   const navigate = useNavigate()
@@ -81,47 +80,12 @@ function DatBanPage() {
   } = useFormDatBan({ nguoiDungHienTai, createBooking: taoDatBan, getDraft: layBanNhapTam, saveDraft: luuBanNhapTam })
 
   const secondaryAction = step > 1 ? () => goToStep(step - 1) : null
-  const secondaryActionLabel = step === 2 ? 'Quay lại bước chọn bàn' : step === 3 ? 'Quay lại bước liên hệ' : ''
+  const secondaryActionLabel = step === 2 ? 'Quay lại bước chọn bàn' : step === 3 ? 'Quay lại chỉnh sửa' : ''
   const primaryAction = step === 1 ? handleStepOneContinue : step === 2 ? handleStepTwoContinue : handleSubmit
 
   return (
     <div className="dat-ban-page dat-ban-page-fullbleed">
-      <section className="dat-ban-hero dat-ban-hero-editorial">
-        <div className="dat-ban-mo-dau-shell dat-ban-mo-dau-shell-full dat-ban-mo-dau-shell-editorial">
-          <div className="dat-ban-mo-dau-copy dat-ban-mo-dau-copy-compact dat-ban-mo-dau-copy-editorial">
-            <span className="dat-ban-label">{NOI_DUNG_MO_DAU_DAT_BAN.label}</span>
-            <h1 className="dat-ban-title dat-ban-title-premium">Đặt bàn tinh gọn cho một buổi dùng bữa chỉn chu</h1>
-            <p className="dat-ban-subtitle dat-ban-subtitle-premium">Chọn số khách, ngày và khung giờ trong trải nghiệm đặt chỗ nhẹ nhàng, rõ ràng và đúng nhịp của một nhà hàng.</p>
-          </div>
-
-          <div className="dat-ban-hero-aside">
-            <div className="dat-ban-mo-dau-note-inline dat-ban-mo-dau-note-panel">
-              <div>
-                <span className="dat-ban-mo-dau-note-label">{NOI_DUNG_MO_DAU_DAT_BAN.noteLabel}</span>
-                <strong>Tối đa {SO_KHACH_TOI_DA_DAT_BAN_TRUC_TUYEN} khách / lượt</strong>
-              </div>
-              <p>{NOI_DUNG_MO_DAU_DAT_BAN.noteText}</p>
-            </div>
-
-            <div className="dat-ban-trust-strip" aria-label="Cam kết dịch vụ đặt bàn">
-              <div className="dat-ban-trust-item">
-                <strong>Giữ bàn 15 phút</strong>
-                <span>Rõ thời gian xác nhận</span>
-              </div>
-              <div className="dat-ban-trust-item">
-                <strong>Xác nhận nhanh</strong>
-                <span>Ưu tiên SMS hoặc cuộc gọi</span>
-              </div>
-              <div className="dat-ban-trust-item">
-                <strong>Ưu tiên chỗ ngồi</strong>
-                <span>Sắp xếp theo tình trạng thực tế</span>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="dat-ban-form-section dat-ban-form-section-premium dat-ban-form-section-editorial">
+      <section className="dat-ban-form-section dat-ban-form-section-premium">
         <div className="dat-ban-layout-premium dat-ban-layout-premium-full">
           <ThanhBenDatBan
             bookingSelectionSummary={bookingSelectionSummary}
@@ -137,7 +101,7 @@ function DatBanPage() {
             submitError={step === 3 ? submitError : ''}
           />
 
-          <div className="dat-ban-main-premium dat-ban-main-premium-editorial">
+          <div className="dat-ban-main-premium">
               {submitted ? (
                 <DatBanThanhCong
                   bookingCode={bookingCode}
@@ -150,7 +114,7 @@ function DatBanPage() {
                   onGoProfile={() => navigate('/ho-so')}
                 />
               ) : (
-                <form id="dat-ban-form" className="dat-ban-shell-premium dat-ban-shell-editorial" onSubmit={handleSubmit}>
+                <form id="dat-ban-form" className="dat-ban-shell-premium" onSubmit={handleSubmit}>
                   {draftRestored && (
                     <div className="dat-ban-draft-banner">
                       <div>

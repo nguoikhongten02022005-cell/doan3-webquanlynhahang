@@ -12,12 +12,17 @@
   --text-secondary: #6b6356;
   --line: #e8e2d8;
   --line-light: #f0ece4;
-  --primary: #1a6b4a;
-  --primary-strong: #145a3d;
-  --primary-light: #e8f5ee;
-  --accent: #c8963e;
-  --accent-light: #fdf6e8;
-  --accent-strong: #a87a2f;
+  --primary: #e6785a;
+  --primary-strong: #d86445;
+  --primary-light: #fdf0ea;
+  --menu-coral: #c96b4a;
+  --menu-coral-strong: #b05438;
+  --menu-coral-soft: #faece7;
+  --menu-coral-surface: #fefaf6;
+  --menu-coral-text: #1a1108;
+  --accent: #f08a67;
+  --accent-light: #fdf0ea;
+  --accent-strong: #d86445;
   --dark: #1c1c1c;
   --dark-warm: #2a2520;
   --radius-sm: 0.5rem;
@@ -636,11 +641,23 @@ button:focus-visible,
 }
 .chan-mon {
   display: flex; align-items: center; justify-content: space-between;
+  gap: 0.75rem;
   margin-top: 0.7rem;
 }
-.chan-mon .price {
+.the-mon-price-block {
+  display: grid;
+  gap: 0.18rem;
+  min-width: 0;
+}
+.chan-mon .price,
+.gia-mon {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.12rem; font-weight: 700; color: var(--primary);
+}
+.the-mon-price-note {
+  font-size: 0.72rem;
+  line-height: 1.5;
+  color: rgba(95, 75, 57, 0.78);
 }
 .nut-them-mon {
   height: 2.2rem; padding: 0 1rem; border-radius: 2rem;
@@ -672,8 +689,8 @@ button:focus-visible,
 .the-mon.tone-cool .nhan-mon { color: #2563eb; }
 .the-mon.tone-violet { border-bottom: 3px solid #7c3aed; }
 .the-mon.tone-violet .nhan-mon { color: #7c3aed; }
-.the-mon.tone-mint { border-bottom: 3px solid #059669; }
-.the-mon.tone-mint .nhan-mon { color: #059669; }
+.the-mon.tone-mint { border-bottom: 3px solid #e6785a; }
+.the-mon.tone-mint .nhan-mon { color: #e6785a; }
 
 /* BUTTONS */
 .btn {
@@ -687,7 +704,7 @@ button:focus-visible,
   background: var(--primary); color: #fff; border-color: var(--primary);
 }
 .nut-chinh:hover {
-  background: #15573d; border-color: #15573d; box-shadow: 0 4px 14px rgba(26,107,74,0.25);
+  background: #d86445; border-color: #d86445; box-shadow: 0 4px 14px rgba(230,120,90,0.25);
 }
 .nut-phu {
   background: transparent; color: var(--text-primary);
@@ -704,9 +721,10 @@ button:focus-visible,
 .dat-ban-banner {
   padding: 4.2rem 0;
   background:
-    radial-gradient(circle at top left, rgba(214, 193, 165, 0.16), transparent 24%),
-    linear-gradient(135deg, #1f1712 0%, #2d241d 42%, #153d2d 100%);
-  color: #fff;
+    radial-gradient(circle at top left, rgba(230, 120, 90, 0.12), transparent 24%),
+    radial-gradient(circle at 82% 24%, rgba(221, 161, 108, 0.12), transparent 28%),
+    linear-gradient(135deg, #fff9f3 0%, #f9ecdf 48%, #f6e4d6 100%);
+  color: #3f2a1f;
 }
 .dat-ban-inner {
   max-width: 70rem;
@@ -738,9 +756,9 @@ button:focus-visible,
   align-items: center;
   padding: 0.9rem 1rem;
   border-radius: 1rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  color: rgba(255, 248, 238, 0.92);
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid rgba(130, 108, 84, 0.12);
+  color: rgba(78, 61, 47, 0.9);
   line-height: 1.55;
 }
 .dat-ban-cta {
@@ -750,14 +768,14 @@ button:focus-visible,
   gap: 0.9rem;
   padding: 1.35rem;
   border-radius: 1.4rem;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 251, 245, 0.88);
+  border: 1px solid rgba(130, 108, 84, 0.12);
 }
 .dat-ban-cta .btn {
   width: 100%;
 }
 .dat-ban-cta span {
-  color: rgba(255, 248, 238, 0.78);
+  color: rgba(78, 61, 47, 0.78);
   font-size: 0.86rem;
   line-height: 1.6;
 }

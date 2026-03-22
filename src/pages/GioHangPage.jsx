@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
 import { useGioHang } from '../context/GioHangContext'
 import { useThongBao } from '../context/ThongBaoContext'
@@ -14,7 +13,7 @@ import {
   layPhieuGiamGiaDaApDung as getStoredVoucher,
   luuPhieuGiamGiaDaApDung as saveVoucher,
 } from '../services/dichVuPhieuGiamGia'
-import { thucHienKiemTraPhieuGiamGia } from '../services/queries/dotBienPhieuGiamGia'
+import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
 
 function GioHangPage() {
   const navigate = useNavigate()
@@ -57,27 +56,6 @@ function GioHangPage() {
     clearStoredVoucher()
   }, [tamTinh, voucherDaApDung])
 
-  const apDungVoucherMutation = useMutation({
-    mutationFn: async (maVoucher) => thucHienKiemTraPhieuGiamGia(maVoucher, tamTinh),
-    onSuccess: (voucherHopLe) => {
-      if (!voucherHopLe) {
-        setVoucherDaApDung(null)
-        setLoiVoucher('Mã giảm giá không hợp lệ.')
-        clearStoredVoucher()
-        return
-      }
-
-      setVoucherDaApDung(voucherHopLe)
-      setMaVoucherNhap(voucherHopLe.code)
-      setLoiVoucher('')
-    },
-    onError: (error) => {
-      setVoucherDaApDung(null)
-      setLoiVoucher(error?.message || 'Mã giảm giá không hợp lệ.')
-      clearStoredVoucher()
-    },
-  })
-
   const handleGoToCheckout = () => {
     if (cartItems.length === 0) {
       hienCanhBao('Giỏ hàng đang trống. Hãy chọn món trước khi sang bước thanh toán.')
@@ -112,9 +90,36 @@ function GioHangPage() {
       return
     }
 
-    setDangApVoucher(true)
     try {
-      await apDungVoucherMutation.mutateAsync(maVoucher)
+      setDangApVoucher(true)
+      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tamTinh)
+      const voucher = duLieu
+        ? {
+            code: duLieu.code,
+            amount: duLieu.discountType === 'FIXED'
+              ? Number(duLieu.discountValue || 0)
+              : Math.min(
+                  (tamTinh * Number(duLieu.discountValue || 0)) / 100,
+                  Number(duLieu.maxDiscountAmount || Number.MAX_SAFE_INTEGER),
+                ),
+          }
+        : null
+      const voucherHopLe = saveVoucher(voucher)
+
+      if (!voucherHopLe) {
+        setVoucherDaApDung(null)
+        setLoiVoucher('Mã giảm giá không hợp lệ.')
+        clearStoredVoucher()
+        return
+      }
+
+      setVoucherDaApDung(voucherHopLe)
+      setMaVoucherNhap(voucherHopLe.code)
+      setLoiVoucher('')
+    } catch (error) {
+      setVoucherDaApDung(null)
+      setLoiVoucher(error?.message || 'Mã giảm giá không hợp lệ.')
+      clearStoredVoucher()
     } finally {
       setDangApVoucher(false)
     }

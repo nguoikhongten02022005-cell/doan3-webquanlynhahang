@@ -1,13 +1,13 @@
 import { useMemo, useState } from 'react'
-import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../../constants/danhMucThucDon'
-import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, CAC_LUA_CHON_SAC_DO_THUC_DON } from '../../../constants/tuyChonThucDon'
+import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../constants/danhMucThucDon'
+import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, CAC_LUA_CHON_SAC_DO_THUC_DON } from '../../constants/tuyChonThucDon'
 import {
   taoMonApi,
   xoaMonApi,
   capNhatMonApi,
-} from '../../../services/api/apiThucDon'
-import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../../services/mappers/anhXaThucDon'
-import { phanTichGiaThanhSo } from '../../../utils/giaTien'
+} from '../../services/api/apiThucDon'
+import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../services/mappers/anhXaThucDon'
+import { phanTichGiaThanhSo } from '../../utils/giaTien'
 
 const DEFAULT_FORM_VALUES = {
   name: '',
@@ -83,8 +83,8 @@ function MonAnTab({ dishes, reloadDishes }) {
 
     try {
       const { duLieu: savedDish } = cheDoForm === 'edit'
-        ? await capNhatMonApi(idMonDangSua, duLieuGuiDi)
-        : await taoMonApi(duLieuGuiDi)
+        ? await capNhatMonApi(idMonDangSua, payload)
+        : await taoMonApi(payload)
 
       if (!savedDish) {
         setLoiForm('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')

@@ -1,8 +1,11 @@
-import { Outlet } from 'react-router-dom'
+import { Outlet, useLocation } from 'react-router-dom'
 import DauTrang from '../components/DauTrang'
 import ChanTrang from '../components/ChanTrang'
 
 function BoCucChinh() {
+  const location = useLocation()
+  const isDatBanPage = location.pathname === '/dat-ban'
+
   return (
     <>
       <a className="skip-link" href="#main-content">
@@ -12,7 +15,7 @@ function BoCucChinh() {
       <main id="main-content">
         <Outlet />
       </main>
-      <ChanTrang />
+      <ChanTrang compact={isDatBanPage} />
     </>
   )
 }

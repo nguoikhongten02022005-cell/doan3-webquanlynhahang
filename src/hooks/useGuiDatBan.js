@@ -1,7 +1,5 @@
 import { useMemo, useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { NHAN_TRANG_THAI_DAT_BAN } from '../data/duLieuDatBan'
-import { thucHienGuiDatBan } from '../services/queries/dotBienDatBan'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import {
   layTieuDeTrangThaiDatBan,
@@ -21,31 +19,12 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
   const [bookingStatus, setBookingStatus] = useState('YEU_CAU_DAT_BAN')
   const [submitError, setSubmitError] = useState('')
   const [inlineErrors, setInlineErrors] = useState({})
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
   const step1Complete = Boolean(
     formData.guests && formData.date && formData.time && !invalidPastDate && !closedDate && !laNhomDongChiDatQuaHotline(soLuongKhach),
   )
   const step2Complete = Boolean(formData.name.trim() && formData.phone.trim() && laSoDienThoaiHopLe(formData.phone))
-  const guiDatBanMutation = useMutation({
-    mutationFn: async ({ duLieuDatBan, duLieuXacNhan, trangThai }) => {
-      const datBanDaTao = await thucHienGuiDatBan(createBooking, duLieuDatBan, duLieuXacNhan)
-
-      return {
-        datBanDaTao,
-        trangThai,
-      }
-    },
-    onSuccess: ({ datBanDaTao, trangThai }) => {
-      setBookingCode(datBanDaTao?.bookingCode || '')
-      setBookingStatus(datBanDaTao?.status || trangThai)
-      setSubmitted(true)
-      window.scrollTo({ top: 0, behavior: 'smooth' })
-    },
-    onError: (error) => {
-      setSubmitError(error?.message || 'Không thể gửi yêu cầu đặt bàn. Vui lòng thử lại.')
-    },
-  })
-  const isSubmitting = guiDatBanMutation.isPending
   const primaryCtaDisabled = isSubmitting || (step === 1 && !step1Complete) || (step === 2 && !step2Complete)
 
   const defaultPrimaryCtaLabel = layNhanHanhDongChinh({
@@ -78,7 +57,7 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
   const validateStepTwo = () => layLoiBuocHai({ name: formData.name, phone: formData.phone })
 
   const submitBooking = async ({ goToStep, saveDraft }) => {
-    if (guiDatBanMutation.isPending) {
+    if (isSubmitting) {
       return { success: false }
     }
 
@@ -146,10 +125,11 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
     }
 
     try {
-      await guiDatBanMutation.mutateAsync({
-        duLieuDatBan,
-        trangThai,
-        duLieuXacNhan: {
+      setIsSubmitting(true)
+
+      const datBanDaTao = await createBooking({
+        booking: duLieuDatBan,
+        confirmationPayload: {
           bookingCode: null,
           status: trangThai,
           confirmationChannel: duLieuDatBan.confirmationChannel,
@@ -160,9 +140,16 @@ export const useGuiDatBan = ({ createBooking, nguoiDungHienTai, formData, soLuon
         },
       })
 
+      setBookingCode(datBanDaTao?.bookingCode || '')
+      setBookingStatus(datBanDaTao?.status || trangThai)
+      setSubmitted(true)
+      window.scrollTo({ top: 0, behavior: 'smooth' })
       return { success: true }
-    } catch {
+    } catch (error) {
+      setSubmitError(error?.message || 'Không thể gửi yêu cầu đặt bàn. Vui lòng thử lại.')
       return { success: false }
+    } finally {
+      setIsSubmitting(false)
     }
   }
 

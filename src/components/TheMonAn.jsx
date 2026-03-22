@@ -3,6 +3,10 @@ function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
   const isMenuVariant = variant === 'menu'
   const safeDish = dish || {}
   const hasImage = typeof safeDish.image === 'string' && safeDish.image.trim().length > 0
+  const dishName = safeDish.name || 'Món được chọn'
+  const dishDescription = safeDish.description || 'Món ăn đang được hoàn thiện mô tả để bạn xem nhanh và chọn tiếp dễ hơn.'
+  const dishPrice = safeDish.price || 'Liên hệ nhà hàng'
+  const dishBadge = safeDish.badge || 'Tuyển chọn'
 
   return (
     <article className={`the-mon ${safeDish.tone || ''} ${isMenuVariant ? 'the-mon--menu' : ''}`}>
@@ -11,17 +15,17 @@ function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
         className={`the-mon-hinh ${canOpenDetail ? 'is-clickable' : ''} ${isMenuVariant ? 'the-mon-hinh--menu' : ''} ${hasImage ? 'has-image' : 'is-placeholder'}`}
         onClick={canOpenDetail ? () => onOpenDetail(safeDish) : undefined}
         disabled={!canOpenDetail}
-        aria-label={canOpenDetail ? `Xem chi tiết món ${safeDish.name || 'được chọn'}` : undefined}
+        aria-label={canOpenDetail ? `Xem chi tiết món ${dishName}` : undefined}
       >
         {hasImage ? (
-          <img className="the-mon-hinh-image" src={safeDish.image} alt={safeDish.name || 'Món ăn'} loading="lazy" />
+          <img className="the-mon-hinh-image" src={safeDish.image} alt={dishName} loading="lazy" />
         ) : null}
 
         <div className="the-mon-hinh-overlay" aria-hidden="true" />
 
         <div className="the-mon-hinh-head">
-          <span className="nhan-mon">{safeDish.badge || 'Tuyển chọn'}</span>
-          {isMenuVariant ? <span className="the-mon-hinh-label">{hasImage ? 'Xem chi tiết' : 'Chỗ ảnh món'}</span> : null}
+          <span className="nhan-mon">{dishBadge}</span>
+          {isMenuVariant ? <span className="the-mon-hinh-label">Xem chi tiết</span> : null}
         </div>
 
         {isMenuVariant && !hasImage ? (
@@ -36,20 +40,23 @@ function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
               </svg>
             </div>
             <div className="the-mon-hinh-placeholder-copy">
-              <strong>Ảnh món sẽ hiển thị tại đây</strong>
-              <span>Giữ `dish.image` để thay ảnh thật khi cần.</span>
+              <strong>{dishName}</strong>
+              <span>{dishDescription}</span>
             </div>
           </div>
         ) : null}
+
       </button>
 
       <div className={`than-mon ${isMenuVariant ? 'than-mon--menu' : ''}`}>
         <div className="noi-dung-mon">
-          <h3>{safeDish.name}</h3>
-          <p>{safeDish.description}</p>
+          <h3 title={dishName}>{dishName}</h3>
+          <p title={dishDescription}>{dishDescription}</p>
         </div>
         <div className="chan-mon">
-          <strong className="gia-mon">{safeDish.price}</strong>
+          <div className="the-mon-price-block">
+            <strong className="gia-mon price">{dishPrice}</strong>
+          </div>
           <button
             type="button"
             className={`nut-them-mon ${isMenuVariant ? 'nut-them-mon--menu' : ''}`}

@@ -1,40 +1,20 @@
-import { lazy } from 'react'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
-import './theme/nen-va-trang-chu.css'
-import './theme/xac-thuc-va-gio-hang.css'
-import './theme/thanh-toan-va-thuc-don.css'
-import './theme/gioi-thieu-va-ho-so.css'
-import './theme/dat-ban.css'
-import './theme/noi-bo.css'
-import './theme/modal-va-tien-ich.css'
+import './App.css'
+import './styles/tong-hop-giao-dien.css'
 import TuyenDuongBaoVe from './components/TuyenDuongBaoVe'
 import BoCucNoiBo from './layouts/BoCucNoiBo'
 import BoCucChinh from './layouts/BoCucChinh'
-import {
-  taiBangDieuKhienNoiBoPage,
-  taiDangKyPage,
-  taiDangNhapNoiBoPage,
-  taiDangNhapPage,
-  taiDatBanPage,
-  taiGioHangPage,
-  taiGioiThieuPage,
-  taiHoSoPage,
-  taiThanhToanPage,
-  taiThucDonPage,
-  taiTrangChuPage,
-} from './services/prefetch/taiTuyenTrang'
-
-const GioiThieuPage = lazy(taiGioiThieuPage)
-const DatBanPage = lazy(taiDatBanPage)
-const GioHangPage = lazy(taiGioHangPage)
-const ThanhToanPage = lazy(taiThanhToanPage)
-const TrangChuPage = lazy(taiTrangChuPage)
-const BangDieuKhienNoiBoPage = lazy(taiBangDieuKhienNoiBoPage)
-const DangNhapNoiBoPage = lazy(taiDangNhapNoiBoPage)
-const DangNhapPage = lazy(taiDangNhapPage)
-const ThucDonPage = lazy(taiThucDonPage)
-const HoSoPage = lazy(taiHoSoPage)
-const DangKyPage = lazy(taiDangKyPage)
+import GioiThieuPage from './pages/GioiThieuPage'
+import DatBanPage from './pages/DatBanPage'
+import GioHangPage from './pages/GioHangPage'
+import ThanhToanPage from './pages/ThanhToanPage'
+import TrangChuPage from './pages/TrangChuPage'
+import BangDieuKhienNoiBoPage from './pages/BangDieuKhienNoiBoPage'
+import DangNhapNoiBoPage from './pages/DangNhapNoiBoPage'
+import DangNhapPage from './pages/DangNhapPage'
+import ThucDonPage from './pages/ThucDonPage'
+import HoSoPage from './pages/HoSoPage'
+import DangKyPage from './pages/DangKyPage'
 
 function App() {
   return (

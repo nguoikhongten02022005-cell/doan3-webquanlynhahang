@@ -23,12 +23,44 @@ export const MO_TA_DANH_MUC_THUC_DON = Object.freeze({
   Combo: 'Set tiết kiệm cho nhóm và cặp đôi',
 })
 
+export const GHI_CHU_DANH_MUC_THUC_DON = Object.freeze({
+  'Món Chính': 'Đậm vị, chỉn chu cho bữa chính.',
+  'Khai Vị': 'Nhẹ nhàng để mở vị và khởi nhịp bàn ăn.',
+  'Đồ Uống': 'Cocktail, trà và thức uống đi cùng món.',
+  'Tráng Miệng': 'Một kết thúc mềm và gọn cho bữa tối.',
+  Combo: 'Lựa chọn tiện cho cặp đôi và nhóm nhỏ.',
+})
+
 export const HOME_CAC_DANH_MUC_THUC_DON = Object.freeze([
-  { name: 'Món Chính', icon: '🍲' },
-  { name: 'Khai Vị', icon: '🥗' },
-  { name: 'Đồ Uống', icon: '🍹' },
-  { name: 'Tráng Miệng', icon: '🍮' },
-  { name: 'Combo', icon: '🍱' },
+  { name: 'Món Chính', icon: '🍲', note: GHI_CHU_DANH_MUC_THUC_DON['Món Chính'] },
+  { name: 'Khai Vị', icon: '🥗', note: GHI_CHU_DANH_MUC_THUC_DON['Khai Vị'] },
+  { name: 'Đồ Uống', icon: '🍹', note: GHI_CHU_DANH_MUC_THUC_DON['Đồ Uống'] },
+  { name: 'Tráng Miệng', icon: '🍮', note: GHI_CHU_DANH_MUC_THUC_DON['Tráng Miệng'] },
+  { name: 'Combo', icon: '🍱', note: GHI_CHU_DANH_MUC_THUC_DON.Combo },
+])
+
+export const DIEM_TIN_CAY_TRANG_THUC_DON = Object.freeze([
+  'Chọn món theo nhịp bữa ăn, không bị rối bởi quá nhiều thao tác.',
+  'Giữ luồng xem chi tiết và thêm giỏ nhanh ngay trên từng món.',
+  'Dễ chuyển từ xem món sang đặt bàn cho nhóm nhỏ hoặc buổi hẹn tối.',
+])
+
+export const NHAN_THUC_DON_NOI_BAT = Object.freeze([
+  'Chuẩn bị theo ngày',
+  'Ưu tiên món được chọn nhiều',
+  'Có thể lọc nhanh theo khẩu vị',
+])
+
+export const NHAN_CTA_DAT_BAN_THUC_DON = Object.freeze([
+  'Giữ chỗ nhanh',
+  'Phù hợp nhóm nhỏ',
+  'Đi thẳng vào bữa ăn',
+])
+
+export const CAC_MOC_THONG_TIN_THUC_DON = Object.freeze([
+  'Chọn theo danh mục rõ ràng',
+  'Mở chi tiết món ngay tại chỗ',
+  'Phối hợp cùng bước đặt bàn cuối trang',
 ])
 
 export const BI_DANH_DANH_MUC_THUC_DON = Object.freeze({

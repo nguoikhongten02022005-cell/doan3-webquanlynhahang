@@ -12,13 +12,7 @@ function BuocHaiDatBan({ formData, soLuongKhach, inlineErrors, selectedMealDurat
           <span>{layVanBanTomTatChoNgoi(formData.seatingArea)}</span>
           {selectedMealDurationText && <span>{selectedMealDurationText}</span>}
         </div>
-        <button type="button" className="tom-tat-edit-btn" onClick={onBack}>Quay lại bước chọn bàn</button>
-      </section>
-
-      <section className="dat-ban-editorial-card dat-ban-step-soft-note">
-        <p>
-          Điền thông tin tối thiểu để nhà hàng giữ liên lạc khi cần xác nhận, đổi chỗ ngồi hoặc hỗ trợ giờ đến.
-        </p>
+        <button type="button" className="tom-tat-edit-btn" onClick={onBack}>Chỉnh sửa bước 1</button>
       </section>
 
       <section className="dat-ban-editorial-card">

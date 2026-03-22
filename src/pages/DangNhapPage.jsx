@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { thucHienDangNhap } from '../services/queries/dotBienXacThuc'
 
 function DangNhapPage() {
   const [identifier, setIdentifier] = useState('')
@@ -12,9 +10,12 @@ function DangNhapPage() {
   const navigate = useNavigate()
   const { dangNhap } = useXacThuc()
 
-  const dangNhapMutation = useMutation({
-    mutationFn: async ({ identifier, password }) => thucHienDangNhap(dangNhap, identifier, password),
-    onSuccess: (ketQua) => {
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    ;(async () => {
+      const ketQua = await dangNhap(identifier, password)
+
       if (!ketQua.success) {
         setLoginError(ketQua.error)
         return
@@ -22,13 +23,7 @@ function DangNhapPage() {
 
       setLoginError('')
       navigate(location.state?.from || '/')
-    },
-  })
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    await dangNhapMutation.mutateAsync({ identifier, password })
+    })()
   }
 
   return (
@@ -90,8 +85,8 @@ function DangNhapPage() {
             </p>
           )}
 
-          <button type="submit" className="btn nut-chinh" disabled={dangNhapMutation.isPending}>
-            {dangNhapMutation.isPending ? 'Đang đăng nhập...' : 'Đăng nhập'}
+          <button type="submit" className="btn nut-chinh">
+            Đăng nhập
           </button>
         </form>
 

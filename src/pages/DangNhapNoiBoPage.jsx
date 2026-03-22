@@ -1,8 +1,6 @@
 import { useState } from 'react'
-import { useMutation } from '@tanstack/react-query'
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { thucHienDangNhapNoiBo } from '../services/queries/dotBienXacThuc'
 
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
@@ -12,9 +10,16 @@ function DangNhapNoiBoPage() {
   const navigate = useNavigate()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
 
-  const dangNhapNoiBoMutation = useMutation({
-    mutationFn: async ({ tenDangNhapHoacEmail, matKhau }) => thucHienDangNhapNoiBo(dangNhapNoiBo, tenDangNhapHoacEmail, matKhau),
-    onSuccess: async (ketQua) => {
+  if (daDangNhap && coTheVaoNoiBo) {
+    return <Navigate to="/noi-bo/bang-dieu-khien" replace />
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+
+    ;(async () => {
+      const ketQua = await dangNhapNoiBo(tenDangNhapHoacEmail, matKhau)
+
       if (!ketQua.success) {
         setLoiDangNhap(ketQua.error)
         return
@@ -28,17 +33,7 @@ function DangNhapNoiBoPage() {
 
       setLoiDangNhap('')
       navigate(location.state?.from || '/noi-bo/bang-dieu-khien', { replace: true })
-    },
-  })
-
-  if (daDangNhap && coTheVaoNoiBo) {
-    return <Navigate to="/noi-bo/bang-dieu-khien" replace />
-  }
-
-  const handleSubmit = async (e) => {
-    e.preventDefault()
-
-    await dangNhapNoiBoMutation.mutateAsync({ tenDangNhapHoacEmail, matKhau })
+    })()
   }
 
   return (
@@ -101,8 +96,8 @@ function DangNhapNoiBoPage() {
             </p>
           )}
 
-          <button type="submit" className="btn nut-chinh" disabled={dangNhapNoiBoMutation.isPending}>
-            {dangNhapNoiBoMutation.isPending ? 'Đang xác thực...' : 'Vào khu vực nội bộ'}
+          <button type="submit" className="btn nut-chinh">
+            Vào khu vực nội bộ
           </button>
         </form>
 

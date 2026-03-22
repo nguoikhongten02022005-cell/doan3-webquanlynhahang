@@ -11,12 +11,6 @@ function BuocBaDatBan({ formData, soLuongKhach, selectedSeatOperationalNote }) {
 
   return (
     <div className="dat-ban-step dat-ban-step-premium">
-      <section className="dat-ban-editorial-card dat-ban-step-soft-note dat-ban-step-soft-note-strong">
-        <p>
-          Đây là bước rà soát cuối cùng. Nếu mọi thông tin đã đúng, gửi yêu cầu để nhà hàng giữ nhịp phục vụ phù hợp cho bàn của bạn.
-        </p>
-      </section>
-
       <section className="dat-ban-review-grid">
         <article className="dat-ban-editorial-card dat-ban-review-card-main">
           <div className="dat-ban-section-head">
