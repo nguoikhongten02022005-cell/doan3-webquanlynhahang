@@ -89,7 +89,7 @@ button:focus-visible,
   width: 2.28rem; height: 2.28rem; border-radius: 50%;
   display: grid; place-items: center;
   font-size: 0.8rem; font-weight: 700; font-family: 'Inter', sans-serif;
-  background: linear-gradient(135deg, #1b714e 0%, #206d4e 100%);
+  background: linear-gradient(135deg, #e88870 0%, #dc7258 100%);
   color: #fff; letter-spacing: 0.02em;
 }
 .brand-name {
@@ -883,12 +883,3 @@ main:has(.trang-chu-page) + .site-footer .footer-khoi:nth-child(3)::before {
   margin-left: -1.5rem;
 }
 
-/* Compact footer variant */
-.site-footer-compact { background: var(--dark); color: rgba(255,255,255,0.7); padding: 1.2rem 0; }
-.footer-compact-bar {
-  display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;
-}
-.footer-compact-bar p { font-size: 0.8rem; }
-.footer-compact-contact { display: flex; gap: 1.2rem; }
-.footer-compact-contact a { color: rgba(255,255,255,0.6); font-size: 0.8rem; }
-.footer-compact-contact a:hover { color: var(--accent); }

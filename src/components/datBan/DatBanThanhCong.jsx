@@ -1,46 +1,51 @@
-import { dinhDangNgayHienThi, layThongDiepTrangThaiDatBan, layDanhSachChinhSach, layVanBanTomTatChoNgoi } from '../../utils/datBan/index'
+import { Link } from 'react-router-dom'
+import { SITE_CONTACT } from '../../constants/lienHeTrang'
 
-function DatBanThanhCong({ bookingCode, bookingStatus, formData, soLuongKhach, successHeading, successStatusLabel, onGoHome, onGoProfile }) {
+function DatBanThanhCong({ confirmation }) {
   return (
-    <div className="dat-ban-success dat-ban-success-premium">
-      <div className="success-icon">✓</div>
-      <p className="dat-ban-side-kicker">Kết quả booking</p>
-      <h3>{successHeading}</h3>
-      <div className="success-dat-ban-code">
-        <span className="code-label">Mã đặt bàn</span>
-        <span className="code-value">{bookingCode}</span>
-      </div>
-      <div className="success-status">
-        <span className="status-badge status-pending">{successStatusLabel}</span>
+    <section className="dat-ban-success-screen dat-ban-customer-card dat-ban-customer-card-soft">
+      <div className="dat-ban-success-hero">
+        <span className="dat-ban-success-emoji">🎉</span>
+        <p className="eyebrow">Đặt bàn thành công</p>
+        <h2>Yêu cầu của bạn đã được ghi nhận.</h2>
+        <p>
+          Chúng tôi đã gửi thông tin xác nhận ban đầu cho bạn. Host sẽ ưu tiên sắp xếp khu vực phù hợp nhất với lịch hẹn đã chọn.
+        </p>
       </div>
 
-      <div className="dat-ban-success-grid">
-        <div className="dat-ban-success-item"><span>Ngày dùng bữa</span><strong>{dinhDangNgayHienThi(formData.date)}</strong></div>
-        <div className="dat-ban-success-item"><span>Khung giờ phục vụ</span><strong>{formData.time}</strong></div>
-        <div className="dat-ban-success-item"><span>Số khách</span><strong>{formData.guests} khách</strong></div>
-        <div className="dat-ban-success-item"><span>Khu vực</span><strong>{layVanBanTomTatChoNgoi(formData.seatingArea)}</strong></div>
-        <div className="dat-ban-success-item"><span>Khách liên hệ</span><strong>{formData.name}</strong></div>
-        <div className="dat-ban-success-item"><span>Số điện thoại</span><strong>{formData.phone}</strong></div>
+      <div className="dat-ban-success-ticket">
+        <strong>Mã đặt bàn: {confirmation.bookingCode}</strong>
+        <span>📅 {confirmation.dateTimeLabel}</span>
+        <span>👥 {confirmation.guests} khách • {confirmation.areaLabel}</span>
       </div>
 
-      <p className="success-note success-note-premium">
-        {layThongDiepTrangThaiDatBan(bookingStatus, formData.seatingArea)}
-      </p>
+      <div className="dat-ban-success-contact-grid">
+        <div>
+          <span>📱 SMS xác nhận</span>
+          <strong>{confirmation.phone}</strong>
+        </div>
+        <div>
+          <span>📧 Email xác nhận</span>
+          <strong>{confirmation.email}</strong>
+        </div>
+      </div>
 
-      <div className="dat-ban-policy-notes dat-ban-policy-notes-premium">
-        {layDanhSachChinhSach(soLuongKhach, formData.seatingArea, formData.time).map((item) => (
-          <div className="policy-item" key={item.text}>
-            <span className="policy-icon">{item.icon}</span>
-            <span>{item.text}</span>
-          </div>
-        ))}
+      <div className="dat-ban-success-map-card">
+        <div>
+          <strong>{SITE_CONTACT.address}</strong>
+          <p>{SITE_CONTACT.hours[0].value}</p>
+        </div>
+        <a className="btn nut-phu" href={SITE_CONTACT.phoneHref}>
+          📞 Gọi hotline
+        </a>
       </div>
 
       <div className="dat-ban-success-actions">
-        <button type="button" className="dat-ban-secondary-btn" onClick={onGoProfile}>Xem trong hồ sơ</button>
-        <button type="button" className="dat-ban-primary-btn" onClick={onGoHome}>Về trang chủ</button>
+        <Link className="btn nut-phu" to="/">🏠 Về trang chủ</Link>
+        <Link className="btn nut-phu" to="/ho-so">📋 Xem lịch sử đặt bàn</Link>
+        <Link className="btn nut-chinh" to="/thuc-don">🍽️ Xem thực đơn trước</Link>
       </div>
-    </div>
+    </section>
   )
 }
 

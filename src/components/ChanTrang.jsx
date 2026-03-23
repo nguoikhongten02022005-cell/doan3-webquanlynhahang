@@ -1,24 +1,7 @@
 import { Link } from 'react-router-dom'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 
-function ChanTrang({ compact = false }) {
-  if (compact) {
-    return (
-      <footer className="site-footer site-footer-compact dat-ban-footer-compact" id="about">
-        <div className="footer-compact-bar footer-compact-bar-full">
-          <Link to="/" className="brand footer-brand">
-            <span className="brand-mark">NH</span>
-            <span className="brand-name">Nhà Hàng Nguyên Vị</span>
-          </Link>
-          <div className="footer-compact-contact">
-            <a href={SITE_CONTACT.phoneHref}>{SITE_CONTACT.phoneDisplay}</a>
-            <span>{SITE_CONTACT.onlineOrderCutoff}</span>
-          </div>
-        </div>
-      </footer>
-    )
-  }
-
+function ChanTrang() {
   return (
     <footer className="site-footer" id="about">
       <div className="container footer-grid">

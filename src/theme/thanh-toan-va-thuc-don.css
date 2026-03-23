@@ -2173,37 +2173,6 @@
   box-shadow: 0 20px 32px rgba(54, 37, 24, 0.05);
 }
 
-.thuc-don-state-card--loading {
-  overflow: hidden;
-}
-
-.thuc-don-state-skeleton {
-  display: grid;
-  gap: 0.55rem;
-  margin-bottom: 0.35rem;
-}
-
-.thuc-don-state-skeleton span {
-  display: block;
-  height: 0.78rem;
-  border-radius: 999px;
-  background: linear-gradient(90deg, rgba(201, 107, 74, 0.08), rgba(201, 107, 74, 0.16), rgba(201, 107, 74, 0.08));
-  background-size: 200% 100%;
-  animation: thuc-don-skeleton 1.4s ease-in-out infinite;
-}
-
-.thuc-don-state-skeleton span:nth-child(1) {
-  width: 36%;
-}
-
-.thuc-don-state-skeleton span:nth-child(2) {
-  width: 72%;
-}
-
-.thuc-don-state-skeleton span:nth-child(3) {
-  width: 58%;
-}
-
 .thuc-don-state-card h3 {
   margin: 0;
   font-family: 'Cormorant Garamond', serif;
@@ -2289,16 +2258,6 @@
   letter-spacing: 0.12em;
   text-transform: uppercase;
   font-weight: 700;
-}
-
-@keyframes thuc-don-skeleton {
-  0% {
-    background-position: 200% 0;
-  }
-
-  100% {
-    background-position: -200% 0;
-  }
 }
 
 @media (max-width: 1080px) {

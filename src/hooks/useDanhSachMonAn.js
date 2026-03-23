@@ -6,18 +6,16 @@ import { chuanHoaDanhSachMonThucDon } from '../services/mappers/anhXaThucDon'
 const DANH_SACH_MON_DU_PHONG = chuanHoaDanhSachMonThucDon(DANH_SACH_MON_MO_PHONG)
 
 export const useDanhSachMonAn = () => {
-  const [danhSachMon, setDanhSachMon] = useState([])
-  const [dangTai, setDangTai] = useState(true)
+  const [danhSachMon, setDanhSachMon] = useState(DANH_SACH_MON_DU_PHONG)
+  const [daTaiLanDau, setDaTaiLanDau] = useState(false)
   const [loiTaiMon, setLoiTaiMon] = useState('')
 
   const taiLaiDanhSachMon = useCallback(async () => {
-    setDangTai(true)
-    setLoiTaiMon('')
-
     try {
       const { duLieu } = await layDanhSachMonApi()
       const monAn = chuanHoaDanhSachMonThucDon(duLieu)
       setDanhSachMon(monAn)
+      setLoiTaiMon('')
       return monAn
     } catch (error) {
       const danhSachMonDuPhong = [...DANH_SACH_MON_DU_PHONG]
@@ -25,7 +23,7 @@ export const useDanhSachMonAn = () => {
       setLoiTaiMon(error?.message || 'Không thể tải danh sách món ăn từ máy chủ.')
       return danhSachMonDuPhong
     } finally {
-      setDangTai(false)
+      setDaTaiLanDau(true)
     }
   }, [])
 
@@ -36,8 +34,7 @@ export const useDanhSachMonAn = () => {
   return {
     dishes: danhSachMon,
     danhSachMon,
-    loading: dangTai,
-    dangTai,
+    daTaiLanDau,
     error: loiTaiMon,
     loiTaiMon,
     reloadDishes: taiLaiDanhSachMon,

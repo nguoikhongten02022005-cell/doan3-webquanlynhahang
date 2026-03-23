@@ -21,9 +21,9 @@ function App() {
     <BrowserRouter>
       <Routes>
         <Route element={<BoCucChinh />}>
+          <Route path="/dat-ban" element={<DatBanPage />} />
           <Route path="/" element={<TrangChuPage />} />
           <Route path="/thuc-don" element={<ThucDonPage />} />
-          <Route path="/dat-ban" element={<DatBanPage />} />
           <Route path="/gioi-thieu" element={<GioiThieuPage />} />
           <Route path="/gio-hang" element={<GioHangPage />} />
           <Route path="/thanh-toan" element={<ThanhToanPage />} />

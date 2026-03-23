@@ -1,65 +1,46 @@
-import { NHAN_TRANG_THAI_DAT_BAN } from '../../data/duLieuDatBan'
-import { dinhDangNgayHienThi, layTrangThaiGuiDatBan, layThoiLuongBuaAnText, layDanhSachChinhSach, layVanBanTomTatChoNgoi } from '../../utils/datBan/index'
-
-function BuocBaDatBan({ formData, soLuongKhach, selectedSeatOperationalNote }) {
-  const submissionStatus = layTrangThaiGuiDatBan({
-    seatingArea: formData.seatingArea,
-    soLuongKhach,
-    time: formData.time,
-    notes: formData.notes,
-  })
-
+function BuocBaDatBan({ summary, contactSummary, reviewNotice, submitError, isSubmitting, onBack, onSubmit }) {
   return (
-    <div className="dat-ban-step dat-ban-step-premium">
-      <section className="dat-ban-review-grid">
-        <article className="dat-ban-editorial-card dat-ban-review-card-main">
-          <div className="dat-ban-section-head">
-            <div>
-              <p className="dat-ban-side-kicker">Xác nhận cuối</p>
-              <h3>Xem lại đầy đủ thông tin trước khi gửi</h3>
-            </div>
-          </div>
+    <article className="dat-ban-customer-card dat-ban-customer-card-soft dat-ban-customer-flow-card">
 
+      <div className="dat-ban-review-grid">
+        <section className="dat-ban-review-card">
+          <p className="eyebrow">Thông tin đặt bàn</p>
           <div className="dat-ban-review-list">
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Số khách</span><strong>{formData.guests} khách</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Ngày dùng bữa</span><strong>{dinhDangNgayHienThi(formData.date)}</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Khung giờ phục vụ</span><strong>{formData.time}</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Dự kiến sử dụng bàn</span><strong>{layThoiLuongBuaAnText(soLuongKhach, formData.time)}</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Khu vực ưu tiên</span><strong>{layVanBanTomTatChoNgoi(formData.seatingArea)}</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Trạng thái sau khi gửi</span><strong>{NHAN_TRANG_THAI_DAT_BAN[submissionStatus]}</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Khách liên hệ</span><strong>{formData.name}</strong></div>
-            <div className="dat-ban-review-item dat-ban-review-item-primary"><span>Số điện thoại</span><strong>{formData.phone}</strong></div>
-            {formData.email && <div className="dat-ban-review-item"><span>Email</span><strong>{formData.email}</strong></div>}
-            {formData.occasion && <div className="dat-ban-review-item"><span>Dịp</span><strong>{formData.occasion}</strong></div>}
-            <div className="dat-ban-review-item dat-ban-review-item-note"><span>Lưu ý vận hành</span><strong>{selectedSeatOperationalNote}</strong></div>
-            {formData.notes && <div className="dat-ban-review-item dat-ban-review-item-notes"><span>Ghi chú thêm</span><strong>{formData.notes}</strong></div>}
+            <div><span>👥 Số khách</span><strong>{summary.guests}</strong></div>
+            <div><span>📅 Ngày</span><strong>{summary.date}</strong></div>
+            <div><span>🕕 Giờ</span><strong>{summary.time}</strong></div>
+            <div><span>📍 Khu vực</span><strong>{summary.area}</strong></div>
           </div>
-        </article>
+        </section>
 
-        <aside className="dat-ban-editorial-card dat-ban-policy-card-premium">
-          <div className="dat-ban-section-head compact">
-            <div>
-              <p className="dat-ban-side-kicker">Điều kiện giữ bàn</p>
-              <h3>Chính sách giữ bàn</h3>
-            </div>
+        <section className="dat-ban-review-card">
+          <p className="eyebrow">Thông tin liên hệ</p>
+          <div className="dat-ban-review-list">
+            <div><span>👤 Họ tên</span><strong>{contactSummary.name}</strong></div>
+            <div><span>📞 SĐT</span><strong>{contactSummary.phone}</strong></div>
+            <div><span>📧 Email</span><strong>{contactSummary.email}</strong></div>
+            <div><span>📝 Ghi chú</span><strong>{contactSummary.notes}</strong></div>
+            <div><span>🎟️ Voucher</span><strong>{contactSummary.voucher}</strong></div>
           </div>
+        </section>
+      </div>
 
-          <div className="dat-ban-keep-ban-note">
-            <strong>Giữ bàn 15 phút</strong>
-            <span>Nhà hàng giữ bàn tối đa 15 phút kể từ giờ hẹn trước khi cần sắp xếp lại.</span>
-          </div>
-
-          <div className="dat-ban-policy-notes dat-ban-policy-notes-premium">
-            {layDanhSachChinhSach(soLuongKhach, formData.seatingArea, formData.time).map((item) => (
-              <div className="policy-item" key={item.text}>
-                <span className="policy-icon">{item.icon}</span>
-                <span>{item.text}</span>
-              </div>
-            ))}
-          </div>
-        </aside>
+      <section className="dat-ban-review-notes">
+        <p className="eyebrow">Lưu ý quan trọng</p>
+        <ul>
+          {reviewNotice.map((item) => <li key={item}>{item}</li>)}
+        </ul>
       </section>
-    </div>
+
+      {submitError ? <p className="dat-ban-customer-error">{submitError}</p> : null}
+
+      <div className="dat-ban-review-actions">
+        <button type="button" className="btn nut-phu" onClick={onBack}>← Quay lại</button>
+        <button type="button" className="btn nut-chinh" onClick={onSubmit} disabled={isSubmitting}>
+          {isSubmitting ? 'Đang xử lý đặt bàn...' : '✅ Xác nhận'}
+        </button>
+      </div>
+    </article>
   )
 }
 

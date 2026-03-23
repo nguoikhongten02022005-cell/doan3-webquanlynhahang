@@ -1,69 +1,145 @@
 import { CAC_GOI_Y_GHI_CHU_DAT_BAN, CAC_DIP_DAT_BAN } from '../../data/duLieuDatBan'
-import { dinhDangNgayHienThi, layVanBanTomTatChoNgoi } from '../../utils/datBan/index'
 
-function BuocHaiDatBan({ formData, soLuongKhach, inlineErrors, selectedMealDurationText, onBack, onChange, onNoteSuggestion }) {
+function BuocHaiDatBan({
+  formData,
+  fieldErrors,
+  voucherState,
+  onFieldChange,
+  onFieldBlur,
+  onSuggestionClick,
+  onApplyVoucher,
+  onClearVoucher,
+}) {
+  const noteLength = formData.notes.length
+
   return (
-    <div className="dat-ban-step dat-ban-step-premium">
-      <section className="dat-ban-editorial-card dat-ban-tom-tat-ribbon">
-        <div className="dat-ban-tom-tat-inline">
-          <span>{soLuongKhach} khách</span>
-          <span>{dinhDangNgayHienThi(formData.date)}</span>
-          <span>{formData.time}</span>
-          <span>{layVanBanTomTatChoNgoi(formData.seatingArea)}</span>
-          {selectedMealDurationText && <span>{selectedMealDurationText}</span>}
-        </div>
-        <button type="button" className="tom-tat-edit-btn" onClick={onBack}>Chỉnh sửa bước 1</button>
-      </section>
+    <article className="dat-ban-customer-card dat-ban-customer-card-soft dat-ban-customer-flow-card">
+      <div className="dat-ban-customer-form-grid">
+        <label className="dat-ban-customer-field">
+          <span>Họ và tên *</span>
+          <input
+            type="text"
+            className={`truong-nhap dat-ban-step-two-input ${fieldErrors.name ? 'truong-nhap-error' : ''}`}
+            placeholder="Nguyễn Văn A"
+            value={formData.name}
+            onChange={onFieldChange('name')}
+            onBlur={onFieldBlur('name')}
+          />
+          {fieldErrors.name ? <small className="dat-ban-customer-error-inline">{fieldErrors.name}</small> : null}
+        </label>
 
-      <section className="dat-ban-editorial-card">
-        <div className="dat-ban-section-head">
-          <div>
-            <p className="dat-ban-side-kicker">Thông tin liên hệ</p>
-            <h3>Ai sẽ đến dùng bữa?</h3>
-          </div>
-        </div>
+        <label className="dat-ban-customer-field">
+          <span>Số điện thoại *</span>
+          <input
+            type="tel"
+            className={`truong-nhap dat-ban-step-two-input ${fieldErrors.phone ? 'truong-nhap-error' : ''}`}
+            placeholder="0901 234 567"
+            value={formData.phone}
+            onChange={onFieldChange('phone')}
+            onBlur={onFieldBlur('phone')}
+          />
+          {fieldErrors.phone ? <small className="dat-ban-customer-error-inline">{fieldErrors.phone}</small> : null}
+        </label>
 
-        <div className="form-row">
-          <div className="form-field">
-            <label className="nhan-truong" htmlFor="dat-ban-name">Họ và tên</label>
-            <input id="dat-ban-name" type="text" name="name" className={`truong-nhap ${inlineErrors.name ? 'truong-nhap-error' : ''}`} placeholder="Nguyễn Văn A" value={formData.name} onChange={onChange} autoFocus />
-            {inlineErrors.name && <span className="loi-bieu-mau-inline">{inlineErrors.name}</span>}
-          </div>
+        <label className="dat-ban-customer-field dat-ban-customer-field-wide">
+          <span>Email</span>
+          <input
+            type="email"
+            className={`truong-nhap dat-ban-step-two-input ${fieldErrors.email ? 'truong-nhap-error' : ''}`}
+            placeholder="example@gmail.com"
+            value={formData.email}
+            onChange={onFieldChange('email')}
+            onBlur={onFieldBlur('email')}
+          />
+          {fieldErrors.email ? <small className="dat-ban-customer-error-inline">{fieldErrors.email}</small> : null}
+        </label>
 
-          <div className="form-field">
-            <label className="nhan-truong" htmlFor="dat-ban-phone">Số điện thoại</label>
-            <input id="dat-ban-phone" type="tel" name="phone" className={`truong-nhap ${inlineErrors.phone ? 'truong-nhap-error' : ''}`} placeholder="0901 234 567" value={formData.phone} onChange={onChange} />
-            {inlineErrors.phone ? <span className="loi-bieu-mau-inline">{inlineErrors.phone}</span> : <span className="dat-ban-field-note">Nhà hàng sẽ dùng số này để xác nhận booking nếu cần.</span>}
-          </div>
-        </div>
-
-        <div className="form-row">
-          <div className="form-field">
-            <label className="nhan-truong" htmlFor="dat-ban-email">Email (tùy chọn)</label>
-            <input id="dat-ban-email" type="email" name="email" className="truong-nhap" placeholder="email@example.com" value={formData.email} onChange={onChange} />
-            <span className="dat-ban-field-note">Tùy chọn, dùng để nhận thông tin nếu cần.</span>
-          </div>
-
-          <div className="form-field">
-            <label className="nhan-truong" htmlFor="dat-ban-occasion">Dịp dùng bữa (tùy chọn)</label>
-            <select id="dat-ban-occasion" name="occasion" className="truong-nhap" value={formData.occasion} onChange={onChange}>
-              <option value="">Không có</option>
-              {CAC_DIP_DAT_BAN.map((occ) => <option key={occ} value={occ}>{occ}</option>)}
-            </select>
-          </div>
-        </div>
-
-        <div className="form-field">
-          <label className="nhan-truong" htmlFor="dat-ban-notes">Ghi chú (tùy chọn)</label>
-          <div className="dat-ban-note-chips">
-            {CAC_GOI_Y_GHI_CHU_DAT_BAN.map((suggestion) => (
-              <button key={suggestion} type="button" className="dat-ban-note-chip" onClick={() => onNoteSuggestion(suggestion)}>{suggestion}</button>
+        <label className="dat-ban-customer-field">
+          <span>Dịp dùng bữa</span>
+          <select className="truong-nhap dat-ban-step-two-input" value={formData.occasion} onChange={onFieldChange('occasion')}>
+            <option value="">Không có</option>
+            {CAC_DIP_DAT_BAN.map((occasion) => (
+              <option key={occasion} value={occasion}>{occasion}</option>
             ))}
+          </select>
+        </label>
+
+        <label className="dat-ban-customer-field dat-ban-customer-field-wide">
+          <span>Ghi chú cho nhà hàng</span>
+          <textarea
+            className={`truong-van-ban dat-ban-step-two-textarea ${fieldErrors.notes ? 'truong-nhap-error' : ''}`}
+            rows="4"
+            placeholder="VD: Có trẻ em, cần ghế cao, muốn bàn gần cửa sổ..."
+            value={formData.notes}
+            onChange={onFieldChange('notes')}
+            onBlur={onFieldBlur('notes')}
+          />
+          <div className="dat-ban-field-meta-row">
+            {fieldErrors.notes ? <small className="dat-ban-customer-error-inline">{fieldErrors.notes}</small> : <small className="dat-ban-customer-help-text">Tối đa 200 ký tự.</small>}
+            <small className="dat-ban-customer-counter">{noteLength}/200</small>
           </div>
-          <textarea id="dat-ban-notes" name="notes" className="truong-van-ban" placeholder="VD: Dị ứng thực phẩm, cần ghế em bé, muốn chỗ yên tĩnh, đến trễ khoảng 10 phút..." value={formData.notes} onChange={onChange} rows="4" />
+        </label>
+      </div>
+
+      <div className="dat-ban-customer-chip-row">
+        {CAC_GOI_Y_GHI_CHU_DAT_BAN.map((item) => (
+          <button key={item} type="button" className="dat-ban-customer-note-chip" onClick={() => onSuggestionClick(item)}>
+            {item}
+          </button>
+        ))}
+      </div>
+
+      <section className="dat-ban-voucher-card">
+        <p className="eyebrow">Mã voucher</p>
+
+        {voucherState.availableVouchers.length > 0 ? (
+          <div className="dat-ban-voucher-owned-list" role="radiogroup" aria-label="Voucher của bạn">
+            {voucherState.availableVouchers.map((voucher) => {
+              const isSelected = voucherState.appliedVoucher?.code === voucher.code
+              return (
+                <button
+                  key={voucher.code}
+                  type="button"
+                  className={`dat-ban-voucher-owned-item ${isSelected ? 'active' : ''}`}
+                  onClick={() => onApplyVoucher(voucher.code)}
+                >
+                  <span>{isSelected ? '●' : '○'}</span>
+                  <div>
+                    <strong>{voucher.code}</strong>
+                    <p>{voucher.description}</p>
+                  </div>
+                </button>
+              )
+            })}
+          </div>
+        ) : null}
+
+        <div className="dat-ban-voucher-row">
+          <input
+            type="text"
+            className="truong-nhap dat-ban-step-two-input"
+            placeholder="Nhập mã voucher..."
+            value={voucherState.codeInput}
+            onChange={onFieldChange('voucherCode')}
+          />
+          <button type="button" className="btn nut-chinh dat-ban-step-two-primary-btn" onClick={() => onApplyVoucher(voucherState.codeInput)} disabled={voucherState.isApplying}>
+            {voucherState.isApplying ? 'Đang kiểm tra...' : 'Áp dụng'}
+          </button>
+          {voucherState.appliedVoucher ? (
+            <button type="button" className="btn nut-phu dat-ban-step-two-secondary-btn" onClick={onClearVoucher}>
+              Bỏ mã
+            </button>
+          ) : null}
         </div>
+
+        {voucherState.error ? <p className="dat-ban-customer-error">{voucherState.error}</p> : null}
+        {voucherState.appliedVoucher ? (
+          <p className="dat-ban-voucher-success">
+            {voucherState.appliedVoucher.code} — {voucherState.appliedVoucher.description}
+          </p>
+        ) : null}
       </section>
-    </div>
+    </article>
   )
 }
 

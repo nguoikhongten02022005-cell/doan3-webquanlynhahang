@@ -1,75 +1,49 @@
+import chefPortrait from '../assets/img/chef.02d6c5b61bfdc70303b4.png'
+
 function GioiThieuPage() {
   return (
     <div className="about-page about-page-editorial">
-      <section className="about-hero">
-        <div className="container about-mo-dau-layout">
-          <div className="about-mo-dau-content">
-            <span className="about-label">Câu chuyện của chúng tôi</span>
-            <h1 className="about-mo-dau-title">
-              Nơi hương vị
-              <br />
-              <span className="about-title-italic">kể chuyện</span>
-            </h1>
-            <p className="about-mo-dau-subtitle">
-              Từ năm 2015, chúng tôi theo đuổi một kiểu nhà hàng ấm và chỉn chu: nơi mỗi món ăn được nhớ đến
-              không chỉ vì ngon, mà vì cả cảm giác được đón tiếp.
-            </p>
-          </div>
-
-          <div className="about-mo-dau-aside">
-            <div className="about-mo-dau-note">
-              <p className="about-label">Tinh thần phục vụ</p>
-              <strong>Ấm · tinh tế · không phô trương</strong>
-              <span>Giữ nhịp bữa ăn vừa đủ để món ngon và câu chuyện riêng của mỗi bàn đều có chỗ đứng.</span>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <section className="about-story">
+      <section className="about-story about-editorial-story">
         <div className="container">
-          <div className="about-grid">
-            <div className="about-content">
-              <h2 className="about-section-title">Hành trình của chúng tôi</h2>
-              <div className="about-text">
-                <p>
-                  Từ năm 2015, chúng tôi bắt đầu hành trình mang đến những trải nghiệm ẩm thực chân thực và đầy cảm xúc.
-                  Mỗi món ăn không chỉ là sự kết hợp của nguyên liệu tươi ngon, mà còn là tâm huyết của đội ngũ đầu bếp
-                  dày dạn kinh nghiệm.
-                </p>
-                <p>
-                  Chúng tôi tin rằng bữa ăn ngon nhất là khi được chia sẻ cùng những người thân yêu. Không gian ấm cúng,
-                  phong cách phục vụ tận tâm và thực đơn đa dạng — tất cả được thiết kế để bạn cảm thấy như đang ở nhà.
-                </p>
-                <p>
-                  Với hơn 11 năm kinh nghiệm, chúng tôi đã phục vụ hơn 50,000 khách hàng hài lòng và không ngừng đổi mới
-                  thực đơn với hơn 200 món ăn đa dạng từ Á đến Âu.
-                </p>
+          <div className="about-editorial">
+            <div className="about-editorial-media">
+              <div className="about-editorial-frame">
+                <img className="about-editorial-image" src={chefPortrait} alt="Đầu bếp của nhà hàng" />
               </div>
             </div>
 
-            <div className="about-visual">
-              <div className="about-image-stack">
-                <div className="about-image about-image-1">
-                  <div className="about-image-placeholder about-img-chef"></div>
-                  <span className="about-image-caption">Đầu bếp của chúng tôi</span>
-                </div>
-                <div className="about-image about-image-2">
-                  <div className="about-image-placeholder about-img-dish"></div>
-                  <span className="about-image-caption">Món ăn được chế biến tỉ mỉ</span>
-                </div>
-                <div className="about-image about-image-3">
-                  <div className="about-image-placeholder about-img-space"></div>
-                  <span className="about-image-caption">Không gian ấm cúng</span>
+            <div className="about-editorial-copy">
+              <p className="about-editorial-eyebrow">Lời đầu bếp</p>
+              <h2 className="about-editorial-title">Hành trình của chúng tôi</h2>
+
+              <div className="about-editorial-reading">
+                <span className="about-editorial-mark" aria-hidden="true">“</span>
+                <div className="about-editorial-prose">
+                  <p>
+                    Từ năm 2015, chúng tôi bắt đầu hành trình mang đến những trải nghiệm ẩm thực chân thực và đầy cảm xúc.
+                    Mỗi món ăn không chỉ là sự kết hợp của nguyên liệu tươi ngon, mà còn là tâm huyết của đội ngũ đầu bếp
+                    dày dạn kinh nghiệm.
+                  </p>
+                  <p>
+                    Chúng tôi tin rằng bữa ăn ngon nhất là khi được chia sẻ cùng những người thân yêu. Không gian ấm cúng,
+                    phong cách phục vụ tận tâm và thực đơn đa dạng — tất cả được thiết kế để bạn cảm thấy như đang ở nhà.
+                  </p>
+                  <p>
+                    Với hơn 11 năm kinh nghiệm, chúng tôi đã phục vụ hơn 50,000 khách hàng hài lòng và không ngừng đổi mới
+                    thực đơn với hơn 200 món ăn đa dạng từ Á đến Âu.
+                  </p>
                 </div>
               </div>
 
-              <div className="about-quote">
-                <svg className="quote-icon" width="40" height="32" viewBox="0 0 40 32" fill="none">
-                  <path d="M0 32V16C0 7.168 4.8 0 16 0v8c-4.8 0-8 2.4-8 8h8v16H0zm24 0V16c0-8.832 4.8-16 16-16v8c-4.8 0-8 2.4-8 8h8v16H24z" fill="currentColor" />
-                </svg>
-                <p className="quote-text">Ẩm thực không chỉ là món ăn, mà là nghệ thuật kết nối con người với nhau</p>
-                <p className="quote-author">— Chef Nguyễn Minh Tuấn</p>
+              <div className="about-editorial-closing">
+                <p className="about-editorial-pullquote">
+                  Ẩm thực không chỉ là món ăn, mà là nghệ thuật kết nối con người với nhau
+                </p>
+                <div className="about-editorial-author">
+                  <p className="about-editorial-name">Chef Nguyễn Minh Tuấn</p>
+                  <p className="about-editorial-role">Bếp trưởng</p>
+                </div>
+                <p className="about-editorial-signature" aria-hidden="true">Nguyễn Minh Tuấn</p>
               </div>
             </div>
           </div>

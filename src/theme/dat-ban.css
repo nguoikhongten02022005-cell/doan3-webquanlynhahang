@@ -1,361 +1,830 @@
-/* BOOKING PAGE */
-.dat-ban-page { min-height: 100vh; background: var(--bg); }
-.dat-ban-hero-editorial {
-  position: relative;
-  overflow: hidden;
-  padding: 3.4rem 0 2.3rem;
+.dat-ban-page-customer {
   background:
-    radial-gradient(circle at 12% 18%, rgba(200, 150, 62, 0.18), transparent 24%),
-    radial-gradient(circle at 82% 14%, rgba(230, 120, 90, 0.14), transparent 28%),
-    linear-gradient(135deg, #fff8f1 0%, #f8eadc 48%, #f4e2d3 100%);
+    radial-gradient(circle at 12% 14%, rgba(230, 120, 90, 0.08), transparent 22%),
+    radial-gradient(circle at 88% 18%, rgba(214, 193, 165, 0.14), transparent 24%),
+    linear-gradient(180deg, #fbf8f2 0%, #f6efe7 100%);
 }
-.dat-ban-hero-editorial::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(255,255,255,0.04), transparent 40%);
-  pointer-events: none;
-}
-.dat-ban-hero {
-  padding: 3rem 0 2rem; text-align: center;
-  background: linear-gradient(160deg, var(--bg) 40%, var(--surface-warm) 100%);
-}
-.dat-ban-hero h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 600; color: var(--dark);
-}
-.dat-ban-hero p {
-  font-size: 0.95rem; color: var(--text-secondary); margin-top: 0.5rem;
-}
-.dat-ban-mo-dau-premium {
-  padding: 4rem 0 2.5rem; text-align: center;
-  background: linear-gradient(160deg, #fff8f1 0%, #f8eadc 52%, #f3e0d0 100%);
-  color: #3f2a1f;
-}
-.dat-ban-mo-dau-premium h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: clamp(1.8rem, 3.5vw, 2.6rem); font-weight: 600;
-}
-.dat-ban-mo-dau-premium p { font-size: 0.95rem; opacity: 1; margin-top: 0.5rem; color: rgba(78, 61, 47, 0.82); }
 
-/* Booking layout */
-.dat-ban-form-section { padding: 2rem 0 4rem; }
-.dat-ban-layout-premium {
-  max-width: 1200px;
+.dat-ban-customer-section {
+  padding: 1rem 0 4rem;
+}
+
+.dat-ban-customer-section-tight {
+  padding-top: 1rem;
+}
+
+.dat-ban-customer-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1.35fr) minmax(310px, 0.65fr);
+  gap: 1.15rem;
+  align-items: start;
+}
+
+.dat-ban-success-layout {
+  width: min(900px, calc(100% - 2rem));
   margin: 0 auto;
+}
+
+.dat-ban-customer-main {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dat-ban-customer-card,
+.dat-ban-customer-summary-card {
+  border: 1px solid rgba(127, 98, 74, 0.12);
+  background: rgba(255, 252, 247, 0.94);
+  box-shadow: 0 18px 36px rgba(55, 39, 28, 0.08);
+}
+
+.dat-ban-customer-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.05rem;
+}
+
+.dat-ban-customer-card-soft {
+  background: linear-gradient(180deg, rgba(255, 251, 246, 0.98) 0%, rgba(251, 244, 235, 0.92) 100%);
+}
+
+.dat-ban-customer-flow-card {
+  gap: 1rem;
+}
+
+.dat-ban-customer-control-head,
+.dat-ban-flow-section-head,
+.dat-ban-time-period-head,
+.dat-ban-review-actions,
+.dat-ban-review-grid {
   display: flex;
-  gap: 2rem;
-  align-items: flex-start;
+  align-items: end;
+  justify-content: space-between;
+  gap: 0.75rem;
 }
 
-.dat-ban-sidebar-premium {
-  width: 350px;
-  position: sticky;
-  top: 2rem;
-  flex-shrink: 0;
-}
-
-.dat-ban-main-premium {
-  flex: 1;
-  min-width: 0;
-}
-
-.dat-ban-shell-premium {
-  background: #fff; border: 1px solid var(--line);
-  border-radius: var(--radius-xl); overflow: hidden;
-  box-shadow: var(--shadow-lg);
-}
-.dat-ban-panel-header {
-  padding: 1.2rem 1.5rem; border-bottom: 1px solid var(--line-light);
-  display: flex; align-items: center; justify-content: space-between;
-}
-.dat-ban-panel-header h2 {
+.dat-ban-customer-control-head h2,
+.dat-ban-flow-section-head h3,
+.dat-ban-time-period-head h3,
+.dat-ban-review-card strong,
+.dat-ban-review-notes h3,
+.dat-ban-success-hero h2,
+.dat-ban-customer-summary-card h2 {
+  margin: 0;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.3rem; font-weight: 700; color: var(--dark);
-}
-.dat-ban-panel-header .step-label {
-  font-size: 0.72rem; letter-spacing: 0.15em; text-transform: uppercase;
-  color: var(--accent-strong); font-weight: 700;
+  color: #241710;
 }
 
-/* Stepper */
-.dat-ban-stepper-bar {
-  display: flex; align-items: center; justify-content: center;
-  gap: 0.5rem; padding: 1rem 1.5rem;
-  background: var(--surface);
+.dat-ban-customer-control-head h2,
+.dat-ban-success-hero h2,
+.dat-ban-customer-summary-card h2 {
+  font-size: 2.1rem;
+  line-height: 0.95;
 }
-.dat-ban-stepper-step {
-  display: flex; align-items: center; gap: 0.4rem;
-  font-size: 0.78rem; font-weight: 600; color: var(--text-muted);
-}
-.dat-ban-stepper-step.active { color: var(--primary); }
-.dat-ban-stepper-step.completed { color: var(--primary); }
-.dat-ban-stepper-num {
-  width: 1.6rem; height: 1.6rem; border-radius: 50%;
-  display: grid; place-items: center; font-size: 0.7rem; font-weight: 700;
-  border: 2px solid var(--line); color: var(--text-muted);
-}
-.dat-ban-stepper-step.active .dat-ban-stepper-num {
-  background: var(--primary); color: #fff; border-color: var(--primary);
-}
-.dat-ban-stepper-step.completed .dat-ban-stepper-num {
-  background: var(--primary); color: #fff; border-color: var(--primary);
-}
-.dat-ban-stepper-line {
-  width: 2rem; height: 2px; background: var(--line);
-}
-.dat-ban-stepper-step.completed + .dat-ban-stepper-line { background: var(--primary); }
 
-/* Guest cards */
+.dat-ban-flow-section-head h3,
+.dat-ban-time-period-head h3 {
+  font-size: 1.4rem;
+  line-height: 1;
+}
+
+.dat-ban-customer-grid-note,
+.dat-ban-page-customer .section-head-description,
+.dat-ban-customer-summary-copy,
+.dat-ban-customer-help-text,
+.dat-ban-customer-footnote,
+.dat-ban-success-hero p,
+.dat-ban-success-map-card p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: rgba(96, 73, 57, 0.78);
+}
+
+.dat-ban-page-customer .section-head {
+  display: grid;
+  gap: 0.75rem;
+  text-align: left;
+  margin-bottom: 0;
+}
+
+.dat-ban-page-customer .section-head h2 {
+  max-width: 12ch;
+  font-size: 2rem;
+  line-height: 0.98;
+}
+
+.dat-ban-customer-inline-note,
+.dat-ban-large-party-banner {
+  display: inline-flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid rgba(200, 150, 62, 0.18);
+  background: rgba(255, 248, 235, 0.92);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: #785737;
+}
+
+.dat-ban-large-party-banner {
+  border-color: rgba(225, 174, 35, 0.22);
+  background: linear-gradient(180deg, rgba(255, 248, 215, 0.98) 0%, rgba(255, 244, 200, 0.96) 100%);
+}
+
+.dat-ban-large-party-banner a,
+.dat-ban-customer-link {
+  border: none;
+  background: transparent;
+  color: var(--primary-strong);
+  font-weight: 700;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.dat-ban-flow-section {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 0.1rem;
+  border-top: 1px solid rgba(127, 98, 74, 0.08);
+}
+
+.dat-ban-flow-section:first-of-type {
+  border-top: none;
+  padding-top: 0;
+}
+
 .dat-ban-guest-grid {
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-  gap: 0.6rem; padding: 1.2rem 1.5rem;
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.65rem;
 }
+
 .dat-ban-guest-card {
-  display: flex; flex-direction: column; align-items: center;
-  gap: 0.3rem; padding: 0.8rem 0.5rem; border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); cursor: pointer;
-  transition: all 0.2s ease; background: #fff;
-}
-.dat-ban-guest-card:hover { border-color: var(--primary-light); background: var(--primary-bg); }
-.dat-ban-guest-card.selected {
-  border-color: var(--primary); background: var(--primary-bg);
-  box-shadow: 0 0 0 3px rgba(230,120,90,0.12);
-}
-.dat-ban-guest-card .guest-icon {
-  font-size: 1.3rem;
-}
-.dat-ban-guest-card .guest-count {
-  font-size: 0.95rem; font-weight: 700; color: var(--dark);
-}
-.dat-ban-guest-card .guest-label {
-  font-size: 0.68rem; color: var(--text-muted);
+  display: grid;
+  gap: 0.2rem;
+  place-items: center;
+  min-height: 5.5rem;
+  border: 1px solid rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  color: #5f4b39;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
 }
 
-/* Date picker / Calendar */
-.dat-ban-date-picker-premium { padding: 1.2rem 1.5rem; }
-.dat-ban-date-picker-header {
-  display: flex; align-items: center; justify-content: space-between;
-  margin-bottom: 1rem;
-}
-.dat-ban-date-picker-header h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; font-weight: 700; color: var(--dark);
-}
-.dat-ban-calendar-nav {
-  display: flex; gap: 0.3rem;
-}
-.dat-ban-calendar-nav button {
-  width: 2rem; height: 2rem; border-radius: 50%;
-  border: 1px solid var(--line); background: #fff;
-  cursor: pointer; display: grid; place-items: center;
-  transition: all 0.2s;
-}
-.dat-ban-calendar-nav button:hover {
-  border-color: var(--primary); color: var(--primary);
-}
-.dat-ban-calendar-grid {
-  display: grid; grid-template-columns: repeat(7, 1fr); gap: 0.3rem;
-}
-.dat-ban-calendar-day-name {
-  text-align: center; font-size: 0.68rem; font-weight: 700;
-  color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.1em;
-  padding: 0.3rem 0;
-}
-.dat-ban-calendar-day {
-  aspect-ratio: 1; display: grid; place-items: center;
-  border-radius: 50%; font-size: 0.82rem; font-weight: 500;
-  cursor: pointer; transition: all 0.2s; color: var(--text-primary);
-  border: none; background: transparent;
-}
-.dat-ban-calendar-day:hover { background: var(--surface-soft); }
-.dat-ban-calendar-day.today {
-  border: 1.5px solid var(--accent); color: var(--accent-strong);
-}
-.dat-ban-calendar-day.selected {
-  background: var(--primary); color: #fff; font-weight: 700;
-}
-.dat-ban-calendar-day.disabled {
-  color: var(--line); cursor: not-allowed;
-}
-.dat-ban-calendar-day.disabled:hover { background: transparent; }
-.dat-ban-calendar-day.other-month { color: var(--line); }
-
-/* Time slots */
-.dat-ban-slot-section { padding: 1.2rem 1.5rem; }
-.dat-ban-slot-section h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.8rem;
-}
-.dat-ban-slot-grid {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(90px, 1fr));
-  gap: 0.5rem;
-}
-.khung-gio-btn {
-  padding: 0.55rem 0.3rem; border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); background: #fff;
-  font-size: 0.82rem; font-weight: 600; cursor: pointer;
-  text-align: center; transition: all 0.2s;
-  color: var(--text-primary);
-}
-.khung-gio-btn:hover { border-color: var(--primary-light); background: var(--primary-bg); }
-.khung-gio-btn.selected {
-  background: var(--primary); color: #fff; border-color: var(--primary);
-}
-.khung-gio-btn.unavailable {
-  opacity: 0.4; cursor: not-allowed; text-decoration: line-through;
-}
-.khung-gio-btn.unavailable:hover { border-color: var(--line); background: #fff; }
-.khung-gio-period {
-  font-size: 0.72rem; letter-spacing: 0.12em; text-transform: uppercase;
-  color: var(--text-muted); font-weight: 700; margin-bottom: 0.5rem; margin-top: 1rem;
+.dat-ban-guest-card:hover,
+.dat-ban-guest-card.active,
+.dat-ban-date-chip:hover,
+.dat-ban-date-chip.active,
+.dat-ban-time-slot:hover,
+.dat-ban-time-slot.active,
+.dat-ban-area-card:hover,
+.dat-ban-area-card.active,
+.dat-ban-customer-note-chip:hover,
+.dat-ban-voucher-owned-item:hover,
+.dat-ban-voucher-owned-item.active {
+  border-color: rgba(230, 120, 90, 0.45);
+  background: rgba(253, 240, 234, 0.95);
+  color: var(--primary-strong);
+  transform: translateY(-2px);
 }
 
-/* Seating */
-.dat-ban-seating-section { padding: 1.2rem 1.5rem; }
-.dat-ban-seating-section h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.8rem;
+.dat-ban-guest-card.active {
+  border-color: #E8664A;
+  background: #E8664A;
+  color: #fff;
 }
-.dat-ban-seating-grid-premium {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+
+.dat-ban-guest-card.active strong,
+.dat-ban-guest-card.active span {
+  color: #fff;
+}
+
+.dat-ban-guest-card strong {
+  font-size: 1.65rem;
+  color: #281811;
+}
+
+.dat-ban-guest-card span {
+  font-size: 0.78rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.dat-ban-guest-card-hotline {
+  text-decoration: none;
+}
+
+.dat-ban-date-quick-row {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.65rem;
+}
+
+.dat-ban-date-chip {
+  display: grid;
+  gap: 0.25rem;
+  min-height: 4.8rem;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dat-ban-date-chip.weekend {
+  background: linear-gradient(180deg, rgba(255, 244, 245, 0.96) 0%, rgba(255, 251, 250, 0.96) 100%);
+}
+
+.dat-ban-date-chip.disabled,
+.dat-ban-time-slot:disabled,
+.dat-ban-area-card.disabled {
+  cursor: not-allowed;
+  transform: none;
+  border-style: dashed;
+}
+
+.dat-ban-date-chip.disabled,
+.dat-ban-time-slot:disabled {
+  opacity: 0.62;
+}
+
+.dat-ban-area-card.disabled {
+  opacity: 1;
+}
+
+.dat-ban-area-card.disabled .dat-ban-area-card-foot {
+  opacity: 0.62;
+}
+
+.dat-ban-date-chip.disabled:hover,
+.dat-ban-time-slot:disabled:hover,
+.dat-ban-area-card.disabled:hover {
+  transform: none;
+  border-color: rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  color: inherit;
+}
+
+.dat-ban-date-chip strong {
+  font-size: 1rem;
+  color: #281811;
+}
+
+.dat-ban-date-chip span {
+  font-size: 0.72rem;
+  color: rgba(96, 73, 57, 0.82);
+}
+
+.dat-ban-customer-form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.9rem;
+}
+
+.dat-ban-customer-field {
+  display: grid;
+  gap: 0.35rem;
+}
+
+.dat-ban-customer-field span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(94, 72, 55, 0.78);
+}
+
+.dat-ban-customer-field-wide {
+  grid-column: 1 / -1;
+}
+
+.dat-ban-time-periods {
+  display: grid;
+  gap: 1rem;
+}
+
+.dat-ban-time-period {
+  display: grid;
+  gap: 0.85rem;
+}
+
+.dat-ban-time-period-head span,
+.dat-ban-review-list span,
+.dat-ban-customer-summary-list span,
+.dat-ban-stepper-index,
+.dat-ban-voucher-owned-item span,
+.dat-ban-area-card-foot small,
+.dat-ban-customer-counter {
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(96, 73, 57, 0.72);
+}
+
+.dat-ban-time-slot-grid {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  gap: 0.75rem;
+}
+
+.dat-ban-time-slot {
+  display: grid;
+  gap: 0.3rem;
+  min-height: 5rem;
+  padding: 0.8rem;
+  border: 1px solid rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dat-ban-time-slot.available span { color: #13744a; }
+.dat-ban-time-slot.limited span { color: #9a6400; }
+.dat-ban-time-slot.full span { color: #b42318; }
+
+.dat-ban-time-slot.active {
+  border-color: #E8664A;
+  background: #E8664A;
+  color: #fff;
+}
+
+.dat-ban-time-slot.active strong,
+.dat-ban-time-slot.active span,
+.dat-ban-time-slot.active.available span,
+.dat-ban-time-slot.active.limited span,
+.dat-ban-time-slot.active.full span {
+  color: #fff;
+}
+
+.dat-ban-time-slot strong {
+  font-size: 1rem;
+  color: #281811;
+}
+
+.dat-ban-time-slot span {
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.dat-ban-area-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.8rem;
 }
-.dat-ban-seat-card {
-  padding: 1rem; border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); cursor: pointer;
-  text-align: center; transition: all 0.2s; background: #fff;
-}
-.dat-ban-seat-card:hover { border-color: var(--primary-light); background: var(--primary-bg); }
-.dat-ban-seat-card.selected {
-  border-color: var(--primary); background: var(--primary-bg);
-  box-shadow: 0 0 0 3px rgba(230,120,90,0.12);
-}
-.dat-ban-seat-card .seat-icon { font-size: 1.5rem; margin-bottom: 0.3rem; }
-.dat-ban-seat-card .seat-name {
-  font-size: 0.85rem; font-weight: 600; color: var(--dark);
-}
-.dat-ban-seat-card .seat-desc {
-  font-size: 0.72rem; color: var(--text-muted); margin-top: 0.2rem;
-}
-.seating-area-icon { font-size: 1.3rem; }
-.seating-area-name { font-size: 0.85rem; font-weight: 600; color: var(--dark); }
-.seating-area-desc { font-size: 0.72rem; color: var(--text-muted); }
 
-/* Booking form / contact fields */
-.dat-ban-contact-section { padding: 1.2rem 1.5rem; }
-.dat-ban-contact-section h3 {
+.dat-ban-area-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1rem;
+  border: 1px solid rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.82);
+  text-align: left;
+  cursor: pointer;
+  transition: transform 0.2s ease, border-color 0.2s ease, background-color 0.2s ease;
+}
+
+.dat-ban-area-card-head {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.75rem;
+  align-items: start;
+}
+
+.dat-ban-area-card-title-row {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.dat-ban-area-badge {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.4rem;
+  padding: 0 0.55rem;
+  border-radius: 999px;
+  background: rgba(232, 102, 74, 0.16);
+  color: #E8664A;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.dat-ban-area-note {
+  display: block;
+  margin-top: 0.3rem;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: rgba(96, 73, 57, 0.82);
+}
+
+.dat-ban-area-card-head span {
+  font-size: 1.4rem;
+}
+
+.dat-ban-area-card-head strong,
+.dat-ban-review-list strong,
+.dat-ban-success-ticket strong,
+.dat-ban-success-contact-grid strong,
+.dat-ban-success-map-card strong {
+  font-size: 1rem;
+  color: #281811;
+}
+
+.dat-ban-area-card-head p,
+.dat-ban-success-contact-grid span {
+  margin: 0.2rem 0 0;
+  font-size: 0.82rem;
+  color: rgba(96, 73, 57, 0.82);
+}
+
+.dat-ban-area-card-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.dat-ban-area-card-foot span {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.dat-ban-customer-summary-card {
+  position: sticky;
+  top: 6.4rem;
+  display: grid;
+  gap: 0.7rem;
+  padding: 1.05rem;
+}
+
+.dat-ban-stepper {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0;
+  margin: 0;
+  list-style: none;
+}
+
+.dat-ban-stepper-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.55rem;
+  align-items: start;
+}
+
+.dat-ban-stepper-index {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 999px;
+  background: rgba(127, 98, 74, 0.08);
+}
+
+.dat-ban-stepper-item.active .dat-ban-stepper-index,
+.dat-ban-stepper-item.done .dat-ban-stepper-index {
+  background: rgba(230, 120, 90, 0.16);
+  color: var(--primary-strong);
+}
+
+.dat-ban-stepper-item strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #281811;
+}
+
+.dat-ban-stepper-item p {
+  margin: 0;
+  font-size: 0.8rem;
+  line-height: 1.6;
+  color: rgba(96, 73, 57, 0.78);
+}
+
+.dat-ban-customer-summary-list {
+  display: grid;
+  gap: 0.6rem;
+}
+
+.dat-ban-customer-summary-list div,
+.dat-ban-review-list div {
+  display: grid;
+  gap: 0.18rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(127, 98, 74, 0.1);
+}
+
+.dat-ban-customer-summary-list div:last-child,
+.dat-ban-review-list div:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.dat-ban-customer-summary-list strong {
+  font-size: 0.92rem;
+  color: #281811;
+}
+
+.dat-ban-customer-submit {
+  width: 100%;
+  min-height: 3rem;
+  font-size: 0.88rem;
+}
+
+.dat-ban-customer-error,
+.dat-ban-customer-error-inline {
+  margin: 0;
+  color: #b42318;
+  font-size: 0.82rem;
+  line-height: 1.65;
+}
+
+.dat-ban-customer-empty-state {
+  display: grid;
+  gap: 0.55rem;
+  align-content: center;
+  min-height: 10rem;
+  padding: 1rem;
+  border: 1px dashed rgba(127, 98, 74, 0.18);
+  background: rgba(255, 250, 245, 0.72);
+  text-align: left;
+}
+
+.dat-ban-customer-empty-state h3 {
+  margin: 0;
+  font-size: 1.7rem;
+  line-height: 0.98;
   font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.8rem;
-}
-.dat-ban-contact-grid {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;
-}
-.dat-ban-contact-grid .nhom-truong.full { grid-column: 1 / -1; }
-
-/* Booking actions */
-.dat-ban-actions {
-  padding: 1.2rem 1.5rem; display: flex;
-  justify-content: space-between; gap: 1rem;
-  border-top: 1px solid var(--line-light);
-}
-.dat-ban-back-btn {
-  padding: 0.65rem 1.5rem; border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); background: #fff; cursor: pointer;
-  font-size: 0.85rem; font-weight: 600; color: var(--text-secondary);
-  transition: all 0.2s;
-}
-.dat-ban-back-btn:hover { border-color: var(--primary); color: var(--primary); }
-.dat-ban-primary-btn {
-  padding: 0.65rem 2rem; border: none; border-radius: var(--radius-md);
-  background: var(--primary); color: #fff; font-size: 0.85rem;
-  font-weight: 600; cursor: pointer; transition: all 0.2s;
-}
-.dat-ban-primary-btn:hover { background: #d86445; box-shadow: 0 4px 14px rgba(230,120,90,0.24); }
-.dat-ban-primary-btn:disabled { opacity: 0.5; cursor: not-allowed; }
-.dat-ban-submit-btn {
-  padding: 0.75rem 2.5rem; border: none; border-radius: var(--radius-md);
-  background: linear-gradient(135deg, #e6785a 0%, #d86445 100%);
-  color: #fff; font-size: 0.9rem; font-weight: 700; cursor: pointer;
-  transition: all 0.3s; box-shadow: 0 4px 14px rgba(230,120,90,0.2);
-}
-.dat-ban-submit-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(230,120,90,0.28); }
-.dat-ban-submit-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-/* Booking success */
-.dat-ban-success {
-  text-align: center; padding: 3rem 1.5rem;
-}
-.dat-ban-success-icon {
-  width: 4rem; height: 4rem; border-radius: 50%;
-  background: var(--primary-bg); color: var(--primary);
-  display: grid; place-items: center; font-size: 1.8rem;
-  margin: 0 auto 1.2rem;
-}
-.dat-ban-success h2 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.6rem; font-weight: 600; color: var(--dark); margin-bottom: 0.5rem;
-}
-.dat-ban-success p {
-  font-size: 0.92rem; color: var(--text-secondary); line-height: 1.6;
-}
-.dat-ban-success-details {
-  display: grid; grid-template-columns: 1fr 1fr;
-  gap: 0.8rem; max-width: 24rem; margin: 1.5rem auto; text-align: left;
-}
-.dat-ban-success-details .detail-item {
-  padding: 0.6rem; background: var(--surface); border-radius: var(--radius-md);
-}
-.dat-ban-success-details .detail-label {
-  font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.1em;
-  color: var(--text-muted); font-weight: 700; margin-bottom: 0.2rem;
-}
-.dat-ban-success-details .detail-value {
-  font-size: 0.88rem; font-weight: 600; color: var(--dark);
+  color: #241710;
 }
 
-/* Mobile sticky bar */
-.dat-ban-mobile-sticky-bar {
-  display: none; position: fixed; bottom: 0; left: 0; right: 0;
-  padding: 0.8rem 1rem; background: #fff; border-top: 1px solid var(--line);
-  box-shadow: 0 -4px 12px rgba(0,0,0,0.06); z-index: 30;
-}
-.dat-ban-mobile-sticky-bar .btn { width: 100%; }
-
-/* Booking notes & special requests */
-.dat-ban-notes-section { padding: 1.2rem 1.5rem; }
-.dat-ban-notes-section h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.8rem;
-}
-.dat-ban-notes-section textarea {
-  width: 100%; min-height: 80px; padding: 0.7rem 0.9rem;
-  border: 1.5px solid var(--line); border-radius: var(--radius-md);
-  font-size: 0.88rem; resize: vertical; font-family: inherit;
-}
-.dat-ban-notes-section textarea:focus {
-  outline: none; border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(230,120,90,0.12);
+.dat-ban-customer-empty-state p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: rgba(78, 60, 47, 0.84);
 }
 
-/* Booking summary panel */
-.dat-ban-tom-tat-panel {
-  padding: 1.2rem 1.5rem; background: var(--surface);
-  border-top: 1px solid var(--line-light);
+.dat-ban-customer-chip-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
 }
-.dat-ban-tom-tat-panel h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.6rem;
-}
-.dat-ban-tom-tat-row {
-  display: flex; justify-content: space-between;
-  font-size: 0.82rem; padding: 0.3rem 0;
-}
-.dat-ban-tom-tat-row .label { color: var(--text-muted); }
-.dat-ban-tom-tat-row .value { font-weight: 600; color: var(--text-primary); }
 
-/* Booking error/validation */
-.dat-ban-error { 
-  color: #dc2626; font-size: 0.78rem; margin-top: 0.3rem;
+.dat-ban-customer-note-chip,
+.dat-ban-voucher-owned-item {
+  border: 1px solid rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.78);
+  color: #5f4b39;
+  cursor: pointer;
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
 }
-.dat-ban-field-error { border-color: #dc2626 !important; }
+
+.dat-ban-customer-note-chip {
+  min-height: 2rem;
+  padding: 0 0.82rem;
+  border-radius: 999px;
+  font-size: 0.74rem;
+  font-weight: 600;
+}
+
+.dat-ban-field-meta-row,
+.dat-ban-voucher-row,
+.dat-ban-success-actions,
+.dat-ban-success-contact-grid {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.dat-ban-customer-counter {
+  white-space: nowrap;
+}
+
+.dat-ban-voucher-card,
+.dat-ban-review-card,
+.dat-ban-review-notes,
+.dat-ban-success-ticket,
+.dat-ban-success-map-card {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem;
+  border: 1px solid rgba(127, 98, 74, 0.1);
+  background: rgba(250, 247, 244, 0.92);
+}
+
+.dat-ban-voucher-owned-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.dat-ban-voucher-owned-item {
+  display: grid;
+  grid-template-columns: auto 1fr;
+  gap: 0.65rem;
+  padding: 0.85rem 0.9rem;
+  text-align: left;
+}
+
+.dat-ban-voucher-owned-item strong {
+  display: block;
+  margin-bottom: 0.15rem;
+  color: #281811;
+}
+
+.dat-ban-voucher-owned-item p,
+.dat-ban-review-notes ul {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.7;
+  color: rgba(78, 60, 47, 0.84);
+}
+
+.dat-ban-voucher-success {
+  margin: 0;
+  padding: 0.7rem 0.85rem;
+  border: 1px solid rgba(232, 102, 74, 0.22);
+  background: rgba(253, 241, 236, 0.96);
+  color: #c7583d;
+  font-size: 0.84rem;
+  line-height: 1.7;
+}
+
+.dat-ban-voucher-row input {
+  flex: 1;
+}
+
+.dat-ban-step-two-input:focus,
+.dat-ban-step-two-textarea:focus {
+  border-color: #E8664A;
+  box-shadow: 0 0 0 3px rgba(232, 102, 74, 0.14);
+}
+
+.dat-ban-step-two-primary-btn:hover:not(:disabled) {
+  background: #d85f44;
+  border-color: #d85f44;
+  box-shadow: 0 4px 14px rgba(232, 102, 74, 0.25);
+}
+
+.dat-ban-step-two-primary-btn:disabled {
+  background: rgba(232, 102, 74, 0.58);
+  border-color: rgba(232, 102, 74, 0.58);
+  color: rgba(255, 255, 255, 0.92);
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.dat-ban-step-two-secondary-btn:hover {
+  border-color: #E8664A;
+  color: #E8664A;
+}
+
+.dat-ban-review-grid {
+  align-items: stretch;
+}
+
+.dat-ban-review-grid > * {
+  flex: 1;
+}
+
+.dat-ban-review-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.dat-ban-review-actions {
+  justify-content: flex-end;
+}
+
+.dat-ban-review-notes ul {
+  padding-left: 1.1rem;
+}
+
+.dat-ban-success-screen {
+  gap: 1.25rem;
+  padding: 1.5rem;
+}
+
+.dat-ban-success-hero {
+  display: grid;
+  justify-items: center;
+  gap: 0.5rem;
+  text-align: center;
+}
+
+.dat-ban-success-emoji {
+  font-size: 2.6rem;
+}
+
+.dat-ban-success-hero p {
+  max-width: 42rem;
+}
+
+.dat-ban-success-ticket {
+  justify-items: center;
+  text-align: center;
+}
+
+.dat-ban-success-ticket span,
+.dat-ban-success-map-card p {
+  font-size: 0.92rem;
+  color: rgba(78, 60, 47, 0.84);
+}
+
+.dat-ban-success-contact-grid {
+  align-items: stretch;
+}
+
+.dat-ban-success-contact-grid > div {
+  flex: 1;
+  display: grid;
+  gap: 0.25rem;
+  padding: 1rem;
+  border: 1px solid rgba(127, 98, 74, 0.1);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.dat-ban-success-map-card {
+  grid-template-columns: 1fr auto;
+  align-items: center;
+}
+
+.dat-ban-success-actions {
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+@media (max-width: 1080px) {
+  .dat-ban-customer-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .dat-ban-customer-summary-card {
+    position: static;
+  }
+}
+
+@media (max-width: 900px) {
+  .dat-ban-guest-grid,
+  .dat-ban-date-quick-row,
+  .dat-ban-time-slot-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .dat-ban-area-grid,
+  .dat-ban-review-grid,
+  .dat-ban-success-contact-grid,
+  .dat-ban-success-map-card {
+    grid-template-columns: 1fr;
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 760px) {
+  .dat-ban-customer-control-head,
+  .dat-ban-flow-section-head,
+  .dat-ban-time-period-head,
+  .dat-ban-field-meta-row,
+  .dat-ban-voucher-row,
+  .dat-ban-review-actions,
+  .dat-ban-success-actions,
+  .dat-ban-success-contact-grid {
+    align-items: start;
+    flex-direction: column;
+  }
+
+  .dat-ban-guest-grid,
+  .dat-ban-date-quick-row,
+  .dat-ban-time-slot-grid,
+  .dat-ban-area-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .dat-ban-page-customer .section-head h2,
+  .dat-ban-customer-control-head h2,
+  .dat-ban-customer-summary-card h2,
+  .dat-ban-success-hero h2 {
+    max-width: none;
+    font-size: 1.9rem;
+  }
+}
+
+@media (max-width: 520px) {
+  .dat-ban-customer-card,
+  .dat-ban-customer-summary-card,
+  .dat-ban-success-screen {
+    padding: 1rem;
+  }
+
+  .dat-ban-guest-grid,
+  .dat-ban-date-quick-row,
+  .dat-ban-time-slot-grid,
+  .dat-ban-area-grid {
+    grid-template-columns: 1fr;
+  }
+}

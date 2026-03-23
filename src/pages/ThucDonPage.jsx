@@ -29,7 +29,7 @@ const KHOANG_CAN_DINH_TAB = 120
 
 function ThucDonPage() {
   const [activeCategory, setActiveCategory] = useState(CAC_TAB_THUC_DON[0])
-  const { dishes, loading, error, reloadDishes } = useDanhSachMonAn()
+  const { dishes, daTaiLanDau, error, reloadDishes } = useDanhSachMonAn()
   const { themVaoGio } = useGioHang()
   const danhMucRefs = useRef({})
   const {
@@ -85,8 +85,10 @@ function ThucDonPage() {
 
   const hasSourceDishes = dishes.length > 0
   const hasLoadError = Boolean(error)
-  const isEmptyState = !loading && !hasLoadError && !hasSourceDishes
-  const isNoResultState = !loading && !hasLoadError && hasSourceDishes && cacSectionDanhMuc.length === 0
+  const isEmptyState = daTaiLanDau && !hasLoadError && !hasSourceDishes
+  const isNoResultState = daTaiLanDau && hasSourceDishes && cacSectionDanhMuc.length === 0
+  const shouldShowErrorState = daTaiLanDau && hasLoadError && !hasSourceDishes
+  const shouldShowMenu = hasSourceDishes && !isNoResultState
 
   useEffect(() => {
     if (!cacSectionDanhMuc.length) {
@@ -173,20 +175,7 @@ function ThucDonPage() {
 
           </div>
 
-          {loading ? (
-            <div className="thuc-don-empty thuc-don-state-card thuc-don-state-card--loading" aria-label="Trạng thái thực đơn">
-              <div className="thuc-don-state-skeleton" aria-hidden="true">
-                <span />
-                <span />
-                <span />
-              </div>
-              <p className="thuc-don-state-kicker">Đang tải dữ liệu</p>
-              <h3>Thực đơn đang được chuẩn bị.</h3>
-              <p>Chúng tôi đang sắp xếp danh sách món để bạn xem thuận mắt hơn.</p>
-            </div>
-          ) : null}
-
-          {!loading && hasLoadError ? (
+          {shouldShowErrorState ? (
             <div className="thuc-don-empty thuc-don-state-card" aria-label="Trạng thái thực đơn">
               <p className="thuc-don-state-kicker">Không thể tải thực đơn</p>
               <h3>{error}</h3>
@@ -213,40 +202,38 @@ function ThucDonPage() {
             </div>
           ) : null}
 
-          {!loading && !hasLoadError && !isEmptyState && !isNoResultState ? (
-            <>
-              <div className="thuc-don-sections" aria-label="Danh sách món ăn theo danh mục">
-                {cacSectionDanhMuc.map((section) => (
-                  <section
-                    key={section.category}
-                    ref={(phanTu) => {
-                      danhMucRefs.current[section.category] = phanTu
-                    }}
-                    className="thuc-don-category-section"
-                    data-category={section.category}
-                  >
-                    <div className="thuc-don-results-head thuc-don-results-head--minimal thuc-don-results-head--section">
-                      <div>
-                        <p className="thuc-don-results-kicker">Danh mục</p>
-                        <h3>{section.label}</h3>
-                      </div>
+          {shouldShowMenu ? (
+            <div className="thuc-don-sections" aria-label="Danh sách món ăn theo danh mục">
+              {cacSectionDanhMuc.map((section) => (
+                <section
+                  key={section.category}
+                  ref={(phanTu) => {
+                    danhMucRefs.current[section.category] = phanTu
+                  }}
+                  className="thuc-don-category-section"
+                  data-category={section.category}
+                >
+                  <div className="thuc-don-results-head thuc-don-results-head--minimal thuc-don-results-head--section">
+                    <div>
+                      <p className="thuc-don-results-kicker">Danh mục</p>
+                      <h3>{section.label}</h3>
                     </div>
+                  </div>
 
-                    <div className="thuc-don-grid thuc-don-grid--menu-showcase">
-                      {section.dishes.map((dish) => (
-                        <TheMonAn
-                          key={dish.id}
-                          dish={dish}
-                          variant="menu"
-                          xuLyThemVaoGio={xuLyThemMonNhanh}
-                          onOpenDetail={moChiTietMon}
-                        />
-                      ))}
-                    </div>
-                  </section>
-                ))}
-              </div>
-            </>
+                  <div className="thuc-don-grid thuc-don-grid--menu-showcase">
+                    {section.dishes.map((dish) => (
+                      <TheMonAn
+                        key={dish.id}
+                        dish={dish}
+                        variant="menu"
+                        xuLyThemVaoGio={xuLyThemMonNhanh}
+                        onOpenDetail={moChiTietMon}
+                      />
+                    ))}
+                  </div>
+                </section>
+              ))}
+            </div>
           ) : null}
         </div>
       </section>
