@@ -3,11 +3,30 @@ import { useNavigate } from 'react-router-dom'
 import { useGioHang } from '../context/GioHangContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useThongBao } from '../context/ThongBaoContext'
-import { dinhDangTienTe } from '../utils/tienTe'
+import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
 import { taoDonHangApi } from '../services/api/apiDonHang'
 import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung } from '../services/dichVuPhieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
+
+const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
+
+const tinhSoTienGiam = (voucher, tamTinh, phiDichVu) => {
+  if (!voucher) {
+    return 0
+  }
+
+  const phanTramGiam = Number(voucher.discountPercent || 0)
+  const soTienGiamTamTinh = phanTramGiam > 0
+    ? Math.round((tamTinh * phanTramGiam) / 100)
+    : Number(voucher.amount || 0)
+
+  if (!Number.isFinite(soTienGiamTamTinh) || soTienGiamTamTinh <= 0) {
+    return 0
+  }
+
+  return Math.min(soTienGiamTamTinh, tamTinh + phiDichVu)
+}
 
 function ThanhToanPage() {
   const navigate = useNavigate()
@@ -23,7 +42,7 @@ function ThanhToanPage() {
     tableNumber: '',
     paymentMethod: 'TIEN_MAT',
   })
-  const [appliedVoucher, luuPhieuGiamGiaDaApDung] = useState(null)
+  const [appliedVoucher, setAppliedVoucher] = useState(null)
 
   useEffect(() => {
     const voucher = layPhieuGiamGiaDaApDung()
@@ -31,15 +50,15 @@ function ThanhToanPage() {
     if (!voucher) {
       xoaPhieuGiamGiaDaApDung()
     } else {
-      luuPhieuGiamGiaDaApDung(voucher)
+      setAppliedVoucher(voucher)
     }
 
     const banNhapTam = layBanNhapTamThanhToan()
     if (banNhapTam) {
       setFormData((prev) => ({
         ...prev,
-        note: banNhapTam.note,
-        tableNumber: banNhapTam.tableNumber,
+        note: String(banNhapTam.note ?? '').slice(0, 300),
+        tableNumber: '',
       }))
     }
   }, [])
@@ -49,21 +68,24 @@ function ThanhToanPage() {
     [cartItems],
   )
 
-  const serviceFee = 0
-  const discountAmount = appliedVoucher ? Math.min(appliedVoucher.amount, subtotal) : 0
+  const serviceFee = tinhPhiDichVu(subtotal)
+  const discountAmount = tinhSoTienGiam(appliedVoucher, subtotal, serviceFee)
   const tongCong = Math.max(0, subtotal + serviceFee - discountAmount)
 
   const handleChange = (event) => {
     const { name, value } = event.target
+    const giaTriDaChuanHoa = name === 'note' ? value.slice(0, 300) : value
+
     setFormData((prev) => {
       const nextFormData = {
         ...prev,
-        [name]: value,
+        [name]: giaTriDaChuanHoa,
+        tableNumber: '',
       }
 
       luuBanNhapTamThanhToan({
         note: nextFormData.note,
-        tableNumber: nextFormData.tableNumber,
+        tableNumber: '',
       })
 
       return nextFormData
@@ -127,7 +149,7 @@ function ThanhToanPage() {
         <div className="thanh-toan-header">
           <p className="thanh-toan-kicker">Hoàn tất đơn gọi món</p>
           <h1>Thanh toán đơn hàng</h1>
-          <p>Kiểm tra thông tin liên hệ, vị trí phục vụ và phương thức thanh toán trước khi hoàn tất đơn của bạn.</p>
+          <p>Kiểm tra thông tin liên hệ, ghi chú cho bếp và xác nhận phương thức thanh toán trước khi hoàn tất đơn hàng.</p>
         </div>
 
         <form className="thanh-toan-layout" onSubmit={handleSubmit}>
@@ -144,7 +166,7 @@ function ThanhToanPage() {
                   name="fullName"
                   type="text"
                   className="truong-nhap"
-                  placeholder="Nhập họ tên người đặt / nhận món"
+                  placeholder="Nhập họ tên người đặt hoặc người nhận món"
                   value={formData.fullName}
                   onChange={handleChange}
                   required
@@ -182,19 +204,10 @@ function ThanhToanPage() {
                 />
               </div>
 
-              <div className="nhom-truong">
-                <label className="nhan-truong" htmlFor="tableNumber">
-                  Số bàn
-                </label>
-                <input
-                  id="tableNumber"
-                  name="tableNumber"
-                  type="text"
-                  className="truong-nhap"
-                  placeholder="Nhập số bàn (nếu có)"
-                  value={formData.tableNumber}
-                  onChange={handleChange}
-                />
+              <div className="nhom-truong full">
+                <div className="gio-hang-table-note-box thanh-toan-table-note-box">
+                  <p>Nhân viên sẽ hướng dẫn bạn đến bàn khi đến nhà hàng.</p>
+                </div>
               </div>
 
               <div className="nhom-truong full">
@@ -205,11 +218,13 @@ function ThanhToanPage() {
                   id="note"
                   name="note"
                   className="truong-van-ban"
-                  placeholder="Ví dụ: không hành, ít cay..."
+                  placeholder="Dị ứng thực phẩm, yêu cầu đặc biệt về món ăn, hoặc ghi chú khác cho bếp..."
                   rows="4"
+                  maxLength={300}
                   value={formData.note}
                   onChange={handleChange}
                 />
+                <div className="gio-hang-note-counter thanh-toan-note-counter">{formData.note.length}/300</div>
               </div>
             </div>
 
@@ -245,12 +260,12 @@ function ThanhToanPage() {
                 <div className="thanh-toan-item-list">
                   {cartItems.map((item, index) => {
                     const itemKey =
-                        typeof layKhoaMonTrongGio === 'function'
-                         ? layKhoaMonTrongGio(item)
+                      typeof layKhoaMonTrongGio === 'function'
+                        ? layKhoaMonTrongGio(item)
                         : `${item.id}-${index}`
                     const optionLines =
-                       typeof layTuyChonHienThiMon === 'function'
-                         ? layTuyChonHienThiMon(item)
+                      typeof layTuyChonHienThiMon === 'function'
+                        ? layTuyChonHienThiMon(item)
                         : []
 
                     return (
@@ -266,7 +281,7 @@ function ThanhToanPage() {
                           )}
                           <p className="thanh-toan-item-qty">x{item.quantity}</p>
                         </div>
-                        <strong>{dinhDangTienTe(item.price * item.quantity)}</strong>
+                        <strong>{dinhDangTienTeVietNam(item.price * item.quantity)}</strong>
                       </div>
                     )
                   })}
@@ -276,27 +291,27 @@ function ThanhToanPage() {
               <div className="thanh-toan-totals">
                 <div className="tom-tat-row">
                   <span>Tạm tính món</span>
-                  <span>{dinhDangTienTe(subtotal)}</span>
+                  <span>{dinhDangTienTeVietNam(subtotal)}</span>
                 </div>
                 <div className="tom-tat-row">
-                  <span>Phí dịch vụ tham chiếu</span>
-                  <span>{dinhDangTienTe(serviceFee)}</span>
+                  <span>Phí dịch vụ (5%)</span>
+                  <span>{dinhDangTienTeVietNam(serviceFee)}</span>
                 </div>
                 <div className="tom-tat-row tom-tat-discount">
-                  <span>Ước tính giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
-                  <span>-{dinhDangTienTe(discountAmount)}</span>
+                  <span>Giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
+                  <span>-{dinhDangTienTeVietNam(discountAmount)}</span>
                 </div>
                 <div className="tom-tat-row tom-tat-total">
-                  <span>Tổng ước tính</span>
-                  <strong>{dinhDangTienTe(tongCong)}</strong>
+                  <span>Tổng cộng</span>
+                  <strong>{dinhDangTienTeVietNam(tongCong)}</strong>
                 </div>
               </div>
 
               <p className="thanh-toan-tom-tat-note">
-                Tổng tiền cuối cùng sẽ do máy chủ xác nhận khi tạo đơn hàng từ dữ liệu thực đơn hiện tại.
+                Tổng tiền cuối cùng sẽ được xác nhận khi đơn hàng được tạo từ dữ liệu thực đơn hiện tại.
               </p>
 
-              <button type="submit" className="btn nut-chinh w-full" disabled={cartItems.length === 0}>
+              <button type="submit" className="btn gio-hang-checkout-btn w-full" disabled={cartItems.length === 0}>
                 Đặt hàng ngay
               </button>
             </div>

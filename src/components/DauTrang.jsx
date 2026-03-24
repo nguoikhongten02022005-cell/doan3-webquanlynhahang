@@ -48,10 +48,9 @@ function DauTrang() {
   }
 
   const isActive = (to) => pathname === to
-  const isWarmHeaderPage = pathname === '/' || pathname === '/thuc-don' || pathname === '/dat-ban'
 
   return (
-    <header className={isWarmHeaderPage ? 'site-header site-header--home' : 'site-header'}>
+    <header className="site-header">
       <div className="container">
         <Link to="/" className="brand" onClick={handleNavLinkClick}>
           <span className="brand-mark">NH</span>

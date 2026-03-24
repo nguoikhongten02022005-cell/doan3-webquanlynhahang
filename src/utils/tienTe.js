@@ -1,5 +1,8 @@
-export const dinhDangTienTe = (value) => {
+const chuanHoaGiaTriTien = (value) => {
   const amount = Number(value)
-  const safeAmount = Number.isFinite(amount) ? amount : 0
-  return `${safeAmount.toLocaleString('vi-VN')}₫`
+  return Number.isFinite(amount) ? amount : 0
 }
+
+export const dinhDangTienTe = (value) => `${chuanHoaGiaTriTien(value).toLocaleString('vi-VN')}₫`
+
+export const dinhDangTienTeVietNam = (value) => `${chuanHoaGiaTriTien(value).toLocaleString('vi-VN')}đ`

@@ -1,6 +1,8 @@
 /* AUTH PAGES */
 .xac-thuc-page {
-  min-height: 100vh; display: grid; place-items: center;
+  min-height: calc(100vh - 79px);
+  display: grid;
+  place-items: start center;
   padding: 2rem;
   background: linear-gradient(135deg, var(--bg) 0%, var(--surface-warm) 100%);
 }
@@ -30,6 +32,15 @@
   outline: none; border-color: var(--primary);
   box-shadow: 0 0 0 3px rgba(26,107,74,0.08);
 }
+.truong-nhap[type='number'] {
+  appearance: textfield;
+  -moz-appearance: textfield;
+}
+.truong-nhap[type='number']::-webkit-outer-spin-button,
+.truong-nhap[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 .loi-bieu-mau {
   font-size: 0.72rem; color: #dc2626; margin-top: 0.15rem;
 }
@@ -37,102 +48,560 @@
 .xac-thuc-card p { text-align: center; font-size: 0.85rem; color: var(--text-secondary); margin-top: 1rem; }
 .xac-thuc-card p a { color: var(--primary); font-weight: 600; }
 .xac-thuc-card p a:hover { text-decoration: underline; }
-
-/* CART PAGE */
-.gio-hang-page { padding: 2rem 0 4rem; min-height: 70vh; }
-.gio-hang-page h1 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 2rem; font-weight: 600; color: var(--dark); margin-bottom: 1.5rem;
+.xac-thuc-demo-note {
+  margin-top: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid #E5E0DB;
+  background: #FAF7F4;
+  text-align: left;
 }
-.gio-hang-layout {
-  display: grid; grid-template-columns: 1fr 360px; gap: 2rem; align-items: start;
+.xac-thuc-demo-note strong {
+  display: block;
+  margin-bottom: 0.45rem;
+  color: var(--dark);
+  font-size: 0.92rem;
 }
-.gio-hang-item {
-  display: grid; grid-template-columns: 80px 1fr auto;
-  gap: 1rem; align-items: center; padding: 1rem;
-  border: 1px solid var(--line-light); border-radius: var(--radius-lg);
-  background: #fff; margin-bottom: 0.8rem;
-}
-.gio-hang-item img {
-  width: 80px; height: 80px; border-radius: var(--radius-md); object-fit: cover;
-}
-.gio-hang-item h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1rem; font-weight: 700; color: var(--dark);
-}
-.gio-hang-item .price { color: var(--primary); font-weight: 600; font-size: 0.95rem; }
-.quantity-control {
-  display: inline-flex; align-items: center; gap: 0.1rem;
-  border: 1px solid var(--line); border-radius: var(--radius-md);
-  overflow: hidden;
-}
-.qty-btn {
-  width: 2rem; height: 2rem; border: none; background: transparent;
-  cursor: pointer; display: grid; place-items: center;
-  font-size: 0.9rem; color: var(--text-primary); transition: background 0.2s;
-}
-.qty-btn:hover { background: var(--surface-soft); }
-.quantity-control span {
-  min-width: 2rem; text-align: center; font-size: 0.88rem; font-weight: 600;
-}
-.remove-btn {
-  background: none; border: none; color: var(--text-muted);
-  cursor: pointer; font-size: 0.8rem; padding: 0.3rem 0.5rem;
-  border-radius: var(--radius-sm); transition: all 0.2s;
-}
-.remove-btn:hover { color: #dc2626; background: #fef2f0; }
-
-/* Cart summary */
-.tom-tat-card {
-  background: #fff; border: 1px solid var(--line);
-  border-radius: var(--radius-xl); padding: 1.5rem;
-  position: sticky; top: 90px;
-}
-.tom-tat-card h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.2rem; font-weight: 700; color: var(--dark); margin-bottom: 1rem;
-  padding-bottom: 0.7rem; border-bottom: 1px solid var(--line-light);
-}
-.gio-hang-summary { display: flex; flex-direction: column; gap: 0.5rem; }
-.gio-hang-summary .row {
-  display: flex; justify-content: space-between; font-size: 0.88rem;
+.xac-thuc-demo-note p {
+  margin: 0.2rem 0 0;
+  text-align: left;
+  font-size: 0.82rem;
   color: var(--text-secondary);
 }
-.gio-hang-summary .row.total {
-  font-weight: 700; font-size: 1.05rem; color: var(--dark);
-  padding-top: 0.7rem; border-top: 1px solid var(--line-light); margin-top: 0.3rem;
+.xac-thuc-demo-note span {
+  color: #E8664A;
+  font-weight: 700;
 }
-.gio-hang-summary .btn { width: 100%; margin-top: 1rem; }
+.xac-thuc-demo-note--centered,
+.xac-thuc-demo-note--centered p {
+  text-align: center;
+}
+.xac-thuc-card-demo-only {
+  max-width: 32rem;
+}
 
-/* Voucher */
-.voucher-section { margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--line-light); }
-.voucher-input-row { display: flex; gap: 0.5rem; }
-.voucher-input {
-  flex: 1; padding: 0.55rem 0.8rem; border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); font-size: 0.85rem;
+/* CART PAGE */
+.gio-hang-page {
+  padding: 0 0 4rem;
+  min-height: 70vh;
 }
-.voucher-input:focus { outline: none; border-color: var(--primary); }
-.voucher-apply-btn {
-  padding: 0.55rem 1rem; border: none; border-radius: var(--radius-md);
-  background: var(--primary); color: #fff; font-size: 0.8rem;
-  font-weight: 600; cursor: pointer; transition: background 0.2s;
+.gio-hang-page .gio-hang-header {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
 }
-.voucher-apply-btn:hover { background: #15573d; }
-.voucher-message { font-size: 0.75rem; margin-top: 0.4rem; }
-.voucher-message.success { color: var(--primary); }
-.voucher-message.error { color: #dc2626; }
-.voucher-applied {
-  display: flex; align-items: center; justify-content: space-between;
-  background: var(--primary-bg); border: 1px solid var(--primary-light);
-  border-radius: var(--radius-md); padding: 0.5rem 0.8rem; margin-top: 0.5rem;
+.gio-hang-page h1 {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--dark);
+  margin: 0;
 }
-.voucher-applied span { font-size: 0.82rem; color: var(--primary); font-weight: 600; }
-.voucher-remove-btn {
-  background: none; border: none; color: var(--text-muted);
-  cursor: pointer; font-size: 0.75rem;
+.gio-hang-page .gio-hang-header p:last-child {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 40rem;
 }
-.voucher-remove-btn:hover { color: #dc2626; }
-.gio-hang-empty {
-  text-align: center; padding: 3rem; color: var(--text-muted);
+.gio-hang-page .gio-hang-layout {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 360px;
+  gap: 2rem;
+  align-items: start;
 }
-.gio-hang-empty p { font-size: 1rem; margin-bottom: 1rem; }
+.gio-hang-page .gio-hang-items-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+.gio-hang-page .gio-hang-list-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.gio-hang-page .gio-hang-list-head h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  color: var(--dark);
+}
+.gio-hang-page .gio-hang-list-head span {
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--text-muted);
+}
+.gio-hang-page .gio-hang-empty {
+  text-align: center;
+  padding: 3rem;
+  color: var(--text-muted);
+  background: #fff;
+  border: 1px solid #E5E0DB;
+  border-radius: 1.5rem;
+}
+.gio-hang-page .gio-hang-empty p {
+  font-size: 1rem;
+  margin-bottom: 1rem;
+}
+.gio-hang-page .gio-hang-item-list {
+  background: #fff;
+  border: 1px solid #E5E0DB;
+  border-radius: 1.5rem;
+  overflow: hidden;
+}
+.gio-hang-page .gio-hang-item {
+  display: grid;
+  grid-template-columns: 80px minmax(0, 1fr);
+  gap: 1rem;
+  align-items: start;
+  padding: 1rem;
+  margin: 0;
+  background: transparent;
+  border: 0;
+  border-radius: 0;
+}
+.gio-hang-page .gio-hang-item + .gio-hang-item {
+  border-top: 1px solid #E5E0DB;
+}
+.gio-hang-page .gio-hang-item-media {
+  width: 80px;
+  height: 80px;
+}
+.gio-hang-page .gio-hang-item-image {
+  width: 80px;
+  height: 80px;
+  border-radius: 8px;
+  object-fit: cover;
+  display: block;
+  background: #FAF7F4;
+}
+.gio-hang-page .gio-hang-item-image-placeholder {
+  display: grid;
+  place-items: center;
+  border: 1px solid #E5E0DB;
+  color: var(--accent-strong);
+  font-size: 1.2rem;
+  font-weight: 700;
+}
+.gio-hang-page .gio-hang-item-content {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.gio-hang-page .gio-hang-item-top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.85rem;
+}
+.gio-hang-page .gio-hang-item-copy {
+  min-width: 0;
+}
+.gio-hang-page .gio-hang-item h3 {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.gio-hang-page .gio-hang-item-description {
+  margin: 0.3rem 0 0;
+  font-size: 0.88rem;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.gio-hang-page .gio-hang-item-bottom {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+}
+.gio-hang-page .quantity-control {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.1rem;
+  border: 1px solid #E5E0DB;
+  border-radius: 999px;
+  overflow: hidden;
+  background: #FAF7F4;
+}
+.gio-hang-page .qty-btn {
+  width: 2.2rem;
+  height: 2.2rem;
+  border: none;
+  background: transparent;
+  cursor: pointer;
+  display: grid;
+  place-items: center;
+  font-size: 1rem;
+  color: var(--text-primary);
+  transition: background 0.2s;
+}
+.gio-hang-page .qty-btn:hover {
+  background: rgba(232, 102, 74, 0.08);
+}
+.gio-hang-page .qty-value {
+  min-width: 2rem;
+  text-align: center;
+  font-size: 0.92rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.gio-hang-page .gio-hang-item-total {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+  white-space: nowrap;
+}
+.gio-hang-page .gio-hang-remove-btn {
+  width: 2.25rem;
+  height: 2.25rem;
+  display: grid;
+  place-items: center;
+  padding: 0;
+  border-radius: 999px;
+}
+.gio-hang-page .remove-btn {
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.8rem;
+  transition: all 0.2s;
+}
+.gio-hang-page .remove-btn:hover {
+  color: #dc2626;
+  background: #fef2f0;
+}
+.gio-hang-page .gio-hang-remove-btn svg {
+  width: 1rem;
+  height: 1rem;
+}
+.gio-hang-page .gio-hang-summary {
+  display: flex;
+  flex-direction: column;
+}
+.gio-hang-page .tom-tat-card {
+  background: #fff;
+  border: 1px solid #E5E0DB;
+  border-radius: 1.5rem;
+  padding: 1.5rem;
+  position: sticky;
+  top: 90px;
+  box-shadow: var(--shadow-sm);
+}
+.gio-hang-page .tom-tat-card h2 {
+  margin: 0 0 1.25rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1.45rem;
+  color: var(--dark);
+}
+.gio-hang-page .voucher-block {
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid #E5E0DB;
+}
+.gio-hang-page .voucher-header h3 {
+  margin: 0 0 0.25rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--dark);
+}
+.gio-hang-page .voucher-header p {
+  margin: 0 0 0.75rem;
+  font-size: 0.8rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.gio-hang-page .voucher-controls {
+  display: flex;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+.gio-hang-page .voucher-input {
+  flex: 1;
+  min-width: 12rem;
+}
+.gio-hang-page .voucher-apply-btn {
+  min-width: 7rem;
+}
+.gio-hang-page .voucher-clear-btn {
+  font-size: 0.78rem;
+  padding: 0.55rem 0.9rem;
+}
+.gio-hang-page .voucher-message {
+  margin: 0.65rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.5;
+}
+.gio-hang-page .voucher-message.success { color: #1f7a47; }
+.gio-hang-page .voucher-message.error { color: #d24b31; }
+.gio-hang-page .voucher-apply-btn:disabled {
+  opacity: 0.7;
+  cursor: wait;
+}
+.gio-hang-page .tom-tat-row,
+.thanh-toan-page .tom-tat-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  padding: 0.4rem 0;
+}
+.gio-hang-page .tom-tat-discount,
+.thanh-toan-page .tom-tat-discount {
+  color: #d24b31;
+}
+.gio-hang-page .tom-tat-divider {
+  height: 1px;
+  background: #E5E0DB;
+  margin: 0.5rem 0;
+}
+.gio-hang-page .tom-tat-total,
+.thanh-toan-page .tom-tat-total {
+  font-weight: 700;
+  font-size: 1.05rem;
+  color: var(--dark);
+  padding-top: 0.65rem;
+  border-top: 1px solid #E5E0DB;
+  margin-top: 0.2rem;
+}
+.gio-hang-page .thanh-toan-tom-tat-note,
+.thanh-toan-page .thanh-toan-tom-tat-note {
+  margin: 1rem 0 0;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  color: var(--text-muted);
+}
+.gio-hang-page .tom-tat-form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+.gio-hang-page .gio-hang-table-note-box,
+.thanh-toan-page .gio-hang-table-note-box {
+  padding: 0.85rem 1rem;
+  border-radius: 1rem;
+  border: 1px solid #E5E0DB;
+  background: #FAF7F4;
+}
+.gio-hang-page .gio-hang-table-note-box p,
+.thanh-toan-page .gio-hang-table-note-box p {
+  margin: 0;
+  font-size: 0.84rem;
+  line-height: 1.55;
+  color: var(--text-muted);
+}
+.gio-hang-page .gio-hang-note-counter,
+.thanh-toan-page .gio-hang-note-counter {
+  text-align: right;
+  font-size: 0.78rem;
+  color: var(--text-muted);
+}
+.gio-hang-page .gio-hang-checkout-btn,
+.thanh-toan-page .gio-hang-checkout-btn {
+  width: 100%;
+  margin-top: 1.2rem;
+  border-color: #E8664A;
+}
+.gio-hang-page .gio-hang-checkout-btn:not(:disabled),
+.thanh-toan-page .gio-hang-checkout-btn:not(:disabled) {
+  background: #E8664A;
+  border-color: #E8664A;
+  color: #fff;
+}
+.gio-hang-page .gio-hang-checkout-btn:not(:disabled):hover,
+.thanh-toan-page .gio-hang-checkout-btn:not(:disabled):hover {
+  background: #d95a3f;
+  border-color: #d95a3f;
+  box-shadow: 0 12px 24px rgba(232, 102, 74, 0.22);
+}
+.gio-hang-page .gio-hang-checkout-btn:disabled,
+.thanh-toan-page .gio-hang-checkout-btn:disabled {
+  background: #d8d2cb;
+  border-color: #d8d2cb;
+  color: #fff;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+.gio-hang-page .gio-hang-checkout-helper {
+  margin: 0.5rem 0 0;
+  font-size: 0.78rem;
+  line-height: 1.5;
+  color: var(--text-muted);
+  text-align: center;
+}
+
+/* CHECKOUT PAGE SUPPORT */
+.thanh-toan-page .thanh-toan-header {
+  display: grid;
+  gap: 0.5rem;
+  margin-bottom: 1.75rem;
+}
+.thanh-toan-page .thanh-toan-header p:last-child {
+  margin: 0;
+  font-size: 0.94rem;
+  line-height: 1.65;
+  color: var(--text-muted);
+  max-width: 40rem;
+}
+.thanh-toan-page .thanh-toan-note-counter {
+  margin-top: 0.2rem;
+}
+.thanh-toan-page .thanh-toan-item-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+.thanh-toan-page .thanh-toan-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 0.65rem 0;
+}
+.thanh-toan-page .thanh-toan-item-name {
+  margin: 0;
+  font-weight: 700;
+  color: var(--dark);
+}
+.thanh-toan-page .thanh-toan-item-options {
+  font-size: 0.78rem;
+  color: var(--text-muted);
+  margin-top: 0.2rem;
+}
+.thanh-toan-page .thanh-toan-item-options p,
+.thanh-toan-page .thanh-toan-item-qty {
+  margin: 0;
+}
+.thanh-toan-page .thanh-toan-item-qty {
+  margin-top: 0.2rem;
+  font-size: 0.8rem;
+  color: var(--text-muted);
+}
+
+/* RESPONSIVE */
+@media (max-width: 960px) {
+  .gio-hang-page {
+    padding: 0 0 3rem;
+  }
+
+  .gio-hang-page .gio-hang-layout {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+
+  .gio-hang-page .tom-tat-card {
+    position: static;
+  }
+}
+
+@media (max-width: 640px) {
+  .xac-thuc-page {
+    min-height: calc(100vh - 60px);
+    padding: 1.5rem 1rem 2rem;
+  }
+
+  .gio-hang-page {
+    padding: 0 0 2.5rem;
+  }
+
+  .gio-hang-page h1,
+  .thanh-toan-page h1 {
+    font-size: 1.75rem;
+  }
+
+  .gio-hang-page .gio-hang-header,
+  .thanh-toan-page .thanh-toan-header {
+    margin-bottom: 1.25rem;
+  }
+
+  .gio-hang-page .gio-hang-list-head,
+  .gio-hang-page .gio-hang-item-bottom,
+  .thanh-toan-page .thanh-toan-item {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .gio-hang-page .gio-hang-list-head {
+    gap: 0.35rem;
+  }
+
+  .gio-hang-page .gio-hang-item-list,
+  .gio-hang-page .gio-hang-empty,
+  .gio-hang-page .tom-tat-card,
+  .thanh-toan-page .thanh-toan-tom-tat-card {
+    border-radius: 1.2rem;
+  }
+
+  .gio-hang-page .gio-hang-item {
+    grid-template-columns: 1fr;
+    gap: 0.85rem;
+    padding: 0.9rem;
+  }
+
+  .gio-hang-page .gio-hang-item-media {
+    width: 100%;
+    height: auto;
+  }
+
+  .gio-hang-page .gio-hang-item-image,
+  .gio-hang-page .gio-hang-item-image-placeholder {
+    width: 80px;
+    height: 80px;
+  }
+
+  .gio-hang-page .gio-hang-item-top {
+    gap: 0.6rem;
+  }
+
+  .gio-hang-page .gio-hang-item-description {
+    white-space: normal;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+  }
+
+  .gio-hang-page .voucher-controls {
+    flex-direction: column;
+  }
+
+  .gio-hang-page .voucher-input,
+  .gio-hang-page .voucher-apply-btn,
+  .gio-hang-page .voucher-clear-btn {
+    width: 100%;
+  }
+
+  .gio-hang-page .gio-hang-checkout-btn,
+  .thanh-toan-page .gio-hang-checkout-btn {
+    margin-top: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .gio-hang-page .gio-hang-empty,
+  .gio-hang-page .tom-tat-card,
+  .thanh-toan-page .thanh-toan-tom-tat-card {
+    padding: 1rem;
+  }
+
+  .gio-hang-page .gio-hang-item-total,
+  .thanh-toan-page .thanh-toan-item strong {
+    font-size: 0.95rem;
+  }
+
+  .gio-hang-page .quantity-control {
+    width: 100%;
+    justify-content: space-between;
+  }
+
+  .gio-hang-page .qty-btn {
+    width: 2.5rem;
+  }
+}

@@ -39,6 +39,8 @@
 
 /* MENU PAGE */
 .thuc-don-page {
+  padding: 0 0 4rem;
+  min-height: 70vh;
   background:
     radial-gradient(circle at top left, rgba(201, 107, 74, 0.08), transparent 22%),
     linear-gradient(180deg, #fbf8f3 0%, #f6efe5 100%);
@@ -2408,7 +2410,7 @@
 
 .thuc-don-list-section--reworked {
   padding-top: 0;
-  margin-top: -7rem;
+  margin-top: 0;
 }
 
 .thuc-don-toolbar-shell {
@@ -2418,11 +2420,20 @@
 }
 
 .thuc-don-toolbar-shell--sticky {
-  position: sticky;
-  top: 4.45rem;
+  position: static;
+  top: auto;
   z-index: 12;
-  padding-top: 0.4rem;
-  margin-top: -2.2rem;
+  padding-top: 0;
+  margin-top: 0;
+  background: transparent;
+  backdrop-filter: none;
+}
+
+.thuc-don-tabs-row {
+  position: sticky;
+  top: 4.95rem;
+  z-index: 12;
+  padding-top: 0;
   background: linear-gradient(180deg, rgba(251, 248, 243, 0.96) 0%, rgba(251, 248, 243, 0.88) 72%, rgba(251, 248, 243, 0) 100%);
   backdrop-filter: blur(10px);
 }
@@ -2659,6 +2670,7 @@
     display: flex;
     overflow-x: auto;
     gap: 0;
+    padding-top: 0;
     padding-bottom: 0.25rem;
   }
 

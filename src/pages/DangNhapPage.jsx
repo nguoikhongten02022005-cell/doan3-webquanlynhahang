@@ -1,5 +1,6 @@
 import { useState } from 'react'
-import { Link, useLocation, useNavigate } from 'react-router-dom'
+import { useLocation, useNavigate } from 'react-router-dom'
+import { TAI_KHOAN_KHACH_HANG_DEMO } from '../constants/xacThucDemo'
 import { useXacThuc } from '../hooks/useXacThuc'
 
 function DangNhapPage() {
@@ -90,12 +91,11 @@ function DangNhapPage() {
           </button>
         </form>
 
-        <p className="xac-thuc-switch-text">
-          Chưa có tài khoản?{' '}
-          <Link to="/dang-ky" className="xac-thuc-switch-link">
-            Đăng ký ngay
-          </Link>
-        </p>
+        <div className="xac-thuc-demo-note" aria-live="polite">
+          <strong>Đăng nhập demo khách hàng</strong>
+          <p>Email / username: <span>{TAI_KHOAN_KHACH_HANG_DEMO.identifier}</span> hoặc <span>{TAI_KHOAN_KHACH_HANG_DEMO.username}</span></p>
+          <p>Mật khẩu: <span>{TAI_KHOAN_KHACH_HANG_DEMO.password}</span></p>
+        </div>
       </div>
     </section>
   )

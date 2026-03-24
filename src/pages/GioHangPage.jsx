@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useGioHang } from '../context/GioHangContext'
 import { useThongBao } from '../context/ThongBaoContext'
-import { dinhDangTienTe } from '../utils/tienTe'
+import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import {
   xoaBanNhapTamThanhToan,
   layBanNhapTamThanhToan,
@@ -13,7 +13,32 @@ import {
   layPhieuGiamGiaDaApDung as getStoredVoucher,
   luuPhieuGiamGiaDaApDung as saveVoucher,
 } from '../services/dichVuPhieuGiamGia'
-import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
+
+// TODO: thay validate mock này bằng API voucher thật khi backend sẵn sàng.
+const VOUCHER_MOCK_DATA = Object.freeze({
+  SUMMER30: 30,
+  WELCOME10: 10,
+  FREESHIP: 20,
+})
+
+const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
+
+const tinhSoTienGiam = (voucher, tamTinh, phiDichVu) => {
+  if (!voucher) {
+    return 0
+  }
+
+  const phanTramGiam = Number(voucher.discountPercent || 0)
+  const soTienGiamTamTinh = phanTramGiam > 0
+    ? Math.round((tamTinh * phanTramGiam) / 100)
+    : Number(voucher.amount || 0)
+
+  if (!Number.isFinite(soTienGiamTamTinh) || soTienGiamTamTinh <= 0) {
+    return 0
+  }
+
+  return Math.min(soTienGiamTamTinh, tamTinh + phiDichVu)
+}
 
 function GioHangPage() {
   const navigate = useNavigate()
@@ -21,15 +46,15 @@ function GioHangPage() {
   const { hienCanhBao } = useThongBao()
 
   const [ghiChu, setGhiChu] = useState('')
-  const [soBan, setSoBan] = useState('')
   const [maVoucherNhap, setMaVoucherNhap] = useState('')
   const [voucherDaApDung, setVoucherDaApDung] = useState(null)
   const [loiVoucher, setLoiVoucher] = useState('')
   const [dangApVoucher, setDangApVoucher] = useState(false)
 
-  const tamTinh = cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0)
-  const phiDichVu = 0
-  const soTienGiam = voucherDaApDung ? Math.min(voucherDaApDung.amount, tamTinh + phiDichVu) : 0
+  const tongSoLuongMon = cartItems.reduce((tong, item) => tong + item.quantity, 0)
+  const tamTinh = cartItems.reduce((tong, item) => tong + item.price * item.quantity, 0)
+  const phiDichVu = tinhPhiDichVu(tamTinh)
+  const soTienGiam = tinhSoTienGiam(voucherDaApDung, tamTinh, phiDichVu)
   const tongTien = Math.max(0, tamTinh + phiDichVu - soTienGiam)
 
   useEffect(() => {
@@ -41,8 +66,7 @@ function GioHangPage() {
 
     const banNhapTam = layBanNhapTamThanhToan()
     if (banNhapTam) {
-      setGhiChu(banNhapTam.note)
-      setSoBan(banNhapTam.tableNumber)
+      setGhiChu(String(banNhapTam.note ?? '').slice(0, 300))
     }
   }, [])
 
@@ -52,7 +76,7 @@ function GioHangPage() {
     }
 
     setVoucherDaApDung(null)
-    setLoiVoucher('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
+    setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
     clearStoredVoucher()
   }, [tamTinh, voucherDaApDung])
 
@@ -64,19 +88,22 @@ function GioHangPage() {
     }
 
     if (voucherDaApDung) {
-      saveVoucher(voucherDaApDung)
+      saveVoucher({
+        ...voucherDaApDung,
+        amount: soTienGiam,
+      })
     } else {
       clearStoredVoucher()
     }
 
-    luuBanNhapTamThanhToan({ note: ghiChu, tableNumber: soBan })
+    luuBanNhapTamThanhToan({ note: ghiChu, tableNumber: '' })
     navigate('/thanh-toan')
   }
 
-  const handleApplyVoucher = async () => {
+  const handleApplyVoucher = () => {
     if (tamTinh <= 0) {
       setVoucherDaApDung(null)
-      setLoiVoucher('Giỏ hàng đang trống, chưa thể áp mã giảm giá.')
+      setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
       clearStoredVoucher()
       return
     }
@@ -85,44 +112,40 @@ function GioHangPage() {
 
     if (!maVoucher) {
       setVoucherDaApDung(null)
-      setLoiVoucher('Vui lòng nhập mã giảm giá.')
+      setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
       clearStoredVoucher()
       return
     }
 
-    try {
-      setDangApVoucher(true)
-      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tamTinh)
-      const voucher = duLieu
-        ? {
-            code: duLieu.code,
-            amount: duLieu.discountType === 'FIXED'
-              ? Number(duLieu.discountValue || 0)
-              : Math.min(
-                  (tamTinh * Number(duLieu.discountValue || 0)) / 100,
-                  Number(duLieu.maxDiscountAmount || Number.MAX_SAFE_INTEGER),
-                ),
-          }
-        : null
-      const voucherHopLe = saveVoucher(voucher)
+    setDangApVoucher(true)
 
-      if (!voucherHopLe) {
-        setVoucherDaApDung(null)
-        setLoiVoucher('Mã giảm giá không hợp lệ.')
-        clearStoredVoucher()
-        return
-      }
-
-      setVoucherDaApDung(voucherHopLe)
-      setMaVoucherNhap(voucherHopLe.code)
-      setLoiVoucher('')
-    } catch (error) {
+    const phanTramGiam = VOUCHER_MOCK_DATA[maVoucher]
+    if (!phanTramGiam) {
       setVoucherDaApDung(null)
-      setLoiVoucher(error?.message || 'Mã giảm giá không hợp lệ.')
+      setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
       clearStoredVoucher()
-    } finally {
       setDangApVoucher(false)
+      return
     }
+
+    const voucherHopLe = saveVoucher({
+      code: maVoucher,
+      discountPercent: phanTramGiam,
+      amount: Math.round((tamTinh * phanTramGiam) / 100),
+    })
+
+    if (!voucherHopLe) {
+      setVoucherDaApDung(null)
+      setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
+      clearStoredVoucher()
+      setDangApVoucher(false)
+      return
+    }
+
+    setVoucherDaApDung(voucherHopLe)
+    setMaVoucherNhap(voucherHopLe.code)
+    setLoiVoucher('')
+    setDangApVoucher(false)
   }
 
   const handleClearVoucher = () => {
@@ -140,7 +163,7 @@ function GioHangPage() {
     if (voucherDaApDung) {
       return (
         <p className="voucher-message success">
-          Đã áp mã {voucherDaApDung.code}: -{dinhDangTienTe(soTienGiam)}
+          ✅ Áp dụng thành công — Giảm {voucherDaApDung.discountPercent || 0}%
         </p>
       )
     }
@@ -151,79 +174,93 @@ function GioHangPage() {
   return (
     <div className="gio-hang-page gio-hang-page-editorial">
       <div className="container">
-        <div className="gio-hang-header">
-          <p className="thanh-toan-kicker">Đơn gọi món tại bàn</p>
-          <h1>Giỏ hàng của bạn</h1>
-          <p>{cartItems.length} món đang chờ được hoàn tất cho bàn ăn tối nay.</p>
-        </div>
-
         <div className="gio-hang-layout">
           <div className="gio-hang-items-section">
+            <div className="gio-hang-list-head">
+              <h2>Giỏ hàng của bạn</h2>
+              <span>{tongSoLuongMon > 0 ? `${tongSoLuongMon} món` : 'Giỏ hàng trống'}</span>
+            </div>
+
             {cartItems.length === 0 ? (
               <div className="gio-hang-empty">
                 <p>Giỏ hàng trống</p>
-                <button className="btn nut-chinh" onClick={() => navigate('/thuc-don')}>
+                <button type="button" className="btn nut-chinh" onClick={() => navigate('/thuc-don')}>
                   Xem thực đơn
                 </button>
               </div>
             ) : (
-              cartItems.map((item) => {
-                const itemKey = typeof layKhoaMonTrongGio === 'function' ? layKhoaMonTrongGio(item) : item.id
-                const optionLines = typeof layTuyChonHienThiMon === 'function' ? layTuyChonHienThiMon(item) : []
+              <div className="gio-hang-item-list">
+                {cartItems.map((item) => {
+                  const itemKey = typeof layKhoaMonTrongGio === 'function' ? layKhoaMonTrongGio(item) : item.id
+                  const optionLines = typeof layTuyChonHienThiMon === 'function' ? layTuyChonHienThiMon(item) : []
+                  const coAnh = typeof item.image === 'string' && item.image.trim().length > 0
+                  const moTaNgan = String(optionLines.join(' • ') || item.description || 'Món sẽ được chuẩn bị ngay sau khi bạn xác nhận đơn.')
+                    .trim()
+                  const tongTienMon = item.price * item.quantity
 
-                return (
-                  <div key={itemKey} className="gio-hang-item">
-                    <div className="gio-hang-item-image" style={{ background: item.image }}></div>
-
-                    <div className="gio-hang-item-info">
-                      <p className="gio-hang-item-kicker">Món đã chọn</p>
-                      <h3>{item.name}</h3>
-                      <p className="gio-hang-item-price">{dinhDangTienTe(item.price)}</p>
-                      {optionLines.length > 0 && (
-                        <div className="gio-hang-item-options">
-                          {optionLines.map((line) => (
-                            <p key={line}>{line}</p>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="gio-hang-item-actions">
-                      <div className="quantity-control">
-                        <button
-                          className="qty-btn"
-                          onClick={() => capNhatSoLuong(itemKey, -1)}
-                          aria-label="Giảm số lượng"
-                        >
-                          −
-                        </button>
-                        <span className="qty-value">{item.quantity}</span>
-                        <button
-                          className="qty-btn"
-                          onClick={() => capNhatSoLuong(itemKey, 1)}
-                          aria-label="Tăng số lượng"
-                        >
-                          +
-                        </button>
+                  return (
+                    <article key={itemKey} className="gio-hang-item">
+                      <div className="gio-hang-item-media">
+                        {coAnh ? (
+                          <img className="gio-hang-item-image" src={item.image} alt={item.name} loading="lazy" />
+                        ) : (
+                          <div className="gio-hang-item-image gio-hang-item-image-placeholder" aria-hidden="true">
+                            {item.name?.slice(0, 1) || 'M'}
+                          </div>
+                        )}
                       </div>
 
-                      <button
-                        className="remove-btn"
-                        onClick={() => xoaKhoiGio(itemKey)}
-                        aria-label="Xóa món"
-                      >
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                          <path
-                            d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
-                          />
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                )
-              })
+                      <div className="gio-hang-item-content">
+                        <div className="gio-hang-item-top">
+                          <div className="gio-hang-item-copy">
+                            <h3>{item.name}</h3>
+                            <p className="gio-hang-item-description" title={moTaNgan}>{moTaNgan}</p>
+                          </div>
+
+                          <button
+                            type="button"
+                            className="remove-btn gio-hang-remove-btn"
+                            onClick={() => xoaKhoiGio(itemKey)}
+                            aria-label={`Xóa nhanh ${item.name}`}
+                          >
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                              <path
+                                d="M3 6h18M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2m3 0v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6h14z"
+                                strokeLinecap="round"
+                                strokeLinejoin="round"
+                              />
+                            </svg>
+                          </button>
+                        </div>
+
+                        <div className="gio-hang-item-bottom">
+                          <div className="quantity-control" aria-label={`Số lượng món ${item.name}`}>
+                            <button
+                              type="button"
+                              className="qty-btn"
+                              onClick={() => capNhatSoLuong(itemKey, -1)}
+                              aria-label="Giảm số lượng"
+                            >
+                              -
+                            </button>
+                            <span className="qty-value">{item.quantity}</span>
+                            <button
+                              type="button"
+                              className="qty-btn"
+                              onClick={() => capNhatSoLuong(itemKey, 1)}
+                              aria-label="Tăng số lượng"
+                            >
+                              +
+                            </button>
+                          </div>
+
+                          <strong className="gio-hang-item-total">{dinhDangTienTeVietNam(tongTienMon)}</strong>
+                        </div>
+                      </div>
+                    </article>
+                  )
+                })}
+              </div>
             )}
           </div>
 
@@ -234,7 +271,7 @@ function GioHangPage() {
               <div className="voucher-block">
                 <div className="voucher-header">
                   <h3>Mã giảm giá</h3>
-                  <p>Nhập mã hợp lệ để áp dụng ưu đãi từ hệ thống.</p>
+                  <p>Nhập mã ưu đãi để áp dụng khuyến mãi tạm thời cho đơn hàng của bạn.</p>
                 </div>
                 <div className="voucher-controls">
                   <input
@@ -249,7 +286,12 @@ function GioHangPage() {
                       }
                     }}
                   />
-                  <button type="button" className="btn nut-chinh voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>
+                  <button
+                    type="button"
+                    className="btn nut-chinh voucher-apply-btn"
+                    onClick={handleApplyVoucher}
+                    disabled={dangApVoucher}
+                  >
                     {dangApVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}
                   </button>
                   {voucherDaApDung && (
@@ -263,61 +305,53 @@ function GioHangPage() {
 
               <div className="tom-tat-row">
                 <span>Tạm tính</span>
-                <span>{dinhDangTienTe(tamTinh)}</span>
+                <span>{dinhDangTienTeVietNam(tamTinh)}</span>
               </div>
 
               <div className="tom-tat-row">
-                  <span>Phí dịch vụ theo máy chủ</span>
-                <span>{dinhDangTienTe(phiDichVu)}</span>
+                <span>Phí dịch vụ (5%)</span>
+                <span>{dinhDangTienTeVietNam(phiDichVu)}</span>
               </div>
 
-              <div className="tom-tat-row tom-tat-discount">
-                <span>Giảm giá {voucherDaApDung ? `(${voucherDaApDung.code})` : ''}</span>
-                <span>-{dinhDangTienTe(soTienGiam)}</span>
-              </div>
+              {voucherDaApDung && (
+                <div className="tom-tat-row tom-tat-discount">
+                  <span>Giảm giá ({voucherDaApDung.code})</span>
+                  <span>-{dinhDangTienTeVietNam(soTienGiam)}</span>
+                </div>
+              )}
 
               <div className="tom-tat-divider"></div>
 
               <div className="tom-tat-row tom-tat-total">
-                <span>Tổng cộng ước tính</span>
-                <strong>{dinhDangTienTe(tongTien)}</strong>
+                <span>Tổng cộng</span>
+                <strong>{dinhDangTienTeVietNam(tongTien)}</strong>
               </div>
-
-              <p className="thanh-toan-tom-tat-note">
-                 Tổng tiền cuối cùng sẽ được máy chủ xác nhận khi tạo đơn hàng.
-              </p>
 
               <div className="tom-tat-form">
                 <div className="nhom-truong">
-                  <label className="nhan-truong">Số bàn</label>
-                  <input
-                    type="text"
-                    className="truong-nhap"
-                    placeholder="Nhập số bàn (nếu có)"
-                    value={soBan}
-                    onChange={(event) => setSoBan(event.target.value)}
-                  />
-                </div>
-
-                <div className="nhom-truong">
-                  <label className="nhan-truong">Ghi chú cho quán</label>
+                  <label className="nhan-truong" htmlFor="gio-hang-note">Ghi chú cho quán</label>
                   <textarea
+                    id="gio-hang-note"
                     className="truong-van-ban"
-                    placeholder="Ví dụ: Không hành, ít cay..."
+                    placeholder="Dị ứng thực phẩm, yêu cầu đặc biệt về món ăn, hoặc ghi chú khác cho bếp..."
                     rows="3"
+                    maxLength={300}
                     value={ghiChu}
-                    onChange={(event) => setGhiChu(event.target.value)}
+                    onChange={(event) => setGhiChu(event.target.value.slice(0, 300))}
                   ></textarea>
+                  <div className="gio-hang-note-counter">{ghiChu.length}/300</div>
                 </div>
               </div>
 
               <button
-                className="btn nut-chinh w-full"
+                type="button"
+                className="btn gio-hang-checkout-btn w-full"
                 onClick={handleGoToCheckout}
                 disabled={cartItems.length === 0}
               >
                 Thanh toán
               </button>
+              <p className="gio-hang-checkout-helper">Nhân viên sẽ hướng dẫn chỗ ngồi khi bạn đến.</p>
             </div>
           </div>
         </div>

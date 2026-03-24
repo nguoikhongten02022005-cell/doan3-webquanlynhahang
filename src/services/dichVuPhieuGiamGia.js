@@ -8,14 +8,18 @@ const chuanHoaVoucher = (voucher) => {
 
   const maGiamGia = String(voucher.code || '').trim().toUpperCase()
   const soTienGiam = Number(voucher.amount ?? voucher.discountAmount ?? 0)
+  const phanTramGiam = Number(voucher.discountPercent ?? voucher.percentage ?? 0)
+  const laSoTienHopLe = Number.isFinite(soTienGiam) && soTienGiam > 0
+  const laPhanTramHopLe = Number.isFinite(phanTramGiam) && phanTramGiam > 0
 
-  if (!maGiamGia || !Number.isFinite(soTienGiam) || soTienGiam <= 0) {
+  if (!maGiamGia || (!laSoTienHopLe && !laPhanTramHopLe)) {
     return null
   }
 
   return {
     code: maGiamGia,
-    amount: soTienGiam,
+    amount: laSoTienHopLe ? soTienGiam : 0,
+    discountPercent: laPhanTramHopLe ? phanTramGiam : 0,
   }
 }
 

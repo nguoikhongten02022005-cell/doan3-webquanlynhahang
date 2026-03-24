@@ -109,18 +109,22 @@ export function GioHangProvider({ children }) {
       return
     }
 
-    setCartItems((prevItems) =>
-      prevItems.map((item) => {
-        if (getItemKey(item) !== variantKey) {
-          return item
-        }
+    setCartItems((prevItems) => prevItems.reduce((danhSachMoi, item) => {
+      if (getItemKey(item) !== variantKey) {
+        danhSachMoi.push(item)
+        return danhSachMoi
+      }
 
-        return {
+      const soLuongMoi = item.quantity + delta
+      if (soLuongMoi > 0) {
+        danhSachMoi.push({
           ...item,
-          quantity: Math.max(1, item.quantity + delta),
-        }
-      }),
-    )
+          quantity: soLuongMoi,
+        })
+      }
+
+      return danhSachMoi
+    }, []))
   }
 
   const xoaToanBoGio = () => {

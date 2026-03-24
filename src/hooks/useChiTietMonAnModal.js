@@ -70,7 +70,7 @@ export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KI
       ...mon,
       kichCoDaChon: kichCoMacDinh,
       toppingDaChon: [],
-      specialNote: '',
+      ghiChuRieng: '',
     })
     hienThanhCong(`Đã thêm ${mon.name} vào giỏ hàng.`)
   }
@@ -93,9 +93,9 @@ export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KI
     themVaoGio({
       ...monDaChon,
       price: phanTichGiaThanhSo(monDaChon.price) + phuThuDaChon,
-      kichCoDaChon: kichCoDaChon,
-      toppingDaChon: toppingDaChon,
-      specialNote: ghiChuRieng,
+      kichCoDaChon,
+      toppingDaChon,
+      ghiChuRieng,
     })
 
     hienThanhCong(`Đã thêm ${monDaChon.name} vào giỏ hàng.`)
