@@ -1,4 +1,4 @@
-import { TRANG_THAI_BAN } from '../services/dichVuBanAn'
+import { TRANG_THAI_BAN } from '../services/dichVuBanAn.js'
 
 export const NHAN_THU_TRONG_TUAN = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']
 

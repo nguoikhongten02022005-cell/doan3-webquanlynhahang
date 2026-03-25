@@ -13,7 +13,7 @@ import {
 } from '../services/api/apiDatBan'
 import { datJsonLuuTru } from '../services/dichVuLuuTru'
 import { xoaBanNhapTamDatBan, layBanNhapTamDatBanHopLe, luuBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
-import { TRANG_THAI_BAN } from '../services/dichVuBanAn'
+import { TRANG_THAI_BAN } from '../services/dichVuBanAn.js'
 import {
   anhXaMucDatBan,
   chuanHoaDatBan,

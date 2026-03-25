@@ -7,14 +7,14 @@ import DonHangTab from '../components/bangDieuKhienNoiBo/DonHangTab'
 import TongQuanTab from '../components/bangDieuKhienNoiBo/TongQuanTab'
 import BanAnTab from '../components/bangDieuKhienNoiBo/BanAnTab'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { CAC_BO_LOC_NGAY, CAC_TAB_NOI_BO, CAC_BO_LOC_CA } from '../features/bangDieuKhienNoiBo/hangSo'
+import { CAC_BO_LOC_NGAY, CAC_TAB_NOI_BO, CAC_BO_LOC_CA, TAB_NOI_BO } from '../features/bangDieuKhienNoiBo/hangSo'
 import { layNhanPhamViTongQuan, khopBoLocNgay, khopBoLocCa } from '../features/bangDieuKhienNoiBo/boChon'
 import { useDuLieuBangDieuKhienNoiBo } from '../features/bangDieuKhienNoiBo/useDuLieuBangDieuKhienNoiBo'
 
 function BangDieuKhienNoiBoPage() {
   const navigate = useNavigate()
   const { nguoiDungHienTai, laAdmin } = useXacThuc()
-  const [tabDangMo, setTabDangMo] = useState('overview')
+  const [tabDangMo, setTabDangMo] = useState(TAB_NOI_BO.TONG_QUAN)
   const [boLocNgay, setBoLocNgay] = useState('all')
   const [boLocCa, setBoLocCa] = useState('all')
   const {
@@ -47,8 +47,8 @@ function BangDieuKhienNoiBoPage() {
   } = useDuLieuBangDieuKhienNoiBo()
 
   useEffect(() => {
-    if (!laAdmin && (tabDangMo === 'accounts' || tabDangMo === 'dishes')) {
-      setTabDangMo('overview')
+    if (!laAdmin && (tabDangMo === TAB_NOI_BO.TAI_KHOAN || tabDangMo === TAB_NOI_BO.MON_AN)) {
+      setTabDangMo(TAB_NOI_BO.TONG_QUAN)
     }
   }, [tabDangMo, laAdmin])
 
@@ -64,29 +64,30 @@ function BangDieuKhienNoiBoPage() {
     return danhSachDatBan.filter((booking) => khopBoLocNgay(booking, boLocNgay, now) && khopBoLocCa(booking, boLocCa))
   }, [danhSachDatBan, boLocCa, boLocNgay])
 
-  const hangDoiDatBanDaLoc = useMemo(
-    () => hangDoiDatBan.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
-    [hangDoiDatBan, danhSachDatBanDaLoc],
-  )
+  const danhSachDatBanDaLocIds = useMemo(() => new Set(danhSachDatBanDaLoc.map((booking) => booking.id)), [danhSachDatBanDaLoc])
+
+  const locDatBanTheoPhamVi = (bookings) => bookings.filter((booking) => danhSachDatBanDaLocIds.has(booking.id))
+
+  const hangDoiDatBanDaLoc = useMemo(() => locDatBanTheoPhamVi(hangDoiDatBan), [hangDoiDatBan, danhSachDatBanDaLocIds])
 
   const danhSachDatBanDangHoatDongDaLoc = useMemo(
-    () => danhSachDatBanDangHoatDong.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
-    [danhSachDatBanDangHoatDong, danhSachDatBanDaLoc],
+    () => locDatBanTheoPhamVi(danhSachDatBanDangHoatDong),
+    [danhSachDatBanDangHoatDong, danhSachDatBanDaLocIds],
   )
 
   const danhSachDatBanDaXacNhanDaLoc = useMemo(
-    () => danhSachDatBanDaXacNhan.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
-    [danhSachDatBanDaXacNhan, danhSachDatBanDaLoc],
+    () => locDatBanTheoPhamVi(danhSachDatBanDaXacNhan),
+    [danhSachDatBanDaXacNhan, danhSachDatBanDaLocIds],
   )
 
   const danhSachDatBanChoXuLyDaLoc = useMemo(
-    () => danhSachDatBanChoXuLy.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
-    [danhSachDatBanChoXuLy, danhSachDatBanDaLoc],
+    () => locDatBanTheoPhamVi(danhSachDatBanChoXuLy),
+    [danhSachDatBanChoXuLy, danhSachDatBanDaLocIds],
   )
 
   const danhSachDatBanSapDienRaDaLoc = useMemo(
-    () => danhSachDatBanSapDienRa.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
-    [danhSachDatBanSapDienRa, danhSachDatBanDaLoc],
+    () => locDatBanTheoPhamVi(danhSachDatBanSapDienRa),
+    [danhSachDatBanSapDienRa, danhSachDatBanDaLocIds],
   )
 
   const soLuongDatBanDaCheckInDaLoc = useMemo(
@@ -95,8 +96,8 @@ function BangDieuKhienNoiBoPage() {
   )
 
   const danhSachDatBanChuaGanBanDaLoc = useMemo(
-    () => danhSachDatBanChuaGanBan.filter((booking) => danhSachDatBanDaLoc.some((item) => item.id === booking.id)),
-    [danhSachDatBanChuaGanBan, danhSachDatBanDaLoc],
+    () => locDatBanTheoPhamVi(danhSachDatBanChuaGanBan),
+    [danhSachDatBanChuaGanBan, danhSachDatBanDaLocIds],
   )
 
   const urgentItems = useMemo(
@@ -107,7 +108,7 @@ function BangDieuKhienNoiBoPage() {
         value: danhSachDatBanChoXuLyDaLoc.length,
         detail: danhSachDatBanChoXuLyDaLoc.length > 0 ? 'Ưu tiên gọi lại và chốt bàn.' : 'Không có booking chờ xử lý.',
         tone: danhSachDatBanChoXuLyDaLoc.length > 0 ? 'warning' : 'neutral',
-        action: () => setTabDangMo('bookings'),
+        action: () => setTabDangMo(TAB_NOI_BO.DAT_BAN),
       },
       {
         key: 'unassigned-bookings',
@@ -115,7 +116,7 @@ function BangDieuKhienNoiBoPage() {
         value: danhSachDatBanChuaGanBanDaLoc.length,
         detail: danhSachDatBanChuaGanBanDaLoc.length > 0 ? 'Cần phân bàn trước giờ khách đến.' : 'Các booking đang có bàn phù hợp.',
         tone: danhSachDatBanChuaGanBanDaLoc.length > 0 ? 'danger' : 'neutral',
-        action: () => setTabDangMo('bookings'),
+        action: () => setTabDangMo(TAB_NOI_BO.DAT_BAN),
       },
       {
         key: 'arriving-soon',
@@ -123,7 +124,7 @@ function BangDieuKhienNoiBoPage() {
         value: danhSachDatBanSapDienRaDaLoc.length,
         detail: danhSachDatBanSapDienRaDaLoc.length > 0 ? 'Kiểm tra bàn, host và ghi chú đặc biệt.' : 'Chưa có lượt đến gần trong 2 giờ tới.',
         tone: danhSachDatBanSapDienRaDaLoc.length > 0 ? 'success' : 'neutral',
-        action: () => setTabDangMo('bookings'),
+        action: () => setTabDangMo(TAB_NOI_BO.DAT_BAN),
       },
       {
         key: 'dirty-tables',
@@ -131,7 +132,7 @@ function BangDieuKhienNoiBoPage() {
         value: tomTatTonKhoBan.dirty,
         detail: tomTatTonKhoBan.dirty > 0 ? 'Cần làm sạch trước khi nhận lượt mới.' : 'Không có bàn đang dọn.',
         tone: tomTatTonKhoBan.dirty > 0 ? 'warning' : 'neutral',
-        action: () => setTabDangMo('tables'),
+        action: () => setTabDangMo(TAB_NOI_BO.BAN_AN),
       },
     ],
     [danhSachDatBanChoXuLyDaLoc.length, tomTatTonKhoBan.dirty, danhSachDatBanChuaGanBanDaLoc.length, danhSachDatBanSapDienRaDaLoc.length],
@@ -140,7 +141,7 @@ function BangDieuKhienNoiBoPage() {
   const canhBaoVanHanh = danhSachDatBanChoXuLyDaLoc.length + danhSachDatBanChuaGanBanDaLoc.length + danhSachDatBanSapDienRaDaLoc.length + tomTatTonKhoBan.dirty
 
   const xuLyTaoDatBan = () => {
-    setTabDangMo('bookings')
+    setTabDangMo(TAB_NOI_BO.DAT_BAN)
   }
 
   const xuLyTaoDonHang = () => {
@@ -150,21 +151,22 @@ function BangDieuKhienNoiBoPage() {
   return (
     <div className="noi-bo-dashboard-page">
       <div className="container">
-        <div className="noi-bo-toolbar ho-so-card">
-          <div className="noi-bo-toolbar-main">
-            <div>
-              <p className="ho-so-kicker">Điều hành ca</p>
-              <h1>Dashboard vận hành</h1>
-              <p>
-                Theo dõi booking, bàn ăn và đơn đang mở theo nhịp vận hành thực tế.
-              </p>
-            </div>
-            <div className="noi-bo-operator-badge">
-              <strong>{nguoiDungHienTai?.fullName || 'Nhân sự nội bộ'}</strong>
-              <span>{laAdmin ? 'Quản trị viên' : 'Nhân viên vận hành'}</span>
-            </div>
+        <header className="ho-so-header noi-bo-dashboard-header">
+          <div className="ho-so-header-copy noi-bo-dashboard-header-copy">
+            <p className="ho-so-kicker">Điều hành ca</p>
+            <h1>Dashboard vận hành</h1>
+            <p>
+              Theo dõi booking, bàn ăn và đơn đang mở theo nhịp vận hành thực tế.
+            </p>
           </div>
 
+          <div className="noi-bo-operator-badge">
+            <strong>{nguoiDungHienTai?.fullName || 'Nhân sự nội bộ'}</strong>
+            <span>{laAdmin ? 'Quản trị viên' : 'Nhân viên vận hành'}</span>
+          </div>
+        </header>
+
+        <section className="ho-so-card noi-bo-toolbar" aria-label="Bộ lọc và thao tác nhanh">
           <div className="noi-bo-toolbar-controls">
             <div className="noi-bo-filter-cluster">
               <span>Bộ lọc ngày</span>
@@ -198,13 +200,13 @@ function BangDieuKhienNoiBoPage() {
               </div>
             </div>
 
-            <div className="noi-bo-filter-cluster">
+            <div className="noi-bo-filter-cluster noi-bo-filter-cluster-actions">
               <span>Thao tác nhanh</span>
               <div className="noi-bo-quick-actions">
                 <button type="button" className="noi-bo-quick-btn noi-bo-quick-nut-chinh" onClick={xuLyTaoDatBan}>
                   Tạo booking
                 </button>
-                <button type="button" className="noi-bo-quick-btn" onClick={() => setTabDangMo('tables')}>
+                <button type="button" className="noi-bo-quick-btn" onClick={() => setTabDangMo(TAB_NOI_BO.BAN_AN)}>
                   Mở sơ đồ bàn
                 </button>
                 <button type="button" className="noi-bo-quick-btn" onClick={xuLyTaoDonHang}>
@@ -213,9 +215,9 @@ function BangDieuKhienNoiBoPage() {
               </div>
             </div>
           </div>
-        </div>
+        </section>
 
-        <div className="ho-so-shell">
+        <div className="ho-so-shell noi-bo-dashboard-shell">
           <aside className="ho-so-tabs noi-bo-dashboard-tabs" aria-label="Điều hướng nội bộ">
             {cacTabHienThi.map((tab) => (
               <button
@@ -229,8 +231,8 @@ function BangDieuKhienNoiBoPage() {
             ))}
           </aside>
 
-          <section className="noi-bo-dashboard-content">
-            {tabDangMo === 'overview' && (
+          <section className="ho-so-content-panel noi-bo-dashboard-content">
+            {tabDangMo === TAB_NOI_BO.TONG_QUAN && (
               <TongQuanTab
                 tomTatTaiKhoan={tomTatTaiKhoan}
                 danhSachDatBanDangHoatDong={danhSachDatBanDangHoatDongDaLoc}
@@ -251,7 +253,7 @@ function BangDieuKhienNoiBoPage() {
               />
             )}
 
-            {tabDangMo === 'bookings' && (
+            {tabDangMo === TAB_NOI_BO.DAT_BAN && (
               <DatBanTab
                 hangDoiDatBan={hangDoiDatBanDaLoc}
                 getAvailableTablesForBooking={(booking) => layBanPhuHopChoDatBan(booking, danhSachBan)}
@@ -265,11 +267,11 @@ function BangDieuKhienNoiBoPage() {
               />
             )}
 
-            {tabDangMo === 'orders' && (
+            {tabDangMo === TAB_NOI_BO.DON_HANG && (
               <DonHangTab orders={danhSachDonHangDaSapXep} />
             )}
 
-            {tabDangMo === 'tables' && (
+            {tabDangMo === TAB_NOI_BO.BAN_AN && (
               <BanAnTab
                 xuLyDanhDauBanBan={xuLyDanhDauBanBan}
                 xuLyDanhDauBanSanSang={xuLyDanhDauBanSanSang}
@@ -280,11 +282,11 @@ function BangDieuKhienNoiBoPage() {
               />
             )}
 
-            {tabDangMo === 'dishes' && laAdmin && (
+            {tabDangMo === TAB_NOI_BO.MON_AN && laAdmin && (
               <MonAnTab dishes={danhSachMon} reloadDishes={taiLaiDanhSachMon} />
             )}
 
-            {tabDangMo === 'accounts' && laAdmin && (
+            {tabDangMo === TAB_NOI_BO.TAI_KHOAN && laAdmin && (
               <TaiKhoanTab accounts={danhSachTaiKhoan} />
             )}
           </section>

@@ -10,6 +10,13 @@
         "ORACLE_HOME_DIR": "C:\\Users\\Moderator\\.oracle",
         "ORACLE_BROWSER_PROFILE_DIR": "C:\\Users\\Moderator\\.oracle\\browser-profile"
       }
+    },
+    "shadcn": {
+      "command": "npx",
+      "args": [
+        "shadcn",
+        "mcp"
+      ]
     }
   }
 }

@@ -4,7 +4,7 @@ import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../../hooks/useDatB
 import { layDanhSachNguoiDungApi } from '../../services/api/apiXacThuc'
 import { layDanhSachDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
-import { TRANG_THAI_BAN } from '../../services/dichVuBanAn'
+import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN } from './hangSo'
 import {
   layTomTatTaiKhoan,

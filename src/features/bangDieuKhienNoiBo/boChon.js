@@ -1,4 +1,4 @@
-import { TRANG_THAI_BAN } from '../../services/dichVuBanAn'
+import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
 import {
   CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG,
   CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN,

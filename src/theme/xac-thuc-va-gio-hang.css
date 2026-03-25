@@ -1,15 +1,22 @@
 /* AUTH PAGES */
+.main-content-auth {
+  min-height: 100vh;
+}
+
 .xac-thuc-page {
-  min-height: calc(100vh - 79px);
+  min-height: 100vh;
   display: grid;
-  place-items: start center;
+  place-items: center;
   padding: 2rem;
   background: linear-gradient(135deg, var(--bg) 0%, var(--surface-warm) 100%);
 }
 .xac-thuc-card {
-  width: 100%; max-width: 26rem; background: #fff;
-  border-radius: var(--radius-xl); padding: 2.5rem 2rem;
-  box-shadow: var(--shadow-lg); border: 1px solid var(--line-light);
+  width: min(100%, 26rem);
+  background: #fff;
+  border-radius: var(--radius-xl);
+  padding: 2.5rem 2rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--line-light);
 }
 .xac-thuc-title {
   font-family: 'Cormorant Garamond', serif;

@@ -1,11 +1,13 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
+import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
 
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
   const [matKhau, setMatKhau] = useState('')
   const [loiDangNhap, setLoiDangNhap] = useState('')
+  const [dangGui, setDangGui] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
@@ -14,10 +16,16 @@ function DangNhapNoiBoPage() {
     return <Navigate to="/noi-bo/bang-dieu-khien" replace />
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
 
-    ;(async () => {
+    if (dangGui) {
+      return
+    }
+
+    setDangGui(true)
+
+    try {
       const ketQua = await dangNhapNoiBo(tenDangNhapHoacEmail, matKhau)
 
       if (!ketQua.success) {
@@ -25,7 +33,7 @@ function DangNhapNoiBoPage() {
         return
       }
 
-      if (!['admin', 'staff'].includes(ketQua.user?.role)) {
+      if (![VAI_TRO_XAC_THUC.QUAN_TRI, VAI_TRO_XAC_THUC.NHAN_VIEN].includes(ketQua.user?.role)) {
         await dangXuat()
         setLoiDangNhap('Tài khoản này không có quyền truy cập khu vực nội bộ.')
         return
@@ -33,14 +41,15 @@ function DangNhapNoiBoPage() {
 
       setLoiDangNhap('')
       navigate(location.state?.from || '/noi-bo/bang-dieu-khien', { replace: true })
-    })()
+    } finally {
+      setDangGui(false)
+    }
   }
 
   return (
     <section className="xac-thuc-page noi-bo-login-page">
-      <div className="xac-thuc-card noi-bo-login-card">
-        <p className="ho-so-kicker">Khu vực nội bộ</p>
-        <h1 className="xac-thuc-title">Đăng nhập nhân sự</h1>
+      <div className="xac-thuc-card">
+        <h1 className="xac-thuc-title">Đăng nhập nội bộ</h1>
         <p className="xac-thuc-subtitle">
           Dành cho quản trị viên và nhân viên vận hành truy cập bảng điều khiển nội bộ.
         </p>
@@ -55,7 +64,7 @@ function DangNhapNoiBoPage() {
               name="identifier"
               type="text"
               className="truong-nhap"
-              placeholder="Nhập tài khoản nội bộ"
+              placeholder="Nhập tên tài khoản hoặc email"
               autoComplete="username"
               value={tenDangNhapHoacEmail}
               onChange={(e) => {
@@ -96,17 +105,21 @@ function DangNhapNoiBoPage() {
             </p>
           )}
 
-          <button type="submit" className="btn nut-chinh">
-            Vào khu vực nội bộ
+          <button type="submit" className="btn nut-chinh" disabled={dangGui}>
+            {dangGui ? 'Đang đăng nhập...' : 'Vào khu vực nội bộ'}
           </button>
         </form>
 
-        <p className="xac-thuc-switch-text">
-          Bạn là khách hàng?{' '}
-          <Link to="/dang-nhap" className="xac-thuc-switch-link">
-            Đăng nhập tại đây
-          </Link>
-        </p>
+        <div className="xac-thuc-demo-note" aria-live="polite">
+          <strong>Khu vực dành cho nhân sự</strong>
+          <p>Chỉ tài khoản quản trị viên và nhân viên vận hành mới có thể truy cập bảng điều khiển nội bộ.</p>
+          <p>
+            Bạn là khách hàng?{' '}
+            <Link to="/dang-nhap" className="xac-thuc-switch-link">
+              Đăng nhập tại đây
+            </Link>
+          </p>
+        </div>
       </div>
     </section>
   )

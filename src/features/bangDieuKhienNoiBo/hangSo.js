@@ -1,10 +1,19 @@
+export const TAB_NOI_BO = Object.freeze({
+  TONG_QUAN: 'overview',
+  DAT_BAN: 'bookings',
+  DON_HANG: 'orders',
+  BAN_AN: 'tables',
+  MON_AN: 'dishes',
+  TAI_KHOAN: 'accounts',
+})
+
 export const CAC_TAB_NOI_BO = Object.freeze([
-  { key: 'overview', label: 'Tổng quan' },
-  { key: 'bookings', label: 'Đặt bàn' },
-  { key: 'orders', label: 'Đơn đang mở' },
-  { key: 'tables', label: 'Bàn ăn' },
-  { key: 'dishes', label: 'Quản lý món ăn', adminOnly: true },
-  { key: 'accounts', label: 'Tài khoản', adminOnly: true },
+  { key: TAB_NOI_BO.TONG_QUAN, label: 'Tổng quan' },
+  { key: TAB_NOI_BO.DAT_BAN, label: 'Đặt bàn' },
+  { key: TAB_NOI_BO.DON_HANG, label: 'Đơn đang mở' },
+  { key: TAB_NOI_BO.BAN_AN, label: 'Bàn ăn' },
+  { key: TAB_NOI_BO.MON_AN, label: 'Quản lý món ăn', adminOnly: true },
+  { key: TAB_NOI_BO.TAI_KHOAN, label: 'Tài khoản', adminOnly: true },
 ])
 
 export const CAC_BO_LOC_NGAY = Object.freeze([
