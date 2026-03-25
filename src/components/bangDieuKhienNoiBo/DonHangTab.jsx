@@ -20,7 +20,7 @@ function DonHangTab({ orders }) {
         {orders.map((order) => (
           <div key={order.id} className="ho-so-list-item">
             <div className="ho-so-list-top">
-              <strong>DH-{String(order.id).slice(-6)}</strong>
+              <strong>{order.orderCode || order.code || order.id || 'DH-000001'}</strong>
               <span className={`nhan-trang-thai tone-${laySacThaiDonHang(order.status)}`}>{layNhanTrangThaiDonHang(order.status)}</span>
             </div>
 

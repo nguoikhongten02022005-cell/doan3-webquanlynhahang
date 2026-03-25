@@ -10,7 +10,12 @@ import {
   luuPhienXacThuc,
   luuNguoiDungHienTai,
 } from '../services/dichVuXacThuc'
-import { TAI_KHOAN_KHACH_HANG_DEMO, laMaXacThucKhachDemo, laThongTinDangNhapKhachDemo } from '../constants/xacThucDemo'
+import {
+  TAI_KHOAN_KHACH_HANG_DEMO,
+  laMaXacThucDemo,
+  laThongTinDangNhapKhachDemo,
+  timTaiKhoanNoiBoDemo,
+} from '../constants/xacThucDemo'
 
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.accessToken || ''
@@ -41,7 +46,7 @@ export const useXacThuc = () => {
         return
       }
 
-      if (laMaXacThucKhachDemo(maXacThuc)) {
+      if (laMaXacThucDemo(maXacThuc)) {
         dongBoNguoiDungHienTai()
         setIsAuthBootstrapping(false)
         return
@@ -142,12 +147,35 @@ export const useXacThuc = () => {
     }
   }, [])
 
-  const dangNhapNoiBo = useCallback((identifier, password) => dangNhapBangApi(
-    dangNhapNoiBoApi,
-    identifier,
-    password,
-    'Đăng nhập nội bộ thất bại.',
-  ), [dangNhapBangApi])
+  const dangNhapNoiBo = useCallback(async (identifier, password) => {
+    const taiKhoanDemo = timTaiKhoanNoiBoDemo(identifier, password)
+
+    if (taiKhoanDemo) {
+      luuPhienXacThuc({
+        user: taiKhoanDemo.user,
+        accessToken: taiKhoanDemo.accessToken,
+      })
+
+      return {
+        success: true,
+        user: taiKhoanDemo.user,
+      }
+    }
+
+    if (!coSuDungMayChu()) {
+      return {
+        success: false,
+        error: 'Sai tài khoản demo nội bộ. Hãy dùng tài khoản admin hoặc nhân viên được hiển thị trên form đăng nhập.',
+      }
+    }
+
+    return dangNhapBangApi(
+      dangNhapNoiBoApi,
+      identifier,
+      password,
+      'Đăng nhập nội bộ thất bại.',
+    )
+  }, [dangNhapBangApi])
 
   const dangKy = useCallback(async () => ({
     success: false,
@@ -157,7 +185,7 @@ export const useXacThuc = () => {
   const dangXuat = useCallback(async () => {
     const maXacThuc = layMaXacThuc()
 
-    if (coSuDungMayChu() && !laMaXacThucKhachDemo(maXacThuc)) {
+    if (coSuDungMayChu() && !laMaXacThucDemo(maXacThuc)) {
       try {
         await dangXuatApi()
       } catch {

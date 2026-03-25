@@ -18,6 +18,8 @@ import {
   sapXepDonHangChoVanHanh,
 } from './boChon'
 import { laySacThaiDonHang } from './dinhDang'
+import { coSuDungMayChu } from '../../services/trinhKhachApi'
+import { taoDuLieuNoiBoDuPhong } from '../admin/mockData'
 
 export const useDuLieuBangDieuKhienNoiBo = () => {
   const {
@@ -37,17 +39,34 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   const [danhSachBan, setDanhSachBan] = useState([])
 
   const taiLaiDuLieu = useCallback(async () => {
-    const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse] = await Promise.all([
-      layDanhSachDatBanHost(),
-      layDanhSachDonHangApi(),
-      layDanhSachNguoiDungApi(),
-      layDanhSachBanApi(),
-    ])
+    const apDungDuLieuDuPhong = () => {
+      const duLieuDuPhong = taoDuLieuNoiBoDuPhong()
+      setDanhSachDatBan(duLieuDuPhong.bookings)
+      setDanhSachDonHang(duLieuDuPhong.orders)
+      setDanhSachTaiKhoan(duLieuDuPhong.accounts)
+      setDanhSachBan(duLieuDuPhong.tables)
+    }
 
-    setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
-    setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu : [])
-    setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu : [])
-    setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu : [])
+    if (!coSuDungMayChu()) {
+      apDungDuLieuDuPhong()
+      return
+    }
+
+    try {
+      const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse] = await Promise.all([
+        layDanhSachDatBanHost(),
+        layDanhSachDonHangApi(),
+        layDanhSachNguoiDungApi(),
+        layDanhSachBanApi(),
+      ])
+
+      setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
+      setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu : [])
+      setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu : [])
+      setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu : [])
+    } catch {
+      apDungDuLieuDuPhong()
+    }
   }, [layDanhSachDatBanHost])
 
   useEffect(() => {
@@ -138,11 +157,29 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   }, [danhDauKhongDen, taiLaiDuLieu])
 
   const xuLyDanhDauBanBan = useCallback(async (tableId) => {
+    if (!coSuDungMayChu()) {
+      setDanhSachBan((currentTables) => currentTables.map((table) => (
+        table.id === tableId
+          ? { ...table, status: TRANG_THAI_BAN.BAN }
+          : table
+      )))
+      return
+    }
+
     await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.BAN)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
   const xuLyDanhDauBanSanSang = useCallback(async (tableId) => {
+    if (!coSuDungMayChu()) {
+      setDanhSachBan((currentTables) => currentTables.map((table) => (
+        table.id === tableId
+          ? { ...table, status: TRANG_THAI_BAN.TRONG }
+          : table
+      )))
+      return
+    }
+
     await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.TRONG)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])

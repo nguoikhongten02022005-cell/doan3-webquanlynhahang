@@ -83,8 +83,8 @@ function MonAnTab({ dishes, reloadDishes }) {
 
     try {
       const { duLieu: savedDish } = cheDoForm === 'edit'
-        ? await capNhatMonApi(idMonDangSua, payload)
-        : await taoMonApi(payload)
+        ? await capNhatMonApi(idMonDangSua, duLieuGuiDi)
+        : await taoMonApi(duLieuGuiDi)
 
       if (!savedDish) {
         setLoiForm('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')

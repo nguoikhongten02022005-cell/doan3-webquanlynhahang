@@ -31,7 +31,7 @@ export const CAC_BO_LOC_CA = Object.freeze([
 export const CAC_KHU_VUC_BAN = Object.freeze([
   { id: 'SANH_CHINH', name: 'Sảnh chính', total: 12 },
   { id: 'PHONG_VIP', name: 'Phòng VIP', total: 4 },
-  { id: 'BAN_CONG', name: 'Ban công', total: 6 },
+  { id: 'BAN_CONG', name: 'Ngoài trời', total: 6 },
   { id: 'QUAY_BAR', name: 'Quầy bar', total: 5 },
 ])
 

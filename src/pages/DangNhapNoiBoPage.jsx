@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
+import { TAI_KHOAN_NOI_BO_DEMO } from '../constants/xacThucDemo'
 
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
@@ -13,7 +14,7 @@ function DangNhapNoiBoPage() {
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
 
   if (daDangNhap && coTheVaoNoiBo) {
-    return <Navigate to="/noi-bo/bang-dieu-khien" replace />
+    return <Navigate to="/admin/dashboard" replace />
   }
 
   const handleSubmit = async (e) => {
@@ -40,19 +41,48 @@ function DangNhapNoiBoPage() {
       }
 
       setLoiDangNhap('')
-      navigate(location.state?.from || '/noi-bo/bang-dieu-khien', { replace: true })
+      navigate(location.state?.from || '/admin/dashboard', { replace: true })
     } finally {
       setDangGui(false)
     }
   }
 
   return (
-    <section className="xac-thuc-page noi-bo-login-page">
-      <div className="xac-thuc-card">
-        <h1 className="xac-thuc-title">Đăng nhập nội bộ</h1>
+    <section className="xac-thuc-page noi-bo-login-page admin-login-page">
+      <div className="xac-thuc-card admin-login-card">
+        <div className="admin-login-brand">
+          <div className="admin-login-brand__mark">NH</div>
+          <div>
+            <p className="admin-login-brand__kicker">Nguyên Vị</p>
+            <strong>Operations Console</strong>
+          </div>
+        </div>
+
+        <h1 className="xac-thuc-title">Đăng nhập quản trị</h1>
         <p className="xac-thuc-subtitle">
-          Dành cho quản trị viên và nhân viên vận hành truy cập bảng điều khiển nội bộ.
+          Ưu tiên hoàn thiện frontend trước backend, nên bạn có thể dùng tài khoản demo để xem toàn bộ Admin Panel ngay.
         </p>
+
+        <div className="admin-demo-credentials" aria-label="Tài khoản demo nội bộ">
+          {TAI_KHOAN_NOI_BO_DEMO.map((account) => (
+            <button
+              key={account.username}
+              type="button"
+              className="admin-demo-credentials__item"
+              onClick={() => {
+                setTenDangNhapHoacEmail(account.username)
+                setMatKhau(account.password)
+                setLoiDangNhap('')
+              }}
+            >
+              <div>
+                <strong>{account.user.role === 'admin' ? 'Admin demo' : 'Nhân viên demo'}</strong>
+                <p>{account.identifier}</p>
+              </div>
+              <span>{account.username} / {account.password}</span>
+            </button>
+          ))}
+        </div>
 
         <form onSubmit={handleSubmit} className="xac-thuc-form">
           <div className="nhom-truong">
@@ -105,14 +135,14 @@ function DangNhapNoiBoPage() {
             </p>
           )}
 
-          <button type="submit" className="btn nut-chinh" disabled={dangGui}>
-            {dangGui ? 'Đang đăng nhập...' : 'Vào khu vực nội bộ'}
+          <button type="submit" className="btn nut-chinh admin-login-submit" disabled={dangGui}>
+            {dangGui ? 'Đang đăng nhập...' : 'Vào Admin Panel'}
           </button>
         </form>
 
-        <div className="xac-thuc-demo-note" aria-live="polite">
+        <div className="xac-thuc-demo-note admin-login-note" aria-live="polite">
           <strong>Khu vực dành cho nhân sự</strong>
-          <p>Chỉ tài khoản quản trị viên và nhân viên vận hành mới có thể truy cập bảng điều khiển nội bộ.</p>
+          <p>Hiện frontend đang ưu tiên trước backend, nên có sẵn tài khoản demo admin và nhân viên để bạn kiểm tra giao diện.</p>
           <p>
             Bạn là khách hàng?{' '}
             <Link to="/dang-nhap" className="xac-thuc-switch-link">

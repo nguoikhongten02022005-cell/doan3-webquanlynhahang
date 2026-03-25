@@ -91,7 +91,7 @@ function TongQuanTab({
                 <article key={booking.id} className="noi-bo-board-item">
                   <div className="noi-bo-board-item-top">
                     <div>
-                      <strong>{booking.bookingCode || `DB-${booking.id}`}</strong>
+                      <strong>{booking.bookingCode || booking.code || `DB-${booking.id}`}</strong>
                       <p>{booking.name} · {dinhDangSoKhach(booking.guests)}</p>
                     </div>
                     <span className={`nhan-trang-thai tone-${laySacThaiTrangThaiDatBan(booking.status)}`}>
@@ -130,7 +130,7 @@ function TongQuanTab({
                 <article key={order.id} className="noi-bo-board-item">
                   <div className="noi-bo-board-item-top">
                     <div>
-                      <strong>DH-{String(order.id).slice(-6)}</strong>
+                      <strong>{order.orderCode || order.code || order.id || 'DH-000001'}</strong>
                       <p>{order.customer?.fullName || 'Khách lẻ'}</p>
                     </div>
                     <span className={`nhan-trang-thai tone-${laySacThaiDonHang(order.status)}`}>

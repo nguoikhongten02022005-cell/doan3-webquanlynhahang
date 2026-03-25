@@ -34,7 +34,7 @@ export const NHAN_KHU_VUC_DAT_BAN = {
   KHONG_UU_TIEN: 'Không ưu tiên',
   SANH_CHINH: 'Sảnh chính',
   PHONG_VIP: 'Phòng riêng / VIP',
-  BAN_CONG: 'Ban công / ngoài trời',
+  BAN_CONG: 'Ngoài trời',
   QUAY_BAR: 'Quầy bar',
 }
 

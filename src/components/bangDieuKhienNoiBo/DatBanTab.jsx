@@ -139,11 +139,11 @@ function DatBanTab({
     }
 
     const ketQua = formMode === 'edit'
-      ? await handleUpdateInternalBooking(editingBookingId, payload)
-      : await handleCreateInternalBooking(payload)
+      ? await handleUpdateInternalBooking(editingBookingId, duLieuGuiDi)
+      : await handleCreateInternalBooking(duLieuGuiDi)
 
-    if (!result?.success) {
-      setFormError(result?.error || 'Không thể lưu đặt bàn nội bộ.')
+    if (!ketQua?.success) {
+      setFormError(ketQua?.error || 'Không thể lưu đặt bàn nội bộ.')
       return
     }
 
@@ -359,7 +359,7 @@ function DatBanTab({
               <article key={booking.id} className="van-hanh-dat-ban-card">
                 <div className="van-hanh-dat-ban-top">
                   <div>
-                    <strong>{booking.bookingCode || `DB-${booking.id}`}</strong>
+                    <strong>{booking.bookingCode || booking.code || `DB-${booking.id}`}</strong>
                     <p>{booking.name} · {booking.phone}</p>
                   </div>
                   <span className={`nhan-trang-thai tone-${laySacThaiTrangThaiDatBan(booking.status)}`}>

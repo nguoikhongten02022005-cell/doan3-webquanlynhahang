@@ -1,23 +1,37 @@
-import { Navigate, useLocation } from 'react-router-dom'
+import { Navigate, Outlet, useLocation, useOutletContext } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
 
-function TuyenDuongBaoVe({ children }) {
+function TuyenDuongBaoVe({
+  children,
+  loginPath = '/noi-bo/dang-nhap',
+  redirectUnauthorizedTo = '/',
+  yeuCauAdmin = false,
+}) {
   const location = useLocation()
-  const { daDangNhap, coTheVaoNoiBo, dangKhoiTaoXacThuc } = useXacThuc()
+  const outletContext = useOutletContext()
+  const { daDangNhap, coTheVaoNoiBo, dangKhoiTaoXacThuc, laAdmin } = useXacThuc()
 
   if (dangKhoiTaoXacThuc) {
     return <div className="dat-ban-empty">Đang xác thực phiên đăng nhập...</div>
   }
 
   if (!daDangNhap) {
-    return <Navigate to="/noi-bo/dang-nhap" replace state={{ from: location.pathname }} />
+    return <Navigate to={loginPath} replace state={{ from: location.pathname }} />
   }
 
   if (!coTheVaoNoiBo) {
-    return <Navigate to="/" replace />
+    return <Navigate to={redirectUnauthorizedTo} replace />
   }
 
-  return children
+  if (yeuCauAdmin && !laAdmin) {
+    return <Navigate to={redirectUnauthorizedTo} replace />
+  }
+
+  if (children) {
+    return children
+  }
+
+  return <Outlet context={outletContext} />
 }
 
 export default TuyenDuongBaoVe
