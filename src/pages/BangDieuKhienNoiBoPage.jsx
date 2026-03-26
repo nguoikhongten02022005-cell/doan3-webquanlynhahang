@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import TaiKhoanTab from '../components/bangDieuKhienNoiBo/TaiKhoanTab'
 import DatBanTab from '../components/bangDieuKhienNoiBo/DatBanTab'
@@ -66,28 +66,31 @@ function BangDieuKhienNoiBoPage() {
 
   const danhSachDatBanDaLocIds = useMemo(() => new Set(danhSachDatBanDaLoc.map((booking) => booking.id)), [danhSachDatBanDaLoc])
 
-  const locDatBanTheoPhamVi = (bookings) => bookings.filter((booking) => danhSachDatBanDaLocIds.has(booking.id))
+  const locDatBanTheoPhamVi = useCallback(
+    (bookings) => bookings.filter((booking) => danhSachDatBanDaLocIds.has(booking.id)),
+    [danhSachDatBanDaLocIds],
+  )
 
-  const hangDoiDatBanDaLoc = useMemo(() => locDatBanTheoPhamVi(hangDoiDatBan), [hangDoiDatBan, danhSachDatBanDaLocIds])
+  const hangDoiDatBanDaLoc = useMemo(() => locDatBanTheoPhamVi(hangDoiDatBan), [hangDoiDatBan, locDatBanTheoPhamVi])
 
   const danhSachDatBanDangHoatDongDaLoc = useMemo(
     () => locDatBanTheoPhamVi(danhSachDatBanDangHoatDong),
-    [danhSachDatBanDangHoatDong, danhSachDatBanDaLocIds],
+    [danhSachDatBanDangHoatDong, locDatBanTheoPhamVi],
   )
 
   const danhSachDatBanDaXacNhanDaLoc = useMemo(
     () => locDatBanTheoPhamVi(danhSachDatBanDaXacNhan),
-    [danhSachDatBanDaXacNhan, danhSachDatBanDaLocIds],
+    [danhSachDatBanDaXacNhan, locDatBanTheoPhamVi],
   )
 
   const danhSachDatBanChoXuLyDaLoc = useMemo(
     () => locDatBanTheoPhamVi(danhSachDatBanChoXuLy),
-    [danhSachDatBanChoXuLy, danhSachDatBanDaLocIds],
+    [danhSachDatBanChoXuLy, locDatBanTheoPhamVi],
   )
 
   const danhSachDatBanSapDienRaDaLoc = useMemo(
     () => locDatBanTheoPhamVi(danhSachDatBanSapDienRa),
-    [danhSachDatBanSapDienRa, danhSachDatBanDaLocIds],
+    [danhSachDatBanSapDienRa, locDatBanTheoPhamVi],
   )
 
   const soLuongDatBanDaCheckInDaLoc = useMemo(
@@ -97,7 +100,7 @@ function BangDieuKhienNoiBoPage() {
 
   const danhSachDatBanChuaGanBanDaLoc = useMemo(
     () => locDatBanTheoPhamVi(danhSachDatBanChuaGanBan),
-    [danhSachDatBanChuaGanBan, danhSachDatBanDaLocIds],
+    [danhSachDatBanChuaGanBan, locDatBanTheoPhamVi],
   )
 
   const urgentItems = useMemo(
