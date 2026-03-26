@@ -261,52 +261,43 @@
 }
 
 /* DatBanTab extras */
-.noi-bo-dat-ban-toolbar {
-  display: flex; gap: 0.5rem; align-items: center; margin-bottom: 0.8rem;
-}
-.noi-bo-dat-ban-form-card { margin-bottom: 1rem; }
-.noi-bo-dat-ban-hop-thoai-overlay {
-  position: fixed; inset: 0; z-index: 2000;
-  background: rgba(0,0,0,0.5); backdrop-filter: blur(3px);
-  display: flex; align-items: center; justify-content: center;
-  padding: 1rem; animation: fadeIn 0.2s;
-}
-.noi-bo-dat-ban-modal {
-  max-width: 560px; width: 100%; max-height: 85vh; overflow-y: auto;
-}
-.noi-bo-dat-ban-hop-thoai-head {
-  display: flex; justify-content: space-between; align-items: center;
-}
-.noi-bo-dat-ban-hop-thoai-close {
-  width: 2rem; height: 2rem; border-radius: 50%; border: none;
-  background: var(--surface-soft); cursor: pointer; font-size: 1rem;
-  display: flex; align-items: center; justify-content: center;
-}
-.noi-bo-dat-ban-assign-summary {
-  font-size: 0.82rem; color: var(--text-secondary); margin: 0.5rem 0;
-}
-.is-warning { color: #dc2626; font-weight: 600; }
-.noi-bo-dat-ban-ban-list {
-  display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
-  gap: 0.5rem; margin: 0.8rem 0;
-}
-.noi-bo-dat-ban-ban-option {
-  padding: 0.6rem; border: 1px solid var(--line);
-  border-radius: var(--radius-md); text-align: center;
-  font-size: 0.82rem; cursor: pointer; transition: all 0.2s;
-}
-.noi-bo-dat-ban-ban-option:hover { border-color: var(--primary); }
-.noi-bo-dat-ban-ban-option.selected {
-  border-color: var(--primary); background: var(--primary-light); color: var(--primary);
-}
-.noi-bo-dat-ban-hop-thoai-actions {
-  display: flex; gap: 0.5rem; justify-content: flex-end; margin-top: 1rem;
-}
-.noi-bo-dat-ban-confirm-modal { max-width: 400px; }
-.noi-bo-dat-ban-confirm-text {
-  font-size: 0.88rem; color: var(--text-secondary); margin: 0.5rem 0 1rem;
-}
 .noi-bo-list-top-gap { margin-top: 0.8rem; }
+
+.booking-admin-search {
+  min-width: min(100%, 320px);
+}
+
+.booking-admin-search .ant-input-affix-wrapper,
+.booking-admin-search.ant-input-affix-wrapper {
+  border-radius: 999px;
+  border-color: #E5E7EB;
+  background: #fff;
+  box-shadow: 0 8px 16px rgba(15, 23, 42, 0.035);
+}
+
+.booking-admin-search .ant-input-affix-wrapper:focus,
+.booking-admin-search.ant-input-affix-wrapper-focused {
+  border-color: #F97316;
+  box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
+}
+
+.booking-admin-filter-chip {
+  margin-inline-end: 0 !important;
+  border-radius: 999px;
+  border: 1px solid #E5E7EB;
+  background: #fff;
+  color: #64748b;
+  padding: 0.28rem 0.75rem;
+  font-size: 0.76rem;
+  font-weight: 600;
+  transition: all 0.2s ease;
+}
+
+.booking-admin-filter-chip.ant-tag-checkable-checked {
+  border-color: #FDBA74;
+  background: #FFF7ED;
+  color: #C2410C;
+}
 
 /* MonAnTab extras */
 .noi-bo-mon-form { margin-bottom: 1rem; }
@@ -321,6 +312,257 @@
 .noi-bo-mon-item-actions { display: flex; gap: 0.3rem; }
 
 /* DonHangTab extras */
+.noi-bo-don-hang-layout {
+  display: grid;
+  gap: 1rem;
+  grid-template-columns: minmax(0, 1.22fr) minmax(340px, 0.78fr);
+  align-items: start;
+}
+
+.noi-bo-don-hang-toolbar {
+  overflow: hidden;
+}
+
+.noi-bo-don-hang-ticket {
+  width: 100%;
+  border: 1px solid #E5E0DB;
+  border-left: 4px solid transparent;
+  border-radius: 22px;
+  background: rgba(255, 255, 255, 0.96);
+  padding: 1rem;
+  text-align: left;
+  box-shadow: 0 18px 40px rgba(55, 39, 28, 0.08);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+}
+
+.noi-bo-don-hang-ticket:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 24px 48px rgba(55, 39, 28, 0.11);
+}
+
+.noi-bo-don-hang-ticket.is-selected {
+  border-color: #FDBA74;
+  box-shadow: 0 0 0 3px rgba(249, 115, 22, 0.12), 0 24px 48px rgba(55, 39, 28, 0.11);
+}
+
+.noi-bo-don-hang-ticket--pending {
+  border-left-color: #ef4444;
+  background: linear-gradient(180deg, #fff8f6 0%, #fffdfb 100%);
+}
+
+.noi-bo-don-hang-ticket--preparing {
+  border-left-color: #3b82f6;
+  background: linear-gradient(180deg, #f5f9ff 0%, #ffffff 100%);
+}
+
+.noi-bo-don-hang-ticket--served {
+  border-left-color: #22c55e;
+  background: #ffffff;
+}
+
+.noi-bo-don-hang-ticket--paid {
+  border-left-color: #0f766e;
+  background: linear-gradient(180deg, #f7fffd 0%, #ffffff 100%);
+}
+
+.noi-bo-don-hang-ticket--cancelled {
+  border-left-color: #94a3b8;
+  background: linear-gradient(180deg, #fafafa 0%, #ffffff 100%);
+}
+
+.noi-bo-don-hang-ticket__top {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-start;
+}
+
+.noi-bo-don-hang-ticket__code {
+  margin: 0 0 0.3rem;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.noi-bo-don-hang-ticket__table {
+  display: block;
+  font-size: 1.65rem;
+  line-height: 1;
+  font-weight: 700;
+  letter-spacing: -0.05em;
+  color: #0f172a;
+}
+
+.noi-bo-don-hang-ticket__meta {
+  display: grid;
+  gap: 0.7rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  margin-top: 1rem;
+}
+
+.noi-bo-don-hang-ticket__meta div {
+  padding: 0.72rem 0.78rem;
+  border-radius: 16px;
+  border: 1px solid rgba(148, 163, 184, 0.18);
+  background: rgba(255, 255, 255, 0.76);
+}
+
+.noi-bo-don-hang-ticket__meta span,
+.noi-bo-don-hang-ticket__footer span {
+  display: block;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #94a3b8;
+}
+
+.noi-bo-don-hang-ticket__meta strong {
+  display: block;
+  margin-top: 0.32rem;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.noi-bo-don-hang-ticket__footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  align-items: flex-end;
+  margin-top: 1rem;
+}
+
+.noi-bo-don-hang-ticket__footer > span:first-child {
+  flex: 1;
+}
+
+.noi-bo-don-hang-ticket__note {
+  max-width: 48%;
+  text-align: right;
+}
+
+.noi-bo-don-hang-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0.38rem 0.82rem;
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.noi-bo-don-hang-badge.badge-pending {
+  background: #fff1f2;
+  color: #b91c1c;
+  border: 1px solid #fecdd3;
+}
+
+.noi-bo-don-hang-badge.badge-preparing {
+  background: #eff6ff;
+  color: #1d4ed8;
+  border: 1px solid #bfdbfe;
+}
+
+.noi-bo-don-hang-badge.badge-served {
+  background: #ecfdf5;
+  color: #15803d;
+  border: 1px solid #bbf7d0;
+}
+
+.noi-bo-don-hang-badge.badge-paid {
+  background: #f0fdfa;
+  color: #0f766e;
+  border: 1px solid #99f6e4;
+}
+
+.noi-bo-don-hang-badge.badge-cancelled {
+  background: #f8fafc;
+  color: #475569;
+  border: 1px solid #cbd5e1;
+}
+
+.noi-bo-don-hang-form-shell {
+  min-width: 0;
+}
+
+.noi-bo-don-hang-detail-grid {
+  display: grid;
+  gap: 0.85rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.noi-bo-don-hang-detail-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.38rem;
+}
+
+.noi-bo-don-hang-detail-field--wide {
+  grid-column: 1 / -1;
+}
+
+.noi-bo-don-hang-detail-field > span {
+  display: inline-flex;
+  gap: 0.35rem;
+  align-items: center;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: #64748b;
+}
+
+.noi-bo-don-hang-detail-loading {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-size: 0.84rem;
+  color: #64748b;
+}
+
+.noi-bo-don-hang-items-table .ant-table-wrapper {
+  border-radius: 16px;
+  overflow: hidden;
+}
+
+.noi-bo-don-hang-items-table .ant-table {
+  background: #fff;
+  border: 1px solid #e2e8f0;
+}
+
+.noi-bo-don-hang-item-name {
+  display: flex;
+  flex-direction: column;
+  gap: 0.18rem;
+}
+
+.noi-bo-don-hang-item-name strong {
+  font-size: 0.88rem;
+  color: #0f172a;
+}
+
+.noi-bo-don-hang-item-name span,
+.noi-bo-don-hang-cell-muted,
+.noi-bo-don-hang-items-empty {
+  font-size: 0.76rem;
+  color: #64748b;
+}
+
+.noi-bo-don-hang-items-empty {
+  padding: 0.4rem 0;
+}
+
+.noi-bo-don-hang-form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  padding-top: 0.2rem;
+}
 
 /* BanAnTab extras */
 .noi-bo-ban-overview-grid {
@@ -391,8 +633,20 @@
   }
 
   .noi-bo-operations-grid,
-  .noi-bo-secondary-grid {
+  .noi-bo-secondary-grid,
+  .noi-bo-don-hang-layout,
+  .noi-bo-don-hang-detail-grid {
     grid-template-columns: 1fr;
+  }
+
+  .noi-bo-don-hang-ticket__footer {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .noi-bo-don-hang-ticket__note {
+    max-width: none;
+    text-align: left;
   }
 }
 

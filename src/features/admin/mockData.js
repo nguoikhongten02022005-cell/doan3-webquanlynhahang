@@ -235,6 +235,7 @@ export const taoDuLieuNoiBoDuPhong = () => {
   const orders = [
     {
       id: 'mock-order-1',
+      orderCode: 'DH-20260326001',
       status: 'MOI_TAO',
       orderDate: new Date().toISOString(),
       total: 485000,
@@ -248,9 +249,14 @@ export const taoDuLieuNoiBoDuPhong = () => {
         phone: '0901234567',
         email: 'vana@example.com',
       },
+      items: [
+        { id: 'mock-order-1-item-1', name: 'Lẩu bò premium', quantity: 1, price: 325000, size: 'L', note: 'Ít cay' },
+        { id: 'mock-order-1-item-2', name: 'Trà đào cam sả', quantity: 2, price: 80000, size: 'M', note: '' },
+      ],
     },
     {
       id: 'mock-order-2',
+      orderCode: 'DH-20260326002',
       status: 'DANG_CHUAN_BI',
       orderDate: new Date(Date.now() - 45 * 60 * 1000).toISOString(),
       total: 920000,
@@ -264,9 +270,15 @@ export const taoDuLieuNoiBoDuPhong = () => {
         phone: '0902345678',
         email: 'thib@example.com',
       },
+      items: [
+        { id: 'mock-order-2-item-1', name: 'Bít tết bò Úc', quantity: 2, price: 310000, size: 'M', note: 'Chín vừa' },
+        { id: 'mock-order-2-item-2', name: 'Salad cá hồi', quantity: 1, price: 180000, size: 'M', note: '' },
+        { id: 'mock-order-2-item-3', name: 'Soda yuzu', quantity: 2, price: 60000, size: 'M', note: '' },
+      ],
     },
     {
       id: 'mock-order-3',
+      orderCode: 'DH-20260326003',
       status: 'DA_HOAN_THANH',
       orderDate: new Date(Date.now() - 3 * 60 * 60 * 1000).toISOString(),
       total: 1280000,
@@ -280,6 +292,10 @@ export const taoDuLieuNoiBoDuPhong = () => {
         phone: '0903456789',
         email: 'minhc@example.com',
       },
+      items: [
+        { id: 'mock-order-3-item-1', name: 'Set hải sản nướng', quantity: 1, price: 890000, size: 'L', note: '' },
+        { id: 'mock-order-3-item-2', name: 'Rượu vang đỏ house', quantity: 1, price: 390000, size: 'Bottle', note: '' },
+      ],
     },
   ]
 

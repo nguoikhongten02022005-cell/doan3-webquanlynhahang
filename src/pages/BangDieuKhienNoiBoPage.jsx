@@ -276,6 +276,7 @@ function BangDieuKhienNoiBoPage() {
 
             {tabDangMo === TAB_NOI_BO.BAN_AN && (
               <BanAnTab
+                variant="legacy"
                 xuLyDanhDauBanBan={xuLyDanhDauBanBan}
                 xuLyDanhDauBanSanSang={xuLyDanhDauBanSanSang}
                 phamViLabel={phamViLabel}

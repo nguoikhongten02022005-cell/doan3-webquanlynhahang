@@ -1,3 +1,7 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 * {
   box-sizing: border-box;
 }
@@ -99,4 +103,22 @@ select {
     transform: none;
     width: auto;
   }
+}
+
+.admin-pos-table-tabs .ant-tabs-nav {
+  margin-bottom: 1rem;
+}
+
+.admin-pos-table-tabs .ant-tabs-tab {
+  border-radius: 999px;
+  padding: 0.35rem 0.25rem;
+}
+
+.admin-pos-table-tabs .ant-tabs-tab-btn {
+  display: inline-flex;
+  align-items: center;
+}
+
+.admin-pos-table-tabs .ant-tabs-ink-bar {
+  background: #f97316;
 }

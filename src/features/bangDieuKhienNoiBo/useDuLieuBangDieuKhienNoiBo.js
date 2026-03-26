@@ -2,7 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDanhSachMonAn } from '../../hooks/useDanhSachMonAn'
 import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../../hooks/useDatBan'
 import { layDanhSachNguoiDungApi } from '../../services/api/apiXacThuc'
-import { layDanhSachDonHangApi } from '../../services/api/apiDonHang'
+import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
 import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN } from './hangSo'
@@ -184,6 +184,42 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
+  const layChiTietDonHang = useCallback(async (orderId) => {
+    if (!coSuDungMayChu()) {
+      return danhSachDonHang.find((order) => String(order.id) === String(orderId)) || null
+    }
+
+    const ketQua = await layChiTietDonHangApi(orderId)
+    return ketQua?.duLieu || null
+  }, [danhSachDonHang])
+
+  const xuLyCapNhatTrangThaiDonHang = useCallback(async (orderId, status) => {
+    if (!coSuDungMayChu()) {
+      let duLieuCapNhat = null
+
+      setDanhSachDonHang((currentOrders) => currentOrders.map((order) => {
+        if (String(order.id) !== String(orderId)) {
+          return order
+        }
+
+        duLieuCapNhat = { ...order, status }
+        return duLieuCapNhat
+      }))
+
+      return {
+        duLieu: duLieuCapNhat,
+        thongDiep: 'Cập nhật trạng thái đơn hàng thành công',
+        meta: null,
+      }
+    }
+
+    const ketQua = await capNhatTrangThaiDonHangApi(orderId, status)
+    if (ketQua?.duLieu) {
+      await taiLaiDuLieu()
+    }
+    return ketQua
+  }, [taiLaiDuLieu])
+
   return {
     tomTatTaiKhoan,
     danhSachDatBanDangHoatDong,
@@ -204,6 +240,8 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     xuLyKhachKhongDen,
     xuLyCapNhatDatBanNoiBo,
     layBanPhuHopChoDatBan,
+    layChiTietDonHang,
+    xuLyCapNhatTrangThaiDonHang,
     danhSachDonHangDangMo,
     tomTatDonHang,
     danhSachDatBanChoXuLy,
