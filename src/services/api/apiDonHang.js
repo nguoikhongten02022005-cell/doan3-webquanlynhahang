@@ -42,26 +42,40 @@ const chuanHoaKhachHang = (order) => ({
   address: layGiaTri(order, 'diaChiKhachHang', 'DiaChiKhachHang') || order.customer?.address || '',
 })
 
+const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
+
 const chuanHoaDonHang = (order) => {
   if (!order || typeof order !== 'object') {
     return null
   }
+
+  const items = chuanHoaDanhSachChiTiet(order.items)
+  const subtotalFromItems = items.reduce((tong, item) => tong + item.price * item.quantity, 0)
+  const subtotalValue = Number(layGiaTri(order, 'subtotal', 'tamTinh', 'TamTinh'))
+  const serviceFeeValue = Number(layGiaTri(order, 'serviceFee', 'phiDichVu', 'PhiDichVu'))
+  const discountAmountValue = Number(layGiaTri(order, 'discountAmount', 'tienGiam', 'TienGiam'))
+  const totalValue = Number(layGiaTri(order, 'total', 'thanhTien', 'ThanhTien'))
+  const subtotal = Number.isFinite(subtotalValue) ? subtotalValue : subtotalFromItems
+  const serviceFee = Number.isFinite(serviceFeeValue) ? serviceFeeValue : tinhPhiDichVu(subtotal)
+  const discountAmount = Number.isFinite(discountAmountValue) ? discountAmountValue : 0
+  const total = Number.isFinite(totalValue) ? totalValue : Math.max(0, subtotal + serviceFee - discountAmount)
 
   return {
     ...order,
     id: layGiaTri(order, 'id', 'Id'),
     orderCode: layGiaTri(order, 'orderCode', 'code', 'maDonHang', 'MaDonHang') || '',
     orderDate: layGiaTri(order, 'orderDate', 'datLuc', 'DatLuc') || '',
-    total: Number(layGiaTri(order, 'total', 'thanhTien', 'ThanhTien') || 0),
-    subtotal: Number(layGiaTri(order, 'subtotal', 'tamTinh', 'TamTinh') || 0),
-    discountAmount: Number(layGiaTri(order, 'discountAmount', 'tienGiam', 'TienGiam') || 0),
+    total,
+    subtotal,
+    serviceFee,
+    discountAmount,
     paymentMethod: layGiaTri(order, 'paymentMethod', 'phuongThucThanhToan', 'PhuongThucThanhToan') || 'TIEN_MAT',
     paymentStatus: layGiaTri(order, 'paymentStatus', 'trangThaiThanhToan', 'TrangThaiThanhToan') || '',
     note: layGiaTri(order, 'note', 'ghiChu', 'GhiChu') || '',
     tableNumber: layGiaTri(order, 'tableNumber', 'maBan', 'MaBan') || '',
     status: layGiaTri(order, 'status', 'trangThai', 'TrangThai') || '',
     customer: chuanHoaKhachHang(order),
-    items: chuanHoaDanhSachChiTiet(order.items),
+    items,
   }
 }
 

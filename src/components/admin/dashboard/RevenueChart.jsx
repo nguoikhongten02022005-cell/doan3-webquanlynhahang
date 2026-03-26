@@ -2,7 +2,7 @@ import { Card } from 'antd'
 import { Column } from '@ant-design/plots'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 
-function RevenueChart({ revenue }) {
+function RevenueChart({ revenue, title = 'Doanh thu 7 ngày gần nhất' }) {
   const data = revenue?.series || []
 
   const config = {
@@ -36,7 +36,7 @@ function RevenueChart({ revenue }) {
   }
 
   return (
-    <Card className="admin-dashboard-card" title="Doanh thu 7 ngày gần nhất" extra={dinhDangTienTe(revenue?.summary?.revenue || 0)} styles={{ body: { padding: '10px 14px' } }}>
+    <Card className="admin-dashboard-card" title={title} extra={dinhDangTienTe(revenue?.summary?.revenue || 0)} styles={{ body: { padding: '10px 14px' } }}>
       <Column {...config} height={232} />
     </Card>
   )

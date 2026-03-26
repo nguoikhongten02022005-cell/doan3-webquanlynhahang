@@ -3,11 +3,12 @@ import {
   CheckOutlined,
   ClockCircleOutlined,
   CreditCardOutlined,
+  EyeOutlined,
   ShoppingCartOutlined,
-  SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Badge, Button, Drawer, Empty, Tabs } from 'antd'
+import { Badge, Button, Drawer, Empty, Tabs, message } from 'antd'
+import { useNavigate } from 'react-router-dom'
 import { layNhanChoNgoi } from '../../features/bangDieuKhienNoiBo/dinhDang'
 
 const TABLE_STATUS_LABELS = {
@@ -64,17 +65,37 @@ const TABLE_STATUS_STYLES = {
 }
 
 const drawerButtonStyles = {
-  order: {
+  primary: {
     background: 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)',
     borderColor: '#f97316',
     boxShadow: '0 12px 24px rgba(249, 115, 22, 0.2)',
   },
-  payment: {
+  success: {
     background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
     borderColor: '#16a34a',
     boxShadow: '0 12px 24px rgba(34, 197, 94, 0.18)',
   },
+  danger: {
+    background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+    borderColor: '#ea580c',
+    boxShadow: '0 12px 24px rgba(234, 88, 12, 0.2)',
+  },
 }
+
+const getTargetRows = (tableCount) => {
+  if (tableCount >= 10) return 3
+  if (tableCount >= 5) return 2
+  return 1
+}
+
+const getAreaGridColumns = (tableCount) => {
+  if (tableCount <= 0) return 1
+
+  const targetRows = getTargetRows(tableCount)
+  return Math.max(1, Math.ceil(tableCount / targetRows))
+}
+
+const getAreaDotClass = (occupancyRate) => (occupancyRate >= 1 ? 'bg-orange-500' : 'bg-slate-300')
 
 const formatBookingTime = (booking) => {
   if (!booking?.time) return ''
@@ -181,12 +202,30 @@ function LegacyBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, xuLyD
   )
 }
 
-function PosBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, bookings, xuLyDanhDauBanSanSang }) {
+function PosBanAnTab({
+  phamViLabel,
+  tomTatBan,
+  tables,
+  tomTatTonKhoBan,
+  bookings,
+  orders,
+  xuLyCheckIn,
+  xuLyDanhDauBanSanSang,
+  xuLyHoanThanh,
+}) {
+  const navigate = useNavigate()
+  const [messageApi, contextHolder] = message.useMessage()
   const [selectedTableId, setSelectedTableId] = useState(null)
+  const [isSubmittingAction, setIsSubmittingAction] = useState(false)
 
   const bookingById = useMemo(
     () => new Map((bookings || []).map((booking) => [String(booking.id), booking])),
     [bookings],
+  )
+
+  const ordersByTableCode = useMemo(
+    () => new Map((orders || []).map((order) => [String(order.tableNumber || '').trim().toUpperCase(), order]).filter(([tableCode]) => tableCode)),
+    [orders],
   )
 
   const tableViewModels = useMemo(
@@ -198,6 +237,11 @@ function PosBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, bookings
     () => tableViewModels.find((table) => table.id === selectedTableId) || null,
     [selectedTableId, tableViewModels],
   )
+
+  const selectedOrder = useMemo(() => {
+    if (!selectedTable) return null
+    return ordersByTableCode.get(String(selectedTable.code || selectedTable.displayName || '').trim().toUpperCase()) || null
+  }, [ordersByTableCode, selectedTable])
 
   const summaryItems = [
     { key: 'total', label: 'Tổng bàn', value: tomTatTonKhoBan.total, dot: 'bg-slate-400' },
@@ -215,13 +259,145 @@ function PosBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, bookings
     await xuLyDanhDauBanSanSang?.(tableId)
   }
 
+  const runTableAction = async (action) => {
+    if (!selectedTable || isSubmittingAction || !action) return
+
+    if (action.type === 'navigate-orders') {
+      navigate('/admin/don-hang')
+      handleCloseDrawer()
+      return
+    }
+
+    if (action.type === 'walk-in') {
+      messageApi.info('Dùng tab Đặt bàn để tạo booking walk-in cho bàn này.')
+      handleCloseDrawer()
+      navigate('/admin/dat-ban')
+      return
+    }
+
+    setIsSubmittingAction(true)
+
+    try {
+      if (action.type === 'check-in') {
+        if (!selectedTable.booking?.id) {
+          messageApi.warning('Bàn này chưa có booking để check-in.')
+          return
+        }
+
+        const ketQua = await xuLyCheckIn?.(selectedTable.booking.id)
+        if (ketQua?.success) {
+          messageApi.success('Đã check-in booking cho bàn này.')
+          handleCloseDrawer()
+          return
+        }
+
+        messageApi.error(ketQua?.error || 'Không thể check-in booking.')
+        return
+      }
+
+      if (action.type === 'complete-booking') {
+        if (!selectedTable.booking?.id) {
+          messageApi.warning('Bàn này chưa có booking đang phục vụ để giải phóng.')
+          return
+        }
+
+        const ketQua = await xuLyHoanThanh?.(selectedTable.booking.id)
+        if (ketQua?.success) {
+          messageApi.success('Đã giải phóng bàn thành công.')
+          handleCloseDrawer()
+          return
+        }
+
+        messageApi.error(ketQua?.error || 'Không thể giải phóng bàn.')
+        return
+      }
+
+      if (action.type === 'mark-ready') {
+        await xuLyDanhDauBanSanSang?.(selectedTable.id)
+        messageApi.success('Đã đánh dấu bàn sẵn sàng.')
+        handleCloseDrawer()
+      }
+    } finally {
+      setIsSubmittingAction(false)
+    }
+  }
+
+  const selectedTableActions = useMemo(() => {
+    if (!selectedTable) return []
+
+    if (selectedTable.status === 'AVAILABLE') {
+      return [
+        {
+          key: 'walk-in',
+          type: 'walk-in',
+          label: 'Nhận walk-in',
+          icon: <ShoppingCartOutlined />,
+          style: drawerButtonStyles.primary,
+          typeButton: 'primary',
+        },
+      ]
+    }
+
+    if (selectedTable.status === 'HELD') {
+      return [
+        {
+          key: 'check-in',
+          type: 'check-in',
+          label: 'Check-in',
+          icon: <CheckOutlined />,
+          style: drawerButtonStyles.success,
+          typeButton: 'primary',
+          disabled: !selectedTable.booking?.id,
+        },
+      ]
+    }
+
+    if (selectedTable.status === 'OCCUPIED') {
+      return [
+        {
+          key: 'view-order',
+          type: 'navigate-orders',
+          label: selectedOrder ? `Xem đơn #${selectedOrder.orderCode || selectedOrder.code || selectedOrder.id}` : 'Xem đơn',
+          icon: <EyeOutlined />,
+          typeButton: 'default',
+        },
+        {
+          key: 'free-table',
+          type: 'complete-booking',
+          label: 'Giải phóng bàn',
+          icon: <CreditCardOutlined />,
+          style: drawerButtonStyles.danger,
+          typeButton: 'primary',
+          disabled: !selectedTable.booking?.id,
+        },
+      ]
+    }
+
+    if (selectedTable.status === 'DIRTY') {
+      return [
+        {
+          key: 'mark-ready',
+          type: 'mark-ready',
+          label: 'Đánh dấu đã dọn',
+          icon: <CheckOutlined />,
+          style: drawerButtonStyles.success,
+          typeButton: 'primary',
+        },
+      ]
+    }
+
+    return []
+  }, [selectedOrder, selectedTable])
+
   const tabItems = tomTatBan.map((area) => {
     const areaTables = tableViewModels.filter((table) => table.areaId === area.id)
+    const areaGridColumns = getAreaGridColumns(areaTables.length)
 
     return {
       key: area.id,
       label: (
         <div className="flex items-center gap-2">
+          <span className={`inline-flex h-2.5 w-2.5 rounded-full ${getAreaDotClass(area.occupancyRate)}`} />
           <span className="font-semibold text-slate-800">{area.name}</span>
           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
             {area.available}/{area.total}
@@ -229,7 +405,7 @@ function PosBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, bookings
         </div>
       ),
       children: areaTables.length ? (
-        <div className="grid grid-cols-[repeat(auto-fill,minmax(126px,1fr))] gap-3">
+        <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${areaGridColumns}, minmax(126px, 1fr))` }}>
           {areaTables.map((table) => (
             <button
               key={table.id}
@@ -293,6 +469,7 @@ function PosBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, bookings
 
   return (
     <>
+      {contextHolder}
       <article className="rounded-[28px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-5">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
@@ -394,28 +571,28 @@ function PosBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, bookings
 
             <div className="rounded-[22px] border border-slate-200 bg-white p-4 shadow-sm">
               <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Khối action</div>
+              <div className="mt-1 text-sm text-slate-500">
+                {selectedTable.status === 'AVAILABLE' ? 'Nhận khách walk-in nhanh cho bàn đang trống.' : null}
+                {selectedTable.status === 'HELD' ? 'Check-in booking đã gán cho bàn này.' : null}
+                {selectedTable.status === 'OCCUPIED' ? 'Mở luồng đơn hàng hiện tại hoặc giải phóng bàn sau khi phục vụ xong.' : null}
+                {selectedTable.status === 'DIRTY' ? 'Xác nhận bàn đã dọn xong để sẵn sàng nhận khách mới.' : null}
+              </div>
               <div className="mt-4 flex flex-col gap-3">
-                <Button
-                  type="primary"
-                  size="large"
-                  block
-                  icon={<ShoppingCartOutlined />}
-                  style={drawerButtonStyles.order}
-                >
-                  Thêm món / Gọi món
-                </Button>
-                <Button
-                  type="primary"
-                  size="large"
-                  block
-                  icon={<CreditCardOutlined />}
-                  style={drawerButtonStyles.payment}
-                >
-                  Thanh toán
-                </Button>
-                <Button size="large" block icon={<SwapOutlined />}>
-                  Đổi bàn
-                </Button>
+                {selectedTableActions.map((action) => (
+                  <Button
+                    key={action.key}
+                    type={action.typeButton || 'default'}
+                    size="large"
+                    block
+                    icon={action.icon}
+                    style={action.style}
+                    disabled={action.disabled || isSubmittingAction}
+                    loading={isSubmittingAction && action.type !== 'navigate-orders' && action.type !== 'walk-in'}
+                    onClick={() => runTableAction(action)}
+                  >
+                    {action.label}
+                  </Button>
+                ))}
               </div>
             </div>
           </div>

@@ -51,14 +51,6 @@ export const ADMIN_NAVIGATION = Object.freeze([
     glyph: '◌',
     adminOnly: true,
   },
-  {
-    key: 'cai-dat',
-    label: 'Cài đặt',
-    path: '/admin/cai-dat',
-    group: 'HỆ THỐNG',
-    glyph: '⚙',
-    adminOnly: true,
-  },
 ])
 
 export const locMenuAdminTheoQuyen = (laAdmin) => (

@@ -6,10 +6,13 @@ function AdminSoDoBanPage() {
   const {
     xuLyDanhDauBanBan,
     xuLyDanhDauBanSanSang,
+    xuLyCheckIn,
+    xuLyHoanThanh,
     tomTatTonKhoBan,
     tomTatBan,
     danhSachBan,
     danhSachDatBan,
+    danhSachDonHangDaSapXep,
   } = useOutletContext()
 
   const phamViLabel = layNhanPhamViTongQuan('all', 'all')
@@ -19,8 +22,11 @@ function AdminSoDoBanPage() {
       <BanAnTab
         variant="pos"
         bookings={danhSachDatBan}
+        orders={danhSachDonHangDaSapXep}
+        xuLyCheckIn={xuLyCheckIn}
         xuLyDanhDauBanBan={xuLyDanhDauBanBan}
         xuLyDanhDauBanSanSang={xuLyDanhDauBanSanSang}
+        xuLyHoanThanh={xuLyHoanThanh}
         phamViLabel={phamViLabel}
         tomTatTonKhoBan={tomTatTonKhoBan}
         tomTatBan={tomTatBan}

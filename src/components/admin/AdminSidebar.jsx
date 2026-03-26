@@ -21,7 +21,6 @@ function AdminSidebar({ laAdmin, badges, nguoiDungHienTai, onLogout, onNavigate,
       <nav className="admin-sidebar__nav">
         {nhomKeys.map((group) => (
           <div key={group} className="admin-sidebar__group">
-            <p className="admin-sidebar__group-label">{group}</p>
             <div className="admin-sidebar__group-items">
               {menuTheoNhom[group].map((item) => {
                 const badgeValue = item.badgeKey ? badges?.[item.badgeKey] : 0

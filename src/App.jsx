@@ -22,7 +22,6 @@ import AdminThucDonPage from './pages/admin/AdminThucDonPage'
 import AdminDonHangPage from './pages/admin/AdminDonHangPage'
 import AdminNhanVienPage from './pages/admin/AdminNhanVienPage'
 import AdminThongKePage from './pages/admin/AdminThongKePage'
-import AdminCaiDatPage from './pages/admin/AdminCaiDatPage'
 
 function App() {
   return (
@@ -66,7 +65,6 @@ function App() {
             )}
           >
             <Route path="nhan-vien" element={<AdminNhanVienPage />} />
-            <Route path="cai-dat" element={<AdminCaiDatPage />} />
           </Route>
         </Route>
 

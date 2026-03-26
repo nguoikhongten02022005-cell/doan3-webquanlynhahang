@@ -3,6 +3,13 @@ import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../../constants/danhMucThucDon'
 import { TAI_KHOAN_NOI_BO_DEMO } from '../../constants/xacThucDemo'
 import { TRANG_THAI_BAN } from '../../services/dichVuBanAn'
 
+export const ADMIN_TIME_RANGE_OPTIONS = Object.freeze([
+  { key: 'today', label: 'Hôm nay' },
+  { key: 'last7Days', label: '7 ngày' },
+  { key: 'last30Days', label: '30 ngày' },
+  { key: 'thisMonth', label: 'Tháng này' },
+])
+
 export const ADMIN_NOTIFICATION_COUNT = 4
 
 export const ADMIN_REVENUE_SERIES = Object.freeze([
@@ -324,44 +331,209 @@ export const taoDuLieuNoiBoDuPhong = () => {
   }
 }
 
-export const taoDuLieuThongKeDoanhThu = ({ orders = [], bookings = [] } = {}) => {
-  const tongDoanhThu = orders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0)
-  const soDonHoanThanh = orders.filter((order) => order?.status === 'DA_HOAN_THANH').length
-  const giaTriTrungBinh = orders.length > 0 ? Math.round(tongDoanhThu / orders.length) : 0
+const parseDateValue = (value) => {
+  if (!value) return null
+  const parsed = new Date(value)
+  return Number.isNaN(parsed.getTime()) ? null : parsed
+}
 
-  const doanhThuTheoNgay = ADMIN_REVENUE_SERIES.map((item) => item.revenue)
-  const giaTriLonNhat = Math.max(...doanhThuTheoNgay, 1)
+const taoMocBatDauNgay = (date) => {
+  const clone = new Date(date)
+  clone.setHours(0, 0, 0, 0)
+  return clone
+}
 
-  const topMonRaw = DANH_SACH_MON.slice(0, 5).map((dish, index) => ({
-    id: dish.id,
-    name: dish.name,
-    quantity: 18 - index * 3,
-    revenue: (dish.priceValue || 0) * (18 - index * 3),
-  }))
+const laCungNgay = (left, right) => (
+  left.getFullYear() === right.getFullYear()
+  && left.getMonth() === right.getMonth()
+  && left.getDate() === right.getDate()
+)
 
-  const tongTopMon = topMonRaw.reduce((sum, item) => sum + item.revenue, 0)
+const isBookingCancelled = (booking) => booking?.status === 'DA_HUY'
+const isBookingCompleted = (booking) => booking?.status === 'DA_HOAN_THANH' || booking?.status === 'DA_CHECK_IN'
 
-  const topDishes = topMonRaw.map((item, index) => ({
+const filterOrdersByTimeRange = (orders, timeRange) => {
+  const now = new Date()
+  const startToday = taoMocBatDauNgay(now)
+
+  return orders.filter((order) => {
+    const orderDate = parseDateValue(order?.orderDate)
+    if (!orderDate) return false
+
+    if (timeRange === 'today') {
+      return laCungNgay(orderDate, now)
+    }
+
+    if (timeRange === 'last7Days') {
+      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
+      return orderDate >= rangeStart && orderDate <= now
+    }
+
+    if (timeRange === 'last30Days') {
+      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29))
+      return orderDate >= rangeStart && orderDate <= now
+    }
+
+    if (timeRange === 'thisMonth') {
+      return orderDate.getFullYear() === now.getFullYear() && orderDate.getMonth() === now.getMonth()
+    }
+
+    return orderDate >= startToday
+  })
+}
+
+const filterBookingsByTimeRange = (bookings, timeRange) => {
+  const now = new Date()
+  return bookings.filter((booking) => {
+    const bookingDate = parseDateValue(booking?.date)
+    if (!bookingDate) return false
+
+    if (timeRange === 'today') {
+      return laCungNgay(bookingDate, now)
+    }
+
+    if (timeRange === 'last7Days') {
+      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
+      return bookingDate >= rangeStart && bookingDate <= now
+    }
+
+    if (timeRange === 'last30Days') {
+      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29))
+      return bookingDate >= rangeStart && bookingDate <= now
+    }
+
+    if (timeRange === 'thisMonth') {
+      return bookingDate.getFullYear() === now.getFullYear() && bookingDate.getMonth() === now.getMonth()
+    }
+
+    return false
+  })
+}
+
+const buildRevenueSeries = (orders = []) => {
+  const today = taoMocBatDauNgay(new Date())
+  const fallbackSeries = ADMIN_REVENUE_SERIES.map((item) => item.revenue)
+
+  return Array.from({ length: 7 }, (_, index) => {
+    const day = new Date(today)
+    day.setDate(today.getDate() - (6 - index))
+
+    const revenueFromOrders = orders.reduce((sum, order) => {
+      const orderDate = parseDateValue(order?.orderDate)
+      if (!orderDate || !laCungNgay(orderDate, day)) return sum
+      return sum + (Number(order?.total) || 0)
+    }, 0)
+
+    const revenue = revenueFromOrders > 0 ? revenueFromOrders : fallbackSeries[index]
+
+    return {
+      label: `${pad(day.getDate())}/${pad(day.getMonth() + 1)}`,
+      revenue,
+    }
+  })
+}
+
+const buildTopDishes = (orders = []) => {
+  const dishMap = new Map()
+
+  orders.forEach((order) => {
+    ;(order?.items || []).forEach((item, index) => {
+      const quantity = Number(item?.quantity) || 0
+      const price = Number(item?.price) || 0
+      const revenue = quantity * price
+      const key = item?.id || `${item?.name || 'dish'}-${index}`
+
+      if (!dishMap.has(key)) {
+        dishMap.set(key, {
+          id: key,
+          name: item?.name || 'Món chưa đặt tên',
+          quantity: 0,
+          revenue: 0,
+        })
+      }
+
+      const current = dishMap.get(key)
+      current.quantity += quantity
+      current.revenue += revenue
+    })
+  })
+
+  if (dishMap.size === 0) {
+    return DANH_SACH_MON.slice(0, 5).map((dish, index) => ({
+      id: dish.id,
+      rank: index + 1,
+      name: dish.name,
+      quantity: 0,
+      revenue: 0,
+      percent: 0,
+    }))
+  }
+
+  const sorted = [...dishMap.values()]
+    .sort((left, right) => right.revenue - left.revenue || right.quantity - left.quantity)
+    .slice(0, 5)
+
+  const totalRevenue = sorted.reduce((sum, item) => sum + item.revenue, 0)
+
+  return sorted.map((item, index) => ({
     ...item,
     rank: index + 1,
-    percent: tongTopMon > 0 ? Math.round((item.revenue / tongTopMon) * 100) : 0,
+    percent: totalRevenue > 0 ? Math.round((item.revenue / totalRevenue) * 100) : 0,
   }))
+}
 
-  const categoryShares = CAC_DANH_MUC_CHUAN_THUC_DON.map((category, index) => ({
-    category,
-    percent: [34, 18, 16, 12, 20][index] || 0,
-  }))
+const buildCategoryShares = (topDishes = []) => {
+  const dishLookup = new Map(DANH_SACH_MON.map((dish) => [String(dish.id), dish]))
+  const categoryRevenueMap = new Map(CAC_DANH_MUC_CHUAN_THUC_DON.map((category) => [category, 0]))
+
+  topDishes.forEach((dish) => {
+    const matchedDish = dishLookup.get(String(dish.id)) || DANH_SACH_MON.find((item) => item.name === dish.name)
+    const category = matchedDish?.category
+    if (!categoryRevenueMap.has(category)) return
+    categoryRevenueMap.set(category, categoryRevenueMap.get(category) + dish.revenue)
+  })
+
+  const totalRevenue = [...categoryRevenueMap.values()].reduce((sum, value) => sum + value, 0)
+
+  return CAC_DANH_MUC_CHUAN_THUC_DON.map((category) => {
+    const revenue = categoryRevenueMap.get(category) || 0
+    return {
+      category,
+      percent: totalRevenue > 0 ? Math.round((revenue / totalRevenue) * 100) : 0,
+    }
+  })
+}
+
+export const taoDuLieuThongKeDoanhThu = ({ orders = [], bookings = [], timeRange = 'today' } = {}) => {
+  const filteredOrders = filterOrdersByTimeRange(orders, timeRange)
+  const filteredBookings = filterBookingsByTimeRange(bookings, timeRange)
+  const tongDoanhThu = filteredOrders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0)
+  const soDonHoanThanh = filteredOrders.filter((order) => order?.status === 'DA_HOAN_THANH').length
+  const giaTriTrungBinh = filteredOrders.length > 0 ? Math.round(tongDoanhThu / filteredOrders.length) : 0
+  const revenueSeries = buildRevenueSeries(filteredOrders)
+  const giaTriLonNhat = Math.max(...revenueSeries.map((item) => item.revenue), 1)
+  const topDishes = buildTopDishes(filteredOrders)
+  const categoryShares = buildCategoryShares(topDishes)
+  const totalBookings = filteredBookings.length
+  const completedBookings = filteredBookings.filter(isBookingCompleted).length
+  const cancelledBookings = filteredBookings.filter(isBookingCancelled).length
 
   return {
     overview: {
       revenue: tongDoanhThu,
       completedOrders: soDonHoanThanh,
       averageOrder: giaTriTrungBinh,
-      totalBookings: bookings.length,
+      totalBookings,
     },
-    revenueSeries: ADMIN_REVENUE_SERIES,
+    revenueSeries,
     topDishes,
     categoryShares,
     peakRevenue: giaTriLonNhat,
+    bookingStats: {
+      total: totalBookings,
+      completed: completedBookings,
+      cancelled: cancelledBookings,
+      cancellationRate: totalBookings > 0 ? Math.round((cancelledBookings / totalBookings) * 100) : 0,
+    },
   }
 }

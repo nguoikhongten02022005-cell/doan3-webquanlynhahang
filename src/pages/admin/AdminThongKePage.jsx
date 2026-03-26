@@ -1,28 +1,92 @@
+import { useMemo, useState } from 'react'
 import { useOutletContext } from 'react-router-dom'
+import RevenueChart from '../../components/admin/dashboard/RevenueChart'
+import { ADMIN_TIME_RANGE_OPTIONS, taoDuLieuThongKeDoanhThu } from '../../features/admin/mockData'
 import { dinhDangTienTe } from '../../utils/tienTe'
 
 function AdminThongKePage() {
-  const { revenueStats } = useOutletContext()
+  const { danhSachDonHang, danhSachDatBan } = useOutletContext()
+  const [timeRange, setTimeRange] = useState('today')
+
+  const revenueStats = useMemo(
+    () => taoDuLieuThongKeDoanhThu({
+      orders: danhSachDonHang,
+      bookings: danhSachDatBan,
+      timeRange,
+    }),
+    [danhSachDatBan, danhSachDonHang, timeRange],
+  )
 
   return (
     <div className="admin-page-stack">
+      <section className="admin-panel-card" aria-label="Bộ lọc thống kê">
+        <div className="admin-panel-card__head">
+          <div>
+            <p className="admin-section-kicker">Bộ lọc thời gian</p>
+            <h2>Khoảng dữ liệu</h2>
+          </div>
+        </div>
+        <div className="admin-filter-chip-row">
+          {ADMIN_TIME_RANGE_OPTIONS.map((option) => (
+            <button
+              key={option.key}
+              type="button"
+              className={`admin-filter-chip ${timeRange === option.key ? 'is-active' : ''}`}
+              onClick={() => setTimeRange(option.key)}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+      </section>
+
       <section className="admin-summary-strip" aria-label="Tổng quan thống kê">
         <article className="admin-summary-strip__card">
           <span>Tổng doanh thu kỳ</span>
           <strong>{dinhDangTienTe(revenueStats.overview.revenue)}</strong>
-          <p>TODO: thay bằng doanh thu theo filter thời gian thực.</p>
+          <p>Doanh thu sau khi áp dụng bộ lọc thời gian.</p>
         </article>
         <article className="admin-summary-strip__card">
           <span>Số đơn hoàn thành</span>
           <strong>{revenueStats.overview.completedOrders}</strong>
-          <p>Đơn có trạng thái hoàn thành từ dữ liệu hiện có.</p>
+          <p>Đơn hàng đã hoàn thành trong khoảng thời gian đang xem.</p>
         </article>
         <article className="admin-summary-strip__card">
           <span>Giá trị đơn trung bình</span>
           <strong>{dinhDangTienTe(revenueStats.overview.averageOrder)}</strong>
-          <p>Dựa trên tập đơn đang đồng bộ.</p>
+          <p>Trung bình theo các đơn hàng thuộc kỳ lọc hiện tại.</p>
+        </article>
+        <article className="admin-summary-strip__card">
+          <span>Tổng booking kỳ</span>
+          <strong>{revenueStats.overview.totalBookings}</strong>
+          <p>Booking thuộc khoảng thời gian đang chọn.</p>
         </article>
       </section>
+
+      <section className="admin-summary-strip" aria-label="Thống kê booking">
+        <article className="admin-summary-strip__card">
+          <span>Tổng booking</span>
+          <strong>{revenueStats.bookingStats.total}</strong>
+          <p>Tổng số booking của kỳ hiện tại.</p>
+        </article>
+        <article className="admin-summary-strip__card">
+          <span>Đã hoàn thành</span>
+          <strong>{revenueStats.bookingStats.completed}</strong>
+          <p>Booking có trạng thái hoàn thành.</p>
+        </article>
+        <article className="admin-summary-strip__card">
+          <span>Đã hủy</span>
+          <strong>{revenueStats.bookingStats.cancelled}</strong>
+          <p>Booking có trạng thái hủy trong kỳ.</p>
+        </article>
+        <article className="admin-summary-strip__card">
+          <span>Tỉ lệ hủy</span>
+          <strong>{revenueStats.bookingStats.cancellationRate}%</strong>
+          <p>Tỉ lệ booking đã hủy trên tổng booking.</p>
+        </article>
+      </section>
+
+      <RevenueChart title="Doanh thu 7 ngày gần nhất" revenue={{ summary: revenueStats.overview, series: revenueStats.revenueSeries }} />
 
       <section className="admin-analytics-grid">
         <article className="admin-panel-card">
@@ -72,7 +136,7 @@ function AdminThongKePage() {
               <article key={item.category} className="admin-category-share-item">
                 <div>
                   <strong>{item.category}</strong>
-                  <p>TODO: thay bằng dữ liệu thống kê backend thật.</p>
+                  <p>Tính từ doanh thu top món trong kỳ hiện tại.</p>
                 </div>
                 <div className="admin-category-share-meter">
                   <span style={{ width: `${item.percent}%` }} />

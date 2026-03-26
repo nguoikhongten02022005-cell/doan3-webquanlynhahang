@@ -1,5 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
-import { CheckCircleOutlined, CreditCardOutlined, FieldTimeOutlined, FileTextOutlined, ReloadOutlined, UserOutlined } from '@ant-design/icons'
+import {
+  CheckCircleOutlined,
+  CreditCardOutlined,
+  FieldTimeOutlined,
+  FileTextOutlined,
+  PrinterOutlined,
+  ReloadOutlined,
+  UserOutlined,
+} from '@ant-design/icons'
 import { Alert, Badge, Button, Empty, Input, Select, Space, Spin, Table } from 'antd'
 import CheckableTag from 'antd/es/tag/CheckableTag'
 import { dinhDangTienTe } from '../../utils/tienTe'
@@ -59,6 +67,15 @@ const STATUS_TICKET_STYLES = {
   },
 }
 
+const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
+
+const escapePrintHtml = (value) => String(value ?? '')
+  .replaceAll('&', '&amp;')
+  .replaceAll('<', '&lt;')
+  .replaceAll('>', '&gt;')
+  .replaceAll('"', '&quot;')
+  .replaceAll("'", '&#39;')
+
 const buildFilterCounts = (orders) => ORDER_FILTERS.reduce((acc, filter) => {
   if (filter.key === 'all') {
     acc[filter.key] = orders.length
@@ -86,6 +103,266 @@ const formatTableLabel = (tableNumber) => {
 const formatOrderCode = (order) => order.orderCode || order.code || `DH-${order.id}`
 
 const getTicketStyle = (status) => STATUS_TICKET_STYLES[status] || STATUS_TICKET_STYLES.MOI_TAO
+
+const buildOrderFinancialSummary = (order) => {
+  const items = Array.isArray(order?.items) ? order.items : []
+  const subtotalFromItems = items.reduce(
+    (tong, item) => tong + (Number(item.price) || 0) * (Number(item.quantity) || 0),
+    0,
+  )
+  const subtotalValue = Number(order?.subtotal)
+  const serviceFeeValue = Number(order?.serviceFee)
+  const discountValue = Number(order?.discountAmount)
+
+  const subtotal = Number.isFinite(subtotalValue) ? subtotalValue : subtotalFromItems
+  const serviceFee = Number.isFinite(serviceFeeValue) ? serviceFeeValue : tinhPhiDichVu(subtotal)
+  const discountAmount = Number.isFinite(discountValue) ? Math.max(0, discountValue) : 0
+  const total = Math.max(0, subtotal + serviceFee - discountAmount)
+
+  return {
+    subtotal,
+    serviceFee,
+    discountAmount,
+    total,
+  }
+}
+
+const taoNoiDungInHoaDon = (order) => {
+  const items = Array.isArray(order?.items) ? order.items : []
+  const moneySummary = buildOrderFinancialSummary(order)
+  const itemRows = items.length
+    ? items.map((item, index) => {
+        const soLuong = Number(item.quantity) || 0
+        const donGia = Number(item.price) || 0
+        const thanhTien = soLuong * donGia
+        const ghiChu = item.note ? `<div class="invoice-note">${escapePrintHtml(item.note)}</div>` : ''
+        const size = item.size ? ` <span class="invoice-size">(Size ${escapePrintHtml(item.size)})</span>` : ''
+
+        return `
+          <tr>
+            <td>
+              <div class="invoice-item-name">${index + 1}. ${escapePrintHtml(item.name || `Món ${index + 1}`)}${size}</div>
+              ${ghiChu}
+            </td>
+            <td>${soLuong}</td>
+            <td>${escapePrintHtml(dinhDangTienTe(donGia))}</td>
+            <td>${escapePrintHtml(dinhDangTienTe(thanhTien))}</td>
+          </tr>
+        `
+      }).join('')
+    : '<tr><td colspan="4" class="invoice-empty">Chưa có dữ liệu món để in hóa đơn.</td></tr>'
+
+  return `
+    <!doctype html>
+    <html lang="vi">
+      <head>
+        <meta charset="utf-8" />
+        <title>Hóa đơn #${escapePrintHtml(formatOrderCode(order))}</title>
+        <style>
+          * { box-sizing: border-box; }
+          body {
+            margin: 0;
+            padding: 24px;
+            font-family: Arial, Helvetica, sans-serif;
+            color: #0f172a;
+            background: #ffffff;
+          }
+          .invoice {
+            max-width: 820px;
+            margin: 0 auto;
+            border: 1px solid #e2e8f0;
+            border-radius: 18px;
+            padding: 28px;
+          }
+          .invoice-header {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #e2e8f0;
+          }
+          .invoice-kicker {
+            margin: 0 0 8px;
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: #64748b;
+          }
+          .invoice-title {
+            margin: 0;
+            font-size: 28px;
+            line-height: 1.2;
+          }
+          .invoice-subtitle,
+          .invoice-meta p,
+          .invoice-note,
+          .invoice-footer {
+            margin: 0;
+            color: #475569;
+            font-size: 14px;
+            line-height: 1.6;
+          }
+          .invoice-meta {
+            text-align: right;
+          }
+          .invoice-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+            margin-top: 22px;
+          }
+          .invoice-panel {
+            border: 1px solid #e2e8f0;
+            border-radius: 14px;
+            padding: 14px 16px;
+            background: #f8fafc;
+          }
+          .invoice-panel h2 {
+            margin: 0 0 10px;
+            font-size: 14px;
+          }
+          .invoice-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 22px;
+          }
+          .invoice-table th,
+          .invoice-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e2e8f0;
+            vertical-align: top;
+            text-align: left;
+            font-size: 14px;
+          }
+          .invoice-table th:nth-child(2),
+          .invoice-table th:nth-child(3),
+          .invoice-table th:nth-child(4),
+          .invoice-table td:nth-child(2),
+          .invoice-table td:nth-child(3),
+          .invoice-table td:nth-child(4) {
+            width: 110px;
+            text-align: right;
+          }
+          .invoice-item-name {
+            font-weight: 700;
+            color: #0f172a;
+          }
+          .invoice-size {
+            font-weight: 400;
+            color: #475569;
+          }
+          .invoice-empty {
+            text-align: center !important;
+            color: #64748b;
+          }
+          .invoice-summary {
+            width: 320px;
+            margin-top: 20px;
+            margin-left: auto;
+          }
+          .invoice-summary-row {
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+            padding: 8px 0;
+            font-size: 14px;
+          }
+          .invoice-summary-row.total {
+            margin-top: 8px;
+            padding-top: 14px;
+            border-top: 1px solid #cbd5e1;
+            font-size: 16px;
+            font-weight: 700;
+          }
+          .invoice-footer {
+            margin-top: 28px;
+            padding-top: 18px;
+            border-top: 1px dashed #cbd5e1;
+            text-align: center;
+          }
+          @media print {
+            body { padding: 0; }
+            .invoice {
+              border: none;
+              border-radius: 0;
+              padding: 0;
+            }
+          }
+        </style>
+      </head>
+      <body>
+        <main class="invoice">
+          <header class="invoice-header">
+            <div>
+              <p class="invoice-kicker">Hóa đơn thanh toán</p>
+              <h1 class="invoice-title">${escapePrintHtml(formatTableLabel(order.tableNumber))}</h1>
+              <p class="invoice-subtitle">Mã đơn #${escapePrintHtml(formatOrderCode(order))}</p>
+            </div>
+            <div class="invoice-meta">
+              <p><strong>Thời gian:</strong> ${escapePrintHtml(dinhDangNgay(order.orderDate))}</p>
+              <p><strong>Trạng thái:</strong> ${escapePrintHtml(layNhanTrangThaiDonHang(order.status))}</p>
+              <p><strong>Thanh toán:</strong> ${escapePrintHtml(layNhanPhuongThucThanhToan(order.paymentMethod))}</p>
+            </div>
+          </header>
+
+          <section class="invoice-grid">
+            <div class="invoice-panel">
+              <h2>Khách hàng</h2>
+              <p>${escapePrintHtml(order.customer?.fullName || 'Khách lẻ')}</p>
+              <p>${escapePrintHtml(order.customer?.phone || 'Không có số điện thoại')}</p>
+            </div>
+            <div class="invoice-panel">
+              <h2>Ghi chú</h2>
+              <p>${escapePrintHtml(order.note || 'Không có ghi chú cho đơn này.')}</p>
+            </div>
+          </section>
+
+          <table class="invoice-table">
+            <thead>
+              <tr>
+                <th>Món</th>
+                <th>SL</th>
+                <th>Đơn giá</th>
+                <th>Thành tiền</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${itemRows}
+            </tbody>
+          </table>
+
+          <section class="invoice-summary">
+            <div class="invoice-summary-row">
+              <span>Tạm tính</span>
+              <span>${escapePrintHtml(dinhDangTienTe(moneySummary.subtotal))}</span>
+            </div>
+            <div class="invoice-summary-row">
+              <span>Phí dịch vụ</span>
+              <span>${escapePrintHtml(dinhDangTienTe(moneySummary.serviceFee))}</span>
+            </div>
+            <div class="invoice-summary-row">
+              <span>Voucher</span>
+              <span>-${escapePrintHtml(dinhDangTienTe(moneySummary.discountAmount))}</span>
+            </div>
+            <div class="invoice-summary-row total">
+              <span>Tổng cộng</span>
+              <span>${escapePrintHtml(dinhDangTienTe(moneySummary.total))}</span>
+            </div>
+          </section>
+
+          <p class="invoice-footer">Cảm ơn quý khách đã sử dụng dịch vụ của nhà hàng.</p>
+        </main>
+        <script>
+          window.addEventListener('load', () => {
+            window.print();
+            window.onafterprint = () => window.close();
+          });
+        </script>
+      </body>
+    </html>
+  `
+}
 
 const buildItemsTableColumns = () => [
   {
@@ -226,6 +503,7 @@ function OrderDetailPanel({
   onReloadDetail,
   onSubmit,
   onQuickPay,
+  onPrint,
   savingStatus,
 }) {
   if (!order) {
@@ -240,6 +518,8 @@ function OrderDetailPanel({
   const items = Array.isArray(sourceOrder.items) ? sourceOrder.items : []
   const ticketStyle = getTicketStyle(order.status)
   const hasStatusChanged = formStatus !== order.status
+  const moneySummary = buildOrderFinancialSummary(sourceOrder)
+  const canPrint = !loadingDetail && items.length > 0
 
   return (
     <article className="noi-bo-don-hang-form-shell rounded-[22px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-4.5 xl:sticky xl:top-4 xl:self-start">
@@ -249,7 +529,11 @@ function OrderDetailPanel({
           <h2 className="m-0 text-[1.2rem] font-semibold tracking-[-0.04em] text-slate-900">{formatTableLabel(order.tableNumber)}</h2>
           <p className="mt-1.5 mb-0 text-xs leading-5 text-slate-500">#{formatOrderCode(order)} · {ticketStyle.hint}</p>
         </div>
-        <span className={`noi-bo-don-hang-badge ${ticketStyle.badge}`}>{layNhanTrangThaiDonHang(order.status)}</span>
+
+        <div className="noi-bo-don-hang-status-control">
+          <span className="noi-bo-don-hang-status-control__label">Trạng thái đơn</span>
+          <Select size="middle" value={formStatus} options={STATUS_OPTIONS} onChange={onStatusChange} />
+        </div>
       </div>
 
       <div className="mt-4 flex flex-col gap-4">
@@ -268,18 +552,34 @@ function OrderDetailPanel({
               <span><FieldTimeOutlined /> Thời gian</span>
               <Input size="middle" value={dinhDangNgay(sourceOrder.orderDate)} readOnly />
             </label>
-            <label className="noi-bo-don-hang-detail-field">
+            <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
               <span><CreditCardOutlined /> Thanh toán</span>
               <Input size="middle" value={layNhanPhuongThucThanhToan(sourceOrder.paymentMethod)} readOnly />
             </label>
-            <label className="noi-bo-don-hang-detail-field">
-              <span>Tổng tiền</span>
-              <Input size="middle" value={dinhDangTienTe(sourceOrder.total)} readOnly />
-            </label>
-            <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
-              <span>Trạng thái đơn</span>
-              <Select size="middle" value={formStatus} options={STATUS_OPTIONS} onChange={onStatusChange} />
-            </label>
+            <div className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
+              <span>Tổng kết thanh toán</span>
+              <div className="noi-bo-don-hang-money-summary">
+                <div className="noi-bo-don-hang-money-summary__row">
+                  <span>Tạm tính</span>
+                  <strong>{dinhDangTienTe(moneySummary.subtotal)}</strong>
+                </div>
+                <div className="noi-bo-don-hang-money-summary__row">
+                  <span>Phí dịch vụ</span>
+                  <strong>{dinhDangTienTe(moneySummary.serviceFee)}</strong>
+                </div>
+                {moneySummary.discountAmount > 0 ? (
+                  <div className="noi-bo-don-hang-money-summary__row">
+                    <span>Voucher</span>
+                    <strong>-{dinhDangTienTe(moneySummary.discountAmount)}</strong>
+                  </div>
+                ) : null}
+                <div className="noi-bo-don-hang-money-summary__divider" />
+                <div className="noi-bo-don-hang-money-summary__row noi-bo-don-hang-money-summary__row--total">
+                  <span>Tổng cộng</span>
+                  <strong>{dinhDangTienTe(moneySummary.total)}</strong>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 
@@ -340,6 +640,14 @@ function OrderDetailPanel({
             disabled={!hasStatusChanged}
           >
             Cập nhật
+          </Button>
+          <Button
+            size="middle"
+            icon={<PrinterOutlined />}
+            onClick={onPrint}
+            disabled={!canPrint || savingStatus}
+          >
+            In hóa đơn
           </Button>
           <Button
             size="middle"
@@ -449,6 +757,26 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
     }
   }
 
+  const handlePrintInvoice = () => {
+    const sourceOrder = detailOrder || selectedOrder
+
+    if (!sourceOrder || !Array.isArray(sourceOrder.items) || !sourceOrder.items.length) {
+      setDetailError('Cần tải đầy đủ chi tiết món trước khi in hóa đơn.')
+      return
+    }
+
+    const printWindow = window.open('', '_blank', 'width=960,height=720')
+    if (!printWindow) {
+      setDetailError('Không thể mở cửa sổ in hóa đơn. Vui lòng kiểm tra chặn popup của trình duyệt.')
+      return
+    }
+
+    setDetailError('')
+    printWindow.document.write(taoNoiDungInHoaDon(sourceOrder))
+    printWindow.document.close()
+    printWindow.focus()
+  }
+
   const submitStatusUpdate = async (nextStatus) => {
     if (!selectedOrder || nextStatus === selectedOrder.status) {
       return
@@ -513,6 +841,7 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
           onReloadDetail={handleReloadDetail}
           onSubmit={handleSubmit}
           onQuickPay={handleQuickPay}
+          onPrint={handlePrintInvoice}
           savingStatus={savingStatus}
         />
       </section>
