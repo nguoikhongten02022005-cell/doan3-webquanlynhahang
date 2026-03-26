@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { layThongTinToiApi, dangNhapNoiBoApi, dangNhapApi, dangXuatApi, dangKyApi } from '../services/api/apiXacThuc'
+import { layThongTinToiApi, dangNhapNoiBoApi, dangXuatApi } from '../services/api/apiXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 import {
   VAI_TRO_XAC_THUC,

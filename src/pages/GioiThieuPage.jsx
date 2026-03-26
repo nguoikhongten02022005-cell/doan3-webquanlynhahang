@@ -3,14 +3,6 @@ import chefPortrait from '../assets/img/chef.02d6c5b61bfdc70303b4.png'
 function GioiThieuPage() {
   return (
     <div className="about-page about-page-editorial">
-      <div className="container">
-        <header className="about-page-header">
-          <p className="about-page-kicker">Câu chuyện thương hiệu</p>
-          <h1>Về chúng tôi</h1>
-          <p>Khám phá hành trình, đội ngũ và những giá trị tạo nên trải nghiệm ẩm thực chỉn chu tại Nhà Hàng Nguyên Vị.</p>
-        </header>
-      </div>
-
       <section className="about-story about-editorial-story">
         <div className="container">
           <div className="about-editorial">

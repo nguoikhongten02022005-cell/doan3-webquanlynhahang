@@ -1,9 +1,11 @@
 import { useMemo } from 'react'
 import { useDuLieuBangDieuKhienNoiBo } from '../bangDieuKhienNoiBo/useDuLieuBangDieuKhienNoiBo'
 import { taoDuLieuThongKeDoanhThu, ADMIN_NOTIFICATION_COUNT } from './mockData'
+import { useDashboardData } from './useDashboardData'
 
 export const useAdminData = () => {
   const duLieuNoiBo = useDuLieuBangDieuKhienNoiBo()
+  const dashboardData = useDashboardData(duLieuNoiBo)
 
   const badges = useMemo(() => ({
     bookings: duLieuNoiBo.danhSachDatBanChoXuLy.length,
@@ -63,5 +65,6 @@ export const useAdminData = () => {
     badges,
     revenueStats,
     urgentItems,
+    dashboardData,
   }
 }

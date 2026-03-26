@@ -45,13 +45,6 @@ function AdminSidebar({ laAdmin, badges, nguoiDungHienTai, onLogout, onNavigate,
       </nav>
 
       <div className="admin-sidebar__footer">
-        <div className="admin-sidebar__status" aria-label="Trạng thái hệ thống">
-          <span className="admin-sidebar__status-dot" aria-hidden="true" />
-          <div className="admin-sidebar__status-copy">
-            <strong>Hệ thống ổn định</strong>
-            <span>Console trực tuyến</span>
-          </div>
-        </div>
         <div className="admin-sidebar__user">
           <div className="admin-sidebar__avatar">{String(nguoiDungHienTai?.fullName || 'A').charAt(0).toUpperCase()}</div>
           <div className="admin-sidebar__user-copy">

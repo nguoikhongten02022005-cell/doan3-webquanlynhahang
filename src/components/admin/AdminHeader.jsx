@@ -1,4 +1,4 @@
-function AdminHeader({ title, description, breadcrumb, notificationCount, nguoiDungHienTai, onToggleSidebar }) {
+function AdminHeader({ title, description, breadcrumb, notificationCount, nguoiDungHienTai, onToggleSidebar, compact = false }) {
   return (
     <header className="admin-header">
       <div className="admin-header__main">
@@ -6,18 +6,22 @@ function AdminHeader({ title, description, breadcrumb, notificationCount, nguoiD
           <button type="button" className="admin-header__menu-btn" onClick={onToggleSidebar} aria-label="Mở menu quản trị">
             ☰
           </button>
-          <div className="admin-header__copy">
-            <p className="admin-header__breadcrumb">{breadcrumb.join(' > ')}</p>
-            <h1>{title}</h1>
-            {description ? <p className="admin-header__description">{description}</p> : null}
-          </div>
+          {!compact ? (
+            <div className="admin-header__copy">
+              <p className="admin-header__breadcrumb">{breadcrumb.join(' > ')}</p>
+              <h1>{title}</h1>
+              {description ? <p className="admin-header__description">{description}</p> : null}
+            </div>
+          ) : null}
         </div>
 
         <div className="admin-header__right">
-          <div className="admin-header__status" aria-label="Trạng thái bảng điều khiển">
-            <span className="admin-header__status-dot" aria-hidden="true" />
-            <span>Live</span>
-          </div>
+          {!compact ? (
+            <div className="admin-header__status" aria-label="Trạng thái bảng điều khiển">
+              <span className="admin-header__status-dot" aria-hidden="true" />
+              <span>Live</span>
+            </div>
+          ) : null}
           <button type="button" className="admin-header__icon-btn" aria-label="Thông báo">
             <span aria-hidden="true">◔</span>
             {notificationCount > 0 ? <span className="admin-header__icon-badge">{notificationCount}</span> : null}

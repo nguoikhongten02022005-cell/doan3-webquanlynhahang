@@ -199,7 +199,7 @@ function DatBanPage() {
   const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan } = useDatBan()
 
   const [tables, setTables] = useState([])
-  const [isLoadingTables, setIsLoadingTables] = useState(true)
+  const [, setIsLoadingTables] = useState(true)
   const [didBootstrapDraft, setDidBootstrapDraft] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [stepErrors, setStepErrors] = useState({})
