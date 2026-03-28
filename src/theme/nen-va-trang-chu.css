@@ -101,24 +101,30 @@ button:focus-visible,
   display: flex; align-items: center; gap: 1.9rem;
   padding-inline: 1.6rem;
 }
-.main-nav a {
+.main-nav a,
+.main-nav button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 2.25rem;
   font-size: 0.76rem; letter-spacing: 0.2em; text-transform: uppercase;
   color: #7a6d5d; font-weight: 600; position: relative; padding: 0.3rem 0;
+  background: transparent; border: none; cursor: pointer; font-family: inherit;
 }
-.main-nav a span {
+.main-nav a span,
+.main-nav button span {
   position: relative;
 }
-.main-nav a::after {
+.main-nav a::after,
+.main-nav button::after {
   content: ''; position: absolute; left: 50%; bottom: 0.15rem;
   width: 100%; max-width: 3.4rem; height: 1.5px; background: #cda865;
   transform: translateX(-50%) scaleX(0); transform-origin: center; transition: transform 0.3s ease;
 }
-.main-nav a.active, .main-nav a:hover { color: #302219; }
-.main-nav a.active::after, .main-nav a:hover::after { transform: translateX(-50%) scaleX(1); }
+.main-nav a.active, .main-nav a:hover,
+.main-nav button.active, .main-nav button:hover { color: #302219; }
+.main-nav a.active::after, .main-nav a:hover::after,
+.main-nav button.active::after, .main-nav button:hover::after { transform: translateX(-50%) scaleX(1); }
 .header-actions { display: flex; align-items: center; gap: 0.5rem; }
 .icon-btn {
   width: 2.45rem; height: 2.45rem; border: 1px solid rgba(216, 204, 190, 0.95);

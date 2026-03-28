@@ -24,6 +24,7 @@ function BuocMotDatBan({
 }) {
   const hasSelectedDate = Boolean(formData.date)
   const hasSelectedTime = Boolean(formData.time)
+  const hasSelectedGuests = Boolean(Number(formData.guests) > 0)
 
   return (
     <article className="dat-ban-customer-card dat-ban-customer-card-soft dat-ban-customer-flow-card">
@@ -172,6 +173,11 @@ function BuocMotDatBan({
             <h3>Chọn giờ dùng bữa để xem khu vực phù hợp.</h3>
             <p>Khi đã có ngày và giờ, hệ thống sẽ gợi ý mức độ khả dụng của từng khu vực để bạn chọn nhanh hơn.</p>
           </div>
+        ) : !hasSelectedGuests ? (
+          <div className="dat-ban-customer-empty-state">
+            <h3>Chọn số khách để xem bàn phù hợp.</h3>
+            <p>Sau khi biết số khách, hệ thống sẽ tính số bàn phù hợp theo từng khu vực để bạn chọn nhanh và chính xác hơn.</p>
+          </div>
         ) : (
           <>
             <div className="dat-ban-area-grid">
@@ -191,8 +197,8 @@ function BuocMotDatBan({
                       <div>
                         <div className="dat-ban-area-card-title-row">
                           <strong>{area.label}</strong>
-                          {area.recommendationBadge ? <span className="dat-ban-area-badge">{area.recommendationBadge}</span> : null}
                         </div>
+                        {area.recommendationBadge ? <span className="dat-ban-area-badge">{area.recommendationBadge}</span> : null}
                         <p>{area.description}</p>
                         {area.recommendationNote ? <small className="dat-ban-area-note">{area.recommendationNote}</small> : null}
                       </div>

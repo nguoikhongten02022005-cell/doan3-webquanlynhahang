@@ -723,6 +723,68 @@
   color: rgba(88, 64, 49, 0.72);
 }
 
+.trang-chu-page .danh-gia-section {
+  padding: 3rem 0;
+  background: linear-gradient(180deg, rgba(255, 250, 245, 0.8), rgba(255, 255, 255, 0.98));
+}
+
+.trang-chu-page .danh-gia-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+}
+
+.trang-chu-page .danh-gia-card {
+  display: grid;
+  gap: 0.85rem;
+  padding: 1.15rem;
+  border: 1px solid rgba(127, 98, 74, 0.14);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 18px 40px rgba(54, 28, 17, 0.08);
+}
+
+.trang-chu-page .danh-gia-card-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.trang-chu-page .danh-gia-card-head strong {
+  color: #281811;
+  font-size: 1rem;
+}
+
+.trang-chu-page .danh-gia-card-head span {
+  color: #E8664A;
+  font-size: 0.95rem;
+  letter-spacing: 0.08em;
+}
+
+.trang-chu-page .danh-gia-card p {
+  margin: 0;
+  color: rgba(78, 60, 47, 0.88);
+  line-height: 1.75;
+}
+
+.trang-chu-page .danh-gia-card small {
+  color: rgba(96, 73, 57, 0.72);
+  font-size: 0.78rem;
+}
+
+.trang-chu-page .danh-gia-empty-state {
+  display: grid;
+  gap: 0.5rem;
+  padding: 1.25rem;
+  border: 1px dashed rgba(127, 98, 74, 0.18);
+  background: rgba(255, 255, 255, 0.82);
+}
+
+.trang-chu-page .danh-gia-empty-state h3,
+.trang-chu-page .danh-gia-empty-state p {
+  margin: 0;
+}
+
 main:has(.trang-chu-page) + .site-footer {
   padding-top: 0;
   background:
@@ -775,6 +837,10 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
   .trang-chu-page .mo-dau-copy {
     max-width: 31rem;
     margin: 0;
+  }
+
+  .trang-chu-page .danh-gia-grid {
+    grid-template-columns: 1fr;
   }
 
   .trang-chu-page .mo-dau-showcase {

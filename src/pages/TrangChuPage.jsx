@@ -1,4 +1,4 @@
-import { useMemo } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 import TheMonAn from '../components/TheMonAn'
 import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
@@ -8,17 +8,13 @@ import { HOME_CAC_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
 import { useGioHang } from '../context/GioHangContext'
 import { useChiTietMonAnModal } from '../hooks/useChiTietMonAnModal'
 import { useDanhSachMonAn } from '../hooks/useDanhSachMonAn'
+import { layDanhSachDanhGiaApi } from '../services/api/apiDanhGia'
 import { layDanhSachMonNoiBatTrangChu } from '../services/mappers/anhXaThucDon'
-
-const HOME_TRUST_POINTS = [
-  'Phù hợp nhóm nhỏ, gặp đối tác và bữa tối gia đình.',
-  'Đặt bàn trước, vào bàn nhanh, không phải gọi lại nhiều lần.',
-  'Có thể thay ảnh món thật về sau mà không cần đổi luồng trang chủ.',
-]
 
 function TrangChuPage() {
   const { themVaoGio } = useGioHang()
   const { dishes } = useDanhSachMonAn()
+  const [danhGiaDaDuyet, setDanhGiaDaDuyet] = useState([])
   const {
     dongChiTietMon,
     giaChiTiet,
@@ -43,6 +39,28 @@ function TrangChuPage() {
     })),
     [dishes],
   )
+
+  useEffect(() => {
+    let active = true
+
+    const taiDanhGia = async () => {
+      try {
+        const { duLieu } = await layDanhSachDanhGiaApi()
+        if (!active) return
+        const danhGiaHopLe = Array.isArray(duLieu)
+          ? duLieu.filter((item) => item.trangThai === 'Approved').slice(0, 3)
+          : []
+        setDanhGiaDaDuyet(danhGiaHopLe)
+      } catch {
+        if (active) setDanhGiaDaDuyet([])
+      }
+    }
+
+    taiDanhGia()
+    return () => {
+      active = false
+    }
+  }, [])
 
   return (
     <div className="trang-chu-page">
@@ -156,6 +174,38 @@ function TrangChuPage() {
         </div>
       </section>
 
+      <section id="reviews" className="danh-gia-section" aria-labelledby="danh-gia-trang-chu-title">
+        <div className="container">
+          <div className="section-head section-head--split">
+            <div className="section-head-copy">
+              <p className="eyebrow">Khách nói gì về chúng tôi</p>
+              <h2 id="danh-gia-trang-chu-title">Đánh Giá Nổi Bật</h2>
+            </div>
+            <p className="section-head-description">Những phản hồi đã được duyệt từ khách hàng sau khi trải nghiệm dịch vụ tại nhà hàng.</p>
+          </div>
+
+          {danhGiaDaDuyet.length > 0 ? (
+            <div className="danh-gia-grid">
+              {danhGiaDaDuyet.map((review) => (
+                <article key={review.maDanhGia} className="danh-gia-card">
+                  <div className="danh-gia-card-head">
+                    <strong>{review.maKH || 'Khách hàng'}</strong>
+                    <span>{'★'.repeat(Math.max(1, Math.min(5, review.soSao || 0)))}</span>
+                  </div>
+                  <p>{review.noiDung || 'Khách hàng đã để lại phản hồi tích cực về nhà hàng.'}</p>
+                  <small>{review.maDonHang ? `Đơn hàng: ${review.maDonHang}` : 'Phản hồi từ trải nghiệm dùng bữa'}</small>
+                </article>
+              ))}
+            </div>
+          ) : (
+            <div className="danh-gia-empty-state">
+              <h3>Đánh giá sẽ xuất hiện tại đây.</h3>
+              <p>Khi có phản hồi được duyệt từ khách hàng, trang chủ sẽ tự động cập nhật để tạo thêm độ tin cậy cho nhà hàng.</p>
+            </div>
+          )}
+        </div>
+      </section>
+
       <ChiTietMonAnModal
         giaChiTiet={giaChiTiet}
         dangMo={dangMoChiTiet}
@@ -172,27 +222,6 @@ function TrangChuPage() {
         ghiChuRieng={ghiChuRieng}
       />
 
-      <section className="dat-ban-banner" id="booking">
-        <div className="container dat-ban-inner">
-          <div className="dat-ban-copy">
-            <p className="eyebrow">Đặt bàn tinh gọn</p>
-            <h2>Chọn trước một bàn đẹp cho buổi hẹn tối nay.</h2>
-            <p>Phần kết được đổi thành một lời mời rõ ràng, có thêm các điểm tin cậy ngắn gọn để thao tác đặt bàn không bị chìm trong hình nền.</p>
-            <div className="dat-ban-points" aria-label="Điểm nổi bật đặt bàn">
-              {HOME_TRUST_POINTS.map((muc) => (
-                <span key={muc}>{muc}</span>
-              ))}
-            </div>
-          </div>
-
-          <div className="dat-ban-cta">
-            <Link className="btn nut-sang" to="/dat-ban">
-              Bắt đầu đặt bàn
-            </Link>
-            <span>Mở form đặt bàn chỉ trong vài bước.</span>
-          </div>
-        </div>
-      </section>
     </div>
   )
 }

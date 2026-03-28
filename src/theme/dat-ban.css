@@ -403,15 +403,21 @@
 .dat-ban-area-badge {
   display: inline-flex;
   align-items: center;
-  min-height: 1.4rem;
-  padding: 0 0.55rem;
-  border-radius: 999px;
-  background: rgba(232, 102, 74, 0.16);
+  justify-content: center;
+  min-height: 1.7rem;
+  margin-top: 0.35rem;
+  padding: 0.15rem 0.7rem;
+  border-radius: 0.8rem;
+  width: fit-content;
+  max-width: 100%;
+  background: rgba(232, 102, 74, 0.12);
   color: #E8664A;
-  font-size: 0.68rem;
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.06em;
-  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+  text-transform: none;
+  white-space: nowrap;
 }
 
 .dat-ban-area-note {

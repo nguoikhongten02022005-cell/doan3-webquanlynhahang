@@ -7,7 +7,6 @@ namespace apiquanlynhahang.Controllers;
 
 [ApiController]
 [Route("api/ban")]
-[Authorize]
 public class BanController : ControllerBase
 {
     private readonly BanService _service;
@@ -17,10 +16,12 @@ public class BanController : ControllerBase
         _service = service;
     }
 
+    [AllowAnonymous]
     [HttpGet]
     public async Task<IActionResult> LayDanhSach(CancellationToken cancellationToken)
         => Ok(new { data = await _service.LayDanhSachAsync(cancellationToken) });
 
+    [AllowAnonymous]
     [HttpGet("{maBan}")]
     public async Task<IActionResult> LayTheoMa(string maBan, CancellationToken cancellationToken)
         => Ok(new { data = await _service.LayTheoMaAsync(maBan, cancellationToken) });
