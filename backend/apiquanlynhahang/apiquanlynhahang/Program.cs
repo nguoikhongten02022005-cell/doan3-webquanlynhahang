@@ -1,29 +1,15 @@
 using System.Security.Cryptography;
 using System.Text;
-using apiquanlynhahang.Data;
-using apiquanlynhahang.Middleware;
-using apiquanlynhahang.Options;
-using apiquanlynhahang.Repositories;
-using apiquanlynhahang.Services;
+using apiquanlynhahang.BLL.Services;
+using apiquanlynhahang.Common;
+using apiquanlynhahang.DAL.Context;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 
 var builder = WebApplication.CreateBuilder(args);
-var cacNguonGocFrontend = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>()
-    ?? new[]
-    {
-        "http://localhost:5173",
-        "http://127.0.0.1:5173",
-        "http://localhost:5174",
-        "http://127.0.0.1:5174",
-        "http://localhost:4173",
-        "http://127.0.0.1:4173",
-    };
 
-// Add services to the container.
-
-builder.Services.AddControllers();
+var origins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? ["http://localhost:5173"];
 var chuoiKetNoi = builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException("Khong tim thay chuoi ket noi DefaultConnection.");
 var jwtSecret = builder.Configuration["Jwt:Secret"];
@@ -32,9 +18,10 @@ if (string.IsNullOrWhiteSpace(jwtSecret))
 {
     jwtSecret = builder.Environment.IsDevelopment()
         ? Convert.ToBase64String(RandomNumberGenerator.GetBytes(64))
-        : throw new InvalidOperationException("Khong tim thay Jwt:Secret hoac bien moi truong Jwt__Secret.");
+        : throw new InvalidOperationException("Khong tim thay Jwt:Secret.");
 }
 
+builder.Services.AddControllers();
 builder.Services.Configure<JwtTuyChon>(options =>
 {
     builder.Configuration.GetSection("Jwt").Bind(options);
@@ -63,28 +50,34 @@ builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
     });
 
 builder.Services.AddAuthorization();
-
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("FrontendLocal", policy =>
     {
-        policy.WithOrigins(cacNguonGocFrontend)
+        policy.WithOrigins(origins)
             .AllowAnyHeader()
             .AllowAnyMethod()
             .AllowCredentials();
     });
 });
 
-builder.Services.AddScoped<IMonAnRepository, MonAnRepository>();
-builder.Services.AddScoped<IMonAnService, MonAnService>();
-builder.Services.AddScoped<BanAnService>();
+builder.Services.AddScoped<AuthService>();
+builder.Services.AddScoped<JwtService>();
+builder.Services.AddScoped<NguoiDungService>();
+builder.Services.AddScoped<NhanVienService>();
+builder.Services.AddScoped<KhachHangService>();
+builder.Services.AddScoped<BanService>();
+builder.Services.AddScoped<QRCodeService>();
+builder.Services.AddScoped<DanhMucService>();
+builder.Services.AddScoped<ThucDonService>();
 builder.Services.AddScoped<MaGiamGiaService>();
 builder.Services.AddScoped<DatBanService>();
 builder.Services.AddScoped<DonHangService>();
-builder.Services.AddScoped<NguoiDungService>();
-builder.Services.AddScoped<AuthService>();
-builder.Services.AddScoped<JwtService>();
-builder.Services.AddScoped<KhoService>();
+builder.Services.AddScoped<HoaDonService>();
+builder.Services.AddScoped<ThanhToanService>();
+builder.Services.AddScoped<DanhGiaService>();
+builder.Services.AddScoped<LichSuDonHangService>();
+builder.Services.AddScoped<ThongBaoService>();
 builder.Services.AddScoped<BaoCaoService>();
 
 builder.Services.AddEndpointsApiExplorer();
@@ -97,7 +90,6 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = Microsoft.OpenApi.Models.ParameterLocation.Header,
-        Description = "Nhap token dang Bearer {token}"
     });
 
     options.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
@@ -123,12 +115,6 @@ if (app.Environment.IsDevelopment())
     using var scope = app.Services.CreateScope();
     var dbContext = scope.ServiceProvider.GetRequiredService<UngDungDbContext>();
     await dbContext.Database.MigrateAsync();
-    await DuLieuPhatTrienKhoiTao.DamBaoDuLieuMauAsync(dbContext);
-}
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
     app.UseSwagger();
     app.UseSwaggerUI();
 }
@@ -141,10 +127,7 @@ if (!app.Environment.IsDevelopment())
 }
 
 app.UseCors("FrontendLocal");
-
 app.UseAuthentication();
 app.UseAuthorization();
-
 app.MapControllers();
-
 app.Run();

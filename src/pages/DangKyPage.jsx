@@ -3,6 +3,8 @@ import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 
+const taoMaNgauNhien = (prefix) => `${prefix}${Date.now()}`
+
 function DangKyPage() {
   const [fullName, setFullName] = useState('')
   const [username, setUsername] = useState('')
@@ -25,13 +27,17 @@ function DangKyPage() {
 
     setDangGui(true)
 
-    try {
-      const ketQua = await dangKy({
-        fullName,
-        username,
-        email,
-        phone,
-        password,
+      try {
+        const ketQua = await dangKy({
+          maND: taoMaNgauNhien('ND'),
+          maKH: taoMaNgauNhien('KH'),
+          tenND: fullName,
+          tenKH: fullName,
+          fullName,
+          username,
+          email,
+          phone,
+          password,
       })
 
       if (!ketQua.success) {
@@ -64,7 +70,7 @@ function DangKyPage() {
             </div>
 
             <div className="nhom-truong">
-              <label htmlFor="register-username" className="nhan-truong">Tên tài khoản</label>
+              <label htmlFor="register-username" className="nhan-truong">Tên tài khoản hiển thị</label>
               <input id="register-username" className="truong-nhap" value={username} onChange={(e) => { setUsername(e.target.value); if (submitError) setSubmitError('') }} required />
             </div>
 

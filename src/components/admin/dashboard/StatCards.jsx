@@ -37,7 +37,7 @@ function StatCards({ stats }) {
       {items.map((item) => (
         <Col key={item.key} xs={24} sm={12} lg={8}>
           <Card className="admin-dashboard-card" variant="borderless" styles={{ body: { padding: '10px 14px' } }}>
-            <Statistic title={item.title} value={item.value} formatter={item.formatter} valueStyle={STAT_VALUE_STYLE} styles={{ title: STAT_TITLE_STYLE }} />
+            <Statistic title={item.title} value={item.value} formatter={item.formatter} styles={{ title: STAT_TITLE_STYLE, content: STAT_VALUE_STYLE }} />
           </Card>
         </Col>
       ))}

@@ -14,7 +14,7 @@ function UrgentActions({ urgentTasks }) {
         {(urgentTasks || []).map((item) => (
           <Col key={item.key} xs={24} sm={12} xl={6}>
             <Card size="small" styles={{ body: { minHeight: 104, padding: 10 } }} style={TONE_STYLES[item.tone] || TONE_STYLES.neutral}>
-              <Space direction="vertical" size={2} style={{ width: '100%' }}>
+              <Space size={2} style={{ width: '100%', flexDirection: 'column', alignItems: 'flex-start' }}>
                 <Typography.Text type="secondary">{item.title}</Typography.Text>
                 <Typography.Title level={3} style={{ margin: 0 }}>{item.value}</Typography.Title>
               </Space>

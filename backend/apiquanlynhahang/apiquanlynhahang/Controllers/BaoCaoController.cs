@@ -1,4 +1,4 @@
-using apiquanlynhahang.Services;
+using apiquanlynhahang.BLL.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -6,34 +6,29 @@ namespace apiquanlynhahang.Controllers;
 
 [ApiController]
 [Route("api/bao-cao")]
-[Authorize(Roles = "admin,staff")]
+[Authorize(Roles = "Admin,NhanVien")]
 public class BaoCaoController : ControllerBase
 {
-    private readonly BaoCaoService _baoCaoService;
+    private readonly BaoCaoService _service;
 
-    public BaoCaoController(BaoCaoService baoCaoService)
+    public BaoCaoController(BaoCaoService service)
     {
-        _baoCaoService = baoCaoService;
+        _service = service;
     }
 
     [HttpGet("tong-quan")]
-    public async Task<IActionResult> LayTongQuan([FromQuery] DateTime? tuNgay, [FromQuery] DateTime? denNgay, CancellationToken cancellationToken)
-    {
-        var duLieu = await _baoCaoService.LayTongQuanAsync(tuNgay, denNgay, cancellationToken);
-        return Ok(new { data = duLieu });
-    }
+    public async Task<IActionResult> TongQuan(CancellationToken cancellationToken)
+        => Ok(new { data = await _service.LayTongQuanAsync(cancellationToken) });
 
-    [HttpGet("top-mon-ban-chay")]
-    public async Task<IActionResult> LayTopMonBanChay([FromQuery] int top = 5, CancellationToken cancellationToken = default)
-    {
-        var duLieu = await _baoCaoService.LayTopMonBanChayAsync(top, cancellationToken);
-        return Ok(new { data = duLieu, meta = new { total = duLieu.Count } });
-    }
+    [HttpGet("doanh-thu-ngay")]
+    public async Task<IActionResult> DoanhThuNgay(CancellationToken cancellationToken)
+        => Ok(new { data = await _service.LayDoanhThuNgayAsync(cancellationToken) });
 
-    [HttpGet("canh-bao-kho")]
-    public async Task<IActionResult> LayCanhBaoKho(CancellationToken cancellationToken = default)
-    {
-        var duLieu = await _baoCaoService.LayCanhBaoKhoAsync(cancellationToken);
-        return Ok(new { data = duLieu, meta = new { total = duLieu.Count } });
-    }
+    [HttpGet("mon-ban-chay")]
+    public async Task<IActionResult> MonBanChay(CancellationToken cancellationToken)
+        => Ok(new { data = await _service.LayMonBanChayAsync(cancellationToken) });
+
+    [HttpGet("tinh-trang-ban")]
+    public async Task<IActionResult> TinhTrangBan(CancellationToken cancellationToken)
+        => Ok(new { data = await _service.LayTinhTrangBanAsync(cancellationToken) });
 }

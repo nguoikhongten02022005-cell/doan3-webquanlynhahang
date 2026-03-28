@@ -10,7 +10,7 @@ function AdminDashboardPage() {
   const { dashboardData } = useOutletContext()
 
   return (
-    <Space direction="vertical" size="middle" style={{ display: 'flex', width: '100%' }}>
+    <Space size="middle" style={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
       <StatCards stats={dashboardData?.stats} />
 
       <Row gutter={[16, 16]}>

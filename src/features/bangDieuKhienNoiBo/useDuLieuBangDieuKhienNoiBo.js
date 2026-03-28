@@ -20,6 +20,19 @@ import {
 import { laySacThaiDonHang } from './dinhDang'
 import { coSuDungMayChu } from '../../services/trinhKhachApi'
 import { taoDuLieuNoiBoDuPhong } from '../admin/mockData'
+import { chuanHoaBanChoNoiBo } from '../../services/dichVuBanAn.js'
+import { chuanHoaNguoiDungApi } from '../../services/api/apiXacThuc'
+
+const chuanHoaDonHangNoiBo = (order) => {
+  if (!order || typeof order !== 'object') return null
+  return {
+    ...order,
+    id: order.id || order.orderCode || order.maDonHang || order.MaDonHang,
+    orderCode: order.orderCode || order.maDonHang || order.MaDonHang || '',
+    status: order.status || order.trangThai || order.TrangThai || '',
+    total: Number(order.total ?? order.tongTien ?? order.TongTien ?? 0),
+  }
+}
 
 export const useDuLieuBangDieuKhienNoiBo = () => {
   const {
@@ -61,9 +74,9 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
       ])
 
       setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
-      setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu : [])
-      setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu : [])
-      setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu : [])
+      setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu.map(chuanHoaDonHangNoiBo).filter(Boolean) : [])
+      setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu.map(chuanHoaNguoiDungApi).filter(Boolean) : [])
+      setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu.map(chuanHoaBanChoNoiBo).filter(Boolean) : [])
     } catch {
       apDungDuLieuDuPhong()
     }

@@ -4,7 +4,7 @@ import { layMucLuuTru } from './dichVuLuuTru'
 
 const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
-const DANH_SACH_DUONG_DAN_CONG_KHAI = ['/mon-an', '/ma-giam-gia/validate']
+const DANH_SACH_DUONG_DAN_CONG_KHAI = ['/auth/login', '/auth/internal-login', '/auth/register', '/thuc-don', '/ma-giam-gia/validate']
 
 const docCoSuDungMayChuTuEnv = () => {
   const giaTri = String(import.meta.env.VITE_USE_BACKEND ?? '').trim().toLowerCase()

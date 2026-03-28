@@ -1,7 +1,6 @@
-using apiquanlynhahang.DTOs;
+using apiquanlynhahang.BLL.Services;
 using apiquanlynhahang.Common;
-using apiquanlynhahang.Models;
-using apiquanlynhahang.Services;
+using apiquanlynhahang.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -9,7 +8,7 @@ namespace apiquanlynhahang.Controllers;
 
 [ApiController]
 [Route("api/nguoi-dung")]
-[Authorize(Roles = "admin,staff")]
+[Authorize(Roles = "Admin,NhanVien")]
 public class NguoiDungController : ControllerBase
 {
     private readonly NguoiDungService _service;
@@ -21,56 +20,28 @@ public class NguoiDungController : ControllerBase
 
     [HttpGet]
     public async Task<IActionResult> LayDanhSach(CancellationToken cancellationToken)
-    {
-        var danhSach = await _service.LayDanhSachAsync(cancellationToken);
-        return Ok(new { data = danhSach.Select(Map), meta = new { total = danhSach.Count } });
-    }
+        => Ok(new { data = await _service.LayDanhSachAsync(cancellationToken) });
 
     [Authorize]
     [HttpGet("me")]
-    public async Task<IActionResult> LayNguoiDungHienTai(CancellationToken cancellationToken)
+    public async Task<IActionResult> LayToi(CancellationToken cancellationToken)
     {
-        var currentUser = User.LayNguoiDungHienTai();
-        if (currentUser is null)
-        {
-            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
-        }
-
-        var nguoiDung = await _service.LayTheoEmailAsync(currentUser.Email, cancellationToken);
-        return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { data = Map(nguoiDung) });
+        var current = User.LayNguoiDungHienTai();
+        if (current is null) return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        return Ok(new { data = await _service.LayTheoMaAsync(current.MaND, cancellationToken) });
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> LayTheoId(int id, CancellationToken cancellationToken)
-    {
-        var nguoiDung = await _service.LayTheoIdAsync(id, cancellationToken);
-        return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { data = Map(nguoiDung) });
-    }
+    [HttpGet("{maNd}")]
+    public async Task<IActionResult> LayTheoMa(string maNd, CancellationToken cancellationToken)
+        => Ok(new { data = await _service.LayTheoMaAsync(maNd, cancellationToken) });
 
-    [HttpPatch("{id:int}/role")]
-    public async Task<IActionResult> CapNhatVaiTro(int id, [FromBody] CapNhatVaiTroNguoiDungDto dto, CancellationToken cancellationToken)
-    {
-        var nguoiDung = await _service.CapNhatVaiTroAsync(id, dto.VaiTro, cancellationToken);
-        return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { message = "Cap nhat vai tro thanh cong", data = Map(nguoiDung) });
-    }
+    [Authorize(Roles = "Admin")]
+    [HttpPatch("{maNd}/role")]
+    public async Task<IActionResult> CapNhatVaiTro(string maNd, [FromBody] CapNhatTrangThaiDto dto, CancellationToken cancellationToken)
+        => Ok(new { data = await _service.CapNhatVaiTroAsync(maNd, dto.TrangThai, cancellationToken) });
 
-    [HttpPatch("{id:int}/status")]
-    public async Task<IActionResult> CapNhatTrangThai(int id, [FromBody] CapNhatTrangThaiNguoiDungDto dto, CancellationToken cancellationToken)
-    {
-        var nguoiDung = await _service.CapNhatTrangThaiAsync(id, dto.TrangThai, cancellationToken);
-        return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { message = "Cap nhat trang thai thanh cong", data = Map(nguoiDung) });
-    }
-
-    private static object Map(NguoiDung entity) => new
-    {
-        entity.Id,
-        entity.HoTen,
-        entity.TenDangNhap,
-        entity.Email,
-        entity.VaiTro,
-        entity.TrangThai,
-        entity.SoDienThoai,
-        entity.TaoLuc,
-        entity.CapNhatLuc,
-    };
+    [Authorize(Roles = "Admin")]
+    [HttpPatch("{maNd}/status")]
+    public async Task<IActionResult> CapNhatTrangThai(string maNd, [FromBody] CapNhatTrangThaiDto dto, CancellationToken cancellationToken)
+        => Ok(new { data = await _service.CapNhatTrangThaiAsync(maNd, dto.TrangThai, cancellationToken) });
 }

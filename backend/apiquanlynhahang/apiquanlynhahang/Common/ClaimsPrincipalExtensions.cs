@@ -6,20 +6,20 @@ public static class ClaimsPrincipalExtensions
 {
     public static CurrentUserInfo? LayNguoiDungHienTai(this ClaimsPrincipal principal)
     {
-        var idText = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? principal.FindFirstValue("sub");
+        var maNd = principal.FindFirstValue(ClaimTypes.NameIdentifier) ?? principal.FindFirstValue("sub");
         var email = principal.FindFirstValue(ClaimTypes.Email);
 
-        if (!int.TryParse(idText, out var id) || string.IsNullOrWhiteSpace(email))
+        if (string.IsNullOrWhiteSpace(maNd) || string.IsNullOrWhiteSpace(email))
         {
             return null;
         }
 
         return new CurrentUserInfo
         {
-            Id = id,
+            MaND = maNd,
             Email = email,
-            Username = principal.FindFirstValue("username") ?? string.Empty,
-            Role = principal.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
+            TenND = principal.FindFirstValue(ClaimTypes.Name) ?? string.Empty,
+            VaiTro = principal.FindFirstValue(ClaimTypes.Role) ?? string.Empty,
         };
     }
 }

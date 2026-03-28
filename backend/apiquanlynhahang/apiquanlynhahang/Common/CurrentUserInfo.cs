@@ -2,8 +2,8 @@ namespace apiquanlynhahang.Common;
 
 public class CurrentUserInfo
 {
-    public int Id { get; set; }
+    public string MaND { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
-    public string Username { get; set; } = string.Empty;
-    public string Role { get; set; } = string.Empty;
+    public string VaiTro { get; set; } = string.Empty;
+    public string TenND { get; set; } = string.Empty;
 }

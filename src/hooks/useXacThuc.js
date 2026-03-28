@@ -17,8 +17,8 @@ import {
   timTaiKhoanNoiBoDemo,
 } from '../constants/xacThucDemo'
 
-const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || null
-const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.accessToken || ''
+const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
+const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
 
 export const useXacThuc = () => {
   const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => layNguoiDungHienTai())
@@ -89,7 +89,7 @@ export const useXacThuc = () => {
     }
   }, [])
 
-  const dangNhapBangApi = useCallback(async (hamDangNhap, identifier, password, thongDiepLoiMacDinh) => {
+  const dangNhapBangApi = useCallback(async (hamDangNhap, email, matKhau, thongDiepLoiMacDinh) => {
     if (!coSuDungMayChu()) {
       return {
         success: false,
@@ -98,7 +98,7 @@ export const useXacThuc = () => {
     }
 
     try {
-      const { duLieu } = await hamDangNhap(identifier, password)
+      const { duLieu } = await hamDangNhap(email, matKhau)
       const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
       const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
 
@@ -115,9 +115,11 @@ export const useXacThuc = () => {
         accessToken,
       })
 
+      const nguoiDungDaLuu = layNguoiDungHienTai()
+
       return {
         success: true,
-        user: nguoiDung,
+        user: nguoiDungDaLuu || nguoiDung,
       }
     } catch (error) {
       xoaPhienXacThuc()
@@ -132,8 +134,8 @@ export const useXacThuc = () => {
     if (coSuDungMayChu()) {
       return dangNhapBangApi(
         dangNhapApi,
-        identifier,
-        password,
+          identifier,
+          password,
         'Đăng nhập thất bại.',
       )
     }
@@ -160,8 +162,8 @@ export const useXacThuc = () => {
     if (coSuDungMayChu()) {
       return dangNhapBangApi(
         dangNhapNoiBoApi,
-        identifier,
-        password,
+          identifier,
+          password,
         'Đăng nhập nội bộ thất bại.',
       )
     }
@@ -206,9 +208,11 @@ export const useXacThuc = () => {
           accessToken,
         })
 
+        const nguoiDungDaLuu = layNguoiDungHienTai()
+
         return {
           success: true,
-          user: nguoiDung,
+          user: nguoiDungDaLuu || nguoiDung,
         }
       } catch (error) {
         xoaPhienXacThuc()

@@ -7,13 +7,13 @@ const chuanHoaPhieuGiamGia = (voucher) => {
 
   return {
     ...voucher,
-    code: voucher.maGiam,
-    name: voucher.tenMaGiam,
-    description: voucher.moTa,
-    discountType: voucher.loaiGiam,
-    discountValue: Number(voucher.giaTriGiam || 0),
-    minOrderAmount: Number(voucher.donToiThieu || 0),
-    maxDiscountAmount: voucher.giamToiDa == null ? null : Number(voucher.giamToiDa),
+    code: voucher.maCode || voucher.MaCode,
+    name: voucher.tenCode || voucher.TenCode,
+    description: voucher.moTa || voucher.MoTa || '',
+    discountType: voucher.loaiGiam || voucher.LoaiGiam,
+    discountValue: Number(voucher.giaTri || voucher.GiaTri || 0),
+    minOrderAmount: Number(voucher.donHangToiThieu || voucher.DonHangToiThieu || 0),
+    maxDiscountAmount: voucher.giaTriToiDa == null && voucher.GiaTriToiDa == null ? null : Number(voucher.giaTriToiDa ?? voucher.GiaTriToiDa),
   }
 }
 
@@ -23,6 +23,6 @@ export const layPhieuGiamGiaTheoMaApi = async (code) => {
 }
 
 export const kiemTraPhieuGiamGiaApi = async (code, orderAmount = 0) => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/ma-giam-gia/validate', { maGiam: code, giaTriDonHang: orderAmount }))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/ma-giam-gia/validate', { maCode: code, tongTien: orderAmount }))
   return { ...phanHoi, duLieu: chuanHoaPhieuGiamGia(phanHoi.duLieu) }
 }

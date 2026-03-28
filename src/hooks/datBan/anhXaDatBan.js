@@ -15,6 +15,11 @@ export const dinhDangNgayGioDatBan = (booking) => `${dinhDangNgay(booking.date)}
 
 export const anhXaTrangThaiDatBan = (status) => {
   if (!status) return '🟡 Yêu cầu đặt bàn'
+  if (status === 'Pending') return '🟡 Yêu cầu đặt bàn'
+  if (status === 'Confirmed') return '🟢 Đã xác nhận'
+  if (status === 'Cancelled') return '🔴 Đã hủy'
+  if (status === 'NoShow') return '⚫ Không đến'
+  if (status === 'Completed') return '⚪ Đã hoàn thành'
   if (status === 'CHO_XAC_NHAN' || status === 'YEU_CAU_DAT_BAN') return '🟡 Yêu cầu đặt bàn'
   if (status === 'GIU_CHO_TAM') return '🟠 Đã giữ chỗ tạm'
   if (status === 'DA_XAC_NHAN') return '🟢 Đã xác nhận'
@@ -39,30 +44,30 @@ export const chuanHoaDatBan = (booking) => {
     return null
   }
 
-  const normalizedId = Number.parseInt(booking.id, 10)
+  const normalizedId = String(booking.id ?? booking.bookingCode ?? booking.maDatBan ?? booking.MaDatBan ?? '').trim()
 
-  if (!Number.isInteger(normalizedId) || normalizedId <= 0) {
+  if (!normalizedId) {
     return null
   }
 
-  const normalizedStatus = String(booking.status || 'CHO_XAC_NHAN').trim() || 'CHO_XAC_NHAN'
+  const normalizedStatus = String(booking.status || booking.trangThai || 'Pending').trim() || 'Pending'
   const assignedTableIds = chuanHoaDanhSachIdBanDaGan(booking.assignedTableIds)
 
   return {
     id: normalizedId,
-    bookingCode: String(booking.bookingCode || dinhDangMaDatBan(normalizedId)).trim() || dinhDangMaDatBan(normalizedId),
-    guests: String(booking.guests ?? '').trim(),
-    date: String(booking.date ?? '').trim(),
-    time: String(booking.time ?? '').trim(),
-    seatingArea: String(booking.seatingArea ?? 'KHONG_UU_TIEN').trim() || 'KHONG_UU_TIEN',
-    notes: String(booking.notes ?? '').trim(),
-    name: String(booking.name ?? '').trim(),
-    phone: String(booking.phone ?? '').trim(),
+    bookingCode: String(booking.bookingCode || booking.maDatBan || booking.MaDatBan || normalizedId).trim() || normalizedId,
+    guests: String(booking.guests ?? booking.soNguoi ?? booking.SoNguoi ?? '').trim(),
+    date: String(booking.date ?? booking.ngayDat ?? booking.NgayDat ?? '').trim(),
+    time: String(booking.time ?? booking.gioDat ?? booking.GioDat ?? '').trim(),
+    seatingArea: String(booking.seatingArea ?? booking.maBan ?? booking.MaBan ?? 'KHONG_UU_TIEN').trim() || 'KHONG_UU_TIEN',
+    notes: String(booking.notes ?? booking.ghiChu ?? booking.GhiChu ?? '').trim(),
+    name: String(booking.name ?? booking.tenKH ?? booking.TenKH ?? '').trim(),
+    phone: String(booking.phone ?? booking.sdt ?? booking.SDT ?? '').trim(),
     email: String(booking.email ?? '').trim(),
     status: normalizedStatus,
     source: String(booking.source ?? 'web').trim() || 'web',
-    createdAt: String(booking.createdAt ?? '').trim(),
-    updatedAt: String(booking.updatedAt ?? '').trim(),
+    createdAt: String(booking.createdAt ?? booking.ngayTao ?? booking.NgayTao ?? '').trim(),
+    updatedAt: String(booking.updatedAt ?? booking.ngayCapNhat ?? booking.NgayCapNhat ?? '').trim(),
     userEmail: booking.userEmail ?? null,
     occasion: String(booking.occasion ?? '').trim(),
     confirmationChannel: Array.isArray(booking.confirmationChannel)
@@ -84,7 +89,7 @@ export const chuanHoaDatBan = (booking) => {
 
 export const anhXaMucDatBan = (booking) => ({
   bookingId: booking.id,
-  id: booking.bookingCode || dinhDangMaDatBan(booking.id),
+  id: booking.bookingCode || booking.id,
   dateTime: dinhDangNgayGioDatBan(booking),
   guests: Number(booking.guests) || 0,
   seatingArea: NHAN_KHU_VUC_DAT_BAN[booking.seatingArea] || '',

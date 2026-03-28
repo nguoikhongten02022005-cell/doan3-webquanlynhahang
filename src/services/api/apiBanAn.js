@@ -7,22 +7,22 @@ const chuanHoaBanAn = (ban) => {
 
   return {
     ...ban,
-    code: ban.maBan,
-    name: ban.tenBan,
-    areaId: ban.khuVucId,
-    capacity: Number(ban.sucChua) || 0,
-    activeBookingId: ban.datBanHienTaiId,
-    activeBookingCode: ban.maDatBanHienTai,
-    note: ban.ghiChu,
+    code: ban.maBan || ban.MaBan,
+    name: `Bàn ${ban.soBan ?? ban.SoBan ?? ''}`.trim(),
+    tableNumber: Number(ban.soBan ?? ban.SoBan ?? 0),
+    capacity: Number(ban.soChoNgoi ?? ban.SoChoNgoi ?? 0),
+    areaId: ban.viTri || ban.ViTri || '',
+    note: ban.viTri || ban.ViTri || '',
+    status: ban.trangThai || ban.TrangThai || '',
   }
 }
 
 export const layDanhSachBanApi = async () => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/ban-an'))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/ban'))
   return {
     ...phanHoi,
     duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaBanAn).filter(Boolean) : [],
   }
 }
 
-export const capNhatTrangThaiBanApi = async (id, status) => tachPhanHoiApi(await trinhKhachApi.patch(`/ban-an/${id}/status`, { trangThai: status }))
+export const capNhatTrangThaiBanApi = async (id, status) => tachPhanHoiApi(await trinhKhachApi.patch(`/ban/${id}/status`, { trangThai: status }))

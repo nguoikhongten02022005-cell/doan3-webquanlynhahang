@@ -69,7 +69,7 @@ const mergeDraftWithUser = (draft, user) => ({
   email: normalizeFieldValue(draft?.email || user?.email),
 })
 
-const taoMaTam = () => `NV${new Date().toISOString().slice(0, 10).replaceAll('-', '')}${Math.random().toString(36).slice(2, 5).toUpperCase()}`
+const taoMaTam = () => `DB_${Date.now()}`
 
 const taoNgayKhongGio = (value) => {
   const [year, month, day] = String(value).split('-').map(Number)
@@ -639,21 +639,26 @@ function DatBanPage() {
     try {
       const confirmationPayload = {
         bookingCode: taoMaTam(),
-        status: 'YEU_CAU_DAT_BAN',
+        status: 'Pending',
         bookingId: undefined,
       }
 
       const createdBooking = await taoDatBan({
         booking: {
           ...formData,
-          source: 'web-reservation-flow',
+          maDatBan: confirmationPayload.bookingCode,
+          maKH: nguoiDungHienTai?.maKH || 'KH001',
+          maBan: candidateTables?.[0]?.code || 'B001',
+          maNV: 'NV002',
+          ngayDat: formData.date,
+          gioDat: formData.time,
+          gioKetThuc: null,
+          soNguoi: Number(formData.guests) || 0,
           notes: [
             formData.notes.trim(),
             voucherState.appliedVoucher ? `Voucher: ${voucherState.appliedVoucher.code} (UI preview)` : '',
             formData.seatingArea !== 'KHONG_UU_TIEN' ? `Ưu tiên khu vực: ${layNhanChoNgoi(formData.seatingArea)}` : '',
           ].filter(Boolean).join(' · '),
-          assignedTableIds: [],
-          assignedTables: [],
         },
         confirmationPayload,
       })

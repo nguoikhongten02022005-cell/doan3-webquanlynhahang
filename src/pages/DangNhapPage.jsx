@@ -4,9 +4,9 @@ import { useXacThuc } from '../hooks/useXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 
 const TAI_KHOAN_KHACH_HANG_LOCAL = {
-  identifier: 'customer@nhahang.local',
-  username: 'customer.local',
-  password: 'secret123',
+  identifier: 'khach1@gmail.com',
+  username: 'ND004',
+  password: '123',
 }
 
 function DangNhapPage() {
@@ -101,7 +101,8 @@ function DangNhapPage() {
           {coSuDungMayChu() ? (
             <>
               <strong>Đăng nhập bằng backend local</strong>
-              <p>Email / username: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.identifier}</span> hoặc <span>{TAI_KHOAN_KHACH_HANG_LOCAL.username}</span></p>
+              <p>Email: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.identifier}</span></p>
+              <p>Mã người dùng: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.username}</span></p>
               <p>Mật khẩu: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.password}</span></p>
               <p>
                 Chưa có tài khoản?{' '}

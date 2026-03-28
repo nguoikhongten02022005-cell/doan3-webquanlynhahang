@@ -61,15 +61,16 @@ export const chuanHoaMonThucDon = (monGoc, chiSoDuPhong = 0) => {
     }
   }
 
-  const giaTriGia = chuanHoaGiaTriGia(monGoc.price ?? monGoc.gia)
-  const danhMucDaChuanHoa = chuanHoaDanhMucThucDon(monGoc.category ?? monGoc.danhMuc)
-  const idDaChuanHoa = monGoc.id ?? monGoc._id ?? monGoc.slug ?? `fallback-${chiSoDuPhong}`
+  const giaTriGia = chuanHoaGiaTriGia(monGoc.price ?? monGoc.gia ?? monGoc.Gia)
+  const danhMucDaChuanHoa = chuanHoaDanhMucThucDon(monGoc.category ?? monGoc.danhMuc ?? monGoc.maDanhMuc ?? monGoc.MaDanhMuc)
+  const idDaChuanHoa = monGoc.id ?? monGoc.maMon ?? monGoc.MaMon ?? monGoc._id ?? monGoc.slug ?? `fallback-${chiSoDuPhong}`
 
   return {
     ...monGoc,
     id: idDaChuanHoa,
-    name: chuanHoaVanBan(monGoc.name ?? monGoc.tenMon) || TEN_MON_DU_PHONG,
-    description: chuanHoaVanBan(monGoc.description ?? monGoc.moTa) || MO_TA_MON_DU_PHONG,
+    maMon: chuanHoaVanBan(monGoc.maMon ?? monGoc.MaMon ?? idDaChuanHoa),
+    name: chuanHoaVanBan(monGoc.name ?? monGoc.tenMon ?? monGoc.TenMon) || TEN_MON_DU_PHONG,
+    description: chuanHoaVanBan(monGoc.description ?? monGoc.moTa ?? monGoc.MoTa) || MO_TA_MON_DU_PHONG,
     price: dinhDangTienTe(giaTriGia),
     priceValue: giaTriGia,
     category: damBaoDanhMucHopLe(danhMucDaChuanHoa),

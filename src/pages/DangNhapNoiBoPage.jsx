@@ -6,15 +6,15 @@ import { coSuDungMayChu } from '../services/trinhKhachApi'
 
 const TAI_KHOAN_NOI_BO_LOCAL = Object.freeze([
   {
-    identifier: 'admin@nhahang.local',
-    username: 'admin.local',
-    password: 'secret123',
+    identifier: 'admin@nhahang.com',
+    username: 'ND001',
+    password: '123',
     roleLabel: 'Admin local',
   },
   {
-    identifier: 'staff@nhahang.local',
-    username: 'staff.local',
-    password: 'secret123',
+    identifier: 'an.nv@nhahang.com',
+    username: 'ND002',
+    password: '123',
     roleLabel: 'Nhân viên local',
   },
 ])
@@ -107,15 +107,15 @@ function DangNhapNoiBoPage() {
 
         <form onSubmit={handleSubmit} className="xac-thuc-form">
           <div className="nhom-truong">
-            <label htmlFor="noi-bo-login-identifier" className="nhan-truong">
-              Tên tài khoản hoặc Email
-            </label>
+              <label htmlFor="noi-bo-login-identifier" className="nhan-truong">
+                Email nội bộ
+              </label>
             <input
               id="noi-bo-login-identifier"
               name="identifier"
               type="text"
               className="truong-nhap"
-              placeholder="Nhập tên tài khoản hoặc email"
+              placeholder="Nhập email nội bộ"
               autoComplete="username"
               value={tenDangNhapHoacEmail}
               onChange={(e) => {

@@ -3,9 +3,9 @@ import { layMucLuuTru, layJsonLuuTru, xoaMucLuuTru, datMucLuuTru, datJsonLuuTru 
 
 export const SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC = 'auth:user-changed'
 export const VAI_TRO_XAC_THUC = Object.freeze({
-  KHACH_HANG: 'customer',
-  NHAN_VIEN: 'staff',
-  QUAN_TRI: 'admin',
+  KHACH_HANG: 'KhachHang',
+  NHAN_VIEN: 'NhanVien',
+  QUAN_TRI: 'Admin',
 })
 
 const phatSuKienThayDoiNguoiDung = () => {
@@ -17,6 +17,9 @@ const phatSuKienThayDoiNguoiDung = () => {
 }
 
 const chuanHoaVaiTro = (vaiTro) => {
+  if (vaiTro === 'Admin' || vaiTro === 'admin') return VAI_TRO_XAC_THUC.QUAN_TRI
+  if (vaiTro === 'NhanVien' || vaiTro === 'staff') return VAI_TRO_XAC_THUC.NHAN_VIEN
+  if (vaiTro === 'KhachHang' || vaiTro === 'customer') return VAI_TRO_XAC_THUC.KHACH_HANG
   if (vaiTro === VAI_TRO_XAC_THUC.QUAN_TRI) return VAI_TRO_XAC_THUC.QUAN_TRI
   if (vaiTro === VAI_TRO_XAC_THUC.NHAN_VIEN) return VAI_TRO_XAC_THUC.NHAN_VIEN
   return VAI_TRO_XAC_THUC.KHACH_HANG
@@ -29,11 +32,13 @@ const chuanHoaNguoiDung = (nguoiDung) => {
 
   return {
     ...nguoiDung,
-    fullName: String(nguoiDung.fullName ?? nguoiDung.name ?? '').trim(),
-    username: String(nguoiDung.username ?? '').trim(),
+    maND: String(nguoiDung.maND ?? nguoiDung.MaND ?? '').trim(),
+    maKH: String(nguoiDung.maKH ?? nguoiDung.MaKH ?? '').trim(),
+    fullName: String(nguoiDung.fullName ?? nguoiDung.tenND ?? nguoiDung.TenND ?? nguoiDung.tenKH ?? nguoiDung.TenKH ?? nguoiDung.name ?? '').trim(),
+    username: String(nguoiDung.username ?? nguoiDung.maND ?? nguoiDung.MaND ?? '').trim(),
     email: String(nguoiDung.email ?? '').trim(),
-    phone: String(nguoiDung.phone ?? '').trim(),
-    role: chuanHoaVaiTro(nguoiDung.role),
+    phone: String(nguoiDung.phone ?? nguoiDung.sdt ?? nguoiDung.SDT ?? '').trim(),
+    role: chuanHoaVaiTro(nguoiDung.role ?? nguoiDung.vaiTro ?? nguoiDung.VaiTro),
   }
 }
 
@@ -46,7 +51,9 @@ const chuanHoaNguoiDungHienTai = (nguoiDung) => {
 
   return {
     fullName: nguoiDungDaChuanHoa.fullName,
-    id: nguoiDungDaChuanHoa.id ?? null,
+    id: nguoiDungDaChuanHoa.id ?? nguoiDungDaChuanHoa.maND ?? null,
+    maND: nguoiDungDaChuanHoa.maND ?? '',
+    maKH: nguoiDungDaChuanHoa.maKH ?? '',
     username: nguoiDungDaChuanHoa.username,
     email: nguoiDungDaChuanHoa.email,
     phone: nguoiDungDaChuanHoa.phone,

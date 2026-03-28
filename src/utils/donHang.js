@@ -1,19 +1,21 @@
 export const NHAN_TRANG_THAI_DON_HANG = Object.freeze({
-  MOI_TAO: 'Mới tạo',
-  DA_XAC_NHAN: 'Đã xác nhận',
-  DANG_CHUAN_BI: 'Đang chuẩn bị',
-  DANG_PHUC_VU: 'Đang phục vụ',
-  DA_HOAN_THANH: 'Đã hoàn thành',
-  DA_HUY: 'Đã hủy',
+  Pending: 'Mới tạo',
+  Confirmed: 'Đã xác nhận',
+  Preparing: 'Đang chuẩn bị',
+  Ready: 'Sẵn sàng',
+  Served: 'Đang phục vụ',
+  Paid: 'Đã hoàn thành',
+  Cancelled: 'Đã hủy',
 })
 
 export const SAC_THAI_TRANG_THAI_DON_HANG = Object.freeze({
-  MOI_TAO: 'warning',
-  DA_XAC_NHAN: 'success',
-  DANG_CHUAN_BI: 'warning',
-  DANG_PHUC_VU: 'warning',
-  DA_HOAN_THANH: 'success',
-  DA_HUY: 'danger',
+  Pending: 'warning',
+  Confirmed: 'success',
+  Preparing: 'warning',
+  Ready: 'warning',
+  Served: 'warning',
+  Paid: 'success',
+  Cancelled: 'danger',
 })
 
 export const CAC_BUOC_TIEN_TRINH_DON_HANG = Object.freeze([
@@ -25,33 +27,37 @@ export const CAC_BUOC_TIEN_TRINH_DON_HANG = Object.freeze([
 ])
 
 const BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI = Object.freeze({
-  MOI_TAO: 1,
-  DA_XAC_NHAN: 2,
-  DANG_CHUAN_BI: 3,
-  DANG_PHUC_VU: 4,
-  DA_HOAN_THANH: 5,
-  DA_HUY: 0,
+  Pending: 1,
+  Confirmed: 2,
+  Preparing: 3,
+  Ready: 4,
+  Served: 5,
+  Paid: 6,
+  Cancelled: 0,
 })
 
 export const NHAN_PHUONG_THUC_THANH_TOAN = Object.freeze({
-  TIEN_MAT: 'Tiền mặt',
-  CHUYEN_KHOAN: 'Chuyển khoản',
-  THE: 'Thẻ',
+  TienMat: 'Tiền mặt',
+  ChuyenKhoan: 'Chuyển khoản',
+  TheNganHang: 'Thẻ',
+  MoMo: 'MoMo',
+  ZaloPay: 'ZaloPay',
+  VNPay: 'VNPay',
 })
 
 export const TUY_CHON_PHUONG_THUC_THANH_TOAN = Object.freeze([
   {
-    value: 'TIEN_MAT',
+    value: 'TienMat',
     label: 'Tiền mặt',
     description: 'Thanh toán trực tiếp tại bàn hoặc khi nhận món.',
   },
   {
-    value: 'CHUYEN_KHOAN',
+    value: 'ChuyenKhoan',
     label: 'Chuyển khoản',
     description: 'Chuyển khoản cho đơn mang đi hoặc dùng tại bàn.',
   },
   {
-    value: 'THE',
+    value: 'TheNganHang',
     label: 'Thanh toán bằng thẻ',
     description: 'Dùng thẻ tại quầy hoặc thiết bị hỗ trợ.',
   },
@@ -68,9 +74,9 @@ const chuanHoaToppingDaChon = (giaTri) => (
 )
 
 const BI_DANH_PHUONG_THUC_THANH_TOAN = Object.freeze({
-  cash: 'TIEN_MAT',
-  banking: 'CHUYEN_KHOAN',
-  card: 'THE',
+  cash: 'TienMat',
+  banking: 'ChuyenKhoan',
+  card: 'TheNganHang',
 })
 
 export const chuanHoaPhuongThucThanhToan = (giaTri) => {
@@ -83,10 +89,7 @@ export const chuanHoaPhuongThucThanhToan = (giaTri) => {
   return BI_DANH_PHUONG_THUC_THANH_TOAN[giaTriDaChuanHoa.toLowerCase()] || 'TIEN_MAT'
 }
 
-export const chuanHoaIdMonAn = (giaTri) => {
-  const giaTriDaChuanHoa = Number(giaTri)
-  return Number.isInteger(giaTriDaChuanHoa) && giaTriDaChuanHoa > 0 ? giaTriDaChuanHoa : undefined
-}
+export const chuanHoaIdMonAn = (giaTri) => String(giaTri ?? '').trim() || undefined
 
 export const layNhanTrangThaiDonHang = (trangThai) => NHAN_TRANG_THAI_DON_HANG[trangThai] || chuanHoaVanBan(trangThai) || 'Không xác định'
 
@@ -94,9 +97,9 @@ export const laySacThaiDonHang = (trangThai) => SAC_THAI_TRANG_THAI_DON_HANG[tra
 
 export const layBuocTienTrinhDonHang = (trangThai) => BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI[trangThai] ?? 0
 
-export const laTrangThaiDonHangDaHuy = (trangThai) => trangThai === 'DA_HUY'
+export const laTrangThaiDonHangDaHuy = (trangThai) => trangThai === 'Cancelled'
 
-export const laTrangThaiDonHangKetThuc = (trangThai) => trangThai === 'DA_HOAN_THANH' || trangThai === 'DA_HUY'
+export const laTrangThaiDonHangKetThuc = (trangThai) => trangThai === 'Paid' || trangThai === 'Cancelled'
 
 export const laTrangThaiDonHangDangHoatDong = (trangThai) => Boolean(trangThai) && !laTrangThaiDonHangKetThuc(trangThai)
 
@@ -105,7 +108,7 @@ export const layNhanPhuongThucThanhToan = (phuongThucThanhToan) => (
 )
 
 export const anhXaMonTrongGioThanhMonDonHang = (monTrongGio) => ({
-  menuItemId: chuanHoaIdMonAn(monTrongGio?.menuItemId ?? monTrongGio?.id),
+  menuItemId: chuanHoaIdMonAn(monTrongGio?.menuItemId ?? monTrongGio?.maMon ?? monTrongGio?.id),
   quantity: Math.max(1, Number(monTrongGio?.quantity) || 1),
   kichCoDaChon: chuanHoaKichCoDaChon(monTrongGio?.kichCoDaChon),
   toppingDaChon: chuanHoaToppingDaChon(monTrongGio?.toppingDaChon),

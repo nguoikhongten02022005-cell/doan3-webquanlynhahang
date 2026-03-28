@@ -1,7 +1,6 @@
-using apiquanlynhahang.DTOs;
+using apiquanlynhahang.BLL.Services;
 using apiquanlynhahang.Common;
-using apiquanlynhahang.Models;
-using apiquanlynhahang.Services;
+using apiquanlynhahang.DTOs.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -19,96 +18,33 @@ public class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> DangNhap([FromBody] DangNhapDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> DangNhapKhach([FromBody] DangNhapDto dto, CancellationToken cancellationToken)
     {
-        var (nguoiDung, loi) = await _authService.DangNhapAsync(dto, null, cancellationToken);
-        return nguoiDung is null
-            ? BadRequest(new { message = loi })
-            : Ok(new { message = "Dang nhap thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
+        var (duLieu, loi) = await _authService.DangNhapKhachAsync(dto, cancellationToken);
+        return duLieu is null ? BadRequest(new { message = loi }) : Ok(new { message = "Dang nhap khach thanh cong", data = duLieu });
     }
 
     [HttpPost("internal-login")]
     public async Task<IActionResult> DangNhapNoiBo([FromBody] DangNhapDto dto, CancellationToken cancellationToken)
     {
-        var (nguoiDung, loi) = await _authService.DangNhapAsync(dto, "staff", cancellationToken);
-        return nguoiDung is null
-            ? BadRequest(new { message = loi })
-            : Ok(new { message = "Dang nhap noi bo thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
+        var (duLieu, loi) = await _authService.DangNhapNoiBoAsync(dto, cancellationToken);
+        return duLieu is null ? BadRequest(new { message = loi }) : Ok(new { message = "Dang nhap noi bo thanh cong", data = duLieu });
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> DangKy([FromBody] DangKyDto dto, CancellationToken cancellationToken)
+    public async Task<IActionResult> DangKy([FromBody] DangKyKhachHangDto dto, CancellationToken cancellationToken)
     {
-        var (nguoiDung, loi) = await _authService.DangKyAsync(dto, cancellationToken);
-        return nguoiDung is null
-            ? BadRequest(new { message = loi })
-            : StatusCode(201, new { message = "Dang ky tai khoan thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
+        var (duLieu, loi) = await _authService.DangKyKhachHangAsync(dto, cancellationToken);
+        return duLieu is null ? BadRequest(new { message = loi }) : StatusCode(201, new { message = "Dang ky khach hang thanh cong", data = duLieu });
     }
 
     [Authorize]
     [HttpGet("me")]
     public async Task<IActionResult> LayToi(CancellationToken cancellationToken)
     {
-        var currentUser = User.LayNguoiDungHienTai();
-        if (currentUser is null)
-        {
-            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
-        }
-
-        var nguoiDung = await _authService.LayTheoEmailAsync(currentUser.Email, cancellationToken);
-        return nguoiDung is null
-            ? NotFound(new { message = "Khong tim thay nguoi dung" })
-            : Ok(new { message = "Lay thong tin nguoi dung thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
+        var current = User.LayNguoiDungHienTai();
+        if (current is null) return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        var nguoiDung = await _authService.LayTheoMaNDAsync(current.MaND, cancellationToken);
+        return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { data = nguoiDung });
     }
-
-    [Authorize]
-    [HttpPatch("me")]
-    public async Task<IActionResult> CapNhatToi([FromBody] CapNhatHoSoDto dto, CancellationToken cancellationToken)
-    {
-        var currentUser = User.LayNguoiDungHienTai();
-        if (currentUser is null)
-        {
-            return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
-        }
-
-        var (nguoiDung, loi) = await _authService.CapNhatHoSoAsync(currentUser.Email, dto, cancellationToken);
-        return nguoiDung is null
-            ? NotFound(new { message = loi })
-            : Ok(new { message = "Cap nhat ho so thanh cong", data = TaoDuLieuAuth(nguoiDung, _authService.TaoAccessToken(nguoiDung)) });
-    }
-
-    [HttpPost("refresh")]
-    public IActionResult LamMoi()
-    {
-        return Ok(new { message = "Chua cau hinh refresh token trong ban nay", data = (object?)null });
-    }
-
-    [HttpPost("logout")]
-    public IActionResult DangXuat()
-    {
-        return Ok(new { message = "Dang xuat thanh cong", data = (object?)null });
-    }
-
-    private static object TaoDuLieuAuth(NguoiDung nguoiDung, string accessToken) => new
-    {
-        accessToken,
-        tokenType = "Bearer",
-        user = new
-        {
-            nguoiDung.Id,
-            fullName = nguoiDung.HoTen,
-            username = nguoiDung.TenDangNhap,
-            nguoiDung.Email,
-            role = nguoiDung.VaiTro,
-            status = nguoiDung.TrangThai,
-            phone = nguoiDung.SoDienThoai,
-        },
-        currentUser = new
-        {
-            id = nguoiDung.Id,
-            fullName = nguoiDung.HoTen,
-            email = nguoiDung.Email,
-            role = nguoiDung.VaiTro,
-        },
-    };
 }
