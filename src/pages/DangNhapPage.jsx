@@ -1,7 +1,13 @@
 import { useState } from 'react'
-import { useLocation, useNavigate } from 'react-router-dom'
-import { TAI_KHOAN_KHACH_HANG_DEMO } from '../constants/xacThucDemo'
+import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
+import { coSuDungMayChu } from '../services/trinhKhachApi'
+
+const TAI_KHOAN_KHACH_HANG_LOCAL = {
+  identifier: 'customer@nhahang.local',
+  username: 'customer.local',
+  password: 'secret123',
+}
 
 function DangNhapPage() {
   const [identifier, setIdentifier] = useState('')
@@ -92,9 +98,24 @@ function DangNhapPage() {
         </form>
 
         <div className="xac-thuc-demo-note" aria-live="polite">
-          <strong>Đăng nhập demo khách hàng</strong>
-          <p>Email / username: <span>{TAI_KHOAN_KHACH_HANG_DEMO.identifier}</span> hoặc <span>{TAI_KHOAN_KHACH_HANG_DEMO.username}</span></p>
-          <p>Mật khẩu: <span>{TAI_KHOAN_KHACH_HANG_DEMO.password}</span></p>
+          {coSuDungMayChu() ? (
+            <>
+              <strong>Đăng nhập bằng backend local</strong>
+              <p>Email / username: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.identifier}</span> hoặc <span>{TAI_KHOAN_KHACH_HANG_LOCAL.username}</span></p>
+              <p>Mật khẩu: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.password}</span></p>
+              <p>
+                Chưa có tài khoản?{' '}
+                <Link to="/dang-ky" className="xac-thuc-switch-link">
+                  Tạo tài khoản mới
+                </Link>
+              </p>
+            </>
+          ) : (
+            <>
+              <strong>Đăng nhập cục bộ</strong>
+              <p>Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản thật.</p>
+            </>
+          )}
         </div>
       </div>
     </section>

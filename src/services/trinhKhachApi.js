@@ -6,7 +6,17 @@ const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
 const DANH_SACH_DUONG_DAN_CONG_KHAI = ['/mon-an', '/ma-giam-gia/validate']
 
-export const coSuDungMayChu = () => false
+const docCoSuDungMayChuTuEnv = () => {
+  const giaTri = String(import.meta.env.VITE_USE_BACKEND ?? '').trim().toLowerCase()
+
+  if (!giaTri) {
+    return false
+  }
+
+  return giaTri === 'true' || giaTri === '1' || giaTri === 'yes' || giaTri === 'on'
+}
+
+export const coSuDungMayChu = () => docCoSuDungMayChuTuEnv()
 
 export const layUrlGocApi = () => {
   const urlGocDaCauHinh = String(import.meta.env.VITE_API_BASE_URL || '').trim()

@@ -22,13 +22,15 @@ Backend nay hien da co:
 
 ## Database
 - Ten database: `doan3quanlynhahang`
-- File khoi tao schema va du lieu mau:
-  - `Data/mysql_init_doan3quanlynhahang.sql`
+- Schema local duoc tao theo EF Core migration trong thu muc `Migrations/`
+- Du lieu mau local duoc seed tu code trong Development
+- File `Data/mysql_init_doan3quanlynhahang.sql` la artifact cu, khong con la nguon chuan de bootstrap schema backend hien tai
 
 ## Cach chay
-1. Dam bao MySQL dang chay va da import schema.
+1. Dam bao MySQL dang chay.
 2. Kiem tra chuoi ket noi trong `appsettings.json`.
-3. Chay lenh:
+3. Khi chay local Development, backend se tu dong apply migration va seed du lieu mau toi thieu.
+4. Chay lenh:
 
 ```bash
 dotnet restore
@@ -36,14 +38,15 @@ dotnet build
 dotnet run
 ```
 
-## Ghi chu ve file SQL
-Tat ca schema va du lieu mau hien duoc giu trong 1 file duy nhat:
+## Ghi chu ve schema local
+Schema local hien tai duoc quan ly bang EF Core migration va du lieu mau duoc seed bang code khi chay trong Development.
 
 ```text
-Data/mysql_init_doan3quanlynhahang.sql
+Migrations/
+Data/DuLieuPhatTrienKhoiTao.cs
 ```
 
-Phan mo rong cho kho nguyen lieu va QR theo ban da duoc bo sung o cuoi file nay de tranh tach nho CSDL thanh nhieu file.
+Neu can reset local, hay xoa DB `doan3quanlynhahang` roi chay lai backend de migration + seed duoc ap dung lai.
 
 ## Dia chi local
 - HTTP: `http://localhost:5011`

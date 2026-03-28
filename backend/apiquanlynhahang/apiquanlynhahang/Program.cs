@@ -118,6 +118,14 @@ builder.Services.AddSwaggerGen(options =>
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    using var scope = app.Services.CreateScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<UngDungDbContext>();
+    await dbContext.Database.MigrateAsync();
+    await DuLieuPhatTrienKhoiTao.DamBaoDuLieuMauAsync(dbContext);
+}
+
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
 {

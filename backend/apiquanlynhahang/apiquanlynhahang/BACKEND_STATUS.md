@@ -40,7 +40,9 @@ Backend C# trong `backend/apiquanlynhahang/apiquanlynhahang` da duoc nang cap tu
   - validate voucher -> tao don hang -> cap nhat trang thai
 
 ## Hien trang MySQL
-- CSDL hien da du de chay cac nghiep vu cot loi cua bai:
+- Schema local hien tai duoc quan ly bang EF Core migration trong `Migrations/`.
+- Khi chay trong Development, backend se tu dong apply migration va seed du lieu mau toi thieu.
+- Seed local hien tao san cac nhom du lieu can cho smoke test:
   - `nguoi_dung`
   - `token_lam_moi`
   - `khu_vuc_ban`
@@ -53,6 +55,7 @@ Backend C# trong `backend/apiquanlynhahang/apiquanlynhahang` da duoc nang cap tu
   - `chi_tiet_don_hang`
 - Cac bang tren da du cho auth, menu, table, booking, order va voucher.
 - Hien chua co bang rieng cho bao cao thong ke, kho nguyen lieu va QR goi mon theo ban.
+- File `Data/mysql_init_doan3quanlynhahang.sql` khong con la nguon chuan cho schema backend hien tai.
 
 ## De xuat mo rong MySQL
 - De phu hop huong mo rong cua bai, nen bo sung theo nhom bang nho gon nhu sau:

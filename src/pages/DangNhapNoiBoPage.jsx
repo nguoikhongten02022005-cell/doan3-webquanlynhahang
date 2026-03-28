@@ -2,7 +2,25 @@ import { useState } from 'react'
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { TAI_KHOAN_NOI_BO_DEMO } from '../constants/xacThucDemo'
+import { coSuDungMayChu } from '../services/trinhKhachApi'
+
+const TAI_KHOAN_NOI_BO_LOCAL = Object.freeze([
+  {
+    identifier: 'admin@nhahang.local',
+    username: 'admin.local',
+    password: 'secret123',
+    roleLabel: 'Admin local',
+  },
+  {
+    identifier: 'staff@nhahang.local',
+    username: 'staff.local',
+    password: 'secret123',
+    roleLabel: 'Nhân viên local',
+  },
+])
+
+const LOI_DANG_NHAP_NOI_BO_LOCAL = 'Sai tài khoản nội bộ. Hãy dùng tài khoản admin hoặc nhân viên local được hiển thị trên form đăng nhập.'
+const LOI_DANG_NHAP_NOI_BO_DEMO = 'Sai tài khoản cục bộ. Hãy bật backend mode nếu muốn đăng nhập nội bộ bằng API thật.'
 
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
@@ -12,6 +30,7 @@ function DangNhapNoiBoPage() {
   const location = useLocation()
   const navigate = useNavigate()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
+  const backendMode = coSuDungMayChu()
 
   if (daDangNhap && coTheVaoNoiBo) {
     return <Navigate to="/admin/dashboard" replace />
@@ -60,23 +79,25 @@ function DangNhapNoiBoPage() {
 
         <h1 className="xac-thuc-title">Đăng nhập quản trị</h1>
         <p className="xac-thuc-subtitle">
-          Ưu tiên hoàn thiện frontend trước backend, nên bạn có thể dùng tài khoản demo để xem toàn bộ Admin Panel ngay.
+          {backendMode
+            ? 'Đăng nhập bằng tài khoản nội bộ thật để truy cập Admin Panel và dữ liệu backend local.'
+            : 'Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
         </p>
 
-        <div className="admin-demo-credentials" aria-label="Tài khoản demo nội bộ">
-          {TAI_KHOAN_NOI_BO_DEMO.map((account) => (
+        <div className="admin-demo-credentials" aria-label={backendMode ? 'Tài khoản nội bộ local' : 'Tài khoản cục bộ nội bộ'}>
+          {TAI_KHOAN_NOI_BO_LOCAL.map((account) => (
             <button
               key={account.username}
               type="button"
               className="admin-demo-credentials__item"
               onClick={() => {
-                setTenDangNhapHoacEmail(account.username)
+                setTenDangNhapHoacEmail(account.identifier)
                 setMatKhau(account.password)
                 setLoiDangNhap('')
               }}
             >
               <div>
-                <strong>{account.user.role === 'admin' ? 'Admin demo' : 'Nhân viên demo'}</strong>
+                <strong>{account.roleLabel}</strong>
                 <p>{account.identifier}</p>
               </div>
               <span>{account.username} / {account.password}</span>
@@ -141,8 +162,8 @@ function DangNhapNoiBoPage() {
         </form>
 
         <div className="xac-thuc-demo-note admin-login-note" aria-live="polite">
-          <strong>Khu vực dành cho nhân sự</strong>
-          <p>Hiện frontend đang ưu tiên trước backend, nên có sẵn tài khoản demo admin và nhân viên để bạn kiểm tra giao diện.</p>
+          <strong>{backendMode ? 'Tài khoản nội bộ local' : 'Khu vực dành cho nhân sự'}</strong>
+          <p>{backendMode ? 'Hệ thống đang dùng backend local, bạn có thể đăng nhập bằng tài khoản admin hoặc nhân viên thật.' : 'Frontend hiện đang chạy cục bộ, chưa dùng backend thật.'}</p>
           <p>
             Bạn là khách hàng?{' '}
             <Link to="/dang-nhap" className="xac-thuc-switch-link">
