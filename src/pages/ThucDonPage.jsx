@@ -32,6 +32,8 @@ function ThucDonPage() {
   const { dishes, daTaiLanDau, error, reloadDishes } = useDanhSachMonAn()
   const { themVaoGio } = useGioHang()
   const danhMucRefs = useRef({})
+  const tabsRowRef = useRef(null)
+  const tabItemRefs = useRef({})
   const {
     dongChiTietMon,
     giaChiTiet,
@@ -62,7 +64,7 @@ function ThucDonPage() {
   const danhSachMonDaCoAnh = useMemo(
     () => dishes.map((mon) => ({
       ...mon,
-      image: layAnhMonTheoTen(mon.name) || mon.image,
+      image: layAnhMonTheoTen(mon.name, mon.category) || mon.image,
     })),
     [dishes],
   )
@@ -135,6 +137,17 @@ function ThucDonPage() {
     return () => window.removeEventListener('scroll', xuLyCuon)
   }, [cacSectionDanhMuc])
 
+  useEffect(() => {
+    const container = tabsRowRef.current
+    const activeTab = tabItemRefs.current[activeCategory]
+    if (!container || !activeTab) return
+
+    const targetScroll =
+      activeTab.offsetLeft - container.offsetWidth / 2 + activeTab.offsetWidth / 2
+
+    container.scrollTo({ left: targetScroll, behavior: 'smooth' })
+  }, [activeCategory])
+
   const xuLyChonDanhMuc = (category) => {
     setActiveCategory(category)
     const phanTu = danhMucRefs.current[category]
@@ -152,12 +165,13 @@ function ThucDonPage() {
       <section className="thuc-don-list-section thuc-don-list-section--reworked">
         <div className="container">
           <div className="thuc-don-toolbar-shell thuc-don-toolbar-shell--sticky">
-            <div className="thuc-don-tabs-row" role="tablist" aria-label="Danh mục thực đơn">
+            <div className="thuc-don-tabs-row" ref={tabsRowRef} role="tablist" aria-label="Danh mục thực đơn">
               {categoryTabs.map((categoryTab) => {
                 const isActive = activeCategory === categoryTab.category
                 return (
                   <button
                     key={categoryTab.category}
+                    ref={(el) => { tabItemRefs.current[categoryTab.category] = el }}
                     type="button"
                     role="tab"
                     aria-selected={isActive}

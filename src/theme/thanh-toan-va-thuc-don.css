@@ -2451,6 +2451,7 @@
   border-bottom: 1px solid rgba(95, 75, 57, 0.14);
   justify-content: flex-start;
   overflow-x: auto;
+  scroll-behavior: smooth;
   scrollbar-width: thin;
 }
 
