@@ -10,8 +10,9 @@ export const useAdminData = () => {
   const badges = useMemo(() => ({
     bookings: duLieuNoiBo.danhSachDatBanChoXuLy.length,
     orders: duLieuNoiBo.danhSachDonHangDangMo.length,
+    reviews: duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
     notifications: ADMIN_NOTIFICATION_COUNT,
-  }), [duLieuNoiBo.danhSachDatBanChoXuLy.length, duLieuNoiBo.danhSachDonHangDangMo.length])
+  }), [duLieuNoiBo.danhSachDatBanChoXuLy.length, duLieuNoiBo.danhSachDonHangDangMo.length, duLieuNoiBo.danhSachDanhGiaChoDuyet.length])
 
   const revenueStats = useMemo(
     () => taoDuLieuThongKeDoanhThu({

@@ -27,7 +27,7 @@ export const layNhanChoNgoi = (giaTri) => NHAN_KHU_VUC_DAT_BAN[giaTri] || giaTri
 export const laySacThaiTrangThaiDatBan = (trangThai) => {
   if (trangThai === 'DA_HUY' || trangThai === 'TU_CHOI_HET_CHO' || trangThai === 'KHONG_DEN') return 'danger'
   if (trangThai === 'DA_CHECK_IN' || trangThai === 'DA_XEP_BAN') return 'neutral'
-  if (trangThai === 'DA_XAC_NHAN' || trangThai === 'DA_GHI_NHAN' || trangThai === 'DA_HOAN_THANH' || trangThai === 'GIU_CHO_TAM') return 'success'
+  if (trangThai === 'DA_XAC_NHAN' || trangThai === 'DA_GHI_NHAN' || trangThai === 'DA_HOAN_THANH' || trangThai === 'GIU_CHO_TAM' || trangThai === 'Confirmed') return 'success'
   return 'warning'
 }
 

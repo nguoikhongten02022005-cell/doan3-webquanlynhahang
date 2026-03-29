@@ -1,6 +1,7 @@
 using System.Text.Json;
 using apiquanlynhahang.Common;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace apiquanlynhahang.Common;
 
@@ -29,6 +30,10 @@ public class ApiExceptionMiddleware
         {
             _logger.LogError(ex, "Loi cap nhat co so du lieu");
             await GhiLoiAsync(context, StatusCodes.Status409Conflict, "Khong the luu du lieu vi vi pham rang buoc");
+        }
+        catch (ValidationException ex)
+        {
+            await GhiLoiAsync(context, StatusCodes.Status400BadRequest, ex.Message);
         }
         catch (Exception ex)
         {

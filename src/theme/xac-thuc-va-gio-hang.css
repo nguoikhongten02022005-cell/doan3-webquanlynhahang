@@ -145,7 +145,7 @@
   color: var(--text-muted);
   background: #fff;
   border: 1px solid #E5E0DB;
-  border-radius: 1.5rem;
+  border-radius: 0;
 }
 .gio-hang-page .gio-hang-empty p {
   font-size: 1rem;
@@ -154,7 +154,7 @@
 .gio-hang-page .gio-hang-item-list {
   background: #fff;
   border: 1px solid #E5E0DB;
-  border-radius: 1.5rem;
+  border-radius: 0;
   overflow: hidden;
 }
 .gio-hang-page .gio-hang-item {
@@ -178,7 +178,7 @@
 .gio-hang-page .gio-hang-item-image {
   width: 80px;
   height: 80px;
-  border-radius: 8px;
+  border-radius: 0;
   object-fit: cover;
   display: block;
   background: #FAF7F4;
@@ -231,7 +231,7 @@
   align-items: center;
   gap: 0.1rem;
   border: 1px solid #E5E0DB;
-  border-radius: 999px;
+  border-radius: 0;
   overflow: hidden;
   background: #FAF7F4;
 }
@@ -269,7 +269,7 @@
   display: grid;
   place-items: center;
   padding: 0;
-  border-radius: 999px;
+  border-radius: 0;
 }
 .gio-hang-page .remove-btn {
   background: none;
@@ -294,7 +294,7 @@
 .gio-hang-page .tom-tat-card {
   background: #fff;
   border: 1px solid #E5E0DB;
-  border-radius: 1.5rem;
+  border-radius: 0;
   padding: 1.5rem;
   position: sticky;
   top: 90px;

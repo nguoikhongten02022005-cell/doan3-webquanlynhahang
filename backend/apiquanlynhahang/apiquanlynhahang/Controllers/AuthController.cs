@@ -44,7 +44,7 @@ public class AuthController : ControllerBase
     {
         var current = User.LayNguoiDungHienTai();
         if (current is null) return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
-        var nguoiDung = await _authService.LayTheoMaNDAsync(current.MaND, cancellationToken);
+        var nguoiDung = await _authService.LayThongTinNguoiDungHienTaiAsync(current.MaND, cancellationToken);
         return nguoiDung is null ? NotFound(new { message = "Khong tim thay nguoi dung" }) : Ok(new { data = nguoiDung });
     }
 }

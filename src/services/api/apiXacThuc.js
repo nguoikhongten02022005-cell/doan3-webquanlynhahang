@@ -9,6 +9,7 @@ const chuanHoaNguoiDung = (nguoiDung) => {
     ...nguoiDung,
     id: nguoiDung.maND || nguoiDung.MaND || nguoiDung.id || null,
     maND: nguoiDung.maND || nguoiDung.MaND || '',
+    maKH: nguoiDung.maKH || nguoiDung.MaKH || '',
     fullName: nguoiDung.tenND || nguoiDung.TenND || nguoiDung.fullName || '',
     username: nguoiDung.maND || nguoiDung.MaND || nguoiDung.username || '',
     email: nguoiDung.email || nguoiDung.Email || '',

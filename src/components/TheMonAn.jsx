@@ -1,4 +1,4 @@
-function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
+function TheMonAn({ dish, onOpenDetail, variant = 'default' }) {
   const canOpenDetail = typeof onOpenDetail === 'function'
   const isMenuVariant = variant === 'menu'
   const safeDish = dish || {}
@@ -57,13 +57,6 @@ function TheMonAn({ dish, xuLyThemVaoGio, onOpenDetail, variant = 'default' }) {
           <div className="the-mon-price-block">
             <strong className="gia-mon price">{dishPrice}</strong>
           </div>
-          <button
-            type="button"
-            className={`nut-them-mon ${isMenuVariant ? 'nut-them-mon--menu' : ''}`}
-            onClick={() => xuLyThemVaoGio(safeDish)}
-          >
-            Thêm món
-          </button>
         </div>
       </div>
     </article>

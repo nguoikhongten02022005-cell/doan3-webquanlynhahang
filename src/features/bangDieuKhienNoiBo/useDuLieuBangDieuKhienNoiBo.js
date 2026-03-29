@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { useDanhSachMonAn } from '../../hooks/useDanhSachMonAn'
 import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../../hooks/useDatBan'
 import { layDanhSachNguoiDungApi } from '../../services/api/apiXacThuc'
+import { layDanhSachDanhGiaApi, duyetDanhGiaApi } from '../../services/api/apiDanhGia'
 import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
 import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
@@ -50,15 +51,17 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   const [danhSachDonHang, setDanhSachDonHang] = useState([])
   const [danhSachTaiKhoan, setDanhSachTaiKhoan] = useState([])
   const [danhSachBan, setDanhSachBan] = useState([])
+  const [danhSachDanhGia, setDanhSachDanhGia] = useState([])
 
   const taiLaiDuLieu = useCallback(async () => {
-    const apDungDuLieuDuPhong = () => {
-      const duLieuDuPhong = taoDuLieuNoiBoDuPhong()
-      setDanhSachDatBan(duLieuDuPhong.bookings)
-      setDanhSachDonHang(duLieuDuPhong.orders)
-      setDanhSachTaiKhoan(duLieuDuPhong.accounts)
-      setDanhSachBan(duLieuDuPhong.tables)
-    }
+      const apDungDuLieuDuPhong = () => {
+        const duLieuDuPhong = taoDuLieuNoiBoDuPhong()
+        setDanhSachDatBan(duLieuDuPhong.bookings)
+        setDanhSachDonHang(duLieuDuPhong.orders)
+        setDanhSachTaiKhoan(duLieuDuPhong.accounts)
+        setDanhSachBan(duLieuDuPhong.tables)
+        setDanhSachDanhGia([])
+      }
 
     if (!coSuDungMayChu()) {
       apDungDuLieuDuPhong()
@@ -66,17 +69,19 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     }
 
     try {
-      const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse] = await Promise.all([
+      const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse, nextReviewsResponse] = await Promise.all([
         layDanhSachDatBanHost(),
         layDanhSachDonHangApi(),
         layDanhSachNguoiDungApi(),
         layDanhSachBanApi(),
+        layDanhSachDanhGiaApi(),
       ])
 
       setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
       setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu.map(chuanHoaDonHangNoiBo).filter(Boolean) : [])
       setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu.map(chuanHoaNguoiDungApi).filter(Boolean) : [])
       setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu.map(chuanHoaBanChoNoiBo).filter(Boolean) : [])
+      setDanhSachDanhGia(Array.isArray(nextReviewsResponse?.duLieu) ? nextReviewsResponse.duLieu : [])
     } catch {
       apDungDuLieuDuPhong()
     }
@@ -132,6 +137,10 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   )
   const danhSachDonHangDaSapXep = useMemo(() => sapXepDonHangChoVanHanh(danhSachDonHang), [danhSachDonHang])
   const tomTatTaiKhoan = useMemo(() => layTomTatTaiKhoan(danhSachTaiKhoan), [danhSachTaiKhoan])
+  const danhSachDanhGiaChoDuyet = useMemo(
+    () => danhSachDanhGia.filter((danhGia) => danhGia.trangThai === 'Pending'),
+    [danhSachDanhGia],
+  )
 
   const xuLyTaoDatBanNoiBo = useCallback(async (duLieuGuiDi) => {
     const ketQua = await taoDatBanNoiBo(duLieuGuiDi)
@@ -233,6 +242,14 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     return ketQua
   }, [taiLaiDuLieu])
 
+  const xuLyDuyetDanhGia = useCallback(async (maDanhGia, trangThai, phanHoi = '') => {
+    const ketQua = await duyetDanhGiaApi(maDanhGia, { trangThai, phanHoi })
+    if (ketQua?.duLieu) {
+      await taiLaiDuLieu()
+    }
+    return ketQua
+  }, [taiLaiDuLieu])
+
   return {
     tomTatTaiKhoan,
     danhSachDatBanDangHoatDong,
@@ -240,6 +257,8 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     soLuongDatBanDaCheckIn,
     danhSachDatBanDaXacNhan,
     danhSachBan,
+    danhSachDanhGia,
+    danhSachDanhGiaChoDuyet,
     danhSachDatBan,
     danhSachDonHang,
     danhSachMon,
@@ -255,6 +274,7 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     layBanPhuHopChoDatBan,
     layChiTietDonHang,
     xuLyCapNhatTrangThaiDonHang,
+    xuLyDuyetDanhGia,
     danhSachDonHangDangMo,
     tomTatDonHang,
     danhSachDatBanChoXuLy,

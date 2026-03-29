@@ -19,7 +19,6 @@ import { useDatBan } from '../hooks/useDatBan'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { layDanhSachBanApi } from '../services/api/apiBanAn'
 import { taoAnhChupBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
-import { layPhieuGiamGiaDaApDung, luuPhieuGiamGiaDaApDung, xoaPhieuGiamGiaDaApDung } from '../services/dichVuPhieuGiamGia'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 import BuocMotDatBan from '../components/datBan/BuocMotDatBan'
 import BuocHaiDatBan from '../components/datBan/BuocHaiDatBan'
@@ -29,7 +28,7 @@ import DatBanThanhCong from '../components/datBan/DatBanThanhCong'
 
 const STEPS = [
   { id: 1, label: 'Chọn thông tin', description: 'Số khách, ngày, giờ và khu vực ưu tiên.' },
-  { id: 2, label: 'Thông tin liên hệ', description: 'Tên, số điện thoại, ghi chú và mã ưu đãi.' },
+  { id: 2, label: 'Thông tin liên hệ', description: 'Tên, số điện thoại và ghi chú.' },
   { id: 3, label: 'Xác nhận', description: 'Rà soát toàn bộ thông tin trước khi gửi.' },
 ]
 
@@ -50,13 +49,6 @@ const REVIEW_NOTICE = [
   'Khu vực là ưu tiên, không cam kết 100% đúng vị trí mong muốn.',
   'Nhóm đông hoặc giờ cao điểm có thể cần host gọi lại để chốt nhanh hơn.',
 ]
-
-// TODO: thay kiểm tra voucher mock bằng API voucher thật khi backend hoàn thiện.
-const DANH_SACH_VOUCHER_MOCK = [
-  { code: 'WELCOME10', description: 'Giảm 10% cho lần ghé đầu tiên', amount: 100000 },
-  { code: 'SUMMER30', description: 'Giảm 30% (tối đa 100k)', amount: 100000 },
-]
-const BANG_TRA_VOUCHER_MOCK = Object.fromEntries(DANH_SACH_VOUCHER_MOCK.map((voucher) => [voucher.code, voucher]))
 
 const normalizeFieldValue = (value) => String(value ?? '')
 const GUEST_PHONE_PATTERN = /^(0[35789])\d{8}$/
@@ -207,21 +199,6 @@ function DatBanPage() {
   const [submitSuccess, setSubmitSuccess] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [formData, setFormData] = useState(() => mergeDraftWithUser(layBanNhapTam(), nguoiDungHienTai))
-  const [voucherState, setVoucherState] = useState(() => {
-    const storedVoucher = layPhieuGiamGiaDaApDung()
-    return {
-      codeInput: storedVoucher?.code || '',
-      appliedVoucher: storedVoucher
-        ? {
-            ...storedVoucher,
-            description: `Ưu đãi lưu sẵn từ lần trước (${storedVoucher.code})`,
-          }
-        : null,
-      error: '',
-      isApplying: false,
-      availableVouchers: [],
-    }
-  })
 
   useEffect(() => {
     const draft = layBanNhapTam()
@@ -263,21 +240,6 @@ function DatBanPage() {
 
     luuBanNhapTam(taoAnhChupBanNhapTamDatBan(formData))
   }, [didBootstrapDraft, formData, luuBanNhapTam, submitSuccess])
-
-  useEffect(() => {
-    if (!daDangNhap) {
-      setVoucherState((current) => ({
-        ...current,
-        availableVouchers: [],
-      }))
-      return
-    }
-
-    setVoucherState((current) => ({
-      ...current,
-      availableVouchers: DANH_SACH_VOUCHER_MOCK,
-    }))
-  }, [daDangNhap])
 
   const dateOptions = useMemo(() => taoDanhSachNgayNhanh(), [])
   const dateOptionMap = useMemo(() => new Map(dateOptions.map((item) => [item.value, item])), [dateOptions])
@@ -374,8 +336,7 @@ function DatBanPage() {
     phone: formData.phone || 'Chưa nhập',
     email: formData.email || 'Không có',
     notes: formData.notes || 'Không có',
-    voucher: voucherState.appliedVoucher?.code || 'Không áp dụng',
-  }), [formData.email, formData.name, formData.notes, formData.phone, voucherState.appliedVoucher])
+  }), [formData.email, formData.name, formData.notes, formData.phone])
 
   const nextStage = !formData.guests ? 'guests' : !formData.date ? 'date' : !formData.time ? 'time' : 'ready'
   const canProceedStepOne = Boolean(Number(formData.guests) > 0 && Number(formData.guests) < 10 && formData.date && formData.time && !selectedAreaUnavailable)
@@ -471,16 +432,6 @@ function DatBanPage() {
 
   const handleFormFieldChange = (field) => (event) => {
     const nextValue = event.target.value
-
-    if (field === 'voucherCode') {
-      setVoucherState((current) => ({
-        ...current,
-        codeInput: nextValue,
-        error: '',
-      }))
-      return
-    }
-
     const sanitizedValue = field === 'notes' ? nextValue.slice(0, 200) : nextValue
 
     setSubmitError('')
@@ -505,10 +456,6 @@ function DatBanPage() {
   }
 
   const handleFieldBlur = (field) => () => {
-    if (field === 'voucherCode') {
-      return
-    }
-
     capNhatLoiField(field, validateContactField(field, formData))
   }
 
@@ -569,54 +516,6 @@ function DatBanPage() {
     setCurrentStep(2)
   }
 
-  const handleApplyVoucher = async (rawCode) => {
-    const code = String(rawCode || '').trim().toUpperCase()
-
-    if (!code) {
-      setVoucherState((current) => ({
-        ...current,
-        appliedVoucher: null,
-        error: 'Vui lòng nhập mã ưu đãi.',
-      }))
-      return
-    }
-
-    setVoucherState((current) => ({ ...current, isApplying: true, error: '' }))
-
-    await new Promise((resolve) => window.setTimeout(resolve, 450))
-
-    const matchedVoucher = BANG_TRA_VOUCHER_MOCK[code]
-
-    if (!matchedVoucher) {
-      setVoucherState((current) => ({
-        ...current,
-        isApplying: false,
-        appliedVoucher: null,
-        error: 'Mã không tồn tại hoặc đã hết hạn.',
-      }))
-      return
-    }
-
-    luuPhieuGiamGiaDaApDung(matchedVoucher)
-    setVoucherState((current) => ({
-      ...current,
-      isApplying: false,
-      codeInput: matchedVoucher.code,
-      appliedVoucher: matchedVoucher,
-      error: '',
-    }))
-  }
-
-  const handleClearVoucher = () => {
-    xoaPhieuGiamGiaDaApDung()
-    setVoucherState((current) => ({
-      ...current,
-      codeInput: '',
-      appliedVoucher: null,
-      error: '',
-    }))
-  }
-
   const handleSubmit = async () => {
     const stepOneError = validateStepOne()
     if (stepOneError) {
@@ -656,7 +555,6 @@ function DatBanPage() {
           soNguoi: Number(formData.guests) || 0,
           notes: [
             formData.notes.trim(),
-            voucherState.appliedVoucher ? `Voucher: ${voucherState.appliedVoucher.code} (UI preview)` : '',
             formData.seatingArea !== 'KHONG_UU_TIEN' ? `Ưu tiên khu vực: ${layNhanChoNgoi(formData.seatingArea)}` : '',
           ].filter(Boolean).join(' · '),
         },
@@ -721,13 +619,9 @@ function DatBanPage() {
               <BuocHaiDatBan
                 formData={formData}
                 fieldErrors={stepErrors}
-                voucherState={voucherState}
-                daDangNhap={daDangNhap}
                 onFieldChange={handleFormFieldChange}
                 onFieldBlur={handleFieldBlur}
                 onSuggestionClick={handleSuggestionClick}
-                onApplyVoucher={handleApplyVoucher}
-                onClearVoucher={handleClearVoucher}
               />
             ) : null}
 

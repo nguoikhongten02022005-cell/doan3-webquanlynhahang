@@ -5,11 +5,11 @@ import { phanTichGiaThanhSo } from '../../utils/giaTien'
 function ChiTietMonAnModal({
   giaChiTiet,
   dangMo,
-  xuLyThemVaoGio,
   xuLyDong,
   xuLyChonKichCo,
   xuLyDoiGhiChuRieng,
   xuLyBatTatTopping,
+  coTheChonKichCo,
   phamVi = 'food',
   monDaChon,
   kichCoDaChon,
@@ -46,40 +46,46 @@ function ChiTietMonAnModal({
         </div>
 
         <div className="chi-tiet-mon-content">
-          <h3 id={idTieuDe}>{monAnAnToan.name}</h3>
-          <p>{monAnAnToan.description}</p>
-          <strong className="chi-tiet-mon-base-price">Giá gốc: {dinhDangTienTe(phanTichGiaThanhSo(monAnAnToan.price))}</strong>
-
-          <div className="chi-tiet-mon-group">
-            <p className="chi-tiet-mon-group-title">Chọn cỡ món</p>
-            <div className="chi-tiet-mon-options two-columns">
-              {danhSachKichCo.map((luaChon) => (
-                <label key={luaChon.value} className="chi-tiet-mon-option">
-                  <input
-                    type="radio"
-                    name={`detail-size-${phamVi}`}
-                    value={luaChon.value}
-                    checked={kichCoDaChon === luaChon.value}
-                    onChange={(event) => xuLyChonKichCo(event.target.value)}
-                  />
-                  <span>{luaChon.label}</span>
-                  <small>{luaChon.surcharge > 0 ? `+${dinhDangTienTe(luaChon.surcharge)}` : 'Giá gốc'}</small>
-                </label>
-              ))}
+          <div className="chi-tiet-mon-header">
+            <div className="chi-tiet-mon-tieu-de-wrap">
+              <h3 id={idTieuDe}>{monAnAnToan.name}</h3>
+              <p>{monAnAnToan.description}</p>
             </div>
+            <strong className="chi-tiet-mon-base-price">Giá gốc: {dinhDangTienTe(phanTichGiaThanhSo(monAnAnToan.price))}</strong>
           </div>
+
+          {coTheChonKichCo ? (
+            <div className="chi-tiet-mon-group">
+              <p className="chi-tiet-mon-group-title">Chọn cỡ món</p>
+              <div className="chi-tiet-mon-options two-columns">
+                {danhSachKichCo.map((luaChon) => (
+                  <label key={luaChon.value} className={`chi-tiet-mon-option ${kichCoDaChon === luaChon.value ? 'selected' : ''}`}>
+                    <input
+                      type="radio"
+                      name={`detail-size-${phamVi}`}
+                      value={luaChon.value}
+                      checked={kichCoDaChon === luaChon.value}
+                      onChange={(event) => xuLyChonKichCo(event.target.value)}
+                    />
+                    <span className="chi-tiet-mon-option-label">{luaChon.label}</span>
+                    <small>{luaChon.surcharge > 0 ? `+${dinhDangTienTe(luaChon.surcharge)}` : 'Giá gốc'}</small>
+                  </label>
+                ))}
+              </div>
+            </div>
+          ) : null}
 
           <div className="chi-tiet-mon-group">
             <p className="chi-tiet-mon-group-title">Topping thêm</p>
             <div className="chi-tiet-mon-options">
               {danhSachTopping.map((topping) => (
-                <label key={topping} className="chi-tiet-mon-option">
+                <label key={topping} className={`chi-tiet-mon-option ${toppingDaChon.includes(topping) ? 'selected' : ''}`}>
                   <input
                     type="checkbox"
                     checked={toppingDaChon.includes(topping)}
                     onChange={() => xuLyBatTatTopping(topping)}
                   />
-                  <span>{topping}</span>
+                  <span className="chi-tiet-mon-option-label">{topping}</span>
                 </label>
               ))}
             </div>
@@ -106,9 +112,6 @@ function ChiTietMonAnModal({
               <strong>{dinhDangTienTe(giaChiTiet)}</strong>
               {phuThuDaChon > 0 && <small>Đã gồm phụ thu cỡ món {dinhDangTienTe(phuThuDaChon)}</small>}
             </div>
-            <button type="button" className="btn nut-chinh" onClick={xuLyThemVaoGio}>
-              Thêm vào giỏ
-            </button>
           </div>
         </div>
       </div>

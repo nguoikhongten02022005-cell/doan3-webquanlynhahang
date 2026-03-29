@@ -37,6 +37,83 @@
   margin-top: 1.2rem;
 }
 
+.thanh-toan-voucher-xem {
+  display: grid;
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 1px solid var(--line-light);
+}
+
+.thanh-toan-voucher-xem-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.thanh-toan-voucher-xem-head strong {
+  font-size: 0.98rem;
+  color: var(--dark);
+}
+
+.thanh-toan-voucher-xem-head span {
+  font-size: 0.74rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(96, 73, 57, 0.72);
+}
+
+.thanh-toan-voucher-xem > p {
+  margin: 0;
+  font-size: 0.82rem;
+  line-height: 1.7;
+  color: rgba(96, 73, 57, 0.78);
+}
+
+.thanh-toan-voucher-xem-list {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.thanh-toan-voucher-xem-item {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.75rem;
+  align-items: center;
+  padding: 0.8rem 0.9rem;
+  border: 1px solid rgba(201, 107, 74, 0.14);
+  border-radius: 1rem;
+  background: rgba(255, 248, 244, 0.92);
+}
+
+.thanh-toan-voucher-xem-item strong {
+  display: block;
+  margin-bottom: 0.2rem;
+  font-size: 0.9rem;
+  color: var(--menu-coral-text);
+}
+
+.thanh-toan-voucher-xem-item p {
+  margin: 0;
+  font-size: 0.78rem;
+  line-height: 1.6;
+  color: rgba(96, 73, 57, 0.78);
+}
+
+.thanh-toan-voucher-xem-item > span {
+  font-size: 0.78rem;
+  font-weight: 700;
+  color: var(--menu-coral-strong);
+  white-space: nowrap;
+}
+
+.thanh-toan-voucher-xem-item.active {
+  border-color: rgba(230, 120, 90, 0.35);
+  background: rgba(253, 240, 234, 0.9);
+}
+
 /* MENU PAGE */
 .thuc-don-page {
   padding: 0 0 4rem;

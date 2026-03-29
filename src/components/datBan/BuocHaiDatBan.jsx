@@ -3,12 +3,9 @@ import { CAC_GOI_Y_GHI_CHU_DAT_BAN, CAC_DIP_DAT_BAN } from '../../data/duLieuDat
 function BuocHaiDatBan({
   formData,
   fieldErrors,
-  voucherState,
   onFieldChange,
   onFieldBlur,
   onSuggestionClick,
-  onApplyVoucher,
-  onClearVoucher,
 }) {
   const noteLength = formData.notes.length
 
@@ -88,57 +85,6 @@ function BuocHaiDatBan({
           </button>
         ))}
       </div>
-
-      <section className="dat-ban-voucher-card">
-        <p className="eyebrow">Mã voucher</p>
-
-        {voucherState.availableVouchers.length > 0 ? (
-          <div className="dat-ban-voucher-owned-list" role="radiogroup" aria-label="Voucher của bạn">
-            {voucherState.availableVouchers.map((voucher) => {
-              const isSelected = voucherState.appliedVoucher?.code === voucher.code
-              return (
-                <button
-                  key={voucher.code}
-                  type="button"
-                  className={`dat-ban-voucher-owned-item ${isSelected ? 'active' : ''}`}
-                  onClick={() => onApplyVoucher(voucher.code)}
-                >
-                  <span>{isSelected ? '●' : '○'}</span>
-                  <div>
-                    <strong>{voucher.code}</strong>
-                    <p>{voucher.description}</p>
-                  </div>
-                </button>
-              )
-            })}
-          </div>
-        ) : null}
-
-        <div className="dat-ban-voucher-row">
-          <input
-            type="text"
-            className="truong-nhap dat-ban-step-two-input"
-            placeholder="Nhập mã voucher..."
-            value={voucherState.codeInput}
-            onChange={onFieldChange('voucherCode')}
-          />
-          <button type="button" className="btn nut-chinh dat-ban-step-two-primary-btn" onClick={() => onApplyVoucher(voucherState.codeInput)} disabled={voucherState.isApplying}>
-            {voucherState.isApplying ? 'Đang kiểm tra...' : 'Áp dụng'}
-          </button>
-          {voucherState.appliedVoucher ? (
-            <button type="button" className="btn nut-phu dat-ban-step-two-secondary-btn" onClick={onClearVoucher}>
-              Bỏ mã
-            </button>
-          ) : null}
-        </div>
-
-        {voucherState.error ? <p className="dat-ban-customer-error">{voucherState.error}</p> : null}
-        {voucherState.appliedVoucher ? (
-          <p className="dat-ban-voucher-success">
-            {voucherState.appliedVoucher.code} — {voucherState.appliedVoucher.description}
-          </p>
-        ) : null}
-      </section>
     </article>
   )
 }

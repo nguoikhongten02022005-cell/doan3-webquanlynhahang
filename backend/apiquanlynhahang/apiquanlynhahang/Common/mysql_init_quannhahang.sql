@@ -402,7 +402,7 @@ INSERT INTO Ban (MaBan, SoBan, SoChoNgoi, ViTri) VALUES
 ('B002', 2, 4, 'Tang 1 - Khu A'),
 ('B003', 3, 4, 'Tang 1 - Khu B'),
 ('B004', 4, 6, 'Tang 2 - View dep'),
-('B005', 5, 8, 'Tang 2 - Phong rieng'),
+('B005', 5, 8, 'Tang 2 - Khu rieng'),
 ('B006', 6, 2, 'Ngoai troi');
 
 INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan) VALUES
@@ -459,4 +459,3 @@ VALUES
 ('M011', 'DM005', 'Combo Gia Đình', 'Combo danh cho 4 nguoi gom mon chinh, khai vi va do uong.', 299000, NULL, 20, 'Available', NOW(), NOW()),
 ('M012', 'DM005', 'Combo Couple', 'Combo gon nhe cho 2 nguoi voi mon chinh va do uong.', 199000, NULL, 15, 'Available', NOW(), NOW()),
 ('M013', 'DM005', 'Combo Solo', 'Combo ca nhan tiet kiem, phuc vu nhanh.', 129000, NULL, 10, 'Available', NOW(), NOW());
-

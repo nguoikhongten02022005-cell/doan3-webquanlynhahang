@@ -33,7 +33,7 @@ export const CAC_CA_KHUNG_GIO_DAT_BAN = [
 export const NHAN_KHU_VUC_DAT_BAN = {
   KHONG_UU_TIEN: 'Không ưu tiên',
   SANH_CHINH: 'Sảnh chính',
-  PHONG_VIP: 'Phòng riêng / VIP',
+  PHONG_VIP: 'Khu riêng / VIP',
   BAN_CONG: 'Ngoài trời',
   QUAY_BAR: 'Quầy bar',
 }
@@ -54,8 +54,8 @@ export const KHU_VUC_DAT_BAN_CONG_KHAI = [
   {
     value: 'PHONG_VIP',
     icon: '👑',
-    label: 'Phòng VIP',
-    description: 'Riêng tư, sang trọng',
+    label: 'Khu riêng / VIP',
+    description: 'Riêng tư, phù hợp tiếp khách hoặc nhóm cần không gian tách biệt',
   },
 ]
 
@@ -109,8 +109,10 @@ export const NHAN_TRANG_THAI_DAT_BAN = {
 
 export const HOST_NHAN_TRANG_THAI_DAT_BAN = {
   YEU_CAU_DAT_BAN: 'Yêu cầu đặt bàn',
+  Pending: 'Chờ xác nhận',
   GIU_CHO_TAM: 'Đã giữ chỗ tạm',
   DA_XAC_NHAN: 'Đã xác nhận',
+  Confirmed: 'Đã xác nhận',
   CAN_GOI_LAI: 'Cần gọi lại',
   TU_CHOI_HET_CHO: 'Từ chối / hết chỗ',
   CHO_XAC_NHAN: 'Chờ xác nhận',

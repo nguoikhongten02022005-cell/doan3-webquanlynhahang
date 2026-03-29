@@ -86,12 +86,18 @@ function DanhGiaPage() {
       return
     }
 
+    if (!nguoiDungHienTai?.maKH) {
+      setLoiGui('Vui lòng đăng nhập bằng tài khoản khách hàng trước khi gửi đánh giá.')
+      return
+    }
+
     try {
       setDangGui(true)
       setLoiGui('')
       setThongBaoGui('')
       await taoDanhGiaApi({
         maDanhGia: formDanhGia.maDanhGia,
+        maKH: nguoiDungHienTai.maKH,
         maDonHang: formDanhGia.maDonHang,
         soSao: formDanhGia.soSao,
         noiDung: formDanhGia.noiDung.trim(),

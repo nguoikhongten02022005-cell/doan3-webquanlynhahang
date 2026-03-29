@@ -7,7 +7,6 @@ import BoCucChinh from './layouts/BoCucChinh'
 import AdminLayout from './layouts/AdminLayout'
 import GioiThieuPage from './pages/GioiThieuPage'
 import DatBanPage from './pages/DatBanPage'
-import GioHangPage from './pages/GioHangPage'
 import ThanhToanPage from './pages/ThanhToanPage'
 import TrangChuPage from './pages/TrangChuPage'
 import DangNhapNoiBoPage from './pages/DangNhapNoiBoPage'
@@ -18,6 +17,7 @@ import DangKyPage from './pages/DangKyPage'
 import DanhGiaPage from './pages/DanhGiaPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminDatBanPage from './pages/admin/AdminDatBanPage'
+import AdminDanhGiaPage from './pages/admin/AdminDanhGiaPage'
 import AdminSoDoBanPage from './pages/admin/AdminSoDoBanPage'
 import AdminThucDonPage from './pages/admin/AdminThucDonPage'
 import AdminDonHangPage from './pages/admin/AdminDonHangPage'
@@ -33,7 +33,7 @@ function App() {
           <Route path="/" element={<TrangChuPage />} />
           <Route path="/thuc-don" element={<ThucDonPage />} />
           <Route path="/gioi-thieu" element={<GioiThieuPage />} />
-          <Route path="/gio-hang" element={<GioHangPage />} />
+          <Route path="/gio-hang" element={<Navigate to="/thuc-don" replace />} />
           <Route path="/thanh-toan" element={<ThanhToanPage />} />
           <Route path="/ho-so" element={<HoSoPage />} />
           <Route path="/danh-gia" element={<DanhGiaPage />} />
@@ -53,6 +53,7 @@ function App() {
           <Route index element={<Navigate to="/admin/dashboard" replace />} />
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="dat-ban" element={<AdminDatBanPage />} />
+          <Route path="danh-gia" element={<AdminDanhGiaPage />} />
           <Route path="so-do-ban" element={<AdminSoDoBanPage />} />
           <Route path="thuc-don" element={<AdminThucDonPage />} />
           <Route path="don-hang" element={<AdminDonHangPage />} />

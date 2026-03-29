@@ -10,10 +10,13 @@ import {
 import { laySacThaiDonHang } from './dinhDang'
 
 export const laDatBanVip = (booking) => booking.seatingArea === 'PHONG_VIP'
-export const canXacNhanThuCong = (booking) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(booking.status) || laDatBanVip(booking)
+const laTrangThaiChoXuLy = (trangThai) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(trangThai) || trangThai === 'Pending'
+const laTrangThaiDaXacNhan = (trangThai) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(trangThai) || trangThai === 'Confirmed'
+
+export const canXacNhanThuCong = (booking) => laTrangThaiChoXuLy(booking.status) || laDatBanVip(booking)
 
 export const layGhiChuUuTienDatBan = (booking) => {
-  if (laDatBanVip(booking)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc phòng riêng.'
+  if (laDatBanVip(booking)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc khu riêng.'
   if (booking.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
   if (!Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0) return 'Booking chưa được gán bàn cụ thể.'
   if (booking.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ban công.'
@@ -189,10 +192,10 @@ export const layDoUuTienDatBan = (booking, now) => {
   const datBanDaGanBan = Array.isArray(booking.assignedTableIds) && booking.assignedTableIds.length > 0
 
   if (canXacNhanThuCong(booking)) return 0
-  if (!datBanDaGanBan && CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(booking.status)) return 1
+  if (!datBanDaGanBan && laTrangThaiDaXacNhan(booking.status)) return 1
   if (chenhLech >= 0 && chenhLech <= 2 * 60 * 60 * 1000) return 2
   if (laDatBanDaCheckIn(booking)) return 3
-  if (CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(booking.status)) return 4
+  if (laTrangThaiDaXacNhan(booking.status)) return 4
   return 5
 }
 

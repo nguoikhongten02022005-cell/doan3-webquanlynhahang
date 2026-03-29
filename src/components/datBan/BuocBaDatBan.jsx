@@ -20,7 +20,6 @@ function BuocBaDatBan({ summary, contactSummary, reviewNotice, submitError, isSu
             <div><span>📞 SĐT</span><strong>{contactSummary.phone}</strong></div>
             <div><span>📧 Email</span><strong>{contactSummary.email}</strong></div>
             <div><span>📝 Ghi chú</span><strong>{contactSummary.notes}</strong></div>
-            <div><span>🎟️ Voucher</span><strong>{contactSummary.voucher}</strong></div>
           </div>
         </section>
       </div>

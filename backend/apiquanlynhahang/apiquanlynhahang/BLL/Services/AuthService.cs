@@ -20,6 +20,39 @@ public class AuthService
     public Task<NguoiDung?> LayTheoMaNDAsync(string maNd, CancellationToken cancellationToken = default)
         => _dbContext.NguoiDung.AsNoTracking().FirstOrDefaultAsync(x => x.MaND == maNd, cancellationToken);
 
+    public async Task<DuLieuDangNhapDto?> LayThongTinNguoiDungHienTaiAsync(string maNd, CancellationToken cancellationToken = default)
+    {
+        var nguoiDung = await _dbContext.NguoiDung
+            .AsNoTracking()
+            .FirstOrDefaultAsync(x => x.MaND == maNd, cancellationToken);
+
+        if (nguoiDung is null)
+        {
+            return null;
+        }
+
+        var maKh = string.Empty;
+
+        if (nguoiDung.VaiTro == "KhachHang")
+        {
+            maKh = await _dbContext.KhachHang
+                .AsNoTracking()
+                .Where(x => x.MaND == nguoiDung.MaND)
+                .Select(x => x.MaKH)
+                .FirstOrDefaultAsync(cancellationToken)
+                ?? string.Empty;
+        }
+
+        return new DuLieuDangNhapDto
+        {
+            MaND = nguoiDung.MaND,
+            MaKH = maKh,
+            TenND = nguoiDung.TenND,
+            Email = nguoiDung.Email,
+            VaiTro = nguoiDung.VaiTro,
+        };
+    }
+
     public Task<NguoiDung?> LayTheoEmailAsync(string email, CancellationToken cancellationToken = default)
         => _dbContext.NguoiDung.AsNoTracking().FirstOrDefaultAsync(x => x.Email == email, cancellationToken);
 
@@ -60,10 +93,23 @@ public class AuthService
             return (null, "Thong tin dang nhap khong dung");
         }
 
+        var maKh = string.Empty;
+
+        if (nguoiDung.VaiTro == "KhachHang")
+        {
+            maKh = await _dbContext.KhachHang
+                .AsNoTracking()
+                .Where(x => x.MaND == nguoiDung.MaND)
+                .Select(x => x.MaKH)
+                .FirstOrDefaultAsync(cancellationToken)
+                ?? string.Empty;
+        }
+
         return (new DuLieuDangNhapDto
         {
             AccessToken = _jwtService.TaoAccessToken(nguoiDung),
             MaND = nguoiDung.MaND,
+            MaKH = maKh,
             TenND = nguoiDung.TenND,
             Email = nguoiDung.Email,
             VaiTro = nguoiDung.VaiTro,
@@ -114,6 +160,7 @@ public class AuthService
         {
             AccessToken = _jwtService.TaoAccessToken(nguoiDung),
             MaND = nguoiDung.MaND,
+            MaKH = khachHang.MaKH,
             TenND = nguoiDung.TenND,
             Email = nguoiDung.Email,
             VaiTro = nguoiDung.VaiTro,

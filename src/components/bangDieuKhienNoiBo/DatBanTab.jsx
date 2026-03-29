@@ -56,7 +56,7 @@ const QUICK_FILTERS = [
   { key: 'pending', label: 'Chờ xác nhận' },
 ]
 
-const PENDING_STATUS_SET = new Set(['YEU_CAU_DAT_BAN', 'CAN_GOI_LAI', 'CHO_XAC_NHAN'])
+const PENDING_STATUS_SET = new Set(['YEU_CAU_DAT_BAN', 'CAN_GOI_LAI', 'CHO_XAC_NHAN', 'Pending'])
 
 const CREATE_STATUS_OPTIONS = CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.filter((status) => Boolean(HOST_NHAN_TRANG_THAI_DAT_BAN[status]))
 
@@ -91,7 +91,7 @@ const ACTION_CONFIRMATION_COPY = {
 const seatingAreaOptions = [
   { value: 'KHONG_UU_TIEN', label: 'Không ưu tiên' },
   { value: 'SANH_CHINH', label: 'Sảnh chính' },
-  { value: 'PHONG_VIP', label: 'Phòng VIP' },
+  { value: 'PHONG_VIP', label: 'Khu riêng / VIP' },
   { value: 'BAN_CONG', label: 'Ban công' },
   { value: 'QUAY_BAR', label: 'Quầy bar' },
 ]
@@ -308,7 +308,7 @@ function DatBanFormCard({
   )
 }
 
-function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction }) {
+function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuickStatusChange }) {
   if (bookings.length === 0) {
     return (
       <div className="rounded-[22px] border border-dashed border-slate-200 bg-white/80 px-6 py-12 text-center shadow-sm">
@@ -329,6 +329,7 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction }) {
         const canComplete = coTheHoanThanhDatBan(booking)
         const canNoShow = coTheDanhDauKhongDen(booking)
         const daCheckIn = booking.status === 'DA_CHECK_IN'
+        const canQuickApprove = PENDING_STATUS_SET.has(booking.status)
         const priorityNote = canXacNhanThuCong(booking)
           ? layGhiChuUuTienDatBan(booking) || 'Booking này cần host xác nhận trước khi chốt bàn.'
           : ''
@@ -405,6 +406,20 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction }) {
                   <div className="mt-3 rounded-[16px] border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-800">
                     <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-600">Ưu tiên xử lý</span>
                     <span>{priorityNote}</span>
+                  </div>
+                ) : null}
+
+                {canQuickApprove ? (
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Button type="primary" size="small" icon={<CheckCircleOutlined />} onClick={() => onQuickStatusChange(booking, 'DA_XAC_NHAN')}>
+                      Duyệt booking
+                    </Button>
+                    <Button size="small" icon={<PhoneOutlined />} onClick={() => onQuickStatusChange(booking, 'CAN_GOI_LAI')}>
+                      Cần gọi lại
+                    </Button>
+                    <Button size="small" danger icon={<StopOutlined />} onClick={() => onQuickStatusChange(booking, 'TU_CHOI_HET_CHO')}>
+                      Từ chối
+                    </Button>
                   </div>
                 ) : null}
 
@@ -572,6 +587,7 @@ function DatBanTab({
   handleCreateInternalBooking,
   handleUpdateInternalBooking,
   handleAssignTables,
+  handleQuickStatusChange,
   handleCheckIn,
   handleComplete,
   xuLyKhachKhongDen,
@@ -779,6 +795,7 @@ function DatBanTab({
           onEdit={handleEditBooking}
           onAssign={openAssignModal}
           onConfirmAction={openConfirmAction}
+          onQuickStatusChange={handleQuickStatusChange}
         />
       </div>
 

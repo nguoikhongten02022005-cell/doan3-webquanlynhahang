@@ -26,7 +26,7 @@ export const BOOKINGS_HO_SO_MOCK = [
     date: '2026-03-15',
     time: '17:00',
     guestCount: 6,
-    area: 'Phòng VIP',
+    area: 'Khu riêng / VIP',
     statusLabel: 'Đã hủy',
     statusTone: 'danger',
     rawStatus: 'DA_HUY',

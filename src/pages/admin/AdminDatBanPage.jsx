@@ -82,6 +82,7 @@ function AdminDatBanPage() {
         hangDoiDatBan={hangDoiDatBan}
         getAvailableTablesForBooking={(booking) => layBanPhuHopChoDatBan(booking, danhSachBan)}
         handleAssignTables={xuLyGanBan}
+        handleQuickStatusChange={(booking, status) => xuLyCapNhatDatBanNoiBo(booking.id, { status })}
         handleCheckIn={xuLyCheckIn}
         handleComplete={xuLyHoanThanh}
         handleCreateInternalBooking={xuLyTaoDatBanNoiBo}

@@ -11,6 +11,11 @@ import { taoThanhToanApi } from '../services/api/apiThanhToan'
 import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung } from '../services/dichVuPhieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
+const DANH_SACH_MA_GIAM_GIA_CO_SAN = Object.freeze([
+  { code: 'WELCOME10', moTa: 'Giảm 10% cho đơn đầu tiên', giaTri: '10%' },
+  { code: 'SUMMER30', moTa: 'Giảm tối đa 100.000đ cho đơn hè', giaTri: 'Tối đa 100.000đ' },
+])
+
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 
 const tinhSoTienGiam = (voucher, tamTinh, phiDichVu) => {
@@ -175,7 +180,6 @@ function ThanhToanPage() {
         <div className="thanh-toan-header">
           <p className="thanh-toan-kicker">Hoàn tất đơn gọi món</p>
           <h1>Thanh toán đơn hàng</h1>
-          <p>Kiểm tra thông tin liên hệ, ghi chú cho bếp và xác nhận phương thức thanh toán trước khi hoàn tất đơn hàng.</p>
         </div>
 
         <form className="thanh-toan-layout" onSubmit={handleSubmit}>
@@ -228,12 +232,6 @@ function ThanhToanPage() {
                   value={formData.address}
                   onChange={handleChange}
                 />
-              </div>
-
-              <div className="nhom-truong full">
-                <div className="gio-hang-table-note-box thanh-toan-table-note-box">
-                  <p>Nhân viên sẽ hướng dẫn bạn đến bàn khi đến nhà hàng.</p>
-                </div>
               </div>
 
               <div className="nhom-truong full">
@@ -315,6 +313,31 @@ function ThanhToanPage() {
               )}
 
               <div className="thanh-toan-totals">
+                <div className="thanh-toan-voucher-xem">
+                  <div className="thanh-toan-voucher-xem-head">
+                    <strong>Mã giảm giá khả dụng</strong>
+                    <span>{DANH_SACH_MA_GIAM_GIA_CO_SAN.length} mã</span>
+                  </div>
+                  <div className="thanh-toan-voucher-xem-list">
+                    {DANH_SACH_MA_GIAM_GIA_CO_SAN.map((maGiamGia) => {
+                      const dangDuocApDung = appliedVoucher?.code === maGiamGia.code
+
+                      return (
+                        <div
+                          key={maGiamGia.code}
+                          className={`thanh-toan-voucher-xem-item ${dangDuocApDung ? 'active' : ''}`}
+                        >
+                          <div>
+                            <strong>{maGiamGia.code}</strong>
+                            <p>{maGiamGia.moTa}</p>
+                          </div>
+                          <span>{dangDuocApDung ? 'Đang áp dụng' : maGiamGia.giaTri}</span>
+                        </div>
+                      )
+                    })}
+                  </div>
+                </div>
+
                 <div className="tom-tat-row">
                   <span>Tạm tính món</span>
                   <span>{dinhDangTienTeVietNam(subtotal)}</span>

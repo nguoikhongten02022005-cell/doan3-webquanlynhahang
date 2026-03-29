@@ -1,6 +1,5 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
-import { useGioHang } from '../context/GioHangContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 
 const navItems = [
@@ -17,10 +16,8 @@ function DauTrang() {
 
   const { pathname } = useLocation()
   const navigate = useNavigate()
-  const { cartItems } = useGioHang()
   const { nguoiDungHienTai, coTheVaoNoiBo, dangXuat } = useXacThuc()
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0)
   const displayName = nguoiDungHienTai?.fullName ?? nguoiDungHienTai?.name
 
   const closeMenus = () => {
@@ -74,15 +71,6 @@ function DauTrang() {
         <div className="header-actions">
           <Link to="/dat-ban" className="btn nut-chinh header-dat-ban-btn" onClick={handleNavLinkClick}>
             Đặt bàn
-          </Link>
-
-          <Link to="/gio-hang" className="icon-btn action-btn gio-hang-btn" aria-label="Giỏ hàng" data-tooltip="Giỏ hàng" onClick={handleNavLinkClick}>
-            <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-              <path d="M4 5h2l2.2 9.2a1 1 0 0 0 1 .8h7.9a1 1 0 0 0 1-.8L20 8H8" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" />
-              <circle cx="10" cy="19" r="1.3" fill="currentColor" />
-              <circle cx="17" cy="19" r="1.3" fill="currentColor" />
-            </svg>
-            {cartCount > 0 ? <span className="gio-hang-count">{cartCount > 99 ? '99+' : cartCount}</span> : null}
           </Link>
 
           <div className="user-thuc-don-wrap desktop-only">

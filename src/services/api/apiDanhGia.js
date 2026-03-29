@@ -24,3 +24,11 @@ export const layDanhSachDanhGiaApi = async () => {
 }
 
 export const taoDanhGiaApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.post('/danh-gia', payload))
+
+export const duyetDanhGiaApi = async (maDanhGia, payload) => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/danh-gia/${maDanhGia}/duyet`, payload))
+  return {
+    ...phanHoi,
+    duLieu: chuanHoaDanhGia(phanHoi.duLieu),
+  }
+}

@@ -37,7 +37,7 @@ const tinhSoTienGiam = (voucher, tamTinh, phiDichVu) => {
     return 0
   }
 
-  return Math.min(soTienGiamTamTinh, tamTinh + phiDichVu)
+  return Math.min(soTienGiamTamTinh, tamTinh)
 }
 
 function GioHangPage() {
@@ -271,7 +271,6 @@ function GioHangPage() {
               <div className="voucher-block">
                 <div className="voucher-header">
                   <h3>Mã giảm giá</h3>
-                  <p>Nhập mã ưu đãi để áp dụng khuyến mãi tạm thời cho đơn hàng của bạn.</p>
                 </div>
                 <div className="voucher-controls">
                   <input
@@ -351,7 +350,6 @@ function GioHangPage() {
               >
                 Thanh toán
               </button>
-              <p className="gio-hang-checkout-helper">Nhân viên sẽ hướng dẫn chỗ ngồi khi bạn đến.</p>
             </div>
           </div>
         </div>

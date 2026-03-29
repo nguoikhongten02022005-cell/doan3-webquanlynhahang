@@ -1,10 +1,9 @@
 import { useEffect, useMemo, useState } from 'react'
 import { CAC_LUA_CHON_KICH_CO_THUC_DON } from '../constants/tuyChonThucDon'
-import { useThongBao } from '../context/ThongBaoContext'
+import { BI_DANH_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
 import { phanTichGiaThanhSo } from '../utils/giaTien'
 
-export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON }) => {
-  const { hienThanhCong } = useThongBao()
+export const useChiTietMonAnModal = ({ sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON }) => {
   const kichCoMacDinh = sizeOptions[0]?.value || 'M'
   const [monDaChon, setMonDaChon] = useState(null)
   const [dangMoChiTiet, setDangMoChiTiet] = useState(false)
@@ -46,6 +45,18 @@ export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KI
     return luaChonDaChon ? luaChonDaChon.surcharge : 0
   }
 
+  const laMonDoUong = (mon) => {
+    const danhMucGoc = String(mon?.category || '').trim()
+    const khoaDanhMuc = danhMucGoc
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .replace(/\s+/g, '')
+
+    const danhMucChuan = BI_DANH_DANH_MUC_THUC_DON[khoaDanhMuc] || danhMucGoc
+    return danhMucChuan === 'Đồ Uống'
+  }
+
   const moChiTietMon = (mon) => {
     setMonDaChon(mon)
     setKichCoDaChon(kichCoMacDinh)
@@ -65,17 +76,8 @@ export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KI
     ))
   }
 
-  const xuLyThemMonNhanh = (mon) => {
-    themVaoGio({
-      ...mon,
-      kichCoDaChon: kichCoMacDinh,
-      toppingDaChon: [],
-      ghiChuRieng: '',
-    })
-    hienThanhCong(`Đã thêm ${mon.name} vào giỏ hàng.`)
-  }
-
-  const phuThuDaChon = layPhuThuTheoKichCo(kichCoDaChon)
+  const coTheChonKichCo = laMonDoUong(monDaChon)
+  const phuThuDaChon = coTheChonKichCo ? layPhuThuTheoKichCo(kichCoDaChon) : 0
 
   const giaChiTiet = useMemo(() => {
     if (!monDaChon) {
@@ -85,28 +87,10 @@ export const useChiTietMonAnModal = ({ themVaoGio, sizeOptions = CAC_LUA_CHON_KI
     return phanTichGiaThanhSo(monDaChon.price) + phuThuDaChon
   }, [monDaChon, phuThuDaChon])
 
-  const xuLyThemMonDaTuyChon = () => {
-    if (!monDaChon) {
-      return
-    }
-
-    themVaoGio({
-      ...monDaChon,
-      price: phanTichGiaThanhSo(monDaChon.price) + phuThuDaChon,
-      kichCoDaChon,
-      toppingDaChon,
-      ghiChuRieng,
-    })
-
-    hienThanhCong(`Đã thêm ${monDaChon.name} vào giỏ hàng.`)
-    dongChiTietMon()
-  }
-
   return {
     giaChiTiet,
-    xuLyThemMonDaTuyChon,
-    xuLyThemMonNhanh,
     xuLyBatTatTopping,
+    coTheChonKichCo,
     dangMoChiTiet,
     moChiTietMon,
     dongChiTietMon,

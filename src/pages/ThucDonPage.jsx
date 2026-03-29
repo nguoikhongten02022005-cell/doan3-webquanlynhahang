@@ -6,7 +6,6 @@ import {
   HOME_CAC_DANH_MUC_THUC_DON,
 } from '../constants/danhMucThucDon'
 import { layAnhMonTheoTen } from '../constants/anhMonAn'
-import { useGioHang } from '../context/GioHangContext'
 import { useChiTietMonAnModal } from '../hooks/useChiTietMonAnModal'
 import { useDanhSachMonAn } from '../hooks/useDanhSachMonAn'
 
@@ -30,15 +29,12 @@ const KHOANG_CAN_DINH_TAB = 120
 function ThucDonPage() {
   const [activeCategory, setActiveCategory] = useState(CAC_TAB_THUC_DON[0])
   const { dishes, daTaiLanDau, error, reloadDishes } = useDanhSachMonAn()
-  const { themVaoGio } = useGioHang()
   const danhMucRefs = useRef({})
   const tabsRowRef = useRef(null)
   const tabItemRefs = useRef({})
   const {
     dongChiTietMon,
     giaChiTiet,
-    xuLyThemMonDaTuyChon,
-    xuLyThemMonNhanh,
     xuLyBatTatTopping,
     dangMoChiTiet,
     moChiTietMon,
@@ -49,7 +45,7 @@ function ThucDonPage() {
     datKichCoDaChon,
     datGhiChuRieng,
     ghiChuRieng,
-  } = useChiTietMonAnModal({ themVaoGio })
+  } = useChiTietMonAnModal({})
 
   const categoryTabs = useMemo(
     () => CAC_TAB_THUC_DON.map((category) => ({
@@ -240,7 +236,6 @@ function ThucDonPage() {
                         key={dish.id}
                         dish={dish}
                         variant="menu"
-                        xuLyThemVaoGio={xuLyThemMonNhanh}
                         onOpenDetail={moChiTietMon}
                       />
                     ))}
@@ -255,7 +250,6 @@ function ThucDonPage() {
       <ChiTietMonAnModal
         giaChiTiet={giaChiTiet}
         dangMo={dangMoChiTiet}
-        xuLyThemVaoGio={xuLyThemMonDaTuyChon}
         xuLyDong={dongChiTietMon}
         xuLyChonKichCo={datKichCoDaChon}
         xuLyDoiGhiChuRieng={datGhiChuRieng}
