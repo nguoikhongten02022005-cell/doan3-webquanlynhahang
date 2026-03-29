@@ -1,0 +1,26 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e4]:
+    - generic [ref=e6]:
+      - heading "Đăng nhập" [level=1] [ref=e7]
+      - paragraph [ref=e8]: Chào mừng bạn quay trở lại nhà hàng của chúng tôi.
+      - generic [ref=e9]:
+        - generic [ref=e10]:
+          - generic [ref=e11]: Tên tài khoản hoặc Email
+          - textbox "Tên tài khoản hoặc Email" [ref=e12]:
+            - /placeholder: Nhập tên tài khoản hoặc email
+        - generic [ref=e13]:
+          - generic [ref=e14]: Mật khẩu
+          - textbox "Mật khẩu" [ref=e15]:
+            - /placeholder: Nhập mật khẩu
+        - button "Đăng nhập" [ref=e16] [cursor=pointer]
+      - generic [ref=e17]:
+        - strong [ref=e18]: Đăng nhập bằng backend local
+        - paragraph [ref=e19]: "Email: khach1@gmail.com"
+        - paragraph [ref=e20]: "Mã người dùng: ND004"
+        - paragraph [ref=e21]: "Mật khẩu: 123"
+        - paragraph [ref=e22]:
+          - text: Chưa có tài khoản?
+          - link "Tạo tài khoản mới" [ref=e23] [cursor=pointer]:
+            - /url: /dang-ky

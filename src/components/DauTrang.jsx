@@ -74,18 +74,21 @@ function DauTrang() {
           </Link>
 
           <div className="user-thuc-don-wrap desktop-only">
-            <button
-              type="button"
-              className="icon-btn action-btn"
-              aria-label={nguoiDungHienTai ? 'Tài khoản' : 'Đăng nhập'}
-              data-tooltip={nguoiDungHienTai ? 'Tài khoản' : 'Đăng nhập'}
-              onClick={handleToggleUserMenu}
-            >
-              <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
-                <circle cx="12" cy="8" r="3.2" stroke="currentColor" strokeWidth="1.7" />
-                <path d="M6 19.2c0-3.1 2.7-5 6-5s6 1.9 6 5" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
-              </svg>
-            </button>
+            {nguoiDungHienTai ? (
+              <button
+                type="button"
+                className="header-user-trigger"
+                aria-label="Tài khoản"
+                onClick={handleToggleUserMenu}
+              >
+                <span className="header-user-avatar">{String(displayName || 'U').trim().slice(0, 1).toUpperCase()}</span>
+                <span className="header-user-name">{displayName}</span>
+              </button>
+            ) : (
+              <Link to="/dang-nhap" className="btn header-login-btn" onClick={handleNavLinkClick}>
+                Đăng nhập
+              </Link>
+            )}
 
             {userMenuOpen && (
               <div className="user-dropdown" role="menu">
@@ -111,8 +114,8 @@ function DauTrang() {
                     <Link to="/dang-nhap" role="menuitem" onClick={handleNavLinkClick}>
                       Đăng nhập
                     </Link>
-                    <Link to="/ho-so" role="menuitem" onClick={handleNavLinkClick}>
-                      Hồ sơ cá nhân
+                    <Link to="/dang-ky" role="menuitem" onClick={handleNavLinkClick}>
+                      Đăng ký
                     </Link>
                   </>
                 )}
@@ -167,8 +170,8 @@ function DauTrang() {
               <Link to="/dang-nhap" onClick={handleNavLinkClick}>
                 Đăng nhập
               </Link>
-              <Link to="/ho-so" onClick={handleNavLinkClick}>
-                Hồ sơ cá nhân
+              <Link to="/dang-ky" onClick={handleNavLinkClick}>
+                Đăng ký
               </Link>
             </>
           )}

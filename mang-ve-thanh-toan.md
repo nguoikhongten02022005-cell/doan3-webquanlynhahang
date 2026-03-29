@@ -1,0 +1,103 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - navigation "Điều hướng chính" [ref=e9]:
+        - link "Trang chủ" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: Trang chủ
+        - link "Thực đơn" [ref=e12] [cursor=pointer]:
+          - /url: /thuc-don
+          - generic [ref=e13]: Thực đơn
+        - link "Đặt bàn" [ref=e14] [cursor=pointer]:
+          - /url: /dat-ban
+          - generic [ref=e15]: Đặt bàn
+        - link "Về chúng tôi" [ref=e16] [cursor=pointer]:
+          - /url: /gioi-thieu
+          - generic [ref=e17]: Về chúng tôi
+        - link "Đánh giá" [ref=e18] [cursor=pointer]:
+          - /url: /danh-gia
+          - generic [ref=e19]: Đánh giá
+      - generic [ref=e20]:
+        - link "Đặt bàn" [ref=e21] [cursor=pointer]:
+          - /url: /dat-ban
+        - button "Tài khoản" [ref=e23] [cursor=pointer]:
+          - generic [ref=e24]: K
+          - generic [ref=e25]: Khach Sprint Mot
+  - main [ref=e26]:
+    - generic [ref=e103]:
+      - generic [ref=e104]:
+        - paragraph [ref=e105]: Mang về - chuyển khoản
+        - heading "Thanh toán đơn mang về" [level=1] [ref=e106]
+      - generic [ref=e107]:
+        - generic [ref=e108]:
+          - heading "Thông tin nhận đơn" [level=2] [ref=e109]
+          - generic [ref=e110]:
+            - generic [ref=e111]:
+              - generic [ref=e112]: Họ tên
+              - textbox [ref=e113]: Khach Sprint Mot
+            - generic [ref=e114]:
+              - generic [ref=e115]: Số điện thoại
+              - textbox [ref=e116]
+            - generic [ref=e117]:
+              - generic [ref=e118]: Giờ đến lấy
+              - textbox [ref=e119]: 18:00
+            - generic [ref=e120]:
+              - generic [ref=e121]: Ghi chú
+              - textbox [ref=e122]
+        - complementary [ref=e123]:
+          - generic [ref=e124]:
+            - heading "Chuyển khoản" [level=2] [ref=e125]
+            - generic [ref=e126]:
+              - generic [ref=e127]:
+                - strong [ref=e128]: Ngân hàng MB Bank
+                - paragraph [ref=e129]: "STK: 123456789 - NGUYEN VI RESTAURANT"
+                - paragraph [ref=e130]: "Nội dung CK: tạo sau khi bấm xác nhận đơn"
+              - generic [ref=e131]: 26.000đ
+            - generic [ref=e132]: QR chuyển khoản tĩnh sẽ được thay bằng ảnh ngân hàng thật ở bước hoàn thiện.
+            - generic [ref=e133]:
+              - generic [ref=e134]: Tạm tính
+              - generic [ref=e135]: 25.000đ
+            - generic [ref=e136]:
+              - generic [ref=e137]: Phí dịch vụ (5%)
+              - generic [ref=e138]: 1.000đ
+            - generic [ref=e139]:
+              - generic [ref=e140]: Số tiền cần chuyển
+              - strong [ref=e141]: 26.000đ
+            - button "Tôi đã chuyển khoản" [ref=e142] [cursor=pointer]
+  - contentinfo [ref=e78]:
+    - generic [ref=e79]:
+      - generic [ref=e80]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e81] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e82]: NH
+          - generic [ref=e83]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e84]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic "Mạng xã hội" [ref=e85]:
+          - link "Facebook" [ref=e86] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e87] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e88]:
+        - heading "Liên hệ" [level=3] [ref=e89]
+        - list [ref=e90]:
+          - listitem [ref=e91]: 28 Nguyễn Huệ, Q.1, TP. HCM
+          - listitem [ref=e92]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e93] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e94]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e95] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e96]:
+        - heading "Giờ mở cửa" [level=3] [ref=e97]
+        - list [ref=e98]:
+          - listitem [ref=e99]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e100]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e101]: Nhận đơn online đến 21:45

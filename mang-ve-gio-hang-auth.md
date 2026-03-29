@@ -1,0 +1,21 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e26]:
+    - generic [ref=e53]:
+      - heading "Đăng nhập" [level=1] [ref=e54]
+      - paragraph [ref=e55]: Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.
+      - generic [ref=e56]:
+        - generic [ref=e57]:
+          - generic [ref=e58]: Email
+          - textbox "Email" [ref=e59]:
+            - /placeholder: Nhập email
+        - generic [ref=e60]:
+          - generic [ref=e61]: Mật khẩu
+          - textbox "Mật khẩu" [ref=e62]:
+            - /placeholder: Nhập mật khẩu
+        - button "Đăng nhập" [ref=e63] [cursor=pointer]
+      - paragraph [ref=e64]:
+        - text: Chưa có tài khoản?
+        - link "Đăng ký ngay" [ref=e65] [cursor=pointer]:
+          - /url: /dang-ky

@@ -145,6 +145,47 @@ button:focus-visible,
   box-shadow: none;
   font-size: 0.82rem;
 }
+.header-login-btn {
+  min-height: 2.45rem;
+  padding-inline: 1rem;
+  border-radius: 0.9rem;
+  border: 1px solid rgba(216, 204, 190, 0.95);
+  background: rgba(255, 252, 248, 0.92);
+  color: #34261d;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
+.header-user-trigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  min-height: 2.45rem;
+  padding: 0.3rem 0.7rem 0.3rem 0.35rem;
+  border: 1px solid rgba(216, 204, 190, 0.95);
+  background: rgba(255, 252, 248, 0.92);
+  border-radius: 999px;
+  color: #34261d;
+  cursor: pointer;
+}
+.header-user-avatar {
+  width: 1.8rem;
+  height: 1.8rem;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: var(--primary);
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+.header-user-name {
+  max-width: 8rem;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.82rem;
+  font-weight: 600;
+}
 .action-btn::after {
   content: attr(data-tooltip); position: absolute;
   left: 50%; bottom: calc(100% + 0.5rem); transform: translate(-50%, 0.2rem);

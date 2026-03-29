@@ -37,6 +37,13 @@ export const ADMIN_NAVIGATION = Object.freeze([
     badgeKey: 'orders',
   },
   {
+    key: 'don-mang-ve',
+    label: 'Đơn mang về',
+    path: '/admin/don-mang-ve',
+    group: 'QUẢN LÝ',
+    glyph: '◈',
+  },
+  {
     key: 'danh-gia',
     label: 'Đánh giá',
     path: '/admin/danh-gia',

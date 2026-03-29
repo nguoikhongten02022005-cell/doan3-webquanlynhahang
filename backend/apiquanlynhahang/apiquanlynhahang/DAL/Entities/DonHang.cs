@@ -7,6 +7,9 @@ public class DonHang
     public string? MaBan { get; set; }
     public string? MaNV { get; set; }
     public string? MaDatBan { get; set; }
+    public string LoaiDon { get; set; } = "TAI_QUAN";
+    public string? DiaChiGiao { get; set; }
+    public decimal PhiShip { get; set; }
     public decimal TongTien { get; set; }
     public string TrangThai { get; set; } = "Pending";
     public string NguonTao { get; set; } = "TaiQuay";

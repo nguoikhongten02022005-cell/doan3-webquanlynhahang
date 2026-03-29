@@ -1,0 +1,74 @@
+import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+
+const chuanHoaChiTiet = (muc, index = 0) => ({
+  id: muc?.MaChiTiet || muc?.maChiTiet || `CT-${index + 1}`,
+  maMon: muc?.MaMon || muc?.maMon || '',
+  soLuong: Number(muc?.SoLuong || muc?.soLuong || 0),
+  donGia: Number(muc?.DonGia || muc?.donGia || 0),
+  thanhTien: Number(muc?.ThanhTien || muc?.thanhTien || 0),
+  ghiChu: muc?.GhiChu || muc?.ghiChu || '',
+})
+
+const chuanHoaDonMangVe = (duLieu) => {
+  const don = duLieu?.DonHang || duLieu?.donHang || duLieu
+  if (!don) return null
+  return {
+    maDonHang: don.MaDonHang || don.maDonHang || '',
+    maKH: don.MaKH || don.maKH || '',
+    loaiDon: don.LoaiDon || don.loaiDon || '',
+    diaChiGiao: don.DiaChiGiao || don.diaChiGiao || '',
+    phiShip: Number(don.PhiShip || don.phiShip || 0),
+    tongTien: Number(don.TongTien || don.tongTien || 0),
+    trangThai: don.TrangThai || don.trangThai || '',
+    ghiChu: don.GhiChu || don.ghiChu || '',
+    ngayTao: don.NgayTao || don.ngayTao || '',
+    chiTiet: Array.isArray(duLieu?.ChiTiet || duLieu?.chiTiet) ? (duLieu.ChiTiet || duLieu.chiTiet).map(chuanHoaChiTiet) : [],
+  }
+}
+
+export const taoDonMangVeApi = async (payload) => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/mang-ve/don-hang', payload))
+  return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+}
+
+export const layDonMangVeApi = async (maDonHang) => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/mang-ve/don-hang/${maDonHang}`))
+  return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+}
+
+export const layDanhSachDonMangVeChoAdminApi = async () => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/mang-ve/admin/don-hang'))
+  return {
+    ...phanHoi,
+    duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonMangVeChoAdmin).filter(Boolean) : [],
+  }
+}
+
+export const capNhatTrangThaiDonMangVeApi = async (maDonHang, trangThai) => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/mang-ve/admin/don-hang/${maDonHang}/trang-thai`, { trangThai }))
+  return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+}
+
+function chuanHoaDonMangVeChoAdmin(duLieu) {
+  if (!duLieu || typeof duLieu !== 'object') return null
+  return {
+    maDonHang: duLieu.MaDonHang || duLieu.maDonHang || '',
+    maKH: duLieu.MaKH || duLieu.maKH || '',
+    hoTen: duLieu.HoTen || duLieu.hoTen || '',
+    soDienThoai: duLieu.SoDienThoai || duLieu.soDienThoai || '',
+    loaiDon: duLieu.LoaiDon || duLieu.loaiDon || '',
+    gioLayHang: duLieu.GioLayHang || duLieu.gioLayHang || '',
+    gioGiao: duLieu.GioGiao || duLieu.gioGiao || '',
+    diaChiGiao: duLieu.DiaChiGiao || duLieu.diaChiGiao || '',
+    phiShip: Number(duLieu.PhiShip || duLieu.phiShip || 0),
+    tongTien: Number(duLieu.TongTien || duLieu.tongTien || 0),
+    trangThai: duLieu.TrangThai || duLieu.trangThai || '',
+    ngayTao: duLieu.NgayTao || duLieu.ngayTao || '',
+    danhSachMon: Array.isArray(duLieu.DanhSachMon || duLieu.danhSachMon) ? (duLieu.DanhSachMon || duLieu.danhSachMon).map((muc) => ({
+      maMon: muc.MaMon || muc.maMon || '',
+      tenMon: muc.TenMon || muc.tenMon || '',
+      soLuong: Number(muc.SoLuong || muc.soLuong || 0),
+      thanhTien: Number(muc.ThanhTien || muc.thanhTien || 0),
+    })) : [],
+  }
+}

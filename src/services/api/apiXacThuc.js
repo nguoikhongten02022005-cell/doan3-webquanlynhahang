@@ -22,17 +22,26 @@ const chuanHoaNguoiDung = (nguoiDung) => {
 export const dangNhapApi = async (email, matKhau) => tachPhanHoiApi(await trinhKhachApi.post('/auth/login', { email, matKhau }))
 export const dangNhapNoiBoApi = async (email, matKhau) => tachPhanHoiApi(await trinhKhachApi.post('/auth/internal-login', { email, matKhau }))
 export const dangKyApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.post('/auth/register', {
-  maND: payload.maND,
-  maKH: payload.maKH,
-  tenND: payload.tenND || payload.fullName || payload.name || '',
-  tenKH: payload.tenKH || payload.fullName || payload.name || '',
+  hoTen: payload.hoTen || payload.fullName || payload.name || '',
   email: payload.email,
+  soDienThoai: payload.soDienThoai || payload.phone || '',
   matKhau: payload.matKhau || payload.password,
-  sdt: payload.sdt || payload.phone || '',
+  xacNhanMatKhau: payload.xacNhanMatKhau || payload.confirmPassword || '',
   diaChi: payload.diaChi || payload.address || '',
 }))
 export const layThongTinToiApi = async () => tachPhanHoiApi(await trinhKhachApi.get('/auth/me'))
 export const dangXuatApi = async () => ({ duLieu: null, thongDiep: 'Dang xuat thanh cong', meta: null })
+export const capNhatHoSoApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.put('/auth/profile', {
+  hoTen: payload.hoTen || payload.fullName || '',
+  email: payload.email || '',
+  soDienThoai: payload.soDienThoai || payload.phone || '',
+  diaChi: payload.diaChi || payload.address || '',
+}))
+export const doiMatKhauApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.put('/auth/doi-mat-khau', {
+  matKhauHienTai: payload.matKhauHienTai || payload.currentPassword || '',
+  matKhauMoi: payload.matKhauMoi || payload.newPassword || '',
+  xacNhanMatKhauMoi: payload.xacNhanMatKhauMoi || payload.confirmPassword || '',
+}))
 export const chuanHoaNguoiDungApi = (nguoiDung) => chuanHoaNguoiDung(nguoiDung)
 export const layDanhSachNguoiDungApi = async () => {
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/nguoi-dung'))

@@ -1,0 +1,94 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - generic [ref=e9]:
+        - link "Đặt bàn" [ref=e10] [cursor=pointer]:
+          - /url: /dat-ban
+        - button "Mở menu" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+  - main [ref=e14]:
+    - generic [ref=e41]:
+      - generic [ref=e42]:
+        - paragraph [ref=e43]: Theo dõi đơn mang về
+        - heading "DHMV_1774800547982" [level=1] [ref=e44]
+      - generic [ref=e45]:
+        - generic [ref=e46]:
+          - heading "Tiến trình đơn giao hàng" [level=2] [ref=e47]
+          - generic [ref=e48]:
+            - generic [ref=e49]:
+              - strong [ref=e51]: 1. Chờ xác nhận
+              - generic [ref=e52]: Đã tới
+            - generic [ref=e53]:
+              - strong [ref=e55]: 2. Đã xác nhận
+              - generic [ref=e56]: Đã tới
+            - generic [ref=e57]:
+              - strong [ref=e59]: 3. Đang chuẩn bị
+              - generic [ref=e60]: Đã tới
+            - generic [ref=e61]:
+              - strong [ref=e63]: 4. Đang giao
+              - generic [ref=e64]: Đã tới
+            - generic [ref=e65]:
+              - strong [ref=e67]: 5. Hoàn thành
+              - generic [ref=e68]: Đã tới
+          - generic [ref=e70]:
+            - generic [ref=e71]:
+              - paragraph [ref=e72]: M007
+              - paragraph [ref=e73]: x1
+            - strong [ref=e74]: 25.000đ
+        - complementary [ref=e75]:
+          - generic [ref=e76]:
+            - heading "Thông tin đơn" [level=2] [ref=e77]
+            - generic [ref=e78]:
+              - generic [ref=e79]: Trạng thái
+              - strong [ref=e80]: Hoàn thành
+            - generic [ref=e81]:
+              - generic [ref=e82]: Loại đơn
+              - strong [ref=e83]: Giao hàng
+            - generic [ref=e84]:
+              - generic [ref=e85]: Phí ship
+              - strong [ref=e86]: 30.000đ
+            - generic [ref=e87]:
+              - generic [ref=e88]: Tổng tiền
+              - strong [ref=e89]: 57.000đ
+            - paragraph [ref=e90]: "Địa chỉ giao: 123 Nguyen Hue, Quan 1, TP.HCM"
+            - paragraph [ref=e91]: "Gio giao: 18:00"
+            - paragraph [ref=e92]: "Nguoi nhan: Khach Sprint Mot"
+            - paragraph [ref=e93]: "SDT: 0912345692"
+            - paragraph [ref=e94]: "Dia chi giao: 123 Nguyen Hue, Quan 1, TP.HCM"
+  - contentinfo [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e19] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e20]: NH
+          - generic [ref=e21]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e22]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic "Mạng xã hội" [ref=e23]:
+          - link "Facebook" [ref=e24] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e25] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e26]:
+        - heading "Liên hệ" [level=3] [ref=e27]
+        - list [ref=e28]:
+          - listitem [ref=e29]: 28 Nguyễn Huệ, Q.1, TP. HCM
+          - listitem [ref=e30]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e31] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e32]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e33] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e34]:
+        - heading "Giờ mở cửa" [level=3] [ref=e35]
+        - list [ref=e36]:
+          - listitem [ref=e37]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e38]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e39]: Nhận đơn online đến 21:45

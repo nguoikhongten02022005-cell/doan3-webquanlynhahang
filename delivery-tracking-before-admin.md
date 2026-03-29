@@ -1,0 +1,47 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - generic [ref=e9]:
+        - link "Đặt bàn" [ref=e10] [cursor=pointer]:
+          - /url: /dat-ban
+        - button "Mở menu" [ref=e11] [cursor=pointer]:
+          - img [ref=e12]
+  - main [ref=e14]:
+    - generic [ref=e15]: Đang xác thực phiên đăng nhập...
+  - contentinfo [ref=e16]:
+    - generic [ref=e17]:
+      - generic [ref=e18]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e19] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e20]: NH
+          - generic [ref=e21]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e22]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic "Mạng xã hội" [ref=e23]:
+          - link "Facebook" [ref=e24] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e25] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e26]:
+        - heading "Liên hệ" [level=3] [ref=e27]
+        - list [ref=e28]:
+          - listitem [ref=e29]: 28 Nguyễn Huệ, Q.1, TP. HCM
+          - listitem [ref=e30]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e31] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e32]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e33] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e34]:
+        - heading "Giờ mở cửa" [level=3] [ref=e35]
+        - list [ref=e36]:
+          - listitem [ref=e37]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e38]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e39]: Nhận đơn online đến 21:45

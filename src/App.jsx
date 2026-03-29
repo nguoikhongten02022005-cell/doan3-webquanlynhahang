@@ -12,12 +12,18 @@ import TrangChuPage from './pages/TrangChuPage'
 import DangNhapNoiBoPage from './pages/DangNhapNoiBoPage'
 import DangNhapPage from './pages/DangNhapPage'
 import ThucDonPage from './pages/ThucDonPage'
+import MangVePage from './pages/MangVePage'
+import MangVeThucDonPage from './pages/MangVeThucDonPage'
+import MangVeGioHangPage from './pages/MangVeGioHangPage'
+import MangVeThanhToanPage from './pages/MangVeThanhToanPage'
+import MangVeTheoDoiDonPage from './pages/MangVeTheoDoiDonPage'
 import HoSoPage from './pages/HoSoPage'
 import DangKyPage from './pages/DangKyPage'
 import DanhGiaPage from './pages/DanhGiaPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminDatBanPage from './pages/admin/AdminDatBanPage'
 import AdminDanhGiaPage from './pages/admin/AdminDanhGiaPage'
+import AdminDonMangVePage from './pages/admin/AdminDonMangVePage'
 import AdminSoDoBanPage from './pages/admin/AdminSoDoBanPage'
 import AdminThucDonPage from './pages/admin/AdminThucDonPage'
 import AdminDonHangPage from './pages/admin/AdminDonHangPage'
@@ -36,9 +42,17 @@ function App() {
           <Route path="/gio-hang" element={<Navigate to="/thuc-don" replace />} />
           <Route path="/thanh-toan" element={<ThanhToanPage />} />
           <Route path="/ho-so" element={<HoSoPage />} />
+          <Route path="/profile" element={<Navigate to="/ho-so" replace />} />
           <Route path="/danh-gia" element={<DanhGiaPage />} />
           <Route path="/dang-nhap" element={<DangNhapPage />} />
           <Route path="/dang-ky" element={<DangKyPage />} />
+          <Route path="/mang-ve" element={<MangVePage />} />
+          <Route path="/mang-ve/thuc-don" element={<MangVeThucDonPage />} />
+          <Route element={<TuyenDuongBaoVe loginPath="/dang-nhap" chiCanDangNhap />}>
+            <Route path="/mang-ve/gio-hang" element={<MangVeGioHangPage />} />
+            <Route path="/mang-ve/thanh-toan" element={<MangVeThanhToanPage />} />
+            <Route path="/mang-ve/don-hang/:id" element={<MangVeTheoDoiDonPage />} />
+          </Route>
         </Route>
 
         <Route path="/admin/dang-nhap" element={<DangNhapNoiBoPage />} />
@@ -54,6 +68,7 @@ function App() {
           <Route path="dashboard" element={<AdminDashboardPage />} />
           <Route path="dat-ban" element={<AdminDatBanPage />} />
           <Route path="danh-gia" element={<AdminDanhGiaPage />} />
+          <Route path="don-mang-ve" element={<AdminDonMangVePage />} />
           <Route path="so-do-ban" element={<AdminSoDoBanPage />} />
           <Route path="thuc-don" element={<AdminThucDonPage />} />
           <Route path="don-hang" element={<AdminDonHangPage />} />

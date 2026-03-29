@@ -146,6 +146,7 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
 export const trinhKhachApi = {
   get: (duongDan, tuyChon = {}) => guiYeuCau(duongDan, tuyChon),
   post: (duongDan, noiDung, tuyChon = {}) => guiYeuCau(duongDan, { method: 'POST', body: JSON.stringify(noiDung), ...tuyChon }),
+  put: (duongDan, noiDung, tuyChon = {}) => guiYeuCau(duongDan, { method: 'PUT', body: JSON.stringify(noiDung), ...tuyChon }),
   patch: (duongDan, noiDung, tuyChon = {}) => guiYeuCau(duongDan, { method: 'PATCH', body: JSON.stringify(noiDung), ...tuyChon }),
   delete: (duongDan, tuyChon = {}) => guiYeuCau(duongDan, { method: 'DELETE', ...tuyChon }),
 }

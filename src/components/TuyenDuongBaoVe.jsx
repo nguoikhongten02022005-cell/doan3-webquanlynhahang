@@ -6,6 +6,7 @@ function TuyenDuongBaoVe({
   loginPath = '/noi-bo/dang-nhap',
   redirectUnauthorizedTo = '/',
   yeuCauAdmin = false,
+  chiCanDangNhap = false,
 }) {
   const location = useLocation()
   const outletContext = useOutletContext()
@@ -17,6 +18,14 @@ function TuyenDuongBaoVe({
 
   if (!daDangNhap) {
     return <Navigate to={loginPath} replace state={{ from: location.pathname }} />
+  }
+
+  if (chiCanDangNhap) {
+    if (children) {
+      return children
+    }
+
+    return <Outlet context={outletContext} />
   }
 
   if (!coTheVaoNoiBo) {

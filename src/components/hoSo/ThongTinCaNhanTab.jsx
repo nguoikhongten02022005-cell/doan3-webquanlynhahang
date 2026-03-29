@@ -14,7 +14,7 @@ const taoGiaTriHoSoBanDau = (nguoiDung) => ({
   phone: String(nguoiDung?.phone ?? ''),
 })
 
-function ThongTinCaNhanTab({ nguoiDung, onLogout }) {
+function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau }) {
   const { hienThongBao } = useThongBao()
   const [formData, setFormData] = useState(() => taoGiaTriHoSoBanDau(nguoiDung))
   const [avatarPreview, setAvatarPreview] = useState('')
@@ -57,8 +57,18 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout }) {
     event.target.value = ''
   }
 
-  const handleSaveProfile = () => {
-    // TODO: Replace mock profile save with the real profile update API.
+  const handleSaveProfile = async () => {
+    const ketQua = await onCapNhatHoSo?.(formData)
+    if (!ketQua?.success) {
+      hienThongBao({
+        message: ketQua?.error || 'Không thể cập nhật hồ sơ.',
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+      return
+    }
+
     hienThongBao({
       message: '✅ Đã lưu thông tin thành công',
       tone: 'success',
@@ -76,8 +86,8 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout }) {
 
     if (!values.newPassword.trim()) {
       nextErrors.newPassword = 'Vui lòng nhập mật khẩu mới.'
-    } else if (values.newPassword.trim().length < 6) {
-      nextErrors.newPassword = 'Mật khẩu mới phải có ít nhất 6 ký tự.'
+    } else if (values.newPassword.trim().length < 8) {
+      nextErrors.newPassword = 'Mật khẩu mới phải có ít nhất 8 ký tự.'
     }
 
     if (!values.confirmPassword.trim()) {
@@ -100,7 +110,7 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout }) {
     })
   }
 
-  const handleUpdatePassword = () => {
+  const handleUpdatePassword = async () => {
     const nextErrors = validatePasswordForm(matKhauForm)
     setMatKhauErrors(nextErrors)
 
@@ -108,7 +118,17 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout }) {
       return
     }
 
-    // TODO: Replace mock password update with the real change-password API.
+    const ketQua = await onDoiMatKhau?.(matKhauForm)
+    if (!ketQua?.success) {
+      hienThongBao({
+        message: ketQua?.error || 'Không thể cập nhật mật khẩu.',
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+      return
+    }
+
     setMatKhauForm({
       currentPassword: '',
       newPassword: '',

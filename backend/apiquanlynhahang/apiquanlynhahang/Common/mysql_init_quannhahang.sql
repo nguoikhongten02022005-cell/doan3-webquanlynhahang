@@ -162,6 +162,9 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaBan       VARCHAR(50),
     MaNV        VARCHAR(50),
     MaDatBan    VARCHAR(50),
+    LoaiDon     ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG') NOT NULL DEFAULT 'TAI_QUAN',
+    DiaChiGiao  VARCHAR(255),
+    PhiShip     DECIMAL(10,2) NOT NULL DEFAULT 0,
     TongTien    DECIMAL(15,2) NOT NULL DEFAULT 0,
     TrangThai   ENUM('Pending','Confirmed','Preparing','Ready','Served','Paid','Cancelled') NOT NULL DEFAULT 'Pending',
     NguonTao    ENUM('TaiQuay','QRCode','DatBan','Online') NOT NULL DEFAULT 'TaiQuay',
@@ -459,3 +462,8 @@ VALUES
 ('M011', 'DM005', 'Combo Gia Đình', 'Combo danh cho 4 nguoi gom mon chinh, khai vi va do uong.', 299000, NULL, 20, 'Available', NOW(), NOW()),
 ('M012', 'DM005', 'Combo Couple', 'Combo gon nhe cho 2 nguoi voi mon chinh va do uong.', 199000, NULL, 15, 'Available', NOW(), NOW()),
 ('M013', 'DM005', 'Combo Solo', 'Combo ca nhan tiet kiem, phuc vu nhanh.', 129000, NULL, 10, 'Available', NOW(), NOW());
+
+
+ALTER TABLE DonHang 
+ADD COLUMN LoaiDon ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG') 
+DEFAULT 'TAI_QUAN';

@@ -1,27 +1,23 @@
 import { useState } from 'react'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { coSuDungMayChu } from '../services/trinhKhachApi'
-
-const TAI_KHOAN_KHACH_HANG_LOCAL = {
-  identifier: 'khach1@gmail.com',
-  username: 'ND004',
-  password: '123',
-}
 
 function DangNhapPage() {
-  const [identifier, setIdentifier] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('')
+  const [matKhau, setMatKhau] = useState('')
   const [loginError, setLoginError] = useState('')
+  const [dangGui, setDangGui] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { dangNhap } = useXacThuc()
 
-  const handleSubmit = (e) => {
-    e.preventDefault()
+  const handleSubmit = async (event) => {
+    event.preventDefault()
+    if (dangGui) return
 
-    ;(async () => {
-      const ketQua = await dangNhap(identifier, password)
+    try {
+      setDangGui(true)
+      const ketQua = await dangNhap(email, matKhau)
 
       if (!ketQua.success) {
         setLoginError(ketQua.error)
@@ -29,45 +25,41 @@ function DangNhapPage() {
       }
 
       setLoginError('')
-      navigate(location.state?.from || '/')
-    })()
+      navigate(location.state?.from || '/', { replace: true })
+    } finally {
+      setDangGui(false)
+    }
   }
 
   return (
     <section className="xac-thuc-page">
       <div className="xac-thuc-card">
         <h1 className="xac-thuc-title">Đăng nhập</h1>
-        <p className="xac-thuc-subtitle">Chào mừng bạn quay trở lại nhà hàng của chúng tôi.</p>
+        <p className="xac-thuc-subtitle">Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.</p>
 
         {location.state?.registered && <p className="form-success">Đăng ký thành công. Vui lòng đăng nhập.</p>}
 
         <form onSubmit={handleSubmit} className="xac-thuc-form">
           <div className="nhom-truong">
-            <label htmlFor="login-identifier" className="nhan-truong">
-              Tên tài khoản hoặc Email
-            </label>
+            <label htmlFor="login-email" className="nhan-truong">Email</label>
             <input
-              id="login-identifier"
-              name="identifier"
-              type="text"
+              id="login-email"
+              name="email"
+              type="email"
               className="truong-nhap"
-              placeholder="Nhập tên tài khoản hoặc email"
-              autoComplete="username"
-              value={identifier}
+              placeholder="Nhập email"
+              autoComplete="email"
+              value={email}
               onChange={(e) => {
-                setIdentifier(e.target.value)
-                if (loginError) {
-                  setLoginError('')
-                }
+                setEmail(e.target.value)
+                if (loginError) setLoginError('')
               }}
               required
             />
           </div>
 
           <div className="nhom-truong">
-            <label htmlFor="login-password" className="nhan-truong">
-              Mật khẩu
-            </label>
+            <label htmlFor="login-password" className="nhan-truong">Mật khẩu</label>
             <input
               id="login-password"
               name="password"
@@ -75,49 +67,28 @@ function DangNhapPage() {
               className="truong-nhap"
               placeholder="Nhập mật khẩu"
               autoComplete="current-password"
-              value={password}
+              value={matKhau}
               onChange={(e) => {
-                setPassword(e.target.value)
-                if (loginError) {
-                  setLoginError('')
-                }
+                setMatKhau(e.target.value)
+                if (loginError) setLoginError('')
               }}
               required
             />
           </div>
 
-          {loginError && (
-            <p className="loi-bieu-mau" role="alert">
-              {loginError}
-            </p>
-          )}
+          {loginError ? <p className="loi-bieu-mau" role="alert">{loginError}</p> : null}
 
-          <button type="submit" className="btn nut-chinh">
-            Đăng nhập
+          <button type="submit" className="btn nut-chinh" disabled={dangGui}>
+            {dangGui ? 'Đang đăng nhập...' : 'Đăng nhập'}
           </button>
         </form>
 
-        <div className="xac-thuc-demo-note" aria-live="polite">
-          {coSuDungMayChu() ? (
-            <>
-              <strong>Đăng nhập bằng backend local</strong>
-              <p>Email: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.identifier}</span></p>
-              <p>Mã người dùng: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.username}</span></p>
-              <p>Mật khẩu: <span>{TAI_KHOAN_KHACH_HANG_LOCAL.password}</span></p>
-              <p>
-                Chưa có tài khoản?{' '}
-                <Link to="/dang-ky" className="xac-thuc-switch-link">
-                  Tạo tài khoản mới
-                </Link>
-              </p>
-            </>
-          ) : (
-            <>
-              <strong>Đăng nhập cục bộ</strong>
-              <p>Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản thật.</p>
-            </>
-          )}
-        </div>
+        <p className="xac-thuc-switch-text">
+          Chưa có tài khoản?{' '}
+          <Link to="/dang-ky" className="xac-thuc-switch-link">
+            Đăng ký ngay
+          </Link>
+        </p>
       </div>
     </section>
   )

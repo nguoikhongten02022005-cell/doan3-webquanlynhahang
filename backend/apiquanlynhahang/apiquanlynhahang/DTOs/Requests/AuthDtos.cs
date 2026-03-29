@@ -8,12 +8,25 @@ public class DangNhapDto
 
 public class DangKyKhachHangDto
 {
-    public string MaND { get; set; } = string.Empty;
-    public string MaKH { get; set; } = string.Empty;
-    public string TenND { get; set; } = string.Empty;
-    public string TenKH { get; set; } = string.Empty;
+    public string HoTen { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string SoDienThoai { get; set; } = string.Empty;
     public string MatKhau { get; set; } = string.Empty;
-    public string? SDT { get; set; }
+    public string XacNhanMatKhau { get; set; } = string.Empty;
     public string? DiaChi { get; set; }
+}
+
+public class CapNhatHoSoDto
+{
+    public string HoTen { get; set; } = string.Empty;
+    public string Email { get; set; } = string.Empty;
+    public string SoDienThoai { get; set; } = string.Empty;
+    public string? DiaChi { get; set; }
+}
+
+public class DoiMatKhauDto
+{
+    public string MatKhauHienTai { get; set; } = string.Empty;
+    public string MatKhauMoi { get; set; } = string.Empty;
+    public string XacNhanMatKhauMoi { get; set; } = string.Empty;
 }

@@ -1,0 +1,28 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - main [ref=e4]:
+    - generic [ref=e25]:
+      - heading "Tạo tài khoản" [level=1] [ref=e26]
+      - paragraph [ref=e27]: Tạo tài khoản khách hàng mới để sử dụng đầy đủ các luồng thật của hệ thống.
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - generic [ref=e30]: Họ và tên
+          - textbox "Họ và tên" [ref=e31]
+        - generic [ref=e32]:
+          - generic [ref=e33]: Tên tài khoản hiển thị
+          - textbox "Tên tài khoản hiển thị" [ref=e34]
+        - generic [ref=e35]:
+          - generic [ref=e36]: Email
+          - textbox "Email" [ref=e37]
+        - generic [ref=e38]:
+          - generic [ref=e39]: Số điện thoại
+          - textbox "Số điện thoại" [ref=e40]
+        - generic [ref=e41]:
+          - generic [ref=e42]: Mật khẩu
+          - textbox "Mật khẩu" [ref=e43]
+        - button "Tạo tài khoản" [ref=e44] [cursor=pointer]
+      - paragraph [ref=e45]:
+        - text: Quay lại
+        - link "trang đăng nhập" [ref=e46] [cursor=pointer]:
+          - /url: /dang-nhap

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
-import { layThongTinToiApi, dangNhapApi, dangKyApi, dangNhapNoiBoApi, dangXuatApi } from '../services/api/apiXacThuc'
+import { layThongTinToiApi, dangNhapApi, dangKyApi, dangNhapNoiBoApi, dangXuatApi, capNhatHoSoApi, doiMatKhauApi } from '../services/api/apiXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 import {
   VAI_TRO_XAC_THUC,
@@ -243,6 +243,34 @@ export const useXacThuc = () => {
     xoaPhienXacThuc()
   }, [])
 
+  const capNhatHoSo = useCallback(async (payload) => {
+    try {
+      const { duLieu } = await capNhatHoSoApi(payload)
+      if (!duLieu) {
+        return { success: false, error: 'Cập nhật hồ sơ thất bại.' }
+      }
+
+      const nguoiDungDangLuu = layNguoiDungHienTai()
+      luuNguoiDungHienTai({
+        ...nguoiDungDangLuu,
+        ...duLieu,
+      })
+
+      return { success: true, user: layNguoiDungHienTai() }
+    } catch (error) {
+      return { success: false, error: error?.message || 'Cập nhật hồ sơ thất bại.' }
+    }
+  }, [])
+
+  const capNhatMatKhau = useCallback(async (payload) => {
+    try {
+      await doiMatKhauApi(payload)
+      return { success: true }
+    } catch (error) {
+      return { success: false, error: error?.message || 'Đổi mật khẩu thất bại.' }
+    }
+  }, [])
+
   const vaiTro = nguoiDungHienTai?.role ?? VAI_TRO_XAC_THUC.KHACH_HANG
   const laAdmin = vaiTro === VAI_TRO_XAC_THUC.QUAN_TRI
   const laNhanVien = vaiTro === VAI_TRO_XAC_THUC.NHAN_VIEN
@@ -260,5 +288,7 @@ export const useXacThuc = () => {
     dangNhapNoiBo,
     dangKy,
     dangXuat,
+    capNhatHoSo,
+    capNhatMatKhau,
   }
 }

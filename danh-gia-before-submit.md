@@ -1,0 +1,126 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - navigation "Điều hướng chính" [ref=e9]:
+        - link "Trang chủ" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: Trang chủ
+        - link "Thực đơn" [ref=e12] [cursor=pointer]:
+          - /url: /thuc-don
+          - generic [ref=e13]: Thực đơn
+        - link "Đặt bàn" [ref=e14] [cursor=pointer]:
+          - /url: /dat-ban
+          - generic [ref=e15]: Đặt bàn
+        - link "Về chúng tôi" [ref=e16] [cursor=pointer]:
+          - /url: /gioi-thieu
+          - generic [ref=e17]: Về chúng tôi
+        - link "Đánh giá" [ref=e18] [cursor=pointer]:
+          - /url: /danh-gia
+          - generic [ref=e19]: Đánh giá
+      - generic [ref=e20]:
+        - link "Đặt bàn" [ref=e21] [cursor=pointer]:
+          - /url: /dat-ban
+        - button "Tài khoản" [ref=e23] [cursor=pointer]:
+          - img [ref=e24]
+          - text: Tài khoản
+  - main [ref=e27]:
+    - generic [ref=e28]:
+      - generic [ref=e30]:
+        - paragraph [ref=e31]: Phản hồi từ khách hàng
+        - heading "Đánh Giá Từ Người Dùng" [level=1] [ref=e32]
+        - paragraph [ref=e33]: Những nhận xét đã được duyệt từ khách hàng sau khi trải nghiệm món ăn, dịch vụ và không gian tại nhà hàng.
+        - generic [ref=e34]:
+          - generic [ref=e35]:
+            - strong [ref=e36]: "3"
+            - text: đánh giá đã duyệt
+          - generic [ref=e37]:
+            - strong [ref=e38]: "4.3"
+            - text: điểm trung bình
+          - generic [ref=e39]:
+            - strong [ref=e40]: ★★★★☆
+            - text: xếp hạng tổng
+      - generic [ref=e43]:
+        - article [ref=e96]:
+          - generic [ref=e97]:
+            - strong [ref=e98]: KH002
+            - generic [ref=e99]: ★★★★
+          - paragraph [ref=e100]: Mon an ngon, phuc vu nhanh, khong gian de chiu.
+          - generic [ref=e101]: "Đơn hàng: DH002"
+        - article [ref=e102]:
+          - generic [ref=e103]:
+            - strong [ref=e104]: KH002
+            - generic [ref=e105]: ★★★★★
+          - paragraph [ref=e106]: Phong VIP rieng tu, mon an len nhanh va dep mat.
+          - generic [ref=e107]: "Đơn hàng: DH005"
+        - article [ref=e108]:
+          - generic [ref=e109]:
+            - strong [ref=e110]: KH001
+            - generic [ref=e111]: ★★★★
+          - paragraph [ref=e112]: Danh gia test
+          - generic [ref=e113]: "Đơn hàng: DH_TEST_03"
+      - generic [ref=e47]:
+        - generic [ref=e48]:
+          - paragraph [ref=e49]: Gửi phản hồi
+          - heading "Chia sẻ trải nghiệm của bạn" [level=2] [ref=e50]
+          - paragraph [ref=e51]: Đánh giá được gắn với mã đơn hàng để phản ánh tổng thể món ăn, phục vụ và trải nghiệm của bạn tại nhà hàng.
+        - generic [ref=e52]:
+          - generic [ref=e53]:
+            - generic [ref=e54]: Họ tên
+            - textbox "Họ tên" [ref=e55]:
+              - /placeholder: "Ví dụ: Trần Văn Khách"
+              - text: Admin System
+          - generic [ref=e56]:
+            - generic [ref=e57]: Mã đơn hàng
+            - textbox "Mã đơn hàng" [ref=e58]:
+              - /placeholder: "VD: DH001"
+        - generic [ref=e59]:
+          - generic [ref=e60]: Chọn số sao
+          - group "Chọn số sao đánh giá" [ref=e61]:
+            - button "★" [ref=e62] [cursor=pointer]
+            - button "★" [ref=e63] [cursor=pointer]
+            - button "★" [ref=e64] [cursor=pointer]
+            - button "★" [ref=e65] [cursor=pointer]
+            - button "★" [ref=e66] [cursor=pointer]
+          - generic [ref=e67]: Chọn số sao phù hợp
+        - generic [ref=e68]:
+          - generic [ref=e69]: Nội dung đánh giá
+          - textbox "Nội dung đánh giá" [ref=e70]:
+            - /placeholder: Hãy chia sẻ cảm nhận của bạn về món ăn, phục vụ và trải nghiệm tại nhà hàng...
+        - button "Gửi Đánh Giá" [disabled] [ref=e71] [cursor=pointer]
+  - contentinfo [ref=e72]:
+    - generic [ref=e73]:
+      - generic [ref=e74]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e75] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e76]: NH
+          - generic [ref=e77]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e78]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic "Mạng xã hội" [ref=e79]:
+          - link "Facebook" [ref=e80] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e81] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e82]:
+        - heading "Liên hệ" [level=3] [ref=e83]
+        - list [ref=e84]:
+          - listitem [ref=e85]: 28 Nguyễn Huệ, Q.1, TP. HCM
+          - listitem [ref=e86]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e87] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e88]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e89] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e90]:
+        - heading "Giờ mở cửa" [level=3] [ref=e91]
+        - list [ref=e92]:
+          - listitem [ref=e93]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e94]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e95]: Nhận đơn online đến 21:45

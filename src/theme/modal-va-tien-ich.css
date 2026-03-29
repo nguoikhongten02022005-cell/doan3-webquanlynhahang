@@ -28,16 +28,31 @@
 
 @media (max-width: 900px) {
   .main-nav { display: none; }
+  .site-header {
+    position: sticky;
+  }
+  .site-header > .container {
+    position: relative;
+  }
+  .brand {
+    min-width: 0;
+    flex: 1;
+  }
   .mobile-toggle {
     display: grid; place-items: center;
     width: 2.5rem; height: 2.5rem; border: 1px solid var(--line);
     border-radius: 50%; background: transparent; cursor: pointer;
+    flex-shrink: 0;
   }
   .mobile-menu.open {
     display: flex; flex-direction: column;
     position: absolute; top: 100%; left: 0; right: 0;
     background: #fff; border-bottom: 1px solid var(--line);
-    padding: 0.5rem 1rem 1rem; box-shadow: var(--shadow-md);
+    padding: 0.65rem 1rem 1rem;
+    box-shadow: var(--shadow-md);
+    gap: 0.1rem;
+    max-height: calc(100vh - 72px);
+    overflow-y: auto;
   }
   .mobile-menu a,
   .mobile-menu button {
@@ -74,7 +89,10 @@
 }
 
 @media (max-width: 680px) {
-  .container { padding-inline: 1rem; }
+  .container {
+    width: min(1180px, calc(100% - 2rem));
+    padding-inline: 0;
+  }
   .hero { padding: 2.5rem 0 2rem; }
   .mo-dau-copy h1 { font-size: 2.2rem; max-width: none; }
   .mo-dau-actions-group { flex-direction: column; align-items: stretch; }
@@ -86,11 +104,143 @@
   .about-features { grid-template-columns: 1fr; }
   .team-grid { grid-template-columns: 1fr 1fr; }
   .noi-bo-kpi-grid { grid-template-columns: 1fr 1fr; }
+
+  .thuc-don-list-section {
+    padding-bottom: 3rem;
+  }
+
+  .thuc-don-toolbar-shell--sticky {
+    top: 72px;
+  }
+
+  .thuc-don-tabs-row {
+    gap: 0.55rem;
+    padding-bottom: 0.2rem;
+    overflow-x: auto;
+    scrollbar-width: none;
+  }
+
+  .thuc-don-tabs-row::-webkit-scrollbar {
+    display: none;
+  }
+
+  .thuc-don-tab {
+    flex: 0 0 auto;
+    min-width: max-content;
+    padding: 0.75rem 0.95rem;
+  }
+
+  .thuc-don-tab-copy strong {
+    font-size: 0.84rem;
+  }
+
+  .thuc-don-category-section {
+    gap: 1rem;
+  }
+
+  .thuc-don-results-head {
+    margin-bottom: 1rem;
+  }
+
+  .thuc-don-results-head h3 {
+    font-size: 1.7rem;
+    max-width: none;
+  }
+
+  .thuc-don-grid--menu-showcase {
+    gap: 1rem;
+    padding-top: 0.25rem;
+  }
+
+  .the-mon--menu {
+    border-radius: 1rem;
+    box-shadow: 0 14px 28px rgba(54, 37, 24, 0.08);
+  }
+
+  .the-mon--menu .the-mon-hinh--menu {
+    height: 212px;
+  }
+
+  .the-mon--menu .the-mon-hinh-head {
+    padding: 0.85rem;
+  }
+
+  .the-mon--menu .nhan-mon,
+  .the-mon--menu .the-mon-hinh-label {
+    font-size: 0.62rem;
+    letter-spacing: 0.12em;
+  }
+
+  .the-mon--menu .than-mon--menu {
+    gap: 0.8rem;
+    padding: 1rem 0.95rem 0.95rem;
+  }
+
+  .the-mon--menu .than-mon::before {
+    inset: 0.55rem 0.95rem auto;
+  }
+
+  .the-mon--menu .noi-dung-mon h3 {
+    font-size: 1.02rem;
+    line-height: 1.2;
+  }
+
+  .the-mon--menu .noi-dung-mon p {
+    font-size: 0.88rem;
+    line-height: 1.6;
+    -webkit-line-clamp: 2;
+  }
+
+  .the-mon--menu .gia-mon {
+    font-size: 1rem;
+  }
+
+  .site-footer {
+    padding: 2.4rem 0 1.8rem;
+  }
+
+  .footer-grid {
+    gap: 1.25rem;
+  }
+
+  .footer-khoi-thuong-hieu {
+    padding-right: 0;
+  }
+
+  .footer-brand p,
+  .site-footer ul li,
+  .site-footer ul a {
+    font-size: 0.88rem;
+    line-height: 1.7;
+  }
 }
 
 @media (max-width: 560px) {
   .site-header > .container { min-height: 60px; }
-  .brand-name { font-size: 1rem; }
+  .brand-name {
+    min-width: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    font-size: 1rem;
+  }
+  .header-actions {
+    gap: 0.4rem;
+    flex-shrink: 0;
+  }
+  .header-dat-ban-btn,
+  .header-login-btn {
+    min-width: 0;
+    min-height: 2.2rem;
+    padding-inline: 0.8rem;
+    font-size: 0.76rem;
+    border-radius: 0.8rem;
+  }
+  .mobile-menu.open {
+    left: -1rem;
+    right: -1rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
   .mo-dau-copy h1 { font-size: 1.9rem; }
   .section-head h2 { font-size: 1.3rem; }
   .food-grid { grid-template-columns: 1fr 1fr; }
@@ -103,6 +253,44 @@
   .ho-so-tabs { gap: 0; }
   .ho-so-tab-btn { padding: 0.6rem 0.8rem; font-size: 0.78rem; }
   .about-stats-row { grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+  .thuc-don-toolbar-shell--sticky {
+    top: 60px;
+  }
+
+  .thuc-don-tab {
+    padding: 0.68rem 0.8rem;
+  }
+
+  .thuc-don-tab-copy strong {
+    font-size: 0.8rem;
+  }
+
+  .the-mon--menu .the-mon-hinh--menu {
+    height: 192px;
+  }
+
+  .the-mon--menu .than-mon--menu {
+    padding: 0.9rem;
+  }
+
+  .the-mon--menu .noi-dung-mon h3 {
+    font-size: 0.98rem;
+  }
+
+  .the-mon--menu .noi-dung-mon p {
+    font-size: 0.84rem;
+  }
+
+  .social-links {
+    gap: 0.55rem;
+  }
+
+  .social-links a {
+    min-height: 2.15rem;
+    padding: 0.4rem 0.75rem;
+    font-size: 0.82rem;
+  }
 }
 
 @media (max-width: 480px) {

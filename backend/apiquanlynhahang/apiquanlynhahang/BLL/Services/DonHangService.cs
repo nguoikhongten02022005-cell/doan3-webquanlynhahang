@@ -2,6 +2,7 @@ using apiquanlynhahang.DAL.Context;
 using apiquanlynhahang.DAL.Entities;
 using apiquanlynhahang.DTOs.Requests;
 using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
 
 namespace apiquanlynhahang.BLL.Services;
 
@@ -59,6 +60,7 @@ public class DonHangService
             MaBan = dto.MaBan,
             MaNV = dto.MaNV,
             MaDatBan = dto.MaDatBan,
+            LoaiDon = "TAI_QUAN",
             TongTien = tongTien,
             TrangThai = "Pending",
             NguonTao = dto.NguonTao,
@@ -73,6 +75,187 @@ public class DonHangService
         _dbContext.ChiTietDonHang.AddRange(chiTietMoi);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        return donHang;
+    }
+
+    public async Task<DonHang> TaoDonMangVeAsync(TaoDonMangVeDto dto, CancellationToken cancellationToken = default)
+    {
+        var laDonGiaoHang = string.Equals(dto.LoaiDon, "MANG_VE_GIAO_HANG", StringComparison.OrdinalIgnoreCase);
+        if (laDonGiaoHang && string.IsNullOrWhiteSpace(dto.DiaChiGiao))
+        {
+            throw new ValidationException("Đơn giao hàng bắt buộc phải có địa chỉ giao.");
+        }
+
+        var maMon = dto.DanhSachMon.Select(x => x.MaMon).ToList();
+        var monAn = await _dbContext.ThucDon.Where(x => maMon.Contains(x.MaMon)).ToListAsync(cancellationToken);
+
+        decimal tongTien = 0;
+        var maDonHang = $"DHMV_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+        var chiTietMoi = new List<ChiTietDonHang>();
+
+        foreach (var item in dto.DanhSachMon)
+        {
+            var mon = monAn.First(x => x.MaMon == item.MaMon);
+            var donGia = item.DonGia ?? mon.Gia;
+            var thanhTien = donGia * item.SoLuong;
+            tongTien += thanhTien;
+
+            chiTietMoi.Add(new ChiTietDonHang
+            {
+                MaChiTiet = string.IsNullOrWhiteSpace(item.MaChiTiet) ? $"CTMV_{Guid.NewGuid():N}"[..18] : item.MaChiTiet,
+                MaDonHang = maDonHang,
+                MaMon = item.MaMon,
+                SoLuong = item.SoLuong,
+                DonGia = donGia,
+                ThanhTien = thanhTien,
+                GhiChu = item.GhiChu,
+                TrangThai = "Pending",
+                NgayTao = DateTime.UtcNow,
+            });
+        }
+
+        decimal phiDichVu = tongTien > 0 ? Math.Ceiling(tongTien * 0.05m / 1000) * 1000 : 0;
+        decimal phiShip = laDonGiaoHang ? 30000 : 0;
+        var maGiamGia = string.IsNullOrWhiteSpace(dto.MaGiamGia) ? null : dto.MaGiamGia.Trim().ToUpperInvariant();
+
+        var donHang = new DonHang
+        {
+            MaDonHang = maDonHang,
+            MaKH = dto.MaKH,
+            LoaiDon = laDonGiaoHang ? "MANG_VE_GIAO_HANG" : "MANG_VE_PICKUP",
+            DiaChiGiao = laDonGiaoHang ? dto.DiaChiGiao?.Trim() : null,
+            PhiShip = phiShip,
+            TongTien = tongTien + phiDichVu + phiShip,
+            TrangThai = "Pending",
+            NguonTao = "Online",
+            GhiChu = string.Join(" | ", new[]
+            {
+                laDonGiaoHang ? $"Gio giao: {dto.GioGiao}" : $"Gio lay: {dto.GioLayHang}",
+                dto.GhiChu?.Trim(),
+                maGiamGia is null ? null : $"Ma giam gia: {maGiamGia}",
+                dto.HoTen is null ? null : $"Nguoi nhan: {dto.HoTen.Trim()}",
+                dto.SoDienThoai is null ? null : $"SDT: {dto.SoDienThoai.Trim()}",
+                laDonGiaoHang ? $"Dia chi giao: {dto.DiaChiGiao?.Trim()}" : null
+            }.Where(x => !string.IsNullOrWhiteSpace(x))),
+            NgayTao = DateTime.UtcNow,
+            NgayCapNhat = DateTime.UtcNow,
+        };
+
+        _dbContext.DonHang.Add(donHang);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        _dbContext.ChiTietDonHang.AddRange(chiTietMoi);
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return donHang;
+    }
+
+    public async Task<object?> LayChiTietDonMangVeAsync(string maDonHang, string? maKh, CancellationToken cancellationToken = default)
+    {
+        var donHang = await _dbContext.DonHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaDonHang == maDonHang && (x.LoaiDon == "MANG_VE_PICKUP" || x.LoaiDon == "MANG_VE_GIAO_HANG"), cancellationToken);
+        if (donHang is null) return null;
+        if (!string.IsNullOrWhiteSpace(maKh) && !string.Equals(donHang.MaKH, maKh, StringComparison.OrdinalIgnoreCase)) return null;
+
+        var chiTiet = await LayChiTietAsync(maDonHang, cancellationToken);
+        return new
+        {
+            DonHang = donHang,
+            ChiTiet = chiTiet,
+        };
+    }
+
+    private static Dictionary<string, string> TachThongTinMangVe(string? ghiChu)
+    {
+        var ketQua = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
+        if (string.IsNullOrWhiteSpace(ghiChu)) return ketQua;
+
+        foreach (var dong in ghiChu.Split("|", StringSplitOptions.TrimEntries | StringSplitOptions.RemoveEmptyEntries))
+        {
+            var viTri = dong.IndexOf(':');
+            if (viTri <= 0) continue;
+            ketQua[dong[..viTri].Trim()] = dong[(viTri + 1)..].Trim();
+        }
+
+        return ketQua;
+    }
+
+    public async Task<List<object>> LayDanhSachDonMangVeChoAdminAsync(CancellationToken cancellationToken = default)
+    {
+        var donMangVe = await _dbContext.DonHang
+            .AsNoTracking()
+            .Where(x => x.LoaiDon == "MANG_VE_PICKUP" || x.LoaiDon == "MANG_VE_GIAO_HANG")
+            .OrderByDescending(x => x.NgayTao)
+            .ToListAsync(cancellationToken);
+
+        var maDon = donMangVe.Select(x => x.MaDonHang).ToList();
+        var chiTiet = await _dbContext.ChiTietDonHang
+            .AsNoTracking()
+            .Where(x => maDon.Contains(x.MaDonHang))
+            .ToListAsync(cancellationToken);
+
+        var maMon = chiTiet.Select(x => x.MaMon).Distinct().ToList();
+        var tenMonLookup = await _dbContext.ThucDon
+            .AsNoTracking()
+            .Where(x => maMon.Contains(x.MaMon))
+            .ToDictionaryAsync(x => x.MaMon, x => x.TenMon, cancellationToken);
+
+        return donMangVe.Select(don =>
+        {
+            var thongTin = TachThongTinMangVe(don.GhiChu);
+            var danhSachMon = chiTiet
+                .Where(x => x.MaDonHang == don.MaDonHang)
+                .Select(x => new
+                {
+                    x.MaMon,
+                    TenMon = tenMonLookup.TryGetValue(x.MaMon, out var tenMon) ? tenMon : x.MaMon,
+                    x.SoLuong,
+                    x.ThanhTien,
+                })
+                .ToList();
+
+            return (object)new
+            {
+                don.MaDonHang,
+                don.MaKH,
+                don.LoaiDon,
+                HoTen = thongTin.TryGetValue("Nguoi nhan", out var hoTen) ? hoTen : string.Empty,
+                SoDienThoai = thongTin.TryGetValue("SDT", out var soDienThoai) ? soDienThoai : string.Empty,
+                GioLayHang = thongTin.TryGetValue("Gio lay", out var gioLayHang) ? gioLayHang : string.Empty,
+                GioGiao = thongTin.TryGetValue("Gio giao", out var gioGiao) ? gioGiao : string.Empty,
+                DiaChiGiao = don.DiaChiGiao ?? (thongTin.TryGetValue("Dia chi giao", out var diaChiGiao) ? diaChiGiao : string.Empty),
+                don.PhiShip,
+                don.TongTien,
+                don.TrangThai,
+                don.NgayTao,
+                DanhSachMon = danhSachMon,
+            };
+        }).ToList();
+    }
+
+    public async Task<DonHang?> CapNhatTrangThaiDonMangVeAsync(string maDonHang, string trangThai, CancellationToken cancellationToken = default)
+    {
+        var donHang = await _dbContext.DonHang.FirstOrDefaultAsync(x => x.MaDonHang == maDonHang && (x.LoaiDon == "MANG_VE_PICKUP" || x.LoaiDon == "MANG_VE_GIAO_HANG"), cancellationToken);
+        if (donHang is null) return null;
+
+        var chuyenTrangThaiHopLe = new Dictionary<string, string[]>(StringComparer.OrdinalIgnoreCase)
+        {
+            ["Pending"] = ["Confirmed", "Cancelled"],
+            ["Confirmed"] = ["Preparing"],
+            ["Preparing"] = [donHang.LoaiDon == "MANG_VE_GIAO_HANG" ? "Served" : "Ready"],
+            ["Ready"] = ["Paid"],
+            ["Served"] = ["Paid"],
+            ["Paid"] = [],
+            ["Cancelled"] = [],
+        };
+
+        if (!chuyenTrangThaiHopLe.TryGetValue(donHang.TrangThai, out var trangThaiHopLe) || !trangThaiHopLe.Contains(trangThai, StringComparer.OrdinalIgnoreCase))
+        {
+            throw new ValidationException($"Không thể chuyển trạng thái từ {donHang.TrangThai} sang {trangThai}.");
+        }
+
+        donHang.TrangThai = trangThai;
+        donHang.NgayCapNhat = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
         return donHang;
     }
 

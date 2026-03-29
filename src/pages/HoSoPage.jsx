@@ -19,7 +19,7 @@ const cloneOrders = () => DON_HANG_HO_SO_MOCK.map((order) => ({
 function HoSoPage() {
   const navigate = useNavigate()
   const { hienThongBao } = useThongBao()
-  const { nguoiDungHienTai, dangKhoiTaoXacThuc, dangXuat } = useXacThuc()
+  const { nguoiDungHienTai, dangKhoiTaoXacThuc, dangXuat, capNhatHoSo, capNhatMatKhau } = useXacThuc()
   const [tabDangMo, setTabDangMo] = useState('personal')
   const [lichSuDatBan, setLichSuDatBan] = useState([])
   const [lichSuDonHang, setLichSuDonHang] = useState([])
@@ -105,7 +105,12 @@ function HoSoPage() {
 
           <section className="ho-so-content-panel">
             {tabDangMo === 'personal' && (
-              <ThongTinCaNhanTab nguoiDung={nguoiDungHienTai} onLogout={handleLogout} />
+              <ThongTinCaNhanTab
+                nguoiDung={nguoiDungHienTai}
+                onLogout={handleLogout}
+                onCapNhatHoSo={capNhatHoSo}
+                onDoiMatKhau={capNhatMatKhau}
+              />
             )}
 
             {tabDangMo === 'bookings' && (

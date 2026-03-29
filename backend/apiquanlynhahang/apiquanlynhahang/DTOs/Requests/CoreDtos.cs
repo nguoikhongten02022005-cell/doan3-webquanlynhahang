@@ -150,3 +150,18 @@ public class CapNhatTrangThaiDto
 {
     public string TrangThai { get; set; } = string.Empty;
 }
+
+public class TaoDonMangVeDto
+{
+    public string MaKH { get; set; } = string.Empty;
+    public string LoaiDon { get; set; } = "MANG_VE_PICKUP";
+    public string? HoTen { get; set; }
+    public string? SoDienThoai { get; set; }
+    public string GioLayHang { get; set; } = string.Empty;
+    public string? GioGiao { get; set; }
+    public string? DiaChiGiao { get; set; }
+    public decimal PhiShip { get; set; }
+    public string? GhiChu { get; set; }
+    public string? MaGiamGia { get; set; }
+    public List<TaoChiTietDonHangDto> DanhSachMon { get; set; } = [];
+}

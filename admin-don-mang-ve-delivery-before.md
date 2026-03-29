@@ -1,0 +1,36 @@
+- generic [ref=e4]:
+  - generic [ref=e5]:
+    - generic [ref=e6]: NH
+    - generic [ref=e7]:
+      - paragraph [ref=e8]: Nguyên Vị
+      - strong [ref=e9]: Operations Console
+  - heading "Đăng nhập quản trị" [level=1] [ref=e10]
+  - paragraph [ref=e11]: Đăng nhập bằng tài khoản nội bộ thật để truy cập Admin Panel và dữ liệu backend local.
+  - generic "Tài khoản nội bộ local" [ref=e12]:
+    - button "Admin local admin@nhahang.com ND001 / 123" [ref=e13] [cursor=pointer]:
+      - generic [ref=e14]:
+        - strong [ref=e15]: Admin local
+        - paragraph [ref=e16]: admin@nhahang.com
+      - generic [ref=e17]: ND001 / 123
+    - button "Nhân viên local an.nv@nhahang.com ND002 / 123" [ref=e18] [cursor=pointer]:
+      - generic [ref=e19]:
+        - strong [ref=e20]: Nhân viên local
+        - paragraph [ref=e21]: an.nv@nhahang.com
+      - generic [ref=e22]: ND002 / 123
+  - generic [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e25]: Email nội bộ
+      - textbox "Email nội bộ" [ref=e26]:
+        - /placeholder: Nhập email nội bộ
+    - generic [ref=e27]:
+      - generic [ref=e28]: Mật khẩu
+      - textbox "Mật khẩu" [ref=e29]:
+        - /placeholder: Nhập mật khẩu
+    - button "Vào Admin Panel" [ref=e30] [cursor=pointer]
+  - generic [ref=e31]:
+    - strong [ref=e32]: Tài khoản nội bộ local
+    - paragraph [ref=e33]: Hệ thống đang dùng backend local, bạn có thể đăng nhập bằng tài khoản admin hoặc nhân viên thật.
+    - paragraph [ref=e34]:
+      - text: Bạn là khách hàng?
+      - link "Đăng nhập tại đây" [ref=e35] [cursor=pointer]:
+        - /url: /dang-nhap
