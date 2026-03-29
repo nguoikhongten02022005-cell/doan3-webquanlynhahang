@@ -15,12 +15,12 @@
   --primary: #e6785a;
   --primary-strong: #d86445;
   --primary-light: #fdf0ea;
-  --menu-coral: #c96b4a;
-  --menu-coral-strong: #b05438;
+  --menu-coral: #e6785a;
+  --menu-coral-strong: #d86445;
   --menu-coral-soft: #faece7;
   --menu-coral-surface: #fefaf6;
   --menu-coral-text: #1a1108;
-  --accent: #f08a67;
+  --accent: #e6785a;
   --accent-light: #fdf0ea;
   --accent-strong: #d86445;
   --dark: #1c1c1c;
@@ -118,7 +118,7 @@ button:focus-visible,
 .main-nav a::after,
 .main-nav button::after {
   content: ''; position: absolute; left: 50%; bottom: 0.15rem;
-  width: 100%; max-width: 3.4rem; height: 1.5px; background: #cda865;
+  width: 100%; max-width: 3.4rem; height: 1.5px; background: var(--primary);
   transform: translateX(-50%) scaleX(0); transform-origin: center; transition: transform 0.3s ease;
 }
 .main-nav a.active, .main-nav a:hover,
@@ -201,7 +201,7 @@ button:focus-visible,
   padding: 5.6rem 0 4.6rem;
   background:
     radial-gradient(circle at top left, rgba(214, 193, 165, 0.28), transparent 34%),
-    radial-gradient(circle at 85% 18%, rgba(24, 95, 68, 0.11), transparent 26%),
+    radial-gradient(circle at 85% 18%, rgba(230, 120, 90, 0.11), transparent 26%),
     linear-gradient(135deg, #fbf6ef 0%, #f1e6d8 48%, #efe1d1 100%);
   overflow: hidden;
 }
@@ -221,10 +221,10 @@ button:focus-visible,
 .eyebrow {
   display: inline-flex; align-items: center; gap: 0.5rem;
   font-size: 0.68rem; letter-spacing: 0.24em; text-transform: uppercase;
-  color: #b88b47; font-weight: 700;
+  color: var(--primary); font-weight: 700;
 }
 .eyebrow::before {
-  content: ''; width: 1.75rem; height: 1.5px; background: #d6b16d;
+  content: ''; width: 1.75rem; height: 1.5px; background: var(--primary);
 }
 .mo-dau-copy h1 {
   font-family: 'Cormorant Garamond', serif;
@@ -352,7 +352,7 @@ button:focus-visible,
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: #9a7b59;
+  color: var(--primary);
 }
 .mo-dau-card-meta p { font-size: 0.88rem; line-height: 1.65; color: rgba(66, 54, 45, 0.82); margin: 0; }
 
@@ -382,7 +382,7 @@ button:focus-visible,
   font-size: 0.72rem;
   text-transform: uppercase;
   letter-spacing: 0.16em;
-  color: #a17c4a;
+  color: var(--primary);
 }
 .mo-dau-visual-copy strong {
   font-family: 'Cormorant Garamond', serif;
@@ -407,7 +407,7 @@ button:focus-visible,
   display: grid;
   place-items: center;
   z-index: 2;
-  box-shadow: 0 18px 50px rgba(26,107,74,0.12);
+  box-shadow: 0 18px 50px rgba(230, 120, 90, 0.12);
 }
 .mo-dau-plate::before {
   content: '';
@@ -500,7 +500,7 @@ button:focus-visible,
 .trai-nghiem-index {
   font-family: 'Playfair Display', serif;
   font-size: 1.5rem;
-  color: #9a7b59;
+  color: var(--primary);
 }
 .trai-nghiem-item p {
   margin: 0;
@@ -548,7 +548,7 @@ button:focus-visible,
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.96), rgba(248, 241, 233, 0.82));
 }
 .danh-muc-item:hover, .danh-muc-item.active {
-  border-color: rgba(26, 107, 74, 0.28); background: #fffaf4; transform: translateY(-4px); box-shadow: 0 18px 32px rgba(47, 31, 18, 0.08);
+  border-color: rgba(230, 120, 90, 0.28); background: #fffaf4; transform: translateY(-4px); box-shadow: 0 18px 32px rgba(47, 31, 18, 0.08);
 }
 .danh-muc-icon {
   width: 3.5rem; height: 3.5rem; border-radius: 1.1rem;
@@ -560,7 +560,7 @@ button:focus-visible,
 .danh-muc-index {
   font-family: 'Playfair Display', serif;
   font-size: 1.25rem;
-  color: #ad8c67;
+  color: var(--primary);
 }
 .danh-muc-copy {
   min-width: 0;
@@ -579,6 +579,163 @@ button:focus-visible,
 
 /* SIGNATURE section */
 .noi-bat-section { padding: 3.2rem 0 4.2rem; }
+
+.tim-chung-toi-section {
+  position: relative;
+  padding: 4.5rem 0 5rem;
+  background:
+    radial-gradient(circle at 18% 14%, rgba(214, 193, 165, 0.26), transparent 18%),
+    radial-gradient(circle at 82% 12%, rgba(230, 120, 90, 0.12), transparent 16%),
+    linear-gradient(135deg, #fbf6ef 0%, #f1e6d8 48%, #efe1d1 100%);
+  overflow: hidden;
+}
+
+.tim-chung-toi-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background:
+    linear-gradient(115deg, rgba(255, 255, 255, 0.22), transparent 34%),
+    radial-gradient(circle at center, rgba(255, 255, 255, 0.15) 0, transparent 58%);
+  pointer-events: none;
+}
+
+.tim-chung-toi-grid {
+  position: relative;
+  z-index: 1;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(320px, 0.92fr);
+  gap: 4rem;
+  align-items: center;
+}
+
+.tim-chung-toi-noi-dung {
+  display: grid;
+  gap: 1.8rem;
+  color: #2f221a;
+}
+
+.tim-chung-toi-kicker {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin: 0;
+  width: fit-content;
+  color: var(--primary);
+  font-size: 0.9rem;
+  letter-spacing: 0.06em;
+  font-weight: 500;
+  font-family: 'Cormorant Garamond', serif;
+}
+
+.tim-chung-toi-kicker::after {
+  content: '';
+  width: 3.2rem;
+  height: 1px;
+  background: rgba(230, 120, 90, 0.8);
+}
+
+.tim-chung-toi-noi-dung h2 {
+  margin: 0;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  font-weight: 500;
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  color: #2a1c15;
+}
+
+.tim-chung-toi-dia-chi {
+  margin: 0;
+  max-width: 34rem;
+  font-size: 1.12rem;
+  line-height: 1.8;
+  color: rgba(66, 54, 45, 0.82);
+}
+
+.tim-chung-toi-thong-tin {
+  display: grid;
+  gap: 0.55rem;
+}
+
+.tim-chung-toi-thong-tin h3 {
+  margin: 0 0 0.55rem;
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 2rem;
+  font-weight: 600;
+  color: var(--primary);
+}
+
+.tim-chung-toi-thong-tin p {
+  margin: 0;
+  font-size: 1.04rem;
+  line-height: 1.8;
+  color: rgba(66, 54, 45, 0.82);
+}
+
+.tim-chung-toi-cta {
+  justify-self: start;
+  min-height: 3.25rem;
+  padding-inline: 1.6rem;
+  border-radius: 0;
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+  font-weight: 600;
+  box-shadow: 0 12px 28px rgba(230, 120, 90, 0.22);
+}
+
+.tim-chung-toi-cta:hover {
+  background: var(--primary-strong);
+  border-color: var(--primary-strong);
+  color: #fff;
+}
+
+.tim-chung-toi-visual {
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 42rem;
+}
+
+.tim-chung-toi-khung {
+  position: absolute;
+  border: 1.4rem solid rgba(230, 120, 90, 0.42);
+  opacity: 0.98;
+}
+
+.tim-chung-toi-khung--tren {
+  width: min(86%, 27rem);
+  height: min(86%, 31rem);
+  top: 0.35rem;
+  right: 0.35rem;
+}
+
+.tim-chung-toi-khung--duoi {
+  width: min(84%, 26rem);
+  height: min(84%, 28.5rem);
+  left: 0;
+  bottom: 1.2rem;
+}
+
+.tim-chung-toi-anh-wrap {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  width: min(100%, 36rem);
+  padding-left: 2rem;
+  padding-right: 1.4rem;
+}
+
+.tim-chung-toi-anh {
+  display: block;
+  width: 100%;
+  aspect-ratio: 0.92;
+  object-fit: cover;
+  box-shadow: 0 28px 64px rgba(0, 0, 0, 0.34);
+}
 
 /* FOOD GRID */
 .food-grid {
@@ -681,20 +838,20 @@ button:focus-visible,
 }
 
 /* Tone variants */
-.the-mon.tone-amber { border-bottom: 3px solid #f59e0b; }
-.the-mon.tone-amber .nhan-mon { color: #b45309; }
+.the-mon.tone-amber { border-bottom: 3px solid var(--primary); }
+.the-mon.tone-amber .nhan-mon { color: var(--primary); }
 .the-mon.tone-green { border-bottom: 3px solid var(--primary); }
 .the-mon.tone-green .nhan-mon { color: var(--primary); }
-.the-mon.tone-red { border-bottom: 3px solid #dc2626; }
-.the-mon.tone-red .nhan-mon { color: #dc2626; }
+.the-mon.tone-red { border-bottom: 3px solid var(--primary); }
+.the-mon.tone-red .nhan-mon { color: var(--primary); }
 .the-mon.tone-gold { border-bottom: 3px solid var(--accent); }
 .the-mon.tone-gold .nhan-mon { color: var(--accent-strong); }
-.the-mon.tone-brown { border-bottom: 3px solid #92400e; }
-.the-mon.tone-brown .nhan-mon { color: #92400e; }
-.the-mon.tone-cool { border-bottom: 3px solid #2563eb; }
-.the-mon.tone-cool .nhan-mon { color: #2563eb; }
-.the-mon.tone-violet { border-bottom: 3px solid #7c3aed; }
-.the-mon.tone-violet .nhan-mon { color: #7c3aed; }
+.the-mon.tone-brown { border-bottom: 3px solid var(--primary); }
+.the-mon.tone-brown .nhan-mon { color: var(--primary); }
+.the-mon.tone-cool { border-bottom: 3px solid var(--primary); }
+.the-mon.tone-cool .nhan-mon { color: var(--primary); }
+.the-mon.tone-violet { border-bottom: 3px solid var(--primary); }
+.the-mon.tone-violet .nhan-mon { color: var(--primary); }
 .the-mon.tone-mint { border-bottom: 3px solid #e6785a; }
 .the-mon.tone-mint .nhan-mon { color: #e6785a; }
 
@@ -710,7 +867,7 @@ button:focus-visible,
   background: var(--primary); color: #fff; border-color: var(--primary);
 }
 .nut-chinh:hover {
-  background: #d86445; border-color: #d86445; box-shadow: 0 4px 14px rgba(230,120,90,0.25);
+  background: var(--primary-strong); border-color: var(--primary-strong); box-shadow: 0 4px 14px rgba(230,120,90,0.25);
 }
 .nut-phu {
   background: transparent; color: var(--text-primary);
@@ -887,5 +1044,230 @@ main:has(.trang-chu-page) + .site-footer .footer-khoi:nth-child(2)::before {
 
 main:has(.trang-chu-page) + .site-footer .footer-khoi:nth-child(3)::before {
   margin-left: -1.5rem;
+}
+
+@media (max-width: 1080px) {
+  .tim-chung-toi-grid {
+    grid-template-columns: minmax(0, 1fr) minmax(300px, 0.95fr);
+    gap: 2.4rem;
+  }
+
+  .tim-chung-toi-visual {
+    min-height: 34rem;
+  }
+
+  .tim-chung-toi-noi-dung h2 {
+    font-size: clamp(2.5rem, 5vw, 4.1rem);
+  }
+}
+
+@media (max-width: 900px) {
+  .tim-chung-toi-section {
+    padding: 4rem 0 4.5rem;
+  }
+
+  .tim-chung-toi-grid {
+    grid-template-columns: 1fr;
+    gap: 2.6rem;
+  }
+
+  .tim-chung-toi-visual {
+    order: -1;
+    min-height: 30rem;
+  }
+
+  .tim-chung-toi-anh-wrap {
+    width: min(100%, 28rem);
+    padding-left: 1.2rem;
+    padding-right: 1rem;
+  }
+
+  .tim-chung-toi-khung--tren {
+    width: min(82%, 22rem);
+    height: min(86%, 25rem);
+    right: 1rem;
+  }
+
+  .tim-chung-toi-khung--duoi {
+    width: min(78%, 20rem);
+    height: min(78%, 22rem);
+    left: 1rem;
+    bottom: 0.7rem;
+  }
+}
+
+@media (max-width: 680px) {
+  .tim-chung-toi-noi-dung {
+    gap: 1.4rem;
+  }
+
+  .tim-chung-toi-dia-chi,
+  .tim-chung-toi-thong-tin p {
+    font-size: 0.98rem;
+    line-height: 1.7;
+  }
+
+  .tim-chung-toi-thong-tin h3 {
+    font-size: 1.7rem;
+  }
+
+  .tim-chung-toi-visual {
+    min-height: 25rem;
+  }
+
+  .tim-chung-toi-khung {
+    border-width: 1rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .tim-chung-toi-section {
+    padding: 3.4rem 0 3.8rem;
+  }
+
+  .tim-chung-toi-kicker {
+    font-size: 0.82rem;
+  }
+
+  .tim-chung-toi-noi-dung h2 {
+    font-size: 2.65rem;
+  }
+
+  .tim-chung-toi-visual {
+    min-height: 21rem;
+  }
+
+  .tim-chung-toi-anh-wrap {
+    width: 100%;
+    padding-left: 0.7rem;
+    padding-right: 0.7rem;
+  }
+
+  .tim-chung-toi-khung--tren {
+    width: calc(100% - 2.6rem);
+    height: 17.5rem;
+    right: 0.6rem;
+    top: 0;
+  }
+
+  .tim-chung-toi-khung--duoi {
+    width: calc(100% - 3.6rem);
+    height: 15rem;
+    left: 0.2rem;
+    bottom: 0.2rem;
+  }
+
+  .tim-chung-toi-cta {
+    width: 100%;
+  }
+}
+
+body:has(.trang-chu-page) {
+  --home-accent: #b88b47;
+  --home-accent-strong: #9f7639;
+  --home-accent-soft: rgba(184, 139, 71, 0.14);
+  --home-accent-border: rgba(184, 139, 71, 0.28);
+}
+
+body:has(.trang-chu-page) .main-nav a::after,
+body:has(.trang-chu-page) .main-nav button::after {
+  background: var(--home-accent);
+}
+
+.trang-chu-page .eyebrow,
+.trang-chu-page .mo-dau-card-overline,
+.trang-chu-page .mo-dau-visual-kicker,
+.trang-chu-page .trai-nghiem-index,
+.trang-chu-page .danh-muc-index,
+.trang-chu-page .tim-chung-toi-kicker,
+.trang-chu-page .tim-chung-toi-thong-tin h3 {
+  color: var(--home-accent);
+}
+
+.trang-chu-page .eyebrow::before,
+.trang-chu-page .tim-chung-toi-kicker::after {
+  background: var(--home-accent);
+}
+
+.trang-chu-page .mo-dau-copy h1 em,
+.trang-chu-page .mo-dau-tag,
+.trang-chu-page .nhan-mon,
+.trang-chu-page .chan-mon .price,
+.trang-chu-page .gia-mon,
+.trang-chu-page .nut-them-mon,
+.trang-chu-page .noi-bat-link,
+.trang-chu-page .showcase-am-thuc-link {
+  color: var(--home-accent);
+}
+
+.trang-chu-page .hero {
+  background:
+    radial-gradient(circle at top left, rgba(214, 193, 165, 0.28), transparent 34%),
+    radial-gradient(circle at 85% 18%, rgba(184, 139, 71, 0.12), transparent 26%),
+    linear-gradient(135deg, #fbf6ef 0%, #f1e6d8 48%, #efe1d1 100%);
+}
+
+.trang-chu-page .mo-dau-plate {
+  box-shadow: 0 18px 50px rgba(184, 139, 71, 0.16);
+}
+
+.trang-chu-page .danh-muc-item:hover,
+.trang-chu-page .danh-muc-item.active {
+  border-color: var(--home-accent-border);
+}
+
+.trang-chu-page .danh-muc-item.active .danh-muc-icon,
+.trang-chu-page .nut-chinh,
+.trang-chu-page .tim-chung-toi-cta,
+.trang-chu-page .nut-them-mon:hover {
+  background: var(--home-accent);
+  border-color: var(--home-accent);
+  color: #fff;
+}
+
+.trang-chu-page .nut-chinh:hover,
+.trang-chu-page .tim-chung-toi-cta:hover {
+  background: var(--home-accent-strong);
+  border-color: var(--home-accent-strong);
+  color: #fff;
+}
+
+.trang-chu-page .nut-phu:hover {
+  border-color: var(--home-accent);
+  color: var(--home-accent);
+}
+
+.trang-chu-page .nut-them-mon {
+  border-color: var(--home-accent);
+}
+
+.trang-chu-page .tim-chung-toi-khung {
+  border-color: rgba(184, 139, 71, 0.42);
+}
+
+.trang-chu-page .tim-chung-toi-cta {
+  box-shadow: 0 12px 28px rgba(184, 139, 71, 0.22);
+}
+
+.trang-chu-page .the-mon.tone-amber,
+.trang-chu-page .the-mon.tone-green,
+.trang-chu-page .the-mon.tone-red,
+.trang-chu-page .the-mon.tone-gold,
+.trang-chu-page .the-mon.tone-brown,
+.trang-chu-page .the-mon.tone-cool,
+.trang-chu-page .the-mon.tone-violet,
+.trang-chu-page .the-mon.tone-mint {
+  border-bottom-color: var(--home-accent);
+}
+
+.trang-chu-page .the-mon.tone-amber .nhan-mon,
+.trang-chu-page .the-mon.tone-green .nhan-mon,
+.trang-chu-page .the-mon.tone-red .nhan-mon,
+.trang-chu-page .the-mon.tone-gold .nhan-mon,
+.trang-chu-page .the-mon.tone-brown .nhan-mon,
+.trang-chu-page .the-mon.tone-cool .nhan-mon,
+.trang-chu-page .the-mon.tone-violet .nhan-mon,
+.trang-chu-page .the-mon.tone-mint .nhan-mon {
+  color: var(--home-accent);
 }
 

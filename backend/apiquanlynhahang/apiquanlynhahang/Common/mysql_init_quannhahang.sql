@@ -446,3 +446,17 @@ INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, Nguoi
 ('LS004', 'DH001', 'Preparing', 'Ready', 'System'),
 ('LS005', 'DH001', 'Ready', 'Served', 'NV002'),
 ('LS006', 'DH001', 'Served', 'Paid', 'NV003');
+
+SET SQL_SAFE_UPDATES = 0;
+
+UPDATE NguoiDung
+SET MatKhau = '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K';
+
+SET SQL_SAFE_UPDATES = 1;
+
+INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai, NgayTao, NgayCapNhat)
+VALUES
+('M011', 'DM005', 'Combo Gia Đình', 'Combo danh cho 4 nguoi gom mon chinh, khai vi va do uong.', 299000, NULL, 20, 'Available', NOW(), NOW()),
+('M012', 'DM005', 'Combo Couple', 'Combo gon nhe cho 2 nguoi voi mon chinh va do uong.', 199000, NULL, 15, 'Available', NOW(), NOW()),
+('M013', 'DM005', 'Combo Solo', 'Combo ca nhan tiet kiem, phuc vu nhanh.', 129000, NULL, 10, 'Available', NOW(), NOW());
+

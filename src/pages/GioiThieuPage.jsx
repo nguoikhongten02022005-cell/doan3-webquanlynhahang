@@ -1,4 +1,5 @@
 import chefPortrait from '../assets/img/chef.02d6c5b61bfdc70303b4.png'
+import anhGiaiThuong from '../assets/img/dish_1.png'
 
 function GioiThieuPage() {
   return (
@@ -73,55 +74,51 @@ function GioiThieuPage() {
         </div>
       </section>
 
-      <section className="about-values">
+      <section className="about-awards-showcase">
         <div className="container">
-          <div className="section-head center">
-            <h2>Giá trị cốt lõi</h2>
-            <p>Những nguyên tắc định hướng mọi hoạt động của chúng tôi</p>
-          </div>
+          <div className="about-awards-shell">
+            <div className="about-awards-copy">
+              <p className="about-awards-eyebrow">Giải thưởng & Sự công nhận</p>
+              <h2 className="about-awards-title">Dấu ấn ẩm thực của chúng tôi</h2>
 
-          <div className="about-features">
-            <div className="about-feature">
-              <div className="about-feature-icon">🌿</div>
-              <div className="about-feature-text">
-                <h4>Nguyên liệu tươi mỗi ngày</h4>
-                <p>Chọn lọc từ các nguồn cung cấp uy tín, đảm bảo chất lượng tốt nhất cho mỗi món ăn</p>
+              <div className="about-awards-grid">
+                <article className="about-award-item">
+                  <span className="about-award-index">01</span>
+                  <div>
+                    <h3>Không gian chuẩn fine dining</h3>
+                    <p>Thiết kế sang trọng, ấm cúng và chỉn chu trong từng trải nghiệm tại bàn.</p>
+                  </div>
+                </article>
+
+                <article className="about-award-item">
+                  <span className="about-award-index">02</span>
+                  <div>
+                    <h3>Nguyên liệu chọn lọc mỗi ngày</h3>
+                    <p>Ưu tiên nguồn nguyên liệu tươi, rõ xuất xứ để giữ trọn hương vị tự nhiên.</p>
+                  </div>
+                </article>
+
+                <article className="about-award-item">
+                  <span className="about-award-index">03</span>
+                  <div>
+                    <h3>Đội ngũ bếp giàu kinh nghiệm</h3>
+                    <p>Kỹ thuật vững vàng kết hợp sáng tạo hiện đại để tạo nên những món ăn đáng nhớ.</p>
+                  </div>
+                </article>
+
+                <article className="about-award-item">
+                  <span className="about-award-index">04</span>
+                  <div>
+                    <h3>Hàng nghìn lượt khách hài lòng</h3>
+                    <p>Dịch vụ tận tâm và chất lượng ổn định là lý do nhiều thực khách luôn quay lại.</p>
+                  </div>
+                </article>
               </div>
             </div>
-            <div className="about-feature">
-              <div className="about-feature-icon">👨‍🍳</div>
-              <div className="about-feature-text">
-                <h4>Đầu bếp chuyên nghiệp</h4>
-                <p>Đội ngũ đầu bếp giàu kinh nghiệm, đam mê và sáng tạo không ngừng trong từng món ăn</p>
-              </div>
-            </div>
-            <div className="about-feature">
-              <div className="about-feature-icon">❤️</div>
-              <div className="about-feature-text">
-                <h4>Phục vụ tận tâm</h4>
-                <p>Mỗi khách hàng đều được chăm sóc chu đáo như người thân trong gia đình</p>
-              </div>
-            </div>
-            <div className="about-feature">
-              <div className="about-feature-icon">🏆</div>
-              <div className="about-feature-text">
-                <h4>Chất lượng hàng đầu</h4>
-                <p>Cam kết mang đến trải nghiệm ẩm thực đẳng cấp với tiêu chuẩn cao nhất</p>
-              </div>
-            </div>
-            <div className="about-feature">
-              <div className="about-feature-icon">🌍</div>
-              <div className="about-feature-text">
-                <h4>Bền vững & trách nhiệm</h4>
-                <p>Ưu tiên nguồn gốc bền vững và đóng góp tích cực cho cộng đồng địa phương</p>
-              </div>
-            </div>
-            <div className="about-feature">
-              <div className="about-feature-icon">✨</div>
-              <div className="about-feature-text">
-                <h4>Đổi mới liên tục</h4>
-                <p>Không ngừng sáng tạo và cập nhật thực đơn để mang đến trải nghiệm mới mẻ</p>
-              </div>
+
+            <div className="about-awards-media">
+              <span className="about-awards-monogram" aria-hidden="true">G</span>
+              <img className="about-awards-image" src={anhGiaiThuong} alt="Món ăn đặc trưng của nhà hàng" />
             </div>
           </div>
         </div>

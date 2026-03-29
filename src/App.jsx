@@ -15,6 +15,7 @@ import DangNhapPage from './pages/DangNhapPage'
 import ThucDonPage from './pages/ThucDonPage'
 import HoSoPage from './pages/HoSoPage'
 import DangKyPage from './pages/DangKyPage'
+import DanhGiaPage from './pages/DanhGiaPage'
 import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminDatBanPage from './pages/admin/AdminDatBanPage'
 import AdminSoDoBanPage from './pages/admin/AdminSoDoBanPage'
@@ -35,6 +36,7 @@ function App() {
           <Route path="/gio-hang" element={<GioHangPage />} />
           <Route path="/thanh-toan" element={<ThanhToanPage />} />
           <Route path="/ho-so" element={<HoSoPage />} />
+          <Route path="/danh-gia" element={<DanhGiaPage />} />
           <Route path="/dang-nhap" element={<DangNhapPage />} />
           <Route path="/dang-ky" element={<DangKyPage />} />
         </Route>

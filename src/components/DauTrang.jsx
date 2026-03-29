@@ -8,7 +8,7 @@ const navItems = [
   { label: 'Thực đơn', to: '/thuc-don' },
   { label: 'Đặt bàn', to: '/dat-ban' },
   { label: 'Về chúng tôi', to: '/gioi-thieu' },
-  { label: 'Đánh giá', to: '/#reviews', anchorId: 'reviews' },
+  { label: 'Đánh giá', to: '/danh-gia' },
 ]
 
 function DauTrang() {
@@ -30,17 +30,6 @@ function DauTrang() {
 
   const handleNavLinkClick = () => {
     closeMenus()
-  }
-
-  const handleAnchorNavigate = (anchorId) => {
-    closeMenus()
-    navigate(`/#${anchorId}`)
-    window.setTimeout(() => {
-      const phanTu = document.getElementById(anchorId)
-      if (phanTu) {
-        phanTu.scrollIntoView({ behavior: 'smooth', block: 'start' })
-      }
-    }, 60)
   }
 
   const handleToggleUserMenu = () => {
@@ -71,25 +60,14 @@ function DauTrang() {
 
         <nav className="main-nav" aria-label="Điều hướng chính">
           {navItems.map((item) => (
-            item.anchorId ? (
-              <button
-                key={item.label}
-                type="button"
-                className={pathname === '/' ? 'active' : ''}
-                onClick={() => handleAnchorNavigate(item.anchorId)}
-              >
-                <span>{item.label}</span>
-              </button>
-            ) : (
-              <Link
-                key={item.label}
-                to={item.to}
-                className={isActive(item.to) ? 'active' : ''}
-                onClick={handleNavLinkClick}
-              >
-                <span>{item.label}</span>
-              </Link>
-            )
+            <Link
+              key={item.label}
+              to={item.to}
+              className={isActive(item.to) ? 'active' : ''}
+              onClick={handleNavLinkClick}
+            >
+              <span>{item.label}</span>
+            </Link>
           ))}
         </nav>
 
@@ -170,25 +148,14 @@ function DauTrang() {
       {mobileMenuOpen && (
         <div className="mobile-menu open container">
           {navItems.map((item) => (
-            item.anchorId ? (
-              <button
-                key={item.label}
-                type="button"
-                className={pathname === '/' ? 'active' : ''}
-                onClick={() => handleAnchorNavigate(item.anchorId)}
-              >
-                {item.label}
-              </button>
-            ) : (
-              <Link
-                key={item.label}
-                to={item.to}
-                className={isActive(item.to) ? 'active' : ''}
-                onClick={handleNavLinkClick}
-              >
-                {item.label}
-              </Link>
-            )
+            <Link
+              key={item.label}
+              to={item.to}
+              className={isActive(item.to) ? 'active' : ''}
+              onClick={handleNavLinkClick}
+            >
+              {item.label}
+            </Link>
           ))}
           {nguoiDungHienTai ? (
             <>
