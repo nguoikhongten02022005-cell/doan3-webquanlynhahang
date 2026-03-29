@@ -39,3 +39,19 @@ hero-*.png
 kiem-tra-*.png
 trang-chu-preview*.png
 trang-chu-mobile*.png
+
+# Playwright and manual test artifacts
+.playwright-mcp/
+reports/
+vite-dev.log
+admin-*-*.md
+dang-nhap-*.md
+danh-gia-*.md
+delivery-tracking-*.md
+mang-ve-*.md
+dat-ban-snapshot.md
+booking-step2-snapshot.md
+trang-chu-desktop.png
+thuc-don-mobile.png
+thuc-don-current.png
+thuc-don-after-fix.png
