@@ -676,20 +676,7 @@ button:focus-visible,
 
 .tim-chung-toi-cta {
   justify-self: start;
-  min-height: 3.25rem;
-  padding-inline: 1.6rem;
-  border-radius: 0;
-  border-color: var(--primary);
-  background: var(--primary);
-  color: #fff;
-  font-weight: 600;
-  box-shadow: 0 12px 28px rgba(230, 120, 90, 0.22);
-}
-
-.tim-chung-toi-cta:hover {
-  background: var(--primary-strong);
-  border-color: var(--primary-strong);
-  color: #fff;
+  box-shadow: 0 12px 28px rgba(184, 139, 71, 0.22);
 }
 
 .tim-chung-toi-visual {
@@ -1167,6 +1154,8 @@ body:has(.trang-chu-page) {
   --home-accent-strong: #9f7639;
   --home-accent-soft: rgba(184, 139, 71, 0.14);
   --home-accent-border: rgba(184, 139, 71, 0.28);
+  --home-nut-chinh: #e6785a;
+  --home-nut-chinh-hover: #d86445;
 }
 
 body:has(.trang-chu-page) .main-nav a::after,
@@ -1195,9 +1184,32 @@ body:has(.trang-chu-page) .main-nav button::after {
 .trang-chu-page .chan-mon .price,
 .trang-chu-page .gia-mon,
 .trang-chu-page .nut-them-mon,
-.trang-chu-page .noi-bat-link,
-.trang-chu-page .showcase-am-thuc-link {
+.trang-chu-page .noi-bat-link {
   color: var(--home-accent);
+}
+
+.trang-chu-page .showcase-am-thuc-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.9rem;
+  padding: 0.7rem 1.6rem;
+  border-radius: var(--radius-md);
+  background: var(--home-nut-chinh);
+  border: 1.5px solid var(--home-nut-chinh);
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  line-height: 1.3;
+  white-space: nowrap;
+  transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease, transform 0.25s ease;
+}
+
+.trang-chu-page .showcase-am-thuc-link:hover {
+  background: var(--home-nut-chinh-hover);
+  border-color: var(--home-nut-chinh-hover);
+  color: #fff;
+  box-shadow: 0 4px 14px rgba(230,120,90,0.25);
 }
 
 .trang-chu-page .hero {
@@ -1217,18 +1229,21 @@ body:has(.trang-chu-page) .main-nav button::after {
 }
 
 .trang-chu-page .danh-muc-item.active .danh-muc-icon,
-.trang-chu-page .nut-chinh,
-.trang-chu-page .tim-chung-toi-cta,
 .trang-chu-page .nut-them-mon:hover {
   background: var(--home-accent);
   border-color: var(--home-accent);
   color: #fff;
 }
 
-.trang-chu-page .nut-chinh:hover,
-.trang-chu-page .tim-chung-toi-cta:hover {
-  background: var(--home-accent-strong);
-  border-color: var(--home-accent-strong);
+.trang-chu-page .nut-chinh {
+  background: var(--home-nut-chinh);
+  border-color: var(--home-nut-chinh);
+  color: #fff;
+}
+
+.trang-chu-page .nut-chinh:hover {
+  background: var(--home-nut-chinh-hover);
+  border-color: var(--home-nut-chinh-hover);
   color: #fff;
 }
 
@@ -1269,5 +1284,46 @@ body:has(.trang-chu-page) .main-nav button::after {
 .trang-chu-page .the-mon.tone-violet .nhan-mon,
 .trang-chu-page .the-mon.tone-mint .nhan-mon {
   color: var(--home-accent);
+}
+
+
+.trang-chu-page {
+  background: #fbf6ef;
+}
+
+.trang-chu-page .hero,
+.trang-chu-page .showcase-am-thuc,
+.trang-chu-page .categories,
+.trang-chu-page .noi-bat-section,
+.trang-chu-page .tim-chung-toi-section,
+.trang-chu-page .dat-ban-banner {
+  background: transparent;
+}
+
+.trang-chu-page .hero::after,
+.trang-chu-page .tim-chung-toi-section::before {
+  background: none;
+}
+
+.trang-chu-page .mo-dau-card,
+.trang-chu-page .trai-nghiem-item,
+.trang-chu-page .danh-muc-item,
+.trang-chu-page .the-mon,
+.trang-chu-page .dat-ban-cta {
+  background: #fffaf4;
+}
+
+.trang-chu-page .danh-muc-icon,
+.trang-chu-page .mo-dau-plate {
+  background: #f6ecdf;
+}
+
+.trang-chu-page .the-mon-hinh,
+.trang-chu-page .the-mon.is-placeholder .the-mon-hinh {
+  background: #f6ecdf;
+}
+
+.trang-chu-page .the-mon-hinh-art {
+  background: linear-gradient(transparent, #fffaf4);
 }
 

@@ -2705,3 +2705,63 @@
     height: 210px;
   }
 }
+
+/* Final menu page background unification */
+.thuc-don-page {
+  background: #fbf6ef;
+}
+
+.thuc-don-page .thuc-don-hero,
+.thuc-don-page .thuc-don-overview-section,
+.thuc-don-page .thuc-don-list-section,
+.thuc-don-page .thuc-don-list-section--reworked,
+.thuc-don-page .thuc-don-control-panel,
+.thuc-don-page .thuc-don-toolbar-shell,
+.thuc-don-page .thuc-don-category-section {
+  background: transparent !important;
+}
+
+.thuc-don-page .thuc-don-hero::before,
+.thuc-don-page .thuc-don-hero::after {
+  background: none !important;
+  content: none !important;
+}
+
+.thuc-don-page .thuc-don-overview-point,
+.thuc-don-page .thuc-don-state-card,
+.thuc-don-page .thuc-don-tab,
+.thuc-don-page .the-mon,
+.thuc-don-page .the-mon--menu,
+.thuc-don-page .thuc-don-control-panel--compact,
+.thuc-don-page .thuc-don-toolbar-shell--sticky {
+  background: #fffaf4 !important;
+}
+
+.thuc-don-page .thuc-don-hero-meta span,
+.thuc-don-page .thuc-don-hero-trust span,
+.thuc-don-page .thuc-don-control-points span,
+.thuc-don-page .thuc-don-results-chips span,
+.thuc-don-page .the-mon-hinh,
+.thuc-don-page .the-mon-hinh--menu,
+.thuc-don-page .the-mon.is-placeholder .the-mon-hinh {
+  background: #f6ecdf !important;
+}
+
+.thuc-don-page .the-mon-hinh-art {
+  background: linear-gradient(transparent, #fffaf4) !important;
+}
+
+main:has(.thuc-don-page) + .site-footer {
+  background: #fbf6ef;
+  border-top-color: rgba(130, 108, 84, 0.06);
+}
+
+main:has(.thuc-don-page) + .site-footer .footer-khoi,
+main:has(.thuc-don-page) + .site-footer .footer-grid,
+main:has(.thuc-don-page) + .site-footer .social-links a {
+  background: transparent;
+}
+
+main:has(.thuc-don-page) + .site-footer .social-links a {
+  border-color: rgba(130, 108, 84, 0.12);
+}

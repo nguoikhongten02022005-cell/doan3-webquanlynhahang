@@ -6,12 +6,10 @@ function GioiThieuPage() {
     <div className="about-page about-page-editorial">
       <section className="about-story about-editorial-story">
         <div className="container">
-          <div className="about-editorial">
-            <div className="about-editorial-media">
-              <div className="about-editorial-frame">
+            <div className="about-editorial">
+              <div className="about-editorial-media">
                 <img className="about-editorial-image" src={chefPortrait} alt="Đầu bếp của nhà hàng" />
               </div>
-            </div>
 
             <div className="about-editorial-copy">
               <p className="about-editorial-eyebrow">Lời đầu bếp</p>
@@ -117,7 +115,6 @@ function GioiThieuPage() {
             </div>
 
             <div className="about-awards-media">
-              <span className="about-awards-monogram" aria-hidden="true">G</span>
               <img className="about-awards-image" src={anhGiaiThuong} alt="Món ăn đặc trưng của nhà hàng" />
             </div>
           </div>

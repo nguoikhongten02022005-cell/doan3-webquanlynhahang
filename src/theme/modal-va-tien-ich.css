@@ -1124,3 +1124,51 @@ main:has(.trang-chu-page) + .site-footer .footer-grid {
     font-size: 1.45rem;
   }
 }
+
+/* Final homepage background unification */
+.trang-chu-page {
+  background: #fbf6ef;
+}
+
+.trang-chu-page .hero,
+.trang-chu-page .showcase-am-thuc,
+.trang-chu-page .categories,
+.trang-chu-page .noi-bat-section,
+.trang-chu-page .tim-chung-toi-section,
+.trang-chu-page .dat-ban-banner,
+.trang-chu-page .trai-nghiem-section {
+  background: transparent !important;
+}
+
+.trang-chu-page .hero::before,
+.trang-chu-page .hero::after,
+.trang-chu-page .tim-chung-toi-section::before {
+  background: none !important;
+  content: none !important;
+}
+
+.trang-chu-page .mo-dau-card,
+.trang-chu-page .trai-nghiem-item,
+.trang-chu-page .danh-muc-item,
+.trang-chu-page .the-mon,
+.trang-chu-page .the-mon--menu,
+.trang-chu-page .dat-ban-inner,
+.trang-chu-page .dat-ban-cta {
+  background: #fffaf4 !important;
+}
+
+.trang-chu-page .danh-muc-icon,
+.trang-chu-page .mo-dau-plate,
+.trang-chu-page .the-mon-hinh,
+.trang-chu-page .the-mon-hinh--menu,
+.trang-chu-page .the-mon.is-placeholder .the-mon-hinh {
+  background: #f6ecdf !important;
+}
+
+.trang-chu-page .the-mon-hinh-art {
+  background: linear-gradient(transparent, #fffaf4) !important;
+}
+
+main:has(.trang-chu-page) + .site-footer {
+  background: #fbf6ef;
+}

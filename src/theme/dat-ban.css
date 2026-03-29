@@ -834,3 +834,81 @@
     grid-template-columns: 1fr;
   }
 }
+
+/* Final booking page background unification */
+.dat-ban-page-customer {
+  background: #fbf6ef;
+}
+
+.dat-ban-customer-section,
+.dat-ban-customer-section-tight {
+  background: transparent;
+}
+
+.dat-ban-customer-card,
+.dat-ban-customer-summary-card,
+.dat-ban-success-screen,
+.dat-ban-success-map-card,
+.dat-ban-review-card,
+.dat-ban-review-notes,
+.dat-ban-customer-card-soft {
+  background: #fffaf4 !important;
+}
+
+.dat-ban-customer-inline-note,
+.dat-ban-large-party-banner,
+.dat-ban-guest-card,
+.dat-ban-date-chip,
+.dat-ban-time-slot,
+.dat-ban-area-card,
+.dat-ban-customer-note-chip,
+.dat-ban-voucher-owned-item,
+.dat-ban-stepper-index,
+.dat-ban-review-list div,
+.dat-ban-customer-summary-list div {
+  background: #f6ecdf !important;
+}
+
+.dat-ban-date-chip.disabled:hover,
+.dat-ban-time-slot:disabled:hover,
+.dat-ban-area-card.disabled:hover {
+  background: #f6ecdf !important;
+}
+
+main:has(.dat-ban-page-customer) + .site-footer {
+  background: #fbf6ef;
+  border-top-color: rgba(130, 108, 84, 0.06);
+}
+
+main:has(.dat-ban-page-customer) + .site-footer .footer-khoi,
+main:has(.dat-ban-page-customer) + .site-footer .footer-grid,
+main:has(.dat-ban-page-customer) + .site-footer .social-links a {
+  background: transparent;
+}
+
+.dat-ban-guest-card.active,
+.dat-ban-date-chip.active,
+.dat-ban-time-slot.active,
+.dat-ban-area-card.active,
+.dat-ban-customer-note-chip.active,
+.dat-ban-voucher-owned-item.active {
+  background: #e8664a !important;
+  border-color: #e8664a !important;
+  color: #fff !important;
+}
+
+.dat-ban-guest-card.active strong,
+.dat-ban-guest-card.active span,
+.dat-ban-date-chip.active strong,
+.dat-ban-date-chip.active span,
+.dat-ban-time-slot.active strong,
+.dat-ban-time-slot.active span,
+.dat-ban-area-card.active strong,
+.dat-ban-area-card.active p,
+.dat-ban-area-card.active span,
+.dat-ban-area-card.active small,
+.dat-ban-customer-note-chip.active,
+.dat-ban-voucher-owned-item.active,
+.dat-ban-voucher-owned-item.active span {
+  color: #fff !important;
+}

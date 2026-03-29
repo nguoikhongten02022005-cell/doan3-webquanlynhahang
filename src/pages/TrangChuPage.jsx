@@ -167,7 +167,7 @@ function TrangChuPage() {
               <p>Thứ Bảy - Chủ Nhật: 10:00 Sáng - 03:00 Sáng</p>
             </div>
 
-            <Link className="btn tim-chung-toi-cta" to="/dat-ban">
+            <Link className="btn nut-chinh tim-chung-toi-cta" to="/dat-ban">
               Ghé thăm chúng tôi
             </Link>
           </div>
