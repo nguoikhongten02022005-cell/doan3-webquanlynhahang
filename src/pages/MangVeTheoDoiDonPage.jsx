@@ -32,7 +32,15 @@ function MangVeTheoDoiDonPage() {
 
   const chiTietMoRong = String(donHang.ghiChu || '')
     .split(' | ')
-    .filter((dong) => !dong.toLowerCase().startsWith('dia chi giao:'))
+    .filter((dong) => {
+      const noiDungKhongDau = dong
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '')
+        .trim()
+
+      return !noiDungKhongDau.startsWith('dia chi giao:')
+    })
   const danhSachBuoc = donHang.loaiDon === 'MANG_VE_GIAO_HANG' ? CAC_BUOC_GIAO_HANG : CAC_BUOC_PICKUP
   const buocHienTai = danhSachBuoc.indexOf(donHang.trangThai)
 
