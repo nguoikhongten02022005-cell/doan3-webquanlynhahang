@@ -1,5 +1,7 @@
 import { useMemo } from 'react'
 import { useOutletContext } from 'react-router-dom'
+import { Avatar, Card, Col, Row, Space, Statistic, Table, Tag, Typography } from 'antd'
+import { TeamOutlined, UserOutlined } from '@ant-design/icons'
 
 const ROLE_LABELS = {
   admin: 'Quản lý',
@@ -7,10 +9,10 @@ const ROLE_LABELS = {
   customer: 'Khách hàng',
 }
 
-const ROLE_TONES = {
-  admin: 'danger',
-  staff: 'success',
-  customer: 'neutral',
+const ROLE_COLORS = {
+  admin: 'red',
+  staff: 'green',
+  customer: 'default',
 }
 
 function AdminNhanVienPage() {
@@ -21,67 +23,37 @@ function AdminNhanVienPage() {
     [danhSachTaiKhoan],
   )
 
-  return (
-    <div className="admin-page-stack">
-      <section className="admin-summary-strip" aria-label="Tóm tắt nhân viên">
-        <article className="admin-summary-strip__card">
-          <span>Tổng nhân sự nội bộ</span>
-          <strong>{danhSachNhanVien.length}</strong>
-          <p>TODO: nối thêm API trạng thái ca làm việc.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Quản lý</span>
-          <strong>{danhSachNhanVien.filter((item) => item.role === 'admin').length}</strong>
-          <p>Nhóm có quyền hệ thống đầy đủ.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Nhân viên vận hành</span>
-          <strong>{danhSachNhanVien.filter((item) => item.role === 'staff').length}</strong>
-          <p>Truy cập các màn hình vận hành.</p>
-        </article>
-      </section>
-
-      <section className="admin-panel-card">
-        <div className="admin-panel-card__head">
+  const columns = [
+    {
+      title: 'Nhân sự',
+      key: 'fullName',
+      render: (_, account) => (
+        <Space>
+          <Avatar icon={<UserOutlined />} style={{ background: account.role === 'admin' ? '#f97316' : '#22c55e' }} />
           <div>
-            <p className="admin-section-kicker">Nhân sự nội bộ</p>
-            <h2>Danh sách nhân viên</h2>
+            <Typography.Text strong>{account.fullName || account.username || 'Chưa cập nhật'}</Typography.Text>
+            <div><Typography.Text type="secondary">{account.username || '--'}</Typography.Text></div>
           </div>
-          <span className="admin-inline-note">TODO: bổ sung modal thêm/sửa nhân viên sau khi có API tương ứng.</span>
-        </div>
+        </Space>
+      ),
+    },
+    { title: 'Vai trò', dataIndex: 'role', key: 'role', render: (value) => <Tag color={ROLE_COLORS[value] || 'default'}>{ROLE_LABELS[value] || value}</Tag> },
+    { title: 'Email', dataIndex: 'email', key: 'email', render: (value) => value || '--' },
+    { title: 'Trạng thái', key: 'status', render: () => <Tag color="success">Đang hoạt động</Tag> },
+  ]
 
-        <div className="admin-table-wrap">
-          <table className="admin-table">
-            <thead>
-              <tr>
-                <th>STT</th>
-                <th>Tên</th>
-                <th>Vai trò</th>
-                <th>Tài khoản</th>
-                <th>Email</th>
-                <th>Trạng thái</th>
-              </tr>
-            </thead>
-            <tbody>
-              {danhSachNhanVien.map((account, index) => (
-                <tr key={`${account.username}-${account.email}-${index}`}>
-                  <td>{index + 1}</td>
-                  <td>{account.fullName || account.username || 'Chưa cập nhật'}</td>
-                  <td>
-                    <span className={`nhan-trang-thai tone-${ROLE_TONES[account.role] || 'neutral'}`}>
-                      {ROLE_LABELS[account.role] || account.role}
-                    </span>
-                  </td>
-                  <td>{account.username || '--'}</td>
-                  <td>{account.email || '--'}</td>
-                  <td><span className="nhan-trang-thai tone-success">Đang hoạt động</span></td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+  return (
+    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={8}><Card><Statistic title="Tổng nhân sự nội bộ" value={danhSachNhanVien.length} prefix={<TeamOutlined />} /></Card></Col>
+        <Col xs={24} md={8}><Card><Statistic title="Quản lý" value={danhSachNhanVien.filter((item) => item.role === 'admin').length} valueStyle={{ color: '#dc2626' }} /></Card></Col>
+        <Col xs={24} md={8}><Card><Statistic title="Nhân viên vận hành" value={danhSachNhanVien.filter((item) => item.role === 'staff').length} valueStyle={{ color: '#16a34a' }} /></Card></Col>
+      </Row>
+
+      <Card title="Danh sách nhân viên" extra={<Typography.Text type="secondary">API thêm/sửa nhân viên sẽ nối ở phase sau.</Typography.Text>}>
+        <Table rowKey={(record, index) => `${record.username}-${index}`} columns={columns} dataSource={danhSachNhanVien} pagination={{ pageSize: 8 }} />
+      </Card>
+    </Space>
   )
 }
 

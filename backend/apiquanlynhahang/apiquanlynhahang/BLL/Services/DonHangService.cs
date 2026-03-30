@@ -298,6 +298,133 @@ public class DonHangService
         return donHang;
     }
 
+    public async Task<List<ThucDon>> LayThucDonChoBanAsync(CancellationToken cancellationToken = default)
+        => await _dbContext.ThucDon.AsNoTracking().Where(x => x.TrangThai == "Available").OrderBy(x => x.TenMon).ToListAsync(cancellationToken);
+
+    public async Task<object?> LayDonTaiBanDangMoAsync(string maBan, CancellationToken cancellationToken = default)
+    {
+        if (!await _dbContext.Ban.AnyAsync(x => x.MaBan == maBan, cancellationToken))
+        {
+            return null;
+        }
+
+        var donHang = await _dbContext.DonHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaBanAn == maBan && x.LoaiDon == "TAI_BAN" && (x.TrangThai == "Pending" || x.TrangThai == "Confirmed"), cancellationToken);
+        if (donHang is null) return null;
+
+        var chiTiet = await LayChiTietAsync(donHang.MaDonHang, cancellationToken);
+        var maMon = chiTiet.Select(x => x.MaMon).Distinct().ToList();
+        var tenMonLookup = await _dbContext.ThucDon
+            .AsNoTracking()
+            .Where(x => maMon.Contains(x.MaMon))
+            .ToDictionaryAsync(x => x.MaMon, x => x.TenMon, cancellationToken);
+
+        var chiTietMoRong = chiTiet.Select(x => new
+        {
+            x.MaMon,
+            TenMon = tenMonLookup.TryGetValue(x.MaMon, out var tenMon) ? tenMon : x.MaMon,
+            x.SoLuong,
+            x.DonGia,
+            x.ThanhTien,
+        }).ToList();
+
+        return new { DonHang = donHang, ChiTiet = chiTietMoRong };
+    }
+
+    public async Task<object> TaoHoacThemMonTaiBanAsync(string maBan, TaoOrderTaiBanDto dto, CancellationToken cancellationToken = default)
+    {
+        var ban = await _dbContext.Ban.FirstOrDefaultAsync(x => x.MaBan == maBan, cancellationToken);
+        if (ban is null) throw new ValidationException("Bàn không tồn tại.");
+
+        var monHopLe = await _dbContext.ThucDon.Where(x => dto.DanhSachMon.Select(m => m.MaMon).Contains(x.MaMon)).ToListAsync(cancellationToken);
+        var donDangMo = await _dbContext.DonHang.FirstOrDefaultAsync(x => x.MaBanAn == maBan && x.LoaiDon == "TAI_BAN" && (x.TrangThai == "Pending" || x.TrangThai == "Confirmed"), cancellationToken);
+
+        if (donDangMo is null)
+        {
+            donDangMo = new DonHang
+            {
+                MaDonHang = $"DHBAN_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}",
+                MaBanAn = maBan,
+                MaBan = maBan,
+                LoaiDon = "TAI_BAN",
+                TongTien = 0,
+                TrangThai = "Pending",
+                NguonTao = "TaiQuay",
+                NgayTao = DateTime.UtcNow,
+                NgayCapNhat = DateTime.UtcNow,
+            };
+            _dbContext.DonHang.Add(donDangMo);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
+        foreach (var item in dto.DanhSachMon)
+        {
+            var mon = monHopLe.First(x => x.MaMon == item.MaMon);
+            var donGia = item.DonGia ?? mon.Gia;
+            var chiTietCu = await _dbContext.ChiTietDonHang.FirstOrDefaultAsync(x => x.MaDonHang == donDangMo.MaDonHang && x.MaMon == item.MaMon, cancellationToken);
+            if (chiTietCu is null)
+            {
+                _dbContext.ChiTietDonHang.Add(new ChiTietDonHang
+                {
+                    MaChiTiet = string.IsNullOrWhiteSpace(item.MaChiTiet) ? $"CTBAN_{Guid.NewGuid():N}"[..18] : item.MaChiTiet,
+                    MaDonHang = donDangMo.MaDonHang,
+                    MaMon = item.MaMon,
+                    SoLuong = item.SoLuong,
+                    DonGia = donGia,
+                    ThanhTien = donGia * item.SoLuong,
+                    GhiChu = item.GhiChu,
+                    TrangThai = "Pending",
+                    NgayTao = DateTime.UtcNow,
+                });
+            }
+            else
+            {
+                chiTietCu.SoLuong += item.SoLuong;
+                chiTietCu.ThanhTien = chiTietCu.DonGia * chiTietCu.SoLuong;
+            }
+        }
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var tongTien = await _dbContext.ChiTietDonHang.Where(x => x.MaDonHang == donDangMo.MaDonHang).SumAsync(x => x.ThanhTien, cancellationToken);
+        donDangMo.TongTien = tongTien;
+        donDangMo.NgayCapNhat = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        var chiTietMoi = await LayChiTietAsync(donDangMo.MaDonHang, cancellationToken);
+        ban.TrangThai = "Occupied";
+        ban.NgayCapNhat = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+
+        return new { DonHang = donDangMo, ChiTiet = chiTietMoi };
+    }
+
+    public async Task<bool> YeuCauThanhToanTaiBanAsync(string maBan, CancellationToken cancellationToken = default)
+    {
+        var ban = await _dbContext.Ban.FirstOrDefaultAsync(x => x.MaBan == maBan, cancellationToken);
+        if (ban is null) return false;
+        ban.TrangThai = "Reserved";
+        ban.NgayCapNhat = DateTime.UtcNow;
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
+    public async Task<bool> XacNhanThanhToanTaiBanAsync(string maBan, CancellationToken cancellationToken = default)
+    {
+        var ban = await _dbContext.Ban.FirstOrDefaultAsync(x => x.MaBan == maBan, cancellationToken);
+        if (ban is null) return false;
+
+        var donHang = await _dbContext.DonHang.FirstOrDefaultAsync(x => x.MaBanAn == maBan && x.LoaiDon == "TAI_BAN" && (x.TrangThai == "Pending" || x.TrangThai == "Confirmed"), cancellationToken);
+        if (donHang is null) return false;
+
+        donHang.TrangThai = "Paid";
+        donHang.NgayCapNhat = DateTime.UtcNow;
+        ban.TrangThai = "Available";
+        ban.NgayCapNhat = DateTime.UtcNow;
+
+        await _dbContext.SaveChangesAsync(cancellationToken);
+        return true;
+    }
+
     public async Task<DonHang?> CapNhatTrangThaiDonMangVeAsync(string maDonHang, string trangThai, CancellationToken cancellationToken = default)
     {
         var donHang = await _dbContext.DonHang.FirstOrDefaultAsync(x => x.MaDonHang == maDonHang && (x.LoaiDon == "MANG_VE_PICKUP" || x.LoaiDon == "MANG_VE_GIAO_HANG"), cancellationToken);

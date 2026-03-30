@@ -1,25 +1,27 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Button, Card, Col, Row, Segmented, Space, Statistic, Table, Tag, Typography } from 'antd'
+import { ShoppingOutlined, CheckCircleOutlined, ClockCircleOutlined } from '@ant-design/icons'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 import { capNhatTrangThaiDonMangVeApi, layDanhSachDonMangVeChoAdminApi } from '../../services/api/apiMangVe'
 
 const BO_LOC = [
-  { value: 'ALL', label: 'Tất cả' },
-  { value: 'MANG_VE_PICKUP', label: 'Pickup' },
-  { value: 'MANG_VE_GIAO_HANG', label: 'Giao hàng' },
-  { value: 'Pending', label: 'Chờ xác nhận' },
-  { value: 'PROCESSING', label: 'Đang xử lý' },
-  { value: 'Paid', label: 'Hoàn thành' },
-  { value: 'Cancelled', label: 'Đã hủy' },
+  { label: 'Tất cả', value: 'ALL' },
+  { label: 'Pickup', value: 'MANG_VE_PICKUP' },
+  { label: 'Giao hàng', value: 'MANG_VE_GIAO_HANG' },
+  { label: 'Chờ xác nhận', value: 'Pending' },
+  { label: 'Đang xử lý', value: 'PROCESSING' },
+  { label: 'Hoàn thành', value: 'Paid' },
+  { label: 'Đã hủy', value: 'Cancelled' },
 ]
 
 const NHAN = {
-  Pending: 'Chờ xác nhận',
-  Confirmed: 'Đã xác nhận',
-  Preparing: 'Đang chuẩn bị',
-  Ready: 'Sẵn sàng lấy',
-  Served: 'Đang giao',
-  Paid: 'Hoàn thành',
-  Cancelled: 'Đã hủy',
+  Pending: { label: 'Chờ xác nhận', color: 'gold' },
+  Confirmed: { label: 'Đã xác nhận', color: 'blue' },
+  Preparing: { label: 'Đang chuẩn bị', color: 'orange' },
+  Ready: { label: 'Sẵn sàng lấy', color: 'green' },
+  Served: { label: 'Đang giao', color: 'cyan' },
+  Paid: { label: 'Hoàn thành', color: 'success' },
+  Cancelled: { label: 'Đã hủy', color: 'red' },
 }
 
 function AdminDonMangVePage() {
@@ -57,7 +59,7 @@ function AdminDonMangVePage() {
     }
   }, [danhSachDon])
 
-  const hanhDong = async (maDonHang, trangThai) => {
+  const capNhatTrangThai = async (maDonHang, trangThai) => {
     try {
       setDangXuLy(`${maDonHang}-${trangThai}`)
       await capNhatTrangThaiDonMangVeApi(maDonHang, trangThai)
@@ -67,76 +69,46 @@ function AdminDonMangVePage() {
     }
   }
 
-  const renderAction = (don) => {
-    if (don.trangThai === 'Pending') {
-      return (
-        <div className="flex gap-2">
-          <button type="button" className="btn nut-chinh" disabled={dangXuLy === `${don.maDonHang}-Confirmed`} onClick={() => hanhDong(don.maDonHang, 'Confirmed')}>Xác nhận</button>
-          <button type="button" className="btn nut-phu" disabled={dangXuLy === `${don.maDonHang}-Cancelled`} onClick={() => hanhDong(don.maDonHang, 'Cancelled')}>Hủy</button>
-        </div>
-      )
-    }
-    if (don.trangThai === 'Confirmed') return <button type="button" className="btn nut-chinh" onClick={() => hanhDong(don.maDonHang, 'Preparing')}>Đang chuẩn bị</button>
-    if (don.trangThai === 'Preparing') return <button type="button" className="btn nut-chinh" onClick={() => hanhDong(don.maDonHang, don.loaiDon === 'MANG_VE_GIAO_HANG' ? 'Served' : 'Ready')}>{don.loaiDon === 'MANG_VE_GIAO_HANG' ? 'Đang giao' : 'Sẵn sàng lấy'}</button>
-    if (don.trangThai === 'Ready' || don.trangThai === 'Served') return <button type="button" className="btn nut-chinh" onClick={() => hanhDong(don.maDonHang, 'Paid')}>Hoàn thành</button>
-    return <span className="text-sm text-slate-400">Không có</span>
-  }
+  const cot = [
+    { title: 'Mã đơn', dataIndex: 'maDonHang', key: 'maDonHang', render: (value) => <Typography.Text strong>{value}</Typography.Text> },
+    { title: 'Loại', dataIndex: 'loaiDon', key: 'loaiDon', render: (value) => <Tag color={value === 'MANG_VE_GIAO_HANG' ? 'cyan' : 'orange'}>{value === 'MANG_VE_GIAO_HANG' ? 'Giao hàng' : 'Pickup'}</Tag> },
+    { title: 'Khách', dataIndex: 'hoTen', key: 'hoTen', render: (_, row) => row.hoTen || row.maKH },
+    { title: 'SĐT', dataIndex: 'soDienThoai', key: 'soDienThoai', render: (value) => value || '---' },
+    { title: 'Địa chỉ', dataIndex: 'diaChiGiao', key: 'diaChiGiao', render: (value) => value || '---' },
+    { title: 'Giờ nhận', key: 'gio', render: (_, row) => row.gioGiao || row.gioLayHang || '---' },
+    { title: 'Món', dataIndex: 'danhSachMon', key: 'danhSachMon', render: (value) => value.map((muc) => `${muc.tenMon} x${muc.soLuong}`).join(', ') },
+    { title: 'Tổng tiền', dataIndex: 'tongTien', key: 'tongTien', render: (value) => dinhDangTienTeVietNam(value) },
+    { title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai', render: (value) => <Tag color={NHAN[value]?.color || 'default'}>{NHAN[value]?.label || value}</Tag> },
+    {
+      title: 'Hành động',
+      key: 'actions',
+      render: (_, don) => {
+        if (don.trangThai === 'Pending') {
+          return <Space><Button type="primary" loading={dangXuLy === `${don.maDonHang}-Confirmed`} onClick={() => capNhatTrangThai(don.maDonHang, 'Confirmed')}>Xác nhận</Button><Button danger loading={dangXuLy === `${don.maDonHang}-Cancelled`} onClick={() => capNhatTrangThai(don.maDonHang, 'Cancelled')}>Hủy</Button></Space>
+        }
+        if (don.trangThai === 'Confirmed') return <Button type="primary" onClick={() => capNhatTrangThai(don.maDonHang, 'Preparing')}>Đang chuẩn bị</Button>
+        if (don.trangThai === 'Preparing') return <Button type="primary" onClick={() => capNhatTrangThai(don.maDonHang, don.loaiDon === 'MANG_VE_GIAO_HANG' ? 'Served' : 'Ready')}>{don.loaiDon === 'MANG_VE_GIAO_HANG' ? 'Đang giao' : 'Sẵn sàng lấy'}</Button>
+        if (don.trangThai === 'Ready' || don.trangThai === 'Served') return <Button type="primary" onClick={() => capNhatTrangThai(don.maDonHang, 'Paid')}>Hoàn thành</Button>
+        return <Typography.Text type="secondary">Không có</Typography.Text>
+      },
+    },
+  ]
 
   return (
-    <div className="space-y-4">
-      <section className="rounded-[24px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-5">
-        <div className="grid gap-3 md:grid-cols-3">
-          <article className="rounded-[18px] border border-slate-200 bg-slate-50/90 p-4"><p className="m-0 text-[11px] uppercase tracking-[0.14em] text-slate-500">Tổng đơn hôm nay</p><strong className="mt-2 block text-[1.7rem] font-bold text-slate-900">{thongKe.tongDonHomNay}</strong></article>
-          <article className="rounded-[18px] border border-amber-200 bg-amber-50/90 p-4"><p className="m-0 text-[11px] uppercase tracking-[0.14em] text-amber-700">Đang xử lý</p><strong className="mt-2 block text-[1.7rem] font-bold text-amber-900">{thongKe.dangXuLy}</strong></article>
-          <article className="rounded-[18px] border border-emerald-200 bg-emerald-50/90 p-4"><p className="m-0 text-[11px] uppercase tracking-[0.14em] text-emerald-700">Doanh thu hôm nay</p><strong className="mt-2 block text-[1.7rem] font-bold text-emerald-900">{dinhDangTienTeVietNam(thongKe.doanhThuHomNay)}</strong></article>
-        </div>
-      </section>
+    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={8}><Card><Statistic title="Tổng đơn hôm nay" value={thongKe.tongDonHomNay} prefix={<ShoppingOutlined />} /></Card></Col>
+        <Col xs={24} md={8}><Card><Statistic title="Đang xử lý" value={thongKe.dangXuLy} valueStyle={{ color: '#d97706' }} prefix={<ClockCircleOutlined />} /></Card></Col>
+        <Col xs={24} md={8}><Card><Statistic title="Doanh thu hôm nay" value={thongKe.doanhThuHomNay} formatter={(value) => dinhDangTienTeVietNam(Number(value) || 0)} valueStyle={{ color: '#059669' }} prefix={<CheckCircleOutlined />} /></Card></Col>
+      </Row>
 
-      <section className="rounded-[24px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-5">
-        <div className="flex flex-wrap gap-2">
-          {BO_LOC.map((muc) => (
-            <button key={muc.value} type="button" className={`btn ${boLoc === muc.value ? 'nut-chinh' : 'nut-phu'}`} onClick={() => setBoLoc(muc.value)}>{muc.label}</button>
-          ))}
-        </div>
-
-        <div className="mt-4 overflow-x-auto">
-          <table className="w-full min-w-[980px] border-collapse">
-            <thead>
-              <tr className="border-b border-slate-200 text-left text-xs uppercase tracking-[0.12em] text-slate-500">
-                <th className="px-3 py-3">Mã đơn</th>
-                <th className="px-3 py-3">Khách</th>
-                <th className="px-3 py-3">SĐT</th>
-                <th className="px-3 py-3">Địa chỉ</th>
-                <th className="px-3 py-3">Giờ lấy</th>
-                <th className="px-3 py-3">Món</th>
-                <th className="px-3 py-3">Tổng tiền</th>
-                <th className="px-3 py-3">Trạng thái</th>
-                <th className="px-3 py-3">Hành động</th>
-              </tr>
-            </thead>
-            <tbody>
-              {dangTai ? (
-                <tr><td colSpan="9" className="px-3 py-6 text-center text-sm text-slate-500">Đang tải đơn mang về...</td></tr>
-              ) : danhSachHienThi.length === 0 ? (
-                <tr><td colSpan="9" className="px-3 py-6 text-center text-sm text-slate-500">Chưa có đơn mang về phù hợp bộ lọc.</td></tr>
-              ) : danhSachHienThi.map((don) => (
-                <tr key={don.maDonHang} className="border-b border-slate-100 align-top">
-                  <td className="px-3 py-3 font-semibold text-slate-900">{don.maDonHang}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{don.hoTen || don.maKH}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{don.soDienThoai || '---'}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{don.diaChiGiao || '---'}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{don.gioGiao || don.gioLayHang || '---'}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{don.danhSachMon.map((muc) => `${muc.tenMon} x${muc.soLuong}`).join(', ')}</td>
-                  <td className="px-3 py-3 text-sm font-semibold text-slate-900">{dinhDangTienTeVietNam(don.tongTien)}</td>
-                  <td className="px-3 py-3 text-sm text-slate-700">{NHAN[don.trangThai] || don.trangThai}</td>
-                  <td className="px-3 py-3">{renderAction(don)}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </section>
-    </div>
+      <Card title="Đơn mang về">
+        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <Segmented options={BO_LOC} value={boLoc} onChange={setBoLoc} />
+          <Table rowKey="maDonHang" loading={dangTai} columns={cot} dataSource={danhSachHienThi} scroll={{ x: 1200 }} pagination={{ pageSize: 8 }} />
+        </Space>
+      </Card>
+    </Space>
   )
 }
 

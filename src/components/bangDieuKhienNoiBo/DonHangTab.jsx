@@ -8,8 +8,7 @@ import {
   ReloadOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, Badge, Button, Empty, Input, Select, Space, Spin, Table } from 'antd'
-import CheckableTag from 'antd/es/tag/CheckableTag'
+import { Alert, Badge, Button, Card, Descriptions, Empty, Input, List, Segmented, Select, Space, Spin, Table, Tag, Typography } from 'antd'
 import { dinhDangTienTe } from '../../utils/tienTe'
 import { dinhDangNgay } from '../../features/bangDieuKhienNoiBo/dinhDang'
 import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../utils/donHang'
@@ -406,90 +405,67 @@ const buildItemsTableColumns = () => [
 
 function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, totalCount, donChoXuLy }) {
   return (
-    <div className="noi-bo-don-hang-toolbar rounded-[20px] border border-[#E5E0DB] bg-white/95 p-3.5 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-4">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+    <Card>
+      <Space direction="vertical" size={12} style={{ width: '100%' }}>
         <div>
-          <h2 className="m-0 text-[1.35rem] font-semibold tracking-[-0.04em] text-slate-900">Quản lý đơn hàng</h2>
-          <p className="mt-1 mb-0 text-xs leading-5 text-slate-500">
-            {visibleCount}/{totalCount} đơn hiển thị · {donChoXuLy} đơn cần xử lý ngay
-          </p>
+          <Typography.Title level={4} style={{ margin: 0 }}>Quản lý đơn hàng</Typography.Title>
+          <Typography.Text type="secondary">{visibleCount}/{totalCount} đơn hiển thị · {donChoXuLy} đơn cần xử lý ngay</Typography.Text>
         </div>
-
-        <Space size={[8, 8]} wrap>
-          {ORDER_FILTERS.map((filter) => (
-            <CheckableTag
-              key={filter.key}
-              checked={activeFilter === filter.key}
-              onChange={() => onFilterChange(filter.key)}
-              className="booking-admin-filter-chip"
-            >
-              <span>{filter.label}</span>
-              <Badge count={counts[filter.key] || 0} size="small" color={activeFilter === filter.key ? '#f97316' : '#94a3b8'} />
-            </CheckableTag>
-          ))}
-        </Space>
-      </div>
-    </div>
+        <Segmented
+          options={ORDER_FILTERS.map((filter) => ({
+            label: <Space size={6}><span>{filter.label}</span><Badge count={counts[filter.key] || 0} size="small" /></Space>,
+            value: filter.key,
+          }))}
+          value={activeFilter}
+          onChange={onFilterChange}
+        />
+      </Space>
+    </Card>
   )
 }
 
 function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
   if (!orders.length) {
     return (
-      <div className="rounded-[22px] border border-dashed border-slate-200 bg-white/80 px-6 py-12 text-center shadow-sm">
+      <Card>
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có đơn hàng phù hợp với bộ lọc hiện tại" />
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="space-y-3">
-      {orders.map((order) => {
+    <Card title="Danh sách order">
+      <List
+        itemLayout="vertical"
+        dataSource={orders}
+        renderItem={(order) => {
         const ticketStyle = getTicketStyle(order.status)
         const isSelected = String(selectedOrderId) === String(order.id)
 
         return (
-          <button
-            key={order.id}
-            type="button"
-            onClick={() => onSelectOrder(order.id)}
-            className={`noi-bo-don-hang-ticket noi-bo-don-hang-ticket--${ticketStyle.tone} ${isSelected ? 'is-selected' : ''}`}
-          >
-            <div className="noi-bo-don-hang-ticket__top">
-              <div>
-                <p className="noi-bo-don-hang-ticket__code">#{formatOrderCode(order)}</p>
-                <strong className="noi-bo-don-hang-ticket__table">{formatTableLabel(order.tableNumber)}</strong>
-              </div>
-              <span className={`noi-bo-don-hang-badge ${ticketStyle.badge}`}>{layNhanTrangThaiDonHang(order.status)}</span>
-            </div>
-
-            <div className="noi-bo-don-hang-ticket__meta">
-              <div>
-                <span>Khách</span>
-                <strong>{order.customer?.fullName || 'Khách lẻ'}</strong>
-              </div>
-              <div>
-                <span>Giờ tạo</span>
-                <strong>{dinhDangNgay(order.orderDate)}</strong>
-              </div>
-              <div>
-                <span>Tổng tiền</span>
-                <strong>{dinhDangTienTe(order.total)}</strong>
-              </div>
-              <div>
-                <span>Thanh toán</span>
-                <strong>{layNhanPhuongThucThanhToan(order.paymentMethod)}</strong>
-              </div>
-            </div>
-
-            <div className="noi-bo-don-hang-ticket__footer">
-              <span>{ticketStyle.hint}</span>
-              {order.note ? <span className="noi-bo-don-hang-ticket__note">{order.note}</span> : null}
-            </div>
-          </button>
+          <List.Item key={order.id} onClick={() => onSelectOrder(order.id)} style={{ cursor: 'pointer', borderRadius: 16, padding: 14, marginBottom: 10, border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb', background: isSelected ? '#fff7ed' : '#fff' }}>
+            <Space direction="vertical" size={10} style={{ width: '100%' }}>
+              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                <div>
+                  <Typography.Text type="secondary">#{formatOrderCode(order)}</Typography.Text>
+                  <div><Typography.Text strong>{formatTableLabel(order.tableNumber)}</Typography.Text></div>
+                </div>
+                <Tag color={ticketStyle.tone === 'cancelled' ? 'red' : ticketStyle.tone === 'paid' ? 'green' : ticketStyle.tone === 'preparing' ? 'orange' : 'blue'}>{layNhanTrangThaiDonHang(order.status)}</Tag>
+              </Space>
+              <Descriptions size="small" column={2} bordered>
+                <Descriptions.Item label="Khách">{order.customer?.fullName || 'Khách lẻ'}</Descriptions.Item>
+                <Descriptions.Item label="Giờ tạo">{dinhDangNgay(order.orderDate)}</Descriptions.Item>
+                <Descriptions.Item label="Tổng tiền">{dinhDangTienTe(order.total)}</Descriptions.Item>
+                <Descriptions.Item label="Thanh toán">{layNhanPhuongThucThanhToan(order.paymentMethod)}</Descriptions.Item>
+              </Descriptions>
+              <Typography.Text type="secondary">{ticketStyle.hint}</Typography.Text>
+              {order.note ? <Typography.Text>{order.note}</Typography.Text> : null}
+            </Space>
+          </List.Item>
         )
-      })}
-    </div>
+      }}
+      />
+    </Card>
   )
 }
 

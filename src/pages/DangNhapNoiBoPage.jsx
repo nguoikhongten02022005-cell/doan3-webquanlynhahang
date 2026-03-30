@@ -1,8 +1,14 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
+import { Alert, Avatar, Button, Card, Col, Form, Input, List, Row, Space, Typography } from 'antd'
+import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons'
+import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
+import { layMucLuuTru, xoaMucLuuTru } from '../services/dichVuLuuTru'
+
+const { Title, Paragraph, Text } = Typography
 
 const TAI_KHOAN_NOI_BO_LOCAL = Object.freeze([
   {
@@ -19,14 +25,12 @@ const TAI_KHOAN_NOI_BO_LOCAL = Object.freeze([
   },
 ])
 
-const LOI_DANG_NHAP_NOI_BO_LOCAL = 'Sai tài khoản nội bộ. Hãy dùng tài khoản admin hoặc nhân viên local được hiển thị trên form đăng nhập.'
-const LOI_DANG_NHAP_NOI_BO_DEMO = 'Sai tài khoản cục bộ. Hãy bật backend mode nếu muốn đăng nhập nội bộ bằng API thật.'
-
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
   const [matKhau, setMatKhau] = useState('')
   const [loiDangNhap, setLoiDangNhap] = useState('')
   const [dangGui, setDangGui] = useState(false)
+  const [canhBaoPhienHetHan, setCanhBaoPhienHetHan] = useState(false)
   const location = useLocation()
   const navigate = useNavigate()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
@@ -36,15 +40,18 @@ function DangNhapNoiBoPage() {
     return <Navigate to="/admin/dashboard" replace />
   }
 
+  useEffect(() => {
+    if (layMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)) {
+      setCanhBaoPhienHetHan(true)
+      xoaMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)
+    }
+  }, [])
+
   const handleSubmit = async (e) => {
     e.preventDefault()
-
-    if (dangGui) {
-      return
-    }
+    if (dangGui) return
 
     setDangGui(true)
-
     try {
       const ketQua = await dangNhapNoiBo(tenDangNhapHoacEmail, matKhau)
 
@@ -67,112 +74,76 @@ function DangNhapNoiBoPage() {
   }
 
   return (
-    <section className="xac-thuc-page noi-bo-login-page admin-login-page">
-      <div className="xac-thuc-card admin-login-card">
-        <div className="admin-login-brand">
-          <div className="admin-login-brand__mark">NH</div>
-          <div>
-            <p className="admin-login-brand__kicker">Nguyên Vị</p>
-            <strong>Operations Console</strong>
-          </div>
-        </div>
+    <div style={{ minHeight: '100vh', padding: 24, background: '#f5f5f5' }}>
+      <Row align="middle" justify="center" style={{ minHeight: '100vh' }}>
+        <Col xs={24} sm={20} md={16} lg={12} xl={9}>
+          <Card bordered={false} style={{ boxShadow: '0 20px 48px rgba(15,23,42,0.10)' }}>
+            <Space direction="vertical" size={18} style={{ width: '100%' }}>
+              <Space align="center" size={14}>
+                <Avatar size={56} style={{ background: '#e96c4a' }}>NH</Avatar>
+                <div>
+                  <Text type="secondary" style={{ textTransform: 'uppercase', letterSpacing: '0.16em' }}>Nguyên Vị</Text>
+                  <Title level={4} style={{ margin: 0 }}>Operations Console</Title>
+                </div>
+              </Space>
 
-        <h1 className="xac-thuc-title">Đăng nhập quản trị</h1>
-        <p className="xac-thuc-subtitle">
-          {backendMode
-            ? 'Đăng nhập bằng tài khoản nội bộ thật để truy cập Admin Panel và dữ liệu backend local.'
-            : 'Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
-        </p>
-
-        <div className="admin-demo-credentials" aria-label={backendMode ? 'Tài khoản nội bộ local' : 'Tài khoản cục bộ nội bộ'}>
-          {TAI_KHOAN_NOI_BO_LOCAL.map((account) => (
-            <button
-              key={account.username}
-              type="button"
-              className="admin-demo-credentials__item"
-              onClick={() => {
-                setTenDangNhapHoacEmail(account.identifier)
-                setMatKhau(account.password)
-                setLoiDangNhap('')
-              }}
-            >
               <div>
-                <strong>{account.roleLabel}</strong>
-                <p>{account.identifier}</p>
+                <Title level={2} style={{ marginBottom: 8 }}>Đăng nhập quản trị</Title>
+                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
+                  {backendMode
+                    ? 'Đăng nhập bằng tài khoản nội bộ thật để truy cập Admin Panel và dữ liệu backend local.'
+                    : 'Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
+                </Paragraph>
               </div>
-              <span>{account.username} / {account.password}</span>
-            </button>
-          ))}
-        </div>
 
-        <form onSubmit={handleSubmit} className="xac-thuc-form">
-          <div className="nhom-truong">
-              <label htmlFor="noi-bo-login-identifier" className="nhan-truong">
-                Email nội bộ
-              </label>
-            <input
-              id="noi-bo-login-identifier"
-              name="identifier"
-              type="text"
-              className="truong-nhap"
-              placeholder="Nhập email nội bộ"
-              autoComplete="username"
-              value={tenDangNhapHoacEmail}
-              onChange={(e) => {
-                setTenDangNhapHoacEmail(e.target.value)
-                if (loiDangNhap) {
-                  setLoiDangNhap('')
-                }
-              }}
-              required
-            />
-          </div>
+              {canhBaoPhienHetHan ? <Alert type="warning" showIcon message="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." /> : null}
+              {loiDangNhap ? <Alert type="error" showIcon message={loiDangNhap} /> : null}
 
-          <div className="nhom-truong">
-            <label htmlFor="noi-bo-login-password" className="nhan-truong">
-              Mật khẩu
-            </label>
-            <input
-              id="noi-bo-login-password"
-              name="password"
-              type="password"
-              className="truong-nhap"
-              placeholder="Nhập mật khẩu"
-              autoComplete="current-password"
-              value={matKhau}
-              onChange={(e) => {
-                setMatKhau(e.target.value)
-                if (loiDangNhap) {
-                  setLoiDangNhap('')
-                }
-              }}
-              required
-            />
-          </div>
+              <Card size="small" title="Tài khoản nội bộ local">
+                <List
+                  dataSource={TAI_KHOAN_NOI_BO_LOCAL}
+                  renderItem={(account) => (
+                    <List.Item>
+                      <Button
+                        type="text"
+                        style={{ width: '100%', height: 'auto', padding: 0, textAlign: 'left' }}
+                        onClick={() => {
+                          setTenDangNhapHoacEmail(account.identifier)
+                          setMatKhau(account.password)
+                          setLoiDangNhap('')
+                        }}
+                      >
+                        <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
+                          <div>
+                            <Text strong>{account.roleLabel}</Text>
+                            <div><Text type="secondary">{account.identifier}</Text></div>
+                          </div>
+                          <Text style={{ color: '#ea580c', fontWeight: 700 }}>{account.username} / {account.password}</Text>
+                        </Space>
+                      </Button>
+                    </List.Item>
+                  )}
+                />
+              </Card>
 
-          {loiDangNhap && (
-            <p className="loi-bieu-mau" role="alert">
-              {loiDangNhap}
-            </p>
-          )}
+              <Form layout="vertical" onFinish={handleSubmit} requiredMark={false}>
+                <Form.Item label="Email nội bộ" required>
+                  <Input prefix={<MailOutlined />} size="large" value={tenDangNhapHoacEmail} onChange={(e) => { setTenDangNhapHoacEmail(e.target.value); if (loiDangNhap) setLoiDangNhap('') }} placeholder="Nhập email nội bộ" />
+                </Form.Item>
+                <Form.Item label="Mật khẩu" required>
+                  <Input.Password prefix={<LockOutlined />} size="large" value={matKhau} onChange={(e) => { setMatKhau(e.target.value); if (loiDangNhap) setLoiDangNhap('') }} placeholder="Nhập mật khẩu" />
+                </Form.Item>
+                <Button htmlType="submit" type="primary" icon={<LoginOutlined />} loading={dangGui} block size="large">
+                  {dangGui ? 'Đang đăng nhập...' : 'Vào Admin Panel'}
+                </Button>
+              </Form>
 
-          <button type="submit" className="btn nut-chinh admin-login-submit" disabled={dangGui}>
-            {dangGui ? 'Đang đăng nhập...' : 'Vào Admin Panel'}
-          </button>
-        </form>
-
-        <div className="xac-thuc-demo-note admin-login-note" aria-live="polite">
-          <strong>{backendMode ? 'Tài khoản nội bộ local' : 'Khu vực dành cho nhân sự'}</strong>
-          <p>{backendMode ? 'Hệ thống đang dùng backend local, bạn có thể đăng nhập bằng tài khoản admin hoặc nhân viên thật.' : 'Frontend hiện đang chạy cục bộ, chưa dùng backend thật.'}</p>
-          <p>
-            Bạn là khách hàng?{' '}
-            <Link to="/dang-nhap" className="xac-thuc-switch-link">
-              Đăng nhập tại đây
-            </Link>
-          </p>
-        </div>
-      </div>
-    </section>
+              <Text type="secondary">Bạn là khách hàng? <Link to="/dang-nhap">Đăng nhập tại đây</Link></Text>
+            </Space>
+          </Card>
+        </Col>
+      </Row>
+    </div>
   )
 }
 

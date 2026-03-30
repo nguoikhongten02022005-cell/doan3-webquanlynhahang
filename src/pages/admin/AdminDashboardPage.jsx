@@ -1,4 +1,4 @@
-import { Col, Row, Space } from 'antd'
+import { Col, Flex, Row } from 'antd'
 import { useOutletContext } from 'react-router-dom'
 import BookingAndOrders from '../../components/admin/dashboard/BookingAndOrders'
 import RevenueChart from '../../components/admin/dashboard/RevenueChart'
@@ -10,7 +10,7 @@ function AdminDashboardPage() {
   const { dashboardData } = useOutletContext()
 
   return (
-    <Space size="middle" style={{ display: 'flex', width: '100%', flexDirection: 'column' }}>
+    <Flex vertical gap={16} style={{ width: '100%' }}>
       <StatCards stats={dashboardData?.stats} />
 
       <Row gutter={[16, 16]}>
@@ -25,7 +25,7 @@ function AdminDashboardPage() {
       <UrgentActions urgentTasks={dashboardData?.urgentTasks} />
 
       <BookingAndOrders bookings={dashboardData?.bookings} orders={dashboardData?.orders} />
-    </Space>
+    </Flex>
   )
 }
 

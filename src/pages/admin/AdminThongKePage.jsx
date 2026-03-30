@@ -1,153 +1,67 @@
 import { useMemo, useState } from 'react'
-import { useOutletContext } from 'react-router-dom'
+import { Card, Col, Row, Segmented, Space, Statistic, Table, Typography } from 'antd'
 import RevenueChart from '../../components/admin/dashboard/RevenueChart'
 import { ADMIN_TIME_RANGE_OPTIONS, taoDuLieuThongKeDoanhThu } from '../../features/admin/mockData'
 import { dinhDangTienTe } from '../../utils/tienTe'
+import { useOutletContext } from 'react-router-dom'
 
 function AdminThongKePage() {
   const { danhSachDonHang, danhSachDatBan } = useOutletContext()
   const [timeRange, setTimeRange] = useState('today')
 
   const revenueStats = useMemo(
-    () => taoDuLieuThongKeDoanhThu({
-      orders: danhSachDonHang,
-      bookings: danhSachDatBan,
-      timeRange,
-    }),
+    () => taoDuLieuThongKeDoanhThu({ orders: danhSachDonHang, bookings: danhSachDatBan, timeRange }),
     [danhSachDatBan, danhSachDonHang, timeRange],
   )
 
+  const topDishColumns = [
+    { title: 'STT', dataIndex: 'rank', key: 'rank', width: 70 },
+    { title: 'Tên món', dataIndex: 'name', key: 'name' },
+    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', width: 110 },
+    { title: 'Doanh thu', dataIndex: 'revenue', key: 'revenue', width: 160, render: (value) => dinhDangTienTe(value) },
+    { title: '% tổng', dataIndex: 'percent', key: 'percent', width: 100, render: (value) => `${value}%` },
+  ]
+
+  const categoryColumns = [
+    { title: 'Danh mục', dataIndex: 'category', key: 'category' },
+    { title: 'Tỷ trọng', dataIndex: 'percent', key: 'percent', width: 120, render: (value) => `${value}%` },
+  ]
+
   return (
-    <div className="admin-page-stack">
-      <section className="admin-panel-card" aria-label="Bộ lọc thống kê">
-        <div className="admin-panel-card__head">
-          <div>
-            <p className="admin-section-kicker">Bộ lọc thời gian</p>
-            <h2>Khoảng dữ liệu</h2>
-          </div>
-        </div>
-        <div className="admin-filter-chip-row">
-          {ADMIN_TIME_RANGE_OPTIONS.map((option) => (
-            <button
-              key={option.key}
-              type="button"
-              className={`admin-filter-chip ${timeRange === option.key ? 'is-active' : ''}`}
-              onClick={() => setTimeRange(option.key)}
-            >
-              {option.label}
-            </button>
-          ))}
-        </div>
-      </section>
+    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+      <Card title="Bộ lọc thời gian">
+        <Segmented options={ADMIN_TIME_RANGE_OPTIONS.map((option) => ({ label: option.label, value: option.key }))} value={timeRange} onChange={setTimeRange} />
+      </Card>
 
-      <section className="admin-summary-strip" aria-label="Tổng quan thống kê">
-        <article className="admin-summary-strip__card">
-          <span>Tổng doanh thu kỳ</span>
-          <strong>{dinhDangTienTe(revenueStats.overview.revenue)}</strong>
-          <p>Doanh thu sau khi áp dụng bộ lọc thời gian.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Số đơn hoàn thành</span>
-          <strong>{revenueStats.overview.completedOrders}</strong>
-          <p>Đơn hàng đã hoàn thành trong khoảng thời gian đang xem.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Giá trị đơn trung bình</span>
-          <strong>{dinhDangTienTe(revenueStats.overview.averageOrder)}</strong>
-          <p>Trung bình theo các đơn hàng thuộc kỳ lọc hiện tại.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Tổng booking kỳ</span>
-          <strong>{revenueStats.overview.totalBookings}</strong>
-          <p>Booking thuộc khoảng thời gian đang chọn.</p>
-        </article>
-      </section>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng doanh thu kỳ" value={revenueStats.overview.revenue} formatter={(value) => dinhDangTienTe(Number(value) || 0)} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Số đơn hoàn thành" value={revenueStats.overview.completedOrders} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Giá trị đơn trung bình" value={revenueStats.overview.averageOrder} formatter={(value) => dinhDangTienTe(Number(value) || 0)} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking kỳ" value={revenueStats.overview.totalBookings} /></Card></Col>
+      </Row>
 
-      <section className="admin-summary-strip" aria-label="Thống kê booking">
-        <article className="admin-summary-strip__card">
-          <span>Tổng booking</span>
-          <strong>{revenueStats.bookingStats.total}</strong>
-          <p>Tổng số booking của kỳ hiện tại.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Đã hoàn thành</span>
-          <strong>{revenueStats.bookingStats.completed}</strong>
-          <p>Booking có trạng thái hoàn thành.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Đã hủy</span>
-          <strong>{revenueStats.bookingStats.cancelled}</strong>
-          <p>Booking có trạng thái hủy trong kỳ.</p>
-        </article>
-        <article className="admin-summary-strip__card">
-          <span>Tỉ lệ hủy</span>
-          <strong>{revenueStats.bookingStats.cancellationRate}%</strong>
-          <p>Tỉ lệ booking đã hủy trên tổng booking.</p>
-        </article>
-      </section>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking" value={revenueStats.bookingStats.total} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Đã hoàn thành" value={revenueStats.bookingStats.completed} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Đã hủy" value={revenueStats.bookingStats.cancelled} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tỉ lệ hủy" value={revenueStats.bookingStats.cancellationRate} suffix="%" /></Card></Col>
+      </Row>
 
       <RevenueChart title="Doanh thu 7 ngày gần nhất" revenue={{ summary: revenueStats.overview, series: revenueStats.revenueSeries }} />
 
-      <section className="admin-analytics-grid">
-        <article className="admin-panel-card">
-          <div className="admin-panel-card__head">
-            <div>
-              <p className="admin-section-kicker">Top món</p>
-              <h2>Món bán chạy</h2>
-            </div>
-          </div>
-
-          <div className="admin-table-wrap">
-            <table className="admin-table">
-              <thead>
-                <tr>
-                  <th>STT</th>
-                  <th>Tên món</th>
-                  <th>Số lượng</th>
-                  <th>Doanh thu</th>
-                  <th>% tổng</th>
-                </tr>
-              </thead>
-              <tbody>
-                {revenueStats.topDishes.map((dish) => (
-                  <tr key={dish.id}>
-                    <td>{dish.rank}</td>
-                    <td>{dish.name}</td>
-                    <td>{dish.quantity}</td>
-                    <td>{dinhDangTienTe(dish.revenue)}</td>
-                    <td>{dish.percent}%</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </article>
-
-        <article className="admin-panel-card">
-          <div className="admin-panel-card__head">
-            <div>
-              <p className="admin-section-kicker">Cơ cấu danh mục</p>
-              <h2>Phân bổ theo nhóm món</h2>
-            </div>
-          </div>
-
-          <div className="admin-category-share-list">
-            {revenueStats.categoryShares.map((item) => (
-              <article key={item.category} className="admin-category-share-item">
-                <div>
-                  <strong>{item.category}</strong>
-                  <p>Tính từ doanh thu top món trong kỳ hiện tại.</p>
-                </div>
-                <div className="admin-category-share-meter">
-                  <span style={{ width: `${item.percent}%` }} />
-                </div>
-                <strong>{item.percent}%</strong>
-              </article>
-            ))}
-          </div>
-        </article>
-      </section>
-    </div>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} xl={14}>
+          <Card title="Món bán chạy">
+            <Table rowKey="id" pagination={false} columns={topDishColumns} dataSource={revenueStats.topDishes} scroll={{ x: 640 }} />
+          </Card>
+        </Col>
+        <Col xs={24} xl={10}>
+          <Card title="Phân bổ theo nhóm món">
+            <Table rowKey="category" pagination={false} columns={categoryColumns} dataSource={revenueStats.categoryShares} />
+          </Card>
+        </Col>
+      </Row>
+    </Space>
   )
 }
 

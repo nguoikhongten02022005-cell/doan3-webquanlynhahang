@@ -5,6 +5,7 @@ public class DonHang
     public string MaDonHang { get; set; } = string.Empty;
     public string? MaKH { get; set; }
     public string? MaBan { get; set; }
+    public string? MaBanAn { get; set; }
     public string? MaNV { get; set; }
     public string? MaDatBan { get; set; }
     public string LoaiDon { get; set; } = "TAI_QUAN";

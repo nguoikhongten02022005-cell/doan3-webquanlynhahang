@@ -17,6 +17,7 @@ import MangVeThucDonPage from './pages/MangVeThucDonPage'
 import MangVeGioHangPage from './pages/MangVeGioHangPage'
 import MangVeThanhToanPage from './pages/MangVeThanhToanPage'
 import MangVeTheoDoiDonPage from './pages/MangVeTheoDoiDonPage'
+import BanGoiMonPage from './pages/BanGoiMonPage'
 import HoSoPage from './pages/HoSoPage'
 import DangKyPage from './pages/DangKyPage'
 import DanhGiaPage from './pages/DanhGiaPage'
@@ -48,6 +49,7 @@ function App() {
           <Route path="/dang-nhap" element={<DangNhapPage />} />
           <Route path="/dang-ky" element={<DangKyPage />} />
           <Route path="/mang-ve" element={<MangVePage />} />
+          <Route path="/ban/:maBan" element={<BanGoiMonPage />} />
           <Route path="/mang-ve/thuc-don" element={<MangVeThucDonPage />} />
           <Route element={<TuyenDuongBaoVe loginPath="/dang-nhap" chiCanDangNhap />}>
             <Route path="/mang-ve/gio-hang" element={<MangVeGioHangPage />} />

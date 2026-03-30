@@ -14,8 +14,7 @@ import {
   SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, Badge, Button, Drawer, Empty, Input, InputNumber, Modal, Select, Space, Tag } from 'antd'
-import CheckableTag from 'antd/es/tag/CheckableTag'
+import { Alert, Badge, Button, Card, Col, Descriptions, Divider, Drawer, Empty, Form, Input, InputNumber, List, Modal, Row, Select, Segmented, Space, Tag, Typography } from 'antd'
 import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../data/duLieuDatBan'
 import {
   dinhDangNgayGio,
@@ -143,47 +142,27 @@ function DatBanToolbar({
   filterCounts,
 }) {
   return (
-    <div className="rounded-[20px] border border-[#E5E0DB] bg-white/95 p-3.5 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-4">
-      <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
-        <div>
-          <h2 className="m-0 text-[1.35rem] font-semibold tracking-[-0.04em] text-slate-900">Danh sách booking</h2>
-          <p className="mt-1 mb-0 text-xs leading-5 text-slate-500">{visibleCount} booking · {phamViLabel}</p>
-        </div>
-
-        <div className="flex flex-col gap-2 lg:min-w-[560px]">
-          <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
-            <Input
-              allowClear
-              size="middle"
-              value={searchQuery}
-              prefix={<SearchOutlined className="text-slate-400" />}
-              placeholder="Tìm theo mã booking, tên khách hoặc SĐT"
-              onChange={(event) => onSearchChange(event.target.value)}
-              className="booking-admin-search"
-            />
-            <Button size="middle" onClick={onReset} icon={<PlusOutlined />}>
-              {formMode === 'edit' ? 'Tạo mới' : 'Làm mới'}
-            </Button>
+    <Card>
+      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+          <div>
+            <Typography.Title level={4} style={{ margin: 0 }}>Danh sách booking</Typography.Title>
+            <Typography.Text type="secondary">{visibleCount} booking · {phamViLabel}</Typography.Text>
           </div>
-
-          <Space size={[8, 8]} wrap>
-            {QUICK_FILTERS.map((filter) => (
-              <CheckableTag
-                key={filter.key}
-                checked={quickFilter === filter.key}
-                onChange={() => onQuickFilterChange(filter.key)}
-                className="booking-admin-filter-chip"
-              >
-                <span className="inline-flex items-center gap-1.5">
-                  <span>{filter.label}</span>
-                  <Badge count={filterCounts[filter.key] || 0} size="small" color={quickFilter === filter.key ? '#f97316' : '#94a3b8'} />
-                </span>
-              </CheckableTag>
-            ))}
-          </Space>
+          <div className="flex flex-col gap-2 lg:min-w-[560px]">
+            <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
+              <Input allowClear size="middle" value={searchQuery} prefix={<SearchOutlined className="text-slate-400" />} placeholder="Tìm theo mã booking, tên khách hoặc SĐT" onChange={(event) => onSearchChange(event.target.value)} />
+              <Button size="middle" onClick={onReset} icon={<PlusOutlined />}>{formMode === 'edit' ? 'Tạo mới' : 'Làm mới'}</Button>
+            </div>
+          </div>
         </div>
-      </div>
-    </div>
+        <Segmented
+          options={QUICK_FILTERS.map((filter) => ({ label: <Space size={6}><span>{filter.label}</span><Badge count={filterCounts[filter.key] || 0} size="small" /></Space>, value: filter.key }))}
+          value={quickFilter}
+          onChange={onQuickFilterChange}
+        />
+      </Space>
+    </Card>
   )
 }
 
@@ -200,126 +179,74 @@ function DatBanFormCard({
   const subtitle = formMode === 'edit' ? 'Cập nhật nhanh cho lễ tân / host' : 'Điền nhanh yêu cầu để chốt chỗ ngay tại quầy'
 
   return (
-    <article className="rounded-[22px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-4.5">
-      <div className="flex items-start justify-between gap-4">
-        <div>
-          <h2 className="m-0 text-[1.25rem] font-semibold tracking-[-0.04em] text-slate-900">{title}</h2>
-          <p className="mt-1.5 mb-0 text-xs leading-5 text-slate-500">{subtitle}</p>
-        </div>
-        <span className="rounded-full border border-orange-100 bg-orange-50 px-2.5 py-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-orange-700">
-          {formMode === 'edit' ? 'Edit' : 'Create'}
-        </span>
-      </div>
+    <Card
+      title={<Typography.Title level={4} style={{ margin: 0 }}>{title}</Typography.Title>}
+      extra={<Tag color="orange">{formMode === 'edit' ? 'EDIT' : 'CREATE'}</Tag>}
+    >
+      <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>{subtitle}</Typography.Paragraph>
 
-      <form className="mt-4 flex flex-col gap-4" onSubmit={onSubmit}>
-        <section className="space-y-3 rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">
-          <div>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Thông tin khách</p>
-            <h3 className="m-0 text-sm font-semibold text-slate-900">Khách hàng & liên hệ</h3>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Tên khách</span>
-              <Input size="middle" value={formValues.name} onChange={onFieldChange('name')} placeholder="Nguyễn Văn A" />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Số điện thoại</span>
-              <Input size="middle" value={formValues.phone} onChange={onFieldChange('phone')} placeholder="0901234567" />
-            </label>
-            <label className="flex flex-col gap-1.5 md:col-span-2">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Email</span>
-              <Input size="middle" type="email" value={formValues.email} onChange={onFieldChange('email')} placeholder="khach@example.com" />
-            </label>
-          </div>
-        </section>
+      <Form layout="vertical" onSubmitCapture={onSubmit}>
+        <Card size="small" title="Khách hàng & liên hệ" style={{ marginBottom: 16 }}>
+          <Row gutter={12}>
+            <Col xs={24} md={12}>
+              <Form.Item label="Tên khách">
+                <Input size="middle" value={formValues.name} onChange={onFieldChange('name')} placeholder="Nguyễn Văn A" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item label="Số điện thoại">
+                <Input size="middle" value={formValues.phone} onChange={onFieldChange('phone')} placeholder="0901234567" />
+              </Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item label="Email">
+                <Input size="middle" type="email" value={formValues.email} onChange={onFieldChange('email')} placeholder="khach@example.com" />
+              </Form.Item>
+            </Col>
+          </Row>
+        </Card>
 
-        <section className="space-y-3 rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">
-          <div>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Thông tin booking</p>
-            <h3 className="m-0 text-sm font-semibold text-slate-900">Thời gian & khu vực</h3>
-          </div>
-          <div className="grid gap-3 md:grid-cols-2">
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Ngày</span>
-              <Input size="middle" type="date" value={formValues.date} onChange={onFieldChange('date')} />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Giờ</span>
-              <Input size="middle" type="time" value={formValues.time} onChange={onFieldChange('time')} />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Số khách</span>
-              <InputNumber
-                size="middle"
-                min={1}
-                value={formValues.guests === '' ? null : Number(formValues.guests)}
-                placeholder="Nhập số khách"
-                onChange={(value) => onFieldChange('guests')({ target: { value: value == null ? '' : String(value) } })}
-                className="!w-full"
-              />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Khu vực</span>
-              <Select size="middle" value={formValues.seatingArea} options={seatingAreaOptions} onChange={(value) => onFieldChange('seatingArea')({ target: { value } })} />
-            </label>
-            {formMode === 'create' ? (
-              <label className="flex flex-col gap-1.5 md:col-span-2">
-                <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Trạng thái ban đầu</span>
-                <Select
-                  size="middle"
-                  value={formValues.status}
-                  options={CREATE_STATUS_OPTIONS.map((status) => ({ value: status, label: HOST_NHAN_TRANG_THAI_DAT_BAN[status] }))}
-                  onChange={(value) => onFieldChange('status')({ target: { value } })}
-                />
-              </label>
-            ) : null}
-          </div>
-        </section>
+        <Card size="small" title="Thời gian & khu vực" style={{ marginBottom: 16 }}>
+          <Row gutter={12}>
+            <Col xs={24} md={12}><Form.Item label="Ngày"><Input size="middle" type="date" value={formValues.date} onChange={onFieldChange('date')} /></Form.Item></Col>
+            <Col xs={24} md={12}><Form.Item label="Giờ"><Input size="middle" type="time" value={formValues.time} onChange={onFieldChange('time')} /></Form.Item></Col>
+            <Col xs={24} md={12}><Form.Item label="Số khách"><InputNumber size="middle" min={1} value={formValues.guests === '' ? null : Number(formValues.guests)} placeholder="Nhập số khách" onChange={(value) => onFieldChange('guests')({ target: { value: value == null ? '' : String(value) } })} className="!w-full" /></Form.Item></Col>
+            <Col xs={24} md={12}><Form.Item label="Khu vực"><Select size="middle" value={formValues.seatingArea} options={seatingAreaOptions} onChange={(value) => onFieldChange('seatingArea')({ target: { value } })} /></Form.Item></Col>
+            {formMode === 'create' ? <Col span={24}><Form.Item label="Trạng thái ban đầu"><Select size="middle" value={formValues.status} options={CREATE_STATUS_OPTIONS.map((status) => ({ value: status, label: HOST_NHAN_TRANG_THAI_DAT_BAN[status] }))} onChange={(value) => onFieldChange('status')({ target: { value } })} /></Form.Item></Col> : null}
+          </Row>
+        </Card>
 
-        <section className="space-y-3 rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">
-          <div>
-            <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Ghi chú</p>
-            <h3 className="m-0 text-sm font-semibold text-slate-900">Thông tin bổ sung</h3>
-          </div>
-          <div className="grid gap-3">
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Ghi chú khách</span>
-              <TextArea rows={3} value={formValues.notes} onChange={onFieldChange('notes')} placeholder="Yêu cầu bàn gần cửa sổ, có trẻ nhỏ..." />
-            </label>
-            <label className="flex flex-col gap-1.5">
-              <span className="text-[11px] font-semibold uppercase tracking-[0.12em] text-slate-500">Ghi chú nội bộ</span>
-              <TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." />
-            </label>
-          </div>
-        </section>
+        <Card size="small" title="Thông tin bổ sung" style={{ marginBottom: 16 }}>
+          <Form.Item label="Ghi chú khách"><TextArea rows={3} value={formValues.notes} onChange={onFieldChange('notes')} placeholder="Yêu cầu bàn gần cửa sổ, có trẻ nhỏ..." /></Form.Item>
+          <Form.Item label="Ghi chú nội bộ"><TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." /></Form.Item>
+        </Card>
 
-        {formError ? <Alert type="error" showIcon message={formError} /> : null}
+        {formError ? <Alert type="error" showIcon message={formError} style={{ marginBottom: 16 }} /> : null}
 
-        <div className="flex items-center justify-end gap-2 border-t border-slate-200 pt-3">
-          <Button size="middle" onClick={onReset}>
-            {formMode === 'edit' ? 'Hủy' : 'Reset'}
-          </Button>
-          <Button type="primary" size="middle" htmlType="submit" icon={<CheckCircleOutlined />}>
-            {formMode === 'edit' ? 'Cập nhật' : 'Thêm mới'}
-          </Button>
-        </div>
-      </form>
-    </article>
+        <Divider style={{ marginTop: 0 }} />
+        <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+          <Button size="middle" onClick={onReset}>{formMode === 'edit' ? 'Hủy' : 'Reset'}</Button>
+          <Button type="primary" size="middle" htmlType="submit" icon={<CheckCircleOutlined />}>{formMode === 'edit' ? 'Cập nhật' : 'Thêm mới'}</Button>
+        </Space>
+      </Form>
+    </Card>
   )
 }
 
 function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuickStatusChange }) {
   if (bookings.length === 0) {
     return (
-      <div className="rounded-[22px] border border-dashed border-slate-200 bg-white/80 px-6 py-12 text-center shadow-sm">
+      <Card>
         <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có booking phù hợp với bộ lọc hiện tại" />
-      </div>
+      </Card>
     )
   }
 
   return (
-    <div className="space-y-2.5">
-      {bookings.map((booking) => {
+    <List
+      grid={{ gutter: 12, column: 1 }}
+      dataSource={bookings}
+      renderItem={(booking) => {
         const assignedTables = booking.assignedTables || []
         const isUnassigned = !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
         const isPending = PENDING_STATUS_SET.has(booking.status)
@@ -335,10 +262,8 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuic
           : ''
 
         return (
-          <article
-            key={booking.id}
-            className={`rounded-[20px] border bg-white/95 p-3.5 shadow-[0_18px_40px_rgba(55,39,28,0.08)] transition-shadow hover:shadow-[0_24px_48px_rgba(55,39,28,0.11)] md:p-4 ${isUrgentCard ? 'border-l-4 border-l-rose-500 border-rose-200 bg-rose-50/60' : 'border-[#E5E0DB]'}`}
-          >
+          <List.Item key={booking.id}>
+          <Card style={{ borderLeft: isUrgentCard ? '4px solid #ef4444' : undefined, background: isUrgentCard ? '#fff7f7' : '#fff' }}>
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
@@ -383,24 +308,11 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuic
                   </span>
                 </div>
 
-                <div className="mt-3 grid gap-2.5 sm:grid-cols-2 xl:grid-cols-3">
-                  <div className="rounded-[16px] border border-slate-200 bg-slate-50/80 px-3 py-2.5">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Bàn đã gán</div>
-                    <div className="mt-1 text-sm font-semibold text-slate-800">
-                      {assignedTables.length > 0 ? assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}
-                    </div>
-                  </div>
-                  <div className="rounded-[16px] border border-slate-200 bg-slate-50/80 px-3 py-2.5">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Nguồn</div>
-                    <div className="mt-1 text-sm font-semibold text-slate-800">{booking.source === 'internal' ? 'Nội bộ' : 'Web'}</div>
-                  </div>
-                  {booking.email ? (
-                    <div className="rounded-[16px] border border-slate-200 bg-slate-50/80 px-3 py-2.5 sm:col-span-2 xl:col-span-1">
-                      <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Email</div>
-                      <div className="mt-1 truncate text-sm font-semibold text-slate-800">{booking.email}</div>
-                    </div>
-                  ) : null}
-                </div>
+                <Descriptions size="small" column={{ xs: 1, sm: 2, xl: 3 }} bordered style={{ marginTop: 12 }}>
+                  <Descriptions.Item label="Bàn đã gán">{assignedTables.length > 0 ? assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
+                  <Descriptions.Item label="Nguồn">{booking.source === 'internal' ? 'Nội bộ' : 'Web'}</Descriptions.Item>
+                  {booking.email ? <Descriptions.Item label="Email">{booking.email}</Descriptions.Item> : null}
+                </Descriptions>
 
                 {priorityNote ? (
                   <div className="mt-3 rounded-[16px] border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-800">
@@ -467,10 +379,11 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuic
                 </div>
               </div>
             </div>
-          </article>
+          </Card>
+          </List.Item>
         )
-      })}
-    </div>
+      }}
+    />
   )
 }
 

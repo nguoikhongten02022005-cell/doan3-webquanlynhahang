@@ -1,6 +1,6 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { xoaPhienXacThuc } from './dichVuXacThuc'
-import { layMucLuuTru } from './dichVuLuuTru'
+import { datMucLuuTru, layMucLuuTru } from './dichVuLuuTru'
 
 const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
@@ -137,6 +137,7 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
   }
 
   if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon)) {
+    datMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN, '1')
     xoaPhienXacThuc()
   }
 

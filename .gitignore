@@ -45,9 +45,13 @@ trang-chu-mobile*.png
 reports/
 vite-dev.log
 admin-*-*.md
+admin-*.md
+ban-*.md
+ban-*.log
 dang-nhap-*.md
 danh-gia-*.md
 delivery-tracking-*.md
+ho-so-*.md
 mang-ve-*.md
 dat-ban-snapshot.md
 booking-step2-snapshot.md

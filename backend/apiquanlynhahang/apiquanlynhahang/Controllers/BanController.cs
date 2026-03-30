@@ -26,6 +26,51 @@ public class BanController : ControllerBase
     public async Task<IActionResult> LayTheoMa(string maBan, CancellationToken cancellationToken)
         => Ok(new { data = await _service.LayTheoMaAsync(maBan, cancellationToken) });
 
+    [AllowAnonymous]
+    [HttpGet("{maBan}/thuc-don")]
+    public async Task<IActionResult> LayThucDonTaiBan(string maBan, [FromServices] DonHangService donHangService, CancellationToken cancellationToken)
+    {
+        var ban = await _service.LayTheoMaAsync(maBan, cancellationToken);
+        if (ban is null) return NotFound(new { message = "Bàn không tồn tại" });
+        return Ok(new { ban, data = await donHangService.LayThucDonChoBanAsync(cancellationToken) });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("{maBan}/order")]
+    public async Task<IActionResult> TaoOrderTaiBan(string maBan, [FromBody] TaoOrderTaiBanDto dto, [FromServices] DonHangService donHangService, CancellationToken cancellationToken)
+    {
+        var ban = await _service.LayTheoMaAsync(maBan, cancellationToken);
+        if (ban is null) return NotFound(new { message = "Bàn không tồn tại" });
+        return Ok(new { data = await donHangService.TaoHoacThemMonTaiBanAsync(maBan, dto, cancellationToken) });
+    }
+
+    [AllowAnonymous]
+    [HttpGet("{maBan}/order")]
+    public async Task<IActionResult> LayOrderDangMoTaiBan(string maBan, [FromServices] DonHangService donHangService, CancellationToken cancellationToken)
+    {
+        var ban = await _service.LayTheoMaAsync(maBan, cancellationToken);
+        if (ban is null) return NotFound(new { message = "Bàn không tồn tại" });
+        return Ok(new { data = await donHangService.LayDonTaiBanDangMoAsync(maBan, cancellationToken) });
+    }
+
+    [AllowAnonymous]
+    [HttpPost("{maBan}/yeu-cau-thanh-toan")]
+    public async Task<IActionResult> YeuCauThanhToanTaiBan(string maBan, [FromServices] DonHangService donHangService, CancellationToken cancellationToken)
+    {
+        var ban = await _service.LayTheoMaAsync(maBan, cancellationToken);
+        if (ban is null) return NotFound(new { message = "Bàn không tồn tại" });
+        return Ok(new { success = await donHangService.YeuCauThanhToanTaiBanAsync(maBan, cancellationToken) });
+    }
+
+    [Authorize(Roles = "Admin,NhanVien")]
+    [HttpPost("{maBan}/xac-nhan-thanh-toan")]
+    public async Task<IActionResult> XacNhanThanhToanTaiBan(string maBan, [FromServices] DonHangService donHangService, CancellationToken cancellationToken)
+    {
+        var ban = await _service.LayTheoMaAsync(maBan, cancellationToken);
+        if (ban is null) return NotFound(new { message = "Bàn không tồn tại" });
+        return Ok(new { success = await donHangService.XacNhanThanhToanTaiBanAsync(maBan, cancellationToken) });
+    }
+
     [Authorize(Roles = "Admin,NhanVien")]
     [HttpPost]
     public async Task<IActionResult> Tao([FromBody] TaoBanDto dto, CancellationToken cancellationToken)

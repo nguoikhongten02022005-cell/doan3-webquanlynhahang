@@ -103,6 +103,11 @@ public class TaoChiTietDonHangDto
     public string? GhiChu { get; set; }
 }
 
+public class TaoOrderTaiBanDto
+{
+    public List<TaoChiTietDonHangDto> DanhSachMon { get; set; } = [];
+}
+
 public class TaoDonHangDto
 {
     public string MaDonHang { get; set; } = string.Empty;
