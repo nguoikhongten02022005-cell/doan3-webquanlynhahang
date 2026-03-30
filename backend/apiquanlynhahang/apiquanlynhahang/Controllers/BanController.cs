@@ -32,7 +32,33 @@ public class BanController : ControllerBase
         => StatusCode(201, new { data = await _service.TaoAsync(dto, cancellationToken) });
 
     [Authorize(Roles = "Admin,NhanVien")]
+    [HttpPut("{maBan}")]
+    public async Task<IActionResult> CapNhat(string maBan, [FromBody] CapNhatBanDto dto, CancellationToken cancellationToken)
+    {
+        var duLieu = await _service.CapNhatAsync(maBan, dto, cancellationToken);
+        return duLieu is null ? NotFound(new { message = "Khong tim thay ban" }) : Ok(new { data = duLieu });
+    }
+
+    [Authorize(Roles = "Admin,NhanVien")]
+    [HttpDelete("{maBan}")]
+    public async Task<IActionResult> Xoa(string maBan, CancellationToken cancellationToken)
+    {
+        await _service.XoaAsync(maBan, cancellationToken);
+        return NoContent();
+    }
+
+    [Authorize(Roles = "Admin,NhanVien")]
     [HttpPatch("{maBan}/status")]
     public async Task<IActionResult> CapNhatTrangThai(string maBan, [FromBody] CapNhatTrangThaiDto dto, CancellationToken cancellationToken)
         => Ok(new { data = await _service.CapNhatTrangThaiAsync(maBan, dto.TrangThai, cancellationToken) });
+
+    [Authorize(Roles = "Admin,NhanVien")]
+    [HttpGet("{maBan}/qr")]
+    public async Task<IActionResult> LayQrTheoBan(string maBan, CancellationToken cancellationToken)
+    {
+        var scheme = Request.Scheme;
+        var host = Request.Host.HasValue ? Request.Host.Value : "localhost:5173";
+        var duLieu = await _service.TaoQrAsync(maBan, $"{scheme}://{host}", cancellationToken);
+        return duLieu is null ? NotFound(new { message = "Khong tim thay ban" }) : Ok(new { data = duLieu });
+    }
 }

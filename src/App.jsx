@@ -24,6 +24,7 @@ import AdminDashboardPage from './pages/admin/AdminDashboardPage'
 import AdminDatBanPage from './pages/admin/AdminDatBanPage'
 import AdminDanhGiaPage from './pages/admin/AdminDanhGiaPage'
 import AdminDonMangVePage from './pages/admin/AdminDonMangVePage'
+import AdminQuanLyBanPage from './pages/admin/AdminQuanLyBanPage'
 import AdminSoDoBanPage from './pages/admin/AdminSoDoBanPage'
 import AdminThucDonPage from './pages/admin/AdminThucDonPage'
 import AdminDonHangPage from './pages/admin/AdminDonHangPage'
@@ -69,6 +70,7 @@ function App() {
           <Route path="dat-ban" element={<AdminDatBanPage />} />
           <Route path="danh-gia" element={<AdminDanhGiaPage />} />
           <Route path="don-mang-ve" element={<AdminDonMangVePage />} />
+          <Route path="quan-ly-ban" element={<AdminQuanLyBanPage />} />
           <Route path="so-do-ban" element={<AdminSoDoBanPage />} />
           <Route path="thuc-don" element={<AdminThucDonPage />} />
           <Route path="don-hang" element={<AdminDonHangPage />} />

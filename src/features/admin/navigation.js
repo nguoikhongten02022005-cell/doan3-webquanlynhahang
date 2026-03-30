@@ -22,6 +22,13 @@ export const ADMIN_NAVIGATION = Object.freeze([
     glyph: '▦',
   },
   {
+    key: 'quan-ly-ban',
+    label: 'Quản lý bàn',
+    path: '/admin/quan-ly-ban',
+    group: 'QUẢN LÝ',
+    glyph: '◩',
+  },
+  {
     key: 'thuc-don',
     label: 'Thực đơn',
     path: '/admin/thuc-don',

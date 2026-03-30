@@ -48,6 +48,37 @@ public class MangVeController : ControllerBase
         return duLieu is null ? NotFound(new { message = "Khong tim thay don mang ve" }) : Ok(new { data = duLieu });
     }
 
+    [HttpGet("/api/mang-ve/lich-su")]
+    public async Task<IActionResult> LayLichSuDonMangVe(CancellationToken cancellationToken)
+    {
+        var current = User.LayNguoiDungHienTai();
+        if (current is null) return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+
+        var thongTinNguoiDung = await _authService.LayThongTinNguoiDungHienTaiAsync(current.MaND, cancellationToken);
+        if (thongTinNguoiDung is null || string.IsNullOrWhiteSpace(thongTinNguoiDung.MaKH))
+        {
+            return BadRequest(new { message = "Khong tim thay ma khach hang de lay lich su don" });
+        }
+
+        return Ok(new { data = await _donHangService.LayLichSuDonMangVeAsync(thongTinNguoiDung.MaKH, cancellationToken) });
+    }
+
+    [HttpPatch("{maDonHang}/huy")]
+    public async Task<IActionResult> HuyDonMangVe(string maDonHang, CancellationToken cancellationToken)
+    {
+        var current = User.LayNguoiDungHienTai();
+        if (current is null) return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+
+        var thongTinNguoiDung = await _authService.LayThongTinNguoiDungHienTaiAsync(current.MaND, cancellationToken);
+        if (thongTinNguoiDung is null || string.IsNullOrWhiteSpace(thongTinNguoiDung.MaKH))
+        {
+            return BadRequest(new { message = "Khong tim thay ma khach hang de huy don" });
+        }
+
+        var duLieu = await _donHangService.HuyDonMangVeAsync(maDonHang, thongTinNguoiDung.MaKH, cancellationToken);
+        return duLieu is null ? NotFound(new { message = "Khong tim thay don mang ve" }) : Ok(new { data = duLieu });
+    }
+
     [Authorize(Roles = "Admin,NhanVien")]
     [HttpGet("/api/mang-ve/admin/don-hang")]
     public async Task<IActionResult> LayDanhSachDonMangVeChoAdmin(CancellationToken cancellationToken)

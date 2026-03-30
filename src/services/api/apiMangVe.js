@@ -49,6 +49,19 @@ export const capNhatTrangThaiDonMangVeApi = async (maDonHang, trangThai) => {
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
+export const layLichSuDonMangVeApi = async () => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/mang-ve/lich-su'))
+  return {
+    ...phanHoi,
+    duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonMangVeLichSu).filter(Boolean) : [],
+  }
+}
+
+export const huyDonMangVeApi = async (maDonHang) => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/mang-ve/don-hang/${maDonHang}/huy`, {}))
+  return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+}
+
 function chuanHoaDonMangVeChoAdmin(duLieu) {
   if (!duLieu || typeof duLieu !== 'object') return null
   return {
@@ -68,6 +81,27 @@ function chuanHoaDonMangVeChoAdmin(duLieu) {
       maMon: muc.MaMon || muc.maMon || '',
       tenMon: muc.TenMon || muc.tenMon || '',
       soLuong: Number(muc.SoLuong || muc.soLuong || 0),
+      thanhTien: Number(muc.ThanhTien || muc.thanhTien || 0),
+    })) : [],
+  }
+}
+
+function chuanHoaDonMangVeLichSu(duLieu) {
+  if (!duLieu || typeof duLieu !== 'object') return null
+  return {
+    maDonHang: duLieu.MaDonHang || duLieu.maDonHang || '',
+    loaiDon: duLieu.LoaiDon || duLieu.loaiDon || '',
+    trangThai: duLieu.TrangThai || duLieu.trangThai || '',
+    tongTien: Number(duLieu.TongTien || duLieu.tongTien || 0),
+    phiShip: Number(duLieu.PhiShip || duLieu.phiShip || 0),
+    diaChiGiao: duLieu.DiaChiGiao || duLieu.diaChiGiao || '',
+    gioLayHang: duLieu.GioLayHang || duLieu.gioLayHang || '',
+    gioGiao: duLieu.GioGiao || duLieu.gioGiao || '',
+    ngayTao: duLieu.NgayTao || duLieu.ngayTao || '',
+    danhSachMon: Array.isArray(duLieu.DanhSachMon || duLieu.danhSachMon) ? (duLieu.DanhSachMon || duLieu.danhSachMon).map((muc) => ({
+      tenMon: muc.TenMon || muc.tenMon || '',
+      soLuong: Number(muc.SoLuong || muc.soLuong || 0),
+      donGia: Number(muc.DonGia || muc.donGia || 0),
       thanhTien: Number(muc.ThanhTien || muc.thanhTien || 0),
     })) : [],
   }

@@ -1,20 +1,16 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Navigate, useNavigate } from 'react-router-dom'
 import ChiTietDonHangModal from '../components/hoSo/ChiTietDonHangModal'
+import DonHangMangVeTab from '../components/hoSo/DonHangMangVeTab'
 import LichSuDatBanTab from '../components/hoSo/LichSuDatBanTab'
-import LichSuDonHangTab from '../components/hoSo/LichSuDonHangTab'
 import ThongTinCaNhanTab from '../components/hoSo/ThongTinCaNhanTab'
 import { PROFILE_TABS } from '../data/duLieuHoSo'
-import { BOOKINGS_HO_SO_MOCK, DON_HANG_HO_SO_MOCK } from '../data/duLieuHoSoMock'
+import { BOOKINGS_HO_SO_MOCK } from '../data/duLieuHoSoMock'
 import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
+import { huyDonMangVeApi, layLichSuDonMangVeApi } from '../services/api/apiMangVe'
 
 const cloneBookings = () => BOOKINGS_HO_SO_MOCK.map((booking) => ({ ...booking }))
-
-const cloneOrders = () => DON_HANG_HO_SO_MOCK.map((order) => ({
-  ...order,
-  items: order.items.map((item) => ({ ...item })),
-}))
 
 function HoSoPage() {
   const navigate = useNavigate()
@@ -24,6 +20,7 @@ function HoSoPage() {
   const [lichSuDatBan, setLichSuDatBan] = useState([])
   const [lichSuDonHang, setLichSuDonHang] = useState([])
   const [maDonDangXem, setMaDonDangXem] = useState('')
+  const [boLocDonHang, setBoLocDonHang] = useState('ALL')
 
   useEffect(() => {
     if (!nguoiDungHienTai) {
@@ -33,14 +30,20 @@ function HoSoPage() {
       return
     }
 
-    // TODO: Replace profile history mocks with the real profile APIs after backend support is ready.
     setLichSuDatBan(cloneBookings())
-    setLichSuDonHang(cloneOrders())
     setMaDonDangXem('')
+    ;(async () => {
+      try {
+        const { duLieu } = await layLichSuDonMangVeApi()
+        setLichSuDonHang(Array.isArray(duLieu) ? duLieu : [])
+      } catch {
+        setLichSuDonHang([])
+      }
+    })()
   }, [nguoiDungHienTai])
 
   const donHangDangXem = useMemo(
-    () => lichSuDonHang.find((order) => order.orderCode === maDonDangXem) || null,
+    () => lichSuDonHang.find((order) => order.maDonHang === maDonDangXem) || null,
     [lichSuDonHang, maDonDangXem],
   )
 
@@ -71,6 +74,20 @@ function HoSoPage() {
 
   const handleOpenOrderDetail = (orderCode) => {
     setMaDonDangXem(orderCode)
+  }
+
+  const handleHuyDonMangVe = async (maDonHang) => {
+    const xacNhan = window.confirm('Bạn có chắc muốn hủy đơn này?')
+    if (!xacNhan) return
+
+    try {
+      await huyDonMangVeApi(maDonHang)
+      const { duLieu } = await layLichSuDonMangVeApi()
+      setLichSuDonHang(Array.isArray(duLieu) ? duLieu : [])
+      hienThongBao({ message: `Đã hủy đơn ${maDonHang}.`, tone: 'success', duration: 3000, title: '' })
+    } catch (error) {
+      hienThongBao({ message: error?.message || 'Không thể hủy đơn lúc này.', tone: 'error', duration: 3000, title: '' })
+    }
   }
 
   const handleCloseOrderDetail = () => {
@@ -122,7 +139,13 @@ function HoSoPage() {
             )}
 
             {tabDangMo === 'orders' && (
-              <LichSuDonHangTab orders={lichSuDonHang} onOpenOrderDetail={handleOpenOrderDetail} />
+              <DonHangMangVeTab
+                danhSachDon={lichSuDonHang}
+                boLoc={boLocDonHang}
+                onDoiBoLoc={setBoLocDonHang}
+                onHuyDon={handleHuyDonMangVe}
+                onXemChiTiet={handleOpenOrderDetail}
+              />
             )}
           </section>
         </div>

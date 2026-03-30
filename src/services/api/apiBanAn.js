@@ -14,6 +14,13 @@ const suyRaKhuVucTuViTri = (viTri = '') => {
   return 'SANH_CHINH'
 }
 
+const chuanHoaTrangThaiBan = (trangThai = '') => {
+  if (trangThai === 'TRONG' || trangThai === 'Available') return 'TRONG'
+  if (trangThai === 'CO_KHACH' || trangThai === 'Occupied') return 'CO_KHACH'
+  if (trangThai === 'CHO_THANH_TOAN' || trangThai === 'Reserved') return 'CHO_THANH_TOAN'
+  return trangThai || 'TRONG'
+}
+
 const chuanHoaBanAn = (ban) => {
   if (!ban || typeof ban !== 'object') {
     return null
@@ -22,13 +29,13 @@ const chuanHoaBanAn = (ban) => {
   return {
     ...ban,
     code: ban.maBan || ban.MaBan,
-    name: `Bàn ${ban.soBan ?? ban.SoBan ?? ''}`.trim(),
+    name: ban.tenBan || ban.TenBan || `Bàn ${ban.soBan ?? ban.SoBan ?? ''}`.trim(),
     tableNumber: Number(ban.soBan ?? ban.SoBan ?? 0),
     capacity: Number(ban.soChoNgoi ?? ban.SoChoNgoi ?? 0),
-    areaId: suyRaKhuVucTuViTri(ban.viTri || ban.ViTri || ''),
-    rawAreaText: ban.viTri || ban.ViTri || '',
-    note: ban.viTri || ban.ViTri || '',
-    status: ban.trangThai || ban.TrangThai || '',
+    areaId: suyRaKhuVucTuViTri(ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || ''),
+    rawAreaText: ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || '',
+    note: ban.ghiChu || ban.GhiChu || '',
+    status: chuanHoaTrangThaiBan(ban.trangThai || ban.TrangThai || ''),
   }
 }
 
@@ -40,4 +47,15 @@ export const layDanhSachBanApi = async () => {
   }
 }
 
-export const capNhatTrangThaiBanApi = async (id, status) => tachPhanHoiApi(await trinhKhachApi.patch(`/ban/${id}/status`, { trangThai: status }))
+const mapTrangThaiBanApi = (status) => {
+  if (status === 'TRONG') return 'TRONG'
+  if (status === 'CO_KHACH') return 'CO_KHACH'
+  if (status === 'CHO_THANH_TOAN') return 'CHO_THANH_TOAN'
+  return status
+}
+
+export const capNhatTrangThaiBanApi = async (id, status) => tachPhanHoiApi(await trinhKhachApi.patch(`/ban/${id}/status`, { trangThai: mapTrangThaiBanApi(status) }))
+export const taoBanApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.post('/ban', payload))
+export const capNhatBanApi = async (maBan, payload) => tachPhanHoiApi(await trinhKhachApi.put(`/ban/${maBan}`, payload))
+export const xoaBanApi = async (maBan) => tachPhanHoiApi(await trinhKhachApi.delete(`/ban/${maBan}`))
+export const layQrBanApi = async (maBan) => tachPhanHoiApi(await trinhKhachApi.get(`/ban/${maBan}/qr`))

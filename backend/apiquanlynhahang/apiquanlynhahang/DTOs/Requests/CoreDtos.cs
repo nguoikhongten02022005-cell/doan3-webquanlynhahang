@@ -25,9 +25,20 @@ public class TaoKhachHangDto
 public class TaoBanDto
 {
     public string MaBan { get; set; } = string.Empty;
+    public string? TenBan { get; set; }
+    public string? KhuVuc { get; set; }
     public int SoBan { get; set; }
     public int SoChoNgoi { get; set; }
     public string? ViTri { get; set; }
+    public string? GhiChu { get; set; }
+}
+
+public class CapNhatBanDto
+{
+    public string TenBan { get; set; } = string.Empty;
+    public string KhuVuc { get; set; } = string.Empty;
+    public int SoChoNgoi { get; set; }
+    public string? GhiChu { get; set; }
 }
 
 public class TaoQRCodeDto
