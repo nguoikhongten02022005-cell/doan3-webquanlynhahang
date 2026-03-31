@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Col, ConfigProvider, Row } from 'antd'
 import '../theme/dat-ban.css'
 import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
@@ -579,78 +580,112 @@ function DatBanPage() {
 
   if (submitSuccess) {
     return (
-      <div className="dat-ban-page-customer">
-        <section className="dat-ban-customer-section dat-ban-customer-section-tight">
-          <div className="container dat-ban-success-layout">
-            <DatBanThanhCong confirmation={submitSuccess} />
-          </div>
-        </section>
-      </div>
+      <ConfigProvider
+        theme={{
+          token: {
+            colorPrimary: '#e8664a',
+            colorLink: '#e8664a',
+            colorInfo: '#e8664a',
+            colorBorder: '#ead7c5',
+            borderRadius: 0,
+            controlOutline: 'rgba(232, 102, 74, 0.18)',
+            colorPrimaryHover: '#d95b41',
+            colorPrimaryActive: '#c94d34',
+          },
+        }}
+      >
+        <div className="dat-ban-page-customer">
+          <section className="dat-ban-customer-section dat-ban-customer-section-tight">
+            <div className="container dat-ban-success-layout">
+              <DatBanThanhCong confirmation={submitSuccess} />
+            </div>
+          </section>
+        </div>
+      </ConfigProvider>
     )
   }
 
   return (
-    <div className="dat-ban-page-customer">
-      <section className="dat-ban-customer-section dat-ban-customer-section-tight">
-        <div className="container dat-ban-customer-layout">
-          <div className="dat-ban-customer-main">
-            {currentStep === 1 ? (
-              <BuocMotDatBan
-                formData={formData}
-                dateOptions={dateOptions}
-                selectedDateLabel={selectedDateLabel}
-                selectedDayLabel={selectedDayLabel}
-                minDate={todayIso}
-                maxDate={maxDateIso}
-                availabilityByArea={areaAvailability}
-                areaOptions={areaOptions}
-                timeSlotOptions={timeSlotOptions}
-                selectedAreaUnavailableMessage={selectedAreaUnavailableMessage}
-                largePartyNotice={largePartyNotice}
-                onGuestSelect={handleGuestSelect}
-                onDateSelect={handleDateSelect}
-                onDateInputChange={handleDateInputChange}
-                onTimeSelect={handleTimeSelect}
-                onAreaToggle={handleAreaToggle}
-              />
-            ) : null}
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#e8664a',
+          colorLink: '#e8664a',
+          colorInfo: '#e8664a',
+          colorBorder: '#ead7c5',
+          borderRadius: 0,
+          controlOutline: 'rgba(232, 102, 74, 0.18)',
+          colorPrimaryHover: '#d95b41',
+          colorPrimaryActive: '#c94d34',
+        },
+      }}
+    >
+      <div className="dat-ban-page-customer">
+        <section className="dat-ban-customer-section dat-ban-customer-section-tight">
+          <div className="container">
+            <Row gutter={[24, 24]} align="start">
+              <Col xs={24} xl={16}>
+              {currentStep === 1 ? (
+                <BuocMotDatBan
+                  formData={formData}
+                  dateOptions={dateOptions}
+                  selectedDateLabel={selectedDateLabel}
+                  selectedDayLabel={selectedDayLabel}
+                  minDate={todayIso}
+                  maxDate={maxDateIso}
+                  availabilityByArea={areaAvailability}
+                  areaOptions={areaOptions}
+                  timeSlotOptions={timeSlotOptions}
+                  selectedAreaUnavailableMessage={selectedAreaUnavailableMessage}
+                  largePartyNotice={largePartyNotice}
+                  onGuestSelect={handleGuestSelect}
+                  onDateSelect={handleDateSelect}
+                  onDateInputChange={handleDateInputChange}
+                  onTimeSelect={handleTimeSelect}
+                  onAreaToggle={handleAreaToggle}
+                />
+              ) : null}
 
-            {currentStep === 2 ? (
-              <BuocHaiDatBan
-                formData={formData}
-                fieldErrors={stepErrors}
-                onFieldChange={handleFormFieldChange}
-                onFieldBlur={handleFieldBlur}
-                onSuggestionClick={handleSuggestionClick}
-              />
-            ) : null}
+              {currentStep === 2 ? (
+                <BuocHaiDatBan
+                  formData={formData}
+                  fieldErrors={stepErrors}
+                  onFieldChange={handleFormFieldChange}
+                  onFieldBlur={handleFieldBlur}
+                  onSuggestionClick={handleSuggestionClick}
+                />
+              ) : null}
 
-            {currentStep === 3 ? (
-              <BuocBaDatBan
-                summary={summary}
-                contactSummary={contactSummary}
-                reviewNotice={REVIEW_NOTICE}
-                submitError={submitError}
-                isSubmitting={isSubmitting}
-                onBack={handleBackFromReview}
-                onSubmit={handleSubmit}
-              />
-            ) : null}
+              {currentStep === 3 ? (
+                <BuocBaDatBan
+                  summary={summary}
+                  contactSummary={contactSummary}
+                  reviewNotice={REVIEW_NOTICE}
+                  submitError={submitError}
+                  isSubmitting={isSubmitting}
+                  onBack={handleBackFromReview}
+                  onSubmit={handleSubmit}
+                />
+              ) : null}
 
+              </Col>
+
+              <Col xs={24} xl={8}>
+                <ThanhBenDatBan
+                  steps={STEPS}
+                  currentStep={currentStep}
+                  summary={summary}
+                  nextStage={nextStage}
+                  canProceed={currentStep === 1 ? canProceedStepOne : currentStep === 2 ? canProceedStepTwo : false}
+                  continueBlockedMessage={currentStep === 1 ? selectedAreaUnavailableMessage : ''}
+                  onContinue={handleContinue}
+                />
+              </Col>
+            </Row>
           </div>
-
-          <ThanhBenDatBan
-            steps={STEPS}
-            currentStep={currentStep}
-            summary={summary}
-            nextStage={nextStage}
-            canProceed={currentStep === 1 ? canProceedStepOne : currentStep === 2 ? canProceedStepTwo : false}
-            continueBlockedMessage={currentStep === 1 ? selectedAreaUnavailableMessage : ''}
-            onContinue={handleContinue}
-          />
-        </div>
-      </section>
-    </div>
+        </section>
+      </div>
+    </ConfigProvider>
   )
 }
 

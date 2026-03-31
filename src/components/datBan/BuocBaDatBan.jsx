@@ -1,45 +1,44 @@
+import { Alert, Button, Card, Col, Descriptions, Row, Space, Typography } from 'antd'
+
 function BuocBaDatBan({ summary, contactSummary, reviewNotice, submitError, isSubmitting, onBack, onSubmit }) {
   return (
-    <article className="dat-ban-customer-card dat-ban-customer-card-soft dat-ban-customer-flow-card">
+    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+      <Row gutter={[16, 16]}>
+        <Col xs={24} xl={12}>
+          <Card title="Thông tin đặt bàn">
+            <Descriptions column={1} bordered size="small">
+              <Descriptions.Item label="Số khách">{summary.guests}</Descriptions.Item>
+              <Descriptions.Item label="Ngày">{summary.date}</Descriptions.Item>
+              <Descriptions.Item label="Giờ">{summary.time}</Descriptions.Item>
+              <Descriptions.Item label="Khu vực">{summary.area}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        </Col>
+        <Col xs={24} xl={12}>
+          <Card title="Thông tin liên hệ">
+            <Descriptions column={1} bordered size="small">
+              <Descriptions.Item label="Họ tên">{contactSummary.name}</Descriptions.Item>
+              <Descriptions.Item label="SĐT">{contactSummary.phone}</Descriptions.Item>
+              <Descriptions.Item label="Email">{contactSummary.email}</Descriptions.Item>
+              <Descriptions.Item label="Ghi chú">{contactSummary.notes}</Descriptions.Item>
+            </Descriptions>
+          </Card>
+        </Col>
+      </Row>
 
-      <div className="dat-ban-review-grid">
-        <section className="dat-ban-review-card">
-          <p className="eyebrow">Thông tin đặt bàn</p>
-          <div className="dat-ban-review-list">
-            <div><span>👥 Số khách</span><strong>{summary.guests}</strong></div>
-            <div><span>📅 Ngày</span><strong>{summary.date}</strong></div>
-            <div><span>🕕 Giờ</span><strong>{summary.time}</strong></div>
-            <div><span>📍 Khu vực</span><strong>{summary.area}</strong></div>
-          </div>
-        </section>
-
-        <section className="dat-ban-review-card">
-          <p className="eyebrow">Thông tin liên hệ</p>
-          <div className="dat-ban-review-list">
-            <div><span>👤 Họ tên</span><strong>{contactSummary.name}</strong></div>
-            <div><span>📞 SĐT</span><strong>{contactSummary.phone}</strong></div>
-            <div><span>📧 Email</span><strong>{contactSummary.email}</strong></div>
-            <div><span>📝 Ghi chú</span><strong>{contactSummary.notes}</strong></div>
-          </div>
-        </section>
-      </div>
-
-      <section className="dat-ban-review-notes">
-        <p className="eyebrow">Lưu ý quan trọng</p>
-        <ul>
-          {reviewNotice.map((item) => <li key={item}>{item}</li>)}
+      <Card title="Lưu ý quan trọng">
+        <ul style={{ margin: 0, paddingLeft: 18 }}>
+          {reviewNotice.map((item) => <li key={item}><Typography.Text>{item}</Typography.Text></li>)}
         </ul>
-      </section>
+      </Card>
 
-      {submitError ? <p className="dat-ban-customer-error">{submitError}</p> : null}
+      {submitError ? <Alert type="error" showIcon message={submitError} /> : null}
 
-      <div className="dat-ban-review-actions">
-        <button type="button" className="btn nut-phu" onClick={onBack}>← Quay lại</button>
-        <button type="button" className="btn nut-chinh" onClick={onSubmit} disabled={isSubmitting}>
-          {isSubmitting ? 'Đang xử lý đặt bàn...' : '✅ Xác nhận'}
-        </button>
-      </div>
-    </article>
+      <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
+        <Button onClick={onBack}>Quay lại</Button>
+        <Button type="primary" onClick={onSubmit} loading={isSubmitting}>{isSubmitting ? 'Đang xử lý đặt bàn...' : 'Xác nhận'}</Button>
+      </Space>
+    </Space>
   )
 }
 

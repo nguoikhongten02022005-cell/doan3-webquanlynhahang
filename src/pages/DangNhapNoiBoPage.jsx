@@ -47,8 +47,7 @@ function DangNhapNoiBoPage() {
     }
   }, [])
 
-  const handleSubmit = async (e) => {
-    e.preventDefault()
+  const handleSubmit = async () => {
     if (dangGui) return
 
     setDangGui(true)

@@ -5,6 +5,62 @@
     linear-gradient(180deg, #fbf8f2 0%, #f6efe7 100%);
 }
 
+.dat-ban-page-customer .ant-card,
+.dat-ban-page-customer .ant-card-head,
+.dat-ban-page-customer .ant-card-body,
+.dat-ban-page-customer .ant-alert,
+.dat-ban-page-customer .ant-alert-message,
+.dat-ban-page-customer .ant-btn,
+.dat-ban-page-customer .ant-picker,
+.dat-ban-page-customer .ant-input,
+.dat-ban-page-customer .ant-input-number,
+.dat-ban-page-customer .ant-input-number-input,
+.dat-ban-page-customer .ant-select-selector,
+.dat-ban-page-customer .ant-descriptions,
+.dat-ban-page-customer .ant-steps-item-icon,
+.dat-ban-page-customer .ant-tag {
+  border-radius: 0 !important;
+}
+
+.dat-ban-page-customer .ant-card {
+  box-shadow: 0 18px 36px rgba(55, 39, 28, 0.08);
+  border-color: rgba(127, 98, 74, 0.12);
+}
+
+.dat-ban-page-customer .ant-btn-primary {
+  background: #e8664a;
+  border-color: #e8664a;
+}
+
+.dat-ban-page-customer .ant-btn-primary:hover,
+.dat-ban-page-customer .ant-btn-primary:focus {
+  background: #d95b41 !important;
+  border-color: #d95b41 !important;
+}
+
+.dat-ban-page-customer .ant-btn-default:hover,
+.dat-ban-page-customer .ant-btn-default:focus,
+.dat-ban-page-customer .ant-btn-link:hover,
+.dat-ban-page-customer .ant-btn-link:focus {
+  color: #e8664a;
+  border-color: #e8664a;
+}
+
+.dat-ban-page-customer .ant-steps-item-process .ant-steps-item-icon,
+.dat-ban-page-customer .ant-steps-item-finish .ant-steps-item-icon {
+  background: #e8664a !important;
+  border-color: #e8664a !important;
+}
+
+.dat-ban-page-customer .ant-steps-item-process .ant-steps-item-title,
+.dat-ban-page-customer .ant-steps-item-finish .ant-steps-item-title,
+.dat-ban-page-customer .ant-picker-suffix,
+.dat-ban-page-customer .ant-input-prefix,
+.dat-ban-page-customer .ant-input-password-icon,
+.dat-ban-page-customer .ant-select-arrow {
+  color: #e8664a !important;
+}
+
 .dat-ban-customer-section {
   padding: 1rem 0 4rem;
 }

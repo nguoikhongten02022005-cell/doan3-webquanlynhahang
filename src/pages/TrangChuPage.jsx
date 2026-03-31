@@ -1,17 +1,18 @@
 import { useMemo } from 'react'
+import { Button, Col, ConfigProvider, Row, Space, Tag, Typography } from 'antd'
 import { Link } from 'react-router-dom'
 import TheMonAn from '../components/TheMonAn'
 import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
 import anhTimChungToi from '../assets/img/findus.585c393ccd3671513743.png'
 import knifeImage from '../assets/img/knife.1121c0a5afb62acb31cb.png'
 import { ANH_HERO_TRANG_CHU, layAnhMonTheoTen } from '../constants/anhMonAn'
-import { HOME_CAC_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
 import { useGioHang } from '../context/GioHangContext'
 import { useChiTietMonAnModal } from '../hooks/useChiTietMonAnModal'
 import { useDanhSachMonAn } from '../hooks/useDanhSachMonAn'
 import { layDanhSachMonNoiBatTrangChu } from '../services/mappers/anhXaThucDon'
 
 function TrangChuPage() {
+  const { Title, Paragraph, Text } = Typography
   const { themVaoGio } = useGioHang()
   const { dishes } = useDanhSachMonAn()
   const {
@@ -41,22 +42,34 @@ function TrangChuPage() {
 
 
   return (
+    <ConfigProvider
+      theme={{
+        token: {
+          colorPrimary: '#e8664a',
+          colorLink: '#e8664a',
+          colorInfo: '#e8664a',
+          colorBorder: '#ead7c5',
+          borderRadius: 0,
+          controlOutline: 'rgba(232, 102, 74, 0.18)',
+          colorPrimaryHover: '#d95b41',
+          colorPrimaryActive: '#c94d34',
+        },
+      }}
+    >
     <div className="trang-chu-page">
       <section className="hero" id="home">
         <div className="container mo-dau-grid">
           <div className="mo-dau-copy">
-            <p className="hero-kicker-tham-chieu">Khơi mở hương vị mới</p>
-            <h1>
-              Tinh hoa ẩm thực
-            </h1>
-            <p className="subtitle">
-              Thưởng thức những món ăn được chuẩn bị chỉn chu, đậm đà bản sắc và phù hợp cho những buổi gặp gỡ ấm cúng lẫn các dịp đặc biệt.
-            </p>
-            <div className="mo-dau-actions-group">
-              <Link className="btn nut-chinh" to="/thuc-don">
+            <Space direction="vertical" size={16} style={{ width: '100%', alignItems: 'flex-start' }}>
+              <Tag color="orange-inverse" bordered={false}>Khơi mở hương vị mới</Tag>
+              <Title level={1} style={{ margin: 0 }}>Tinh hoa ẩm thực</Title>
+              <Paragraph className="subtitle" style={{ marginBottom: 0 }}>
+                Thưởng thức những món ăn được chuẩn bị chỉn chu, đậm đà bản sắc và phù hợp cho những buổi gặp gỡ ấm cúng lẫn các dịp đặc biệt.
+              </Paragraph>
+              <Button type="primary" size="large" href="/thuc-don">
                 Xem thực đơn
-              </Link>
-            </div>
+              </Button>
+            </Space>
           </div>
 
           <div className="mo-dau-showcase">
@@ -102,47 +115,21 @@ function TrangChuPage() {
         </div>
       </section>
 
-      <section className="categories" id="menu">
-        <div className="container">
-          <div className="section-head section-head--split">
-            <div className="section-head-copy">
-              <p className="eyebrow">Đi nhanh vào thực đơn</p>
-              <h2>Danh Mục Nổi Bật</h2>
-            </div>
-            <p className="section-head-description">Danh mục được chuyển sang dạng thẻ lớn, đọc theo hàng có nhịp để bớt cảm giác chip slider quen thuộc.</p>
-          </div>
-
-          <div className="danh-muc-row">
-            {HOME_CAC_DANH_MUC_THUC_DON.map((category, index) => (
-              <Link key={category.name} to="/thuc-don" className="danh-muc-item">
-                <span className="danh-muc-index">0{index + 1}</span>
-                <span className="danh-muc-icon" aria-hidden="true">
-                  {category.icon}
-                </span>
-                <span className="danh-muc-copy">
-                  <strong>{category.name}</strong>
-                  <small>{category.note}</small>
-                </span>
-              </Link>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="noi-bat-section">
         <div className="container">
-          <div className="section-head section-head--split noi-bat-head">
-            <div className="section-head-copy">
-              <p className="eyebrow">Món được chọn nhiều</p>
-              <h2>Món Ngon Phải Thử</h2>
-            </div>
-            <div className="noi-bat-intro">
-              <p>Phần này giữ nguyên luồng xem chi tiết và thêm giỏ, nhưng được đặt trong khung sạch hơn để món ăn thật sự là trung tâm.</p>
-              <Link className="noi-bat-link" to="/thuc-don">
-                Xem toàn bộ thực đơn
-              </Link>
-            </div>
-          </div>
+          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 24 }}>
+            <Col xs={24} lg={12}>
+              <Space direction="vertical" size={8}>
+                <Text className="eyebrow">Món được chọn nhiều</Text>
+                <Title level={2} style={{ margin: 0 }}>Món Ngon Phải Thử</Title>
+              </Space>
+            </Col>
+            <Col xs={24} lg={12}>
+              <Space direction="vertical" size={8} style={{ width: '100%', alignItems: 'flex-start' }}>
+                <Button type="link" href="/thuc-don" style={{ paddingInline: 0 }}>Xem toàn bộ thực đơn</Button>
+              </Space>
+            </Col>
+          </Row>
 
           <div className="food-grid">
             {danhSachMonDacTrung.map((dish) => (
@@ -204,6 +191,7 @@ function TrangChuPage() {
       />
 
     </div>
+    </ConfigProvider>
   )
 }
 

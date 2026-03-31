@@ -427,6 +427,9 @@
   gap: 1rem;
   text-align: center;
   color: #513b30;
+  background: transparent;
+  box-shadow: none;
+  border: none;
 }
 
 .trang-chu-page .showcase-am-thuc-panel h2,
@@ -496,6 +499,7 @@
   display: grid;
   place-items: center;
   min-height: 34rem;
+  z-index: 2;
 }
 
 .trang-chu-page .showcase-am-thuc-monogram {
@@ -516,6 +520,7 @@
   max-height: 38rem;
   object-fit: contain;
   filter: drop-shadow(0 16px 18px rgba(128, 77, 51, 0.24));
+  opacity: 1;
 }
 
 .trang-chu-page .categories,

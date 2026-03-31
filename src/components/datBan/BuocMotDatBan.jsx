@@ -3,6 +3,17 @@ import {
   CAC_SO_KHACH_DAT_BAN,
   NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN,
 } from '../../data/duLieuDatBan'
+import { Alert, Button, Card, Col, DatePicker, Row, Space, Tag, Typography } from 'antd'
+import dayjs from 'dayjs'
+
+const { Title, Paragraph, Text } = Typography
+
+const MAU_ANTD_DAT_BAN = {
+  nutChon: { borderColor: '#ead7c5', background: '#fffaf4', color: '#2b1b14' },
+  nutDangChon: { borderColor: '#e8664a', background: '#fff1eb', color: '#e8664a' },
+  nutVoHieu: { borderColor: '#ede5db', background: '#f7f1ea', color: '#b2a79a' },
+  canhBao: { borderColor: '#facc15', background: '#fffbeb' },
+}
 
 function BuocMotDatBan({
   formData,
@@ -27,195 +38,141 @@ function BuocMotDatBan({
   const hasSelectedGuests = Boolean(Number(formData.guests) > 0)
 
   return (
-    <article className="dat-ban-customer-card dat-ban-customer-card-soft dat-ban-customer-flow-card">
-      <div className="dat-ban-customer-control-head dat-ban-customer-flow-head">
-        <div>
-          <h2>Chọn số khách, ngày, giờ và khu vực bạn muốn ưu tiên.</h2>
-        </div>
-      </div>
+    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+      <Card>
+        <Title level={3} style={{ margin: 0 }}>Chọn số khách, ngày, giờ và khu vực bạn muốn ưu tiên.</Title>
+      </Card>
 
-      <section className="dat-ban-flow-section">
+      <Card title="Chọn số khách" extra={<Text type="secondary">Nhóm từ 6 khách nên đặt sớm để có bàn phù hợp.</Text>}>
         <div className="dat-ban-flow-section-head">
-          <div>
-            <h3>Chọn số khách</h3>
-          </div>
-          <p className="dat-ban-customer-grid-note">Nhóm từ 6 khách nên đặt sớm để có bàn phù hợp.</p>
         </div>
 
-        <div className="dat-ban-guest-grid" role="list" aria-label="Chọn số khách">
+        <Row gutter={[12, 12]} role="list" aria-label="Chọn số khách">
           {CAC_SO_KHACH_DAT_BAN.map((guestCount) => {
             const isActive = String(guestCount) === String(formData.guests)
             return (
-              <button
-                key={guestCount}
-                type="button"
-                className={`dat-ban-guest-card ${isActive ? 'active' : ''}`}
-                onClick={() => onGuestSelect(String(guestCount))}
-              >
-                <strong>{guestCount}</strong>
-                <span>khách</span>
-              </button>
+              <Col xs={12} sm={8} md={6} lg={4} key={guestCount}>
+                <Button type={isActive ? 'primary' : 'default'} block style={isActive ? MAU_ANTD_DAT_BAN.nutDangChon : MAU_ANTD_DAT_BAN.nutChon} onClick={() => onGuestSelect(String(guestCount))}>
+                  {guestCount} khách
+                </Button>
+              </Col>
             )
           })}
 
-          <button type="button" className="dat-ban-guest-card dat-ban-guest-card-hotline" onClick={() => onGuestSelect('10')}>
-            <strong>10+</strong>
-            <span>Gọi hotline</span>
-          </button>
-        </div>
+          <Col xs={12} sm={8} md={6} lg={4}>
+            <Button block danger onClick={() => onGuestSelect('10')}>10+ Gọi hotline</Button>
+          </Col>
+        </Row>
 
         {largePartyNotice ? (
-          <div className="dat-ban-large-party-banner" role="note">
-            <strong>Nhóm lớn vui lòng gọi hotline.</strong>
-            <a href="tel:02838256789">{largePartyNotice}</a>
-          </div>
+          <Alert type="warning" showIcon message={<span><strong>Nhóm lớn vui lòng gọi hotline.</strong> <a href="tel:02838256789">{largePartyNotice}</a></span>} style={{ marginTop: 16 }} />
         ) : null}
-      </section>
+      </Card>
 
-      <section className="dat-ban-flow-section">
-        <div className="dat-ban-flow-section-head">
-          <div>
-            <h3>Chọn ngày</h3>
-          </div>
-          <p className="dat-ban-customer-grid-note">Cuối tuần được đánh dấu nhẹ vì thường kín chỗ hơn.</p>
-        </div>
-
-        <div className="dat-ban-date-quick-row" role="list" aria-label="Ngày dùng bữa gợi ý">
+      <Card title="Chọn ngày" extra={<Text type="secondary">Cuối tuần được đánh dấu nhẹ vì thường kín chỗ hơn.</Text>}>
+        <Row gutter={[12, 12]} role="list" aria-label="Ngày dùng bữa gợi ý">
           {dateOptions.map((option) => {
             const isActive = option.value === formData.date
+            const trangThaiStyle = option.isDisabled ? MAU_ANTD_DAT_BAN.nutVoHieu : isActive ? MAU_ANTD_DAT_BAN.nutDangChon : MAU_ANTD_DAT_BAN.nutChon
             return (
-              <button
-                key={option.value}
-                type="button"
-                className={`dat-ban-date-chip ${isActive ? 'active' : ''} ${option.isWeekend ? 'weekend' : ''} ${option.isDisabled ? 'disabled' : ''}`}
-                onClick={() => onDateSelect(option.value)}
-                title={option.isDisabled ? option.disabledReason : option.dayLabel}
-                disabled={option.isDisabled}
-              >
-                <strong>{option.label}</strong>
-                <span>{option.dayLabel}{option.isDisabled ? ' 🚫' : ''}</span>
-              </button>
+              <Col xs={12} sm={8} md={6} xl={4} key={option.value}>
+                <Button
+                  type={isActive ? 'primary' : 'default'}
+                  block
+                  disabled={option.isDisabled}
+                  title={option.isDisabled ? option.disabledReason : option.dayLabel}
+                  style={trangThaiStyle}
+                  onClick={() => onDateSelect(option.value)}
+                >
+                  {option.label} • {option.dayLabel}{option.isDisabled ? ' 🚫' : ''}
+                </Button>
+              </Col>
             )
           })}
-        </div>
+        </Row>
 
-        <label className="dat-ban-customer-field dat-ban-customer-field-wide">
-          <span>Xem lịch đầy đủ</span>
-          <input type="date" min={minDate} max={maxDate} className="truong-nhap" value={formData.date} onChange={onDateInputChange} />
-          <small className="dat-ban-customer-help-text">Chỉ nhận đặt bàn trong vòng 30 ngày tới.</small>
-        </label>
-      </section>
-
-      <section className="dat-ban-flow-section">
-        <div className="dat-ban-flow-section-head">
-          <div>
-            <h3>Chọn khung giờ</h3>
+        <div style={{ marginTop: 16 }}>
+          <Text strong>Xem lịch đầy đủ</Text>
+          <div style={{ marginTop: 8 }}>
+            <DatePicker value={formData.date ? dayjs(formData.date) : null} format="DD/MM/YYYY" onChange={(value) => onDateInputChange({ target: { value: value ? value.format('YYYY-MM-DD') : '' } })} minDate={dayjs(minDate)} maxDate={dayjs(maxDate)} style={{ width: '100%' }} />
           </div>
-          {hasSelectedDate ? (
-            <p className="dat-ban-customer-grid-note">{selectedDateLabel} {selectedDayLabel ? `· ${selectedDayLabel}` : ''}</p>
-          ) : null}
+          <Text type="secondary">Chỉ nhận đặt bàn trong vòng 30 ngày tới.</Text>
+        </div>
+      </Card>
+
+      <Card title="Chọn khung giờ" extra={hasSelectedDate ? <Text type="secondary">{selectedDateLabel} {selectedDayLabel ? `· ${selectedDayLabel}` : ''}</Text> : null}>
+        <div className="dat-ban-flow-section-head">
         </div>
 
         {!hasSelectedDate ? (
-          <div className="dat-ban-customer-empty-state">
-            <h3>Chọn ngày trước để xem khung giờ.</h3>
-            <p>Ngay khi có ngày dùng bữa, chúng tôi sẽ gợi ý các khung giờ còn phù hợp với lựa chọn của bạn.</p>
-          </div>
+          <Alert type="info" showIcon message="Chọn ngày trước để xem khung giờ." description="Ngay khi có ngày dùng bữa, chúng tôi sẽ gợi ý các khung giờ còn phù hợp với lựa chọn của bạn." />
         ) : (
-          <div className="dat-ban-time-periods">
+          <Space direction="vertical" size={16} style={{ width: '100%' }}>
             {CAC_CA_KHUNG_GIO_DAT_BAN.map((period) => (
-              <section key={period.id} className="dat-ban-time-period">
+              <Card key={period.id} size="small" title={<span>{period.icon} {period.label}</span>} extra={<Text type="secondary">{period.timeRange}</Text>}>
                 <div className="dat-ban-time-period-head">
-                  <div>
-                    <p className="eyebrow">{period.icon} {period.label}</p>
-                    <h3>{period.timeRange}</h3>
-                  </div>
-                  <span>🟢 {NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.AVAILABLE} · 🟡 {NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.LIMITED} · 🔴 {NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.FULL}</span>
+                  <Text type="secondary">🟢 {NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.AVAILABLE} · 🟡 {NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.LIMITED} · 🔴 {NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.FULL}</Text>
                 </div>
 
-                <div className="dat-ban-time-slot-grid">
+                <Row gutter={[12, 12]}>
                   {period.slots.map((slot) => {
                     const slotOption = timeSlotOptions.find((item) => item.time === slot)
                     if (!slotOption) return null
 
                     const isActive = slotOption.time === formData.time
                     return (
-                      <button
-                        key={slotOption.time}
-                        type="button"
-                        className={`dat-ban-time-slot ${slotOption.availability.toLowerCase()} ${isActive ? 'active' : ''}`}
-                        onClick={() => onTimeSelect(slotOption.time)}
-                        disabled={slotOption.isDisabled}
-                      >
-                        <strong>{slotOption.time}</strong>
-                        <span>{slotOption.availabilityLabel}</span>
-                      </button>
+                      <Col xs={12} md={8} lg={6} key={slotOption.time}>
+                        <Button type={isActive ? 'primary' : 'default'} block disabled={slotOption.isDisabled} onClick={() => onTimeSelect(slotOption.time)} style={slotOption.isDisabled ? MAU_ANTD_DAT_BAN.nutVoHieu : isActive ? MAU_ANTD_DAT_BAN.nutDangChon : MAU_ANTD_DAT_BAN.nutChon}>
+                          {slotOption.time} • {slotOption.availabilityLabel}
+                        </Button>
+                      </Col>
                     )
                   })}
-                </div>
-              </section>
+                </Row>
+              </Card>
             ))}
-          </div>
+          </Space>
         )}
-      </section>
+      </Card>
 
-      <section className="dat-ban-flow-section">
-        <div className="dat-ban-flow-section-head">
-          <div>
-            <p className="eyebrow">1.4</p>
-            <h3>Chọn khu vực (tuỳ chọn)</h3>
-          </div>
-          <p className="dat-ban-customer-grid-note">Nhà hàng sẽ cố gắng sắp xếp theo ưu tiên này nhưng không cam kết 100%.</p>
-        </div>
+      <Card title="Chọn khu vực (tuỳ chọn)" extra={<Text type="secondary">Nhà hàng sẽ cố gắng sắp xếp theo ưu tiên này nhưng không cam kết 100%.</Text>}>
 
         {!hasSelectedTime ? (
-          <div className="dat-ban-customer-empty-state">
-            <h3>Chọn giờ dùng bữa để xem khu vực phù hợp.</h3>
-            <p>Khi đã có ngày và giờ, hệ thống sẽ gợi ý mức độ khả dụng của từng khu vực để bạn chọn nhanh hơn.</p>
-          </div>
+          <Alert type="info" showIcon message="Chọn giờ dùng bữa để xem khu vực phù hợp." description="Khi đã có ngày và giờ, hệ thống sẽ gợi ý mức độ khả dụng của từng khu vực để bạn chọn nhanh hơn." />
         ) : !hasSelectedGuests ? (
-          <div className="dat-ban-customer-empty-state">
-            <h3>Chọn số khách để xem bàn phù hợp.</h3>
-            <p>Sau khi biết số khách, hệ thống sẽ tính số bàn phù hợp theo từng khu vực để bạn chọn nhanh và chính xác hơn.</p>
-          </div>
+          <Alert type="info" showIcon message="Chọn số khách để xem bàn phù hợp." description="Sau khi biết số khách, hệ thống sẽ tính số bàn phù hợp theo từng khu vực để bạn chọn nhanh và chính xác hơn." />
         ) : (
           <>
-            <div className="dat-ban-area-grid">
+            <Row gutter={[12, 12]}>
               {areaOptions.map((area) => {
                 const availability = availabilityByArea[area.value]
                 const isActive = formData.seatingArea === area.value
                 return (
-                  <button
-                    key={area.value}
-                    type="button"
-                    className={`dat-ban-area-card ${isActive ? 'active' : ''} ${availability.count === 0 ? 'disabled' : ''}`}
-                    onClick={() => onAreaToggle(area.value)}
-                    disabled={availability.count === 0}
-                  >
-                    <div className="dat-ban-area-card-head">
-                      <span>{area.icon}</span>
-                      <div>
-                        <div className="dat-ban-area-card-title-row">
-                          <strong>{area.label}</strong>
-                        </div>
-                        {area.recommendationBadge ? <span className="dat-ban-area-badge">{area.recommendationBadge}</span> : null}
-                        <p>{area.description}</p>
-                        {area.recommendationNote ? <small className="dat-ban-area-note">{area.recommendationNote}</small> : null}
-                      </div>
-                    </div>
-                    <div className="dat-ban-area-card-foot">
-                      <span>{availability.label}</span>
-                      <small>Còn: {availability.count} bàn</small>
-                    </div>
-                  </button>
+                  <Col xs={24} md={12} xl={8} key={area.value}>
+                    <Card hoverable size="small" style={availability.count === 0 ? MAU_ANTD_DAT_BAN.nutVoHieu : isActive ? MAU_ANTD_DAT_BAN.nutDangChon : MAU_ANTD_DAT_BAN.nutChon} onClick={() => availability.count > 0 && onAreaToggle(area.value)}>
+                      <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                        <Space>
+                          <span>{area.icon}</span>
+                          <Text strong>{area.label}</Text>
+                        </Space>
+                        {area.recommendationBadge ? <Tag color="gold">{area.recommendationBadge}</Tag> : null}
+                        <Paragraph style={{ marginBottom: 0 }}>{area.description}</Paragraph>
+                        {area.recommendationNote ? <Text type="secondary">{area.recommendationNote}</Text> : null}
+                        <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                          <Tag color={availability.count <= 0 ? 'red' : availability.tone === 'limited' ? 'gold' : 'green'}>{availability.label}</Tag>
+                          <Text type="secondary">Còn: {availability.count} bàn</Text>
+                        </Space>
+                      </Space>
+                    </Card>
+                  </Col>
                 )
               })}
-            </div>
-            {selectedAreaUnavailableMessage ? <p className="dat-ban-customer-error">{selectedAreaUnavailableMessage}</p> : null}
+            </Row>
+            {selectedAreaUnavailableMessage ? <Alert style={{ marginTop: 16 }} type="error" showIcon message={selectedAreaUnavailableMessage} /> : null}
           </>
         )}
-      </section>
-    </article>
+      </Card>
+    </Space>
   )
 }
 

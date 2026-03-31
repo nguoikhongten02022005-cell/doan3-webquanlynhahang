@@ -1,4 +1,7 @@
+import { Alert, Button, Card, Col, Form, Input, Row, Select, Space, Tag, Typography } from 'antd'
 import { CAC_GOI_Y_GHI_CHU_DAT_BAN, CAC_DIP_DAT_BAN } from '../../data/duLieuDatBan'
+
+const { TextArea } = Input
 
 function BuocHaiDatBan({
   formData,
@@ -10,82 +13,46 @@ function BuocHaiDatBan({
   const noteLength = formData.notes.length
 
   return (
-    <article className="dat-ban-customer-card dat-ban-customer-card-soft dat-ban-customer-flow-card">
-      <div className="dat-ban-customer-form-grid">
-        <label className="dat-ban-customer-field">
-          <span>Họ và tên *</span>
-          <input
-            type="text"
-            className={`truong-nhap dat-ban-step-two-input ${fieldErrors.name ? 'truong-nhap-error' : ''}`}
-            placeholder="Nguyễn Văn A"
-            value={formData.name}
-            onChange={onFieldChange('name')}
-            onBlur={onFieldBlur('name')}
-          />
-          {fieldErrors.name ? <small className="dat-ban-customer-error-inline">{fieldErrors.name}</small> : null}
-        </label>
+    <Card title="Thông tin liên hệ" bordered={false}>
+      <Form layout="vertical">
+        <Row gutter={16}>
+          <Col xs={24} md={12}>
+            <Form.Item label="Họ và tên *" validateStatus={fieldErrors.name ? 'error' : ''} help={fieldErrors.name || ''}>
+              <Input placeholder="Nguyễn Văn A" value={formData.name} onChange={onFieldChange('name')} onBlur={onFieldBlur('name')} />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item label="Số điện thoại *" validateStatus={fieldErrors.phone ? 'error' : ''} help={fieldErrors.phone || ''}>
+              <Input placeholder="0901 234 567" value={formData.phone} onChange={onFieldChange('phone')} onBlur={onFieldBlur('phone')} />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item label="Email" validateStatus={fieldErrors.email ? 'error' : ''} help={fieldErrors.email || ''}>
+              <Input placeholder="example@gmail.com" value={formData.email} onChange={onFieldChange('email')} onBlur={onFieldBlur('email')} />
+            </Form.Item>
+          </Col>
+          <Col xs={24} md={12}>
+            <Form.Item label="Dịp dùng bữa">
+              <Select value={formData.occasion} onChange={(value) => onFieldChange('occasion')({ target: { value } })} options={[{ value: '', label: 'Không có' }, ...CAC_DIP_DAT_BAN.map((occasion) => ({ value: occasion, label: occasion }))]} />
+            </Form.Item>
+          </Col>
+          <Col span={24}>
+            <Form.Item label="Ghi chú cho nhà hàng" validateStatus={fieldErrors.notes ? 'error' : ''} help={fieldErrors.notes || 'Tối đa 200 ký tự.'}>
+              <TextArea rows={4} placeholder="VD: Có trẻ em, cần ghế cao, muốn bàn gần cửa sổ..." value={formData.notes} onChange={onFieldChange('notes')} onBlur={onFieldBlur('notes')} />
+            </Form.Item>
+            <div style={{ textAlign: 'right', marginTop: -8 }}><Typography.Text type="secondary">{noteLength}/200</Typography.Text></div>
+          </Col>
+        </Row>
+      </Form>
 
-        <label className="dat-ban-customer-field">
-          <span>Số điện thoại *</span>
-          <input
-            type="tel"
-            className={`truong-nhap dat-ban-step-two-input ${fieldErrors.phone ? 'truong-nhap-error' : ''}`}
-            placeholder="0901 234 567"
-            value={formData.phone}
-            onChange={onFieldChange('phone')}
-            onBlur={onFieldBlur('phone')}
-          />
-          {fieldErrors.phone ? <small className="dat-ban-customer-error-inline">{fieldErrors.phone}</small> : null}
-        </label>
-
-        <label className="dat-ban-customer-field dat-ban-customer-field-wide">
-          <span>Email</span>
-          <input
-            type="email"
-            className={`truong-nhap dat-ban-step-two-input ${fieldErrors.email ? 'truong-nhap-error' : ''}`}
-            placeholder="example@gmail.com"
-            value={formData.email}
-            onChange={onFieldChange('email')}
-            onBlur={onFieldBlur('email')}
-          />
-          {fieldErrors.email ? <small className="dat-ban-customer-error-inline">{fieldErrors.email}</small> : null}
-        </label>
-
-        <label className="dat-ban-customer-field">
-          <span>Dịp dùng bữa</span>
-          <select className="truong-nhap dat-ban-step-two-input" value={formData.occasion} onChange={onFieldChange('occasion')}>
-            <option value="">Không có</option>
-            {CAC_DIP_DAT_BAN.map((occasion) => (
-              <option key={occasion} value={occasion}>{occasion}</option>
-            ))}
-          </select>
-        </label>
-
-        <label className="dat-ban-customer-field dat-ban-customer-field-wide">
-          <span>Ghi chú cho nhà hàng</span>
-          <textarea
-            className={`truong-van-ban dat-ban-step-two-textarea ${fieldErrors.notes ? 'truong-nhap-error' : ''}`}
-            rows="4"
-            placeholder="VD: Có trẻ em, cần ghế cao, muốn bàn gần cửa sổ..."
-            value={formData.notes}
-            onChange={onFieldChange('notes')}
-            onBlur={onFieldBlur('notes')}
-          />
-          <div className="dat-ban-field-meta-row">
-            {fieldErrors.notes ? <small className="dat-ban-customer-error-inline">{fieldErrors.notes}</small> : <small className="dat-ban-customer-help-text">Tối đa 200 ký tự.</small>}
-            <small className="dat-ban-customer-counter">{noteLength}/200</small>
-          </div>
-        </label>
-      </div>
-
-      <div className="dat-ban-customer-chip-row">
+      <Space wrap>
         {CAC_GOI_Y_GHI_CHU_DAT_BAN.map((item) => (
-          <button key={item} type="button" className="dat-ban-customer-note-chip" onClick={() => onSuggestionClick(item)}>
+          <Tag key={item} color="default" style={{ cursor: 'pointer', padding: '6px 10px' }} onClick={() => onSuggestionClick(item)}>
             {item}
-          </button>
+          </Tag>
         ))}
-      </div>
-    </article>
+      </Space>
+    </Card>
   )
 }
 
