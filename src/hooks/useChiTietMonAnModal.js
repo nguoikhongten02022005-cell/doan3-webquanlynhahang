@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CAC_LUA_CHON_KICH_CO_THUC_DON } from '../constants/tuyChonThucDon'
 import { BI_DANH_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
 import { phanTichGiaThanhSo } from '../utils/giaTien'
 
-export const useChiTietMonAnModal = ({ sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON }) => {
+export const useChiTietMonAnModal = ({ sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON, themVaoGio = null }) => {
   const kichCoMacDinh = sizeOptions[0]?.value || 'M'
   const [monDaChon, setMonDaChon] = useState(null)
   const [dangMoChiTiet, setDangMoChiTiet] = useState(false)
@@ -87,6 +87,49 @@ export const useChiTietMonAnModal = ({ sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_D
     return phanTichGiaThanhSo(monDaChon.price) + phuThuDaChon
   }, [monDaChon, phuThuDaChon])
 
+  const taoMonDaTuyChon = useCallback(() => {
+    if (!monDaChon) {
+      return null
+    }
+
+    return {
+      ...monDaChon,
+      price: giaChiTiet,
+      quantity: 1,
+      kichCoDaChon,
+      toppingDaChon,
+      ghiChuRieng,
+    }
+  }, [monDaChon, giaChiTiet, kichCoDaChon, toppingDaChon, ghiChuRieng])
+
+  const xuLyThemMonDaTuyChon = useCallback(() => {
+    if (typeof themVaoGio !== 'function') {
+      return
+    }
+
+    const monDaTuyChon = taoMonDaTuyChon()
+    if (!monDaTuyChon) {
+      return
+    }
+
+    themVaoGio(monDaTuyChon)
+    dongChiTietMon()
+  }, [themVaoGio, taoMonDaTuyChon])
+
+  const xuLyThemVaoGio = useCallback((mon) => {
+    if (typeof themVaoGio !== 'function' || !mon) {
+      return
+    }
+
+    themVaoGio({
+      ...mon,
+      quantity: 1,
+      kichCoDaChon: kichCoMacDinh,
+      toppingDaChon: [],
+      ghiChuRieng: '',
+    })
+  }, [themVaoGio, kichCoMacDinh])
+
   return {
     giaChiTiet,
     xuLyBatTatTopping,
@@ -101,5 +144,7 @@ export const useChiTietMonAnModal = ({ sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_D
     datKichCoDaChon: setKichCoDaChon,
     datGhiChuRieng,
     ghiChuRieng,
+    xuLyThemMonDaTuyChon,
+    xuLyThemVaoGio,
   }
 }

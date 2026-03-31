@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
 import TheMonAn from '../components/TheMonAn'
 import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
+import { useGioHang } from '../context/GioHangContext'
 import {
   GHI_CHU_DANH_MUC_THUC_DON,
   HOME_CAC_DANH_MUC_THUC_DON,
@@ -28,6 +29,7 @@ const KHOANG_CAN_DINH_TAB = 120
 
 function ThucDonPage() {
   const [activeCategory, setActiveCategory] = useState(CAC_TAB_THUC_DON[0])
+  const { themVaoGio } = useGioHang()
   const { dishes, daTaiLanDau, error, reloadDishes } = useDanhSachMonAn()
   const danhMucRefs = useRef({})
   const tabsRowRef = useRef(null)
@@ -35,6 +37,7 @@ function ThucDonPage() {
   const {
     dongChiTietMon,
     giaChiTiet,
+    xuLyThemMonDaTuyChon,
     xuLyBatTatTopping,
     dangMoChiTiet,
     moChiTietMon,
@@ -45,7 +48,7 @@ function ThucDonPage() {
     datKichCoDaChon,
     datGhiChuRieng,
     ghiChuRieng,
-  } = useChiTietMonAnModal({})
+  } = useChiTietMonAnModal({ themVaoGio })
 
   const categoryTabs = useMemo(
     () => CAC_TAB_THUC_DON.map((category) => ({
@@ -250,6 +253,7 @@ function ThucDonPage() {
       <ChiTietMonAnModal
         giaChiTiet={giaChiTiet}
         dangMo={dangMoChiTiet}
+        xuLyThemVaoGio={xuLyThemMonDaTuyChon}
         xuLyDong={dongChiTietMon}
         xuLyChonKichCo={datKichCoDaChon}
         xuLyDoiGhiChuRieng={datGhiChuRieng}

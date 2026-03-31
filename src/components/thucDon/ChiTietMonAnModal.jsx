@@ -6,6 +6,7 @@ function ChiTietMonAnModal({
   giaChiTiet,
   dangMo,
   xuLyDong,
+  xuLyThemVaoGio,
   xuLyChonKichCo,
   xuLyDoiGhiChuRieng,
   xuLyBatTatTopping,
@@ -112,6 +113,11 @@ function ChiTietMonAnModal({
               <strong>{dinhDangTienTe(giaChiTiet)}</strong>
               {phuThuDaChon > 0 && <small>Đã gồm phụ thu cỡ món {dinhDangTienTe(phuThuDaChon)}</small>}
             </div>
+            {typeof xuLyThemVaoGio === 'function' ? (
+              <button type="button" className="btn nut-chinh" onClick={xuLyThemVaoGio}>
+                Thêm vào giỏ
+              </button>
+            ) : null}
           </div>
         </div>
       </div>

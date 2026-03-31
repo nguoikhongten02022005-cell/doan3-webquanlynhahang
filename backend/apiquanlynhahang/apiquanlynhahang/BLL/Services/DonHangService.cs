@@ -15,6 +15,27 @@ public class DonHangService
         _dbContext = dbContext;
     }
 
+    private async Task DongBoTrangThaiBanVaBookingAsync(string maBan, string trangThaiBan, string? trangThaiDatBan, CancellationToken cancellationToken)
+    {
+        var ban = await _dbContext.Ban.FirstOrDefaultAsync(x => x.MaBan == maBan, cancellationToken);
+        if (ban is not null)
+        {
+            ban.TrangThai = trangThaiBan;
+            ban.NgayCapNhat = DateTime.UtcNow;
+        }
+
+        var datBanGanNhat = await _dbContext.DatBan
+            .Where(x => x.MaBan == maBan && x.TrangThai != "Cancelled" && x.TrangThai != "Completed" && x.TrangThai != "NoShow")
+            .OrderByDescending(x => x.NgayTao)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (datBanGanNhat is not null && !string.IsNullOrWhiteSpace(trangThaiDatBan))
+        {
+            datBanGanNhat.TrangThai = trangThaiDatBan;
+            datBanGanNhat.NgayCapNhat = DateTime.UtcNow;
+        }
+    }
+
     public Task<List<DonHang>> LayDanhSachAsync(CancellationToken cancellationToken = default)
         => _dbContext.DonHang.AsNoTracking().OrderByDescending(x => x.NgayTao).ToListAsync(cancellationToken);
 
@@ -391,8 +412,7 @@ public class DonHangService
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         var chiTietMoi = await LayChiTietAsync(donDangMo.MaDonHang, cancellationToken);
-        ban.TrangThai = "Occupied";
-        ban.NgayCapNhat = DateTime.UtcNow;
+        await DongBoTrangThaiBanVaBookingAsync(maBan, "Occupied", "DA_CHECK_IN", cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
         return new { DonHang = donDangMo, ChiTiet = chiTietMoi };
@@ -402,8 +422,13 @@ public class DonHangService
     {
         var ban = await _dbContext.Ban.FirstOrDefaultAsync(x => x.MaBan == maBan, cancellationToken);
         if (ban is null) return false;
-        ban.TrangThai = "Reserved";
-        ban.NgayCapNhat = DateTime.UtcNow;
+
+        var donHang = await _dbContext.DonHang.FirstOrDefaultAsync(x => x.MaBanAn == maBan && x.LoaiDon == "TAI_BAN" && (x.TrangThai == "Pending" || x.TrangThai == "Confirmed"), cancellationToken);
+        if (donHang is null) return false;
+
+        donHang.TrangThai = "Confirmed";
+        donHang.NgayCapNhat = DateTime.UtcNow;
+        await DongBoTrangThaiBanVaBookingAsync(maBan, "Reserved", "Confirmed", cancellationToken);
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
     }
@@ -418,8 +443,7 @@ public class DonHangService
 
         donHang.TrangThai = "Paid";
         donHang.NgayCapNhat = DateTime.UtcNow;
-        ban.TrangThai = "Available";
-        ban.NgayCapNhat = DateTime.UtcNow;
+        await DongBoTrangThaiBanVaBookingAsync(maBan, "Available", "Completed", cancellationToken);
 
         await _dbContext.SaveChangesAsync(cancellationToken);
         return true;
