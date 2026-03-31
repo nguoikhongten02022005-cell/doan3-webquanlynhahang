@@ -1,4 +1,4 @@
-DROP DATABASE QuanNhaHang;
+DROP DATABASE IF EXISTS QuanNhaHang;
 
 CREATE DATABASE IF NOT EXISTS QuanNhaHang
     DEFAULT CHARACTER SET utf8mb4
@@ -10,6 +10,9 @@ SET FOREIGN_KEY_CHECKS = 0;
 
 -- ============================================================
 -- 1. NGUOI DUNG
+-- Password mac dinh:
+-- Admin/NhanVien/Khach cu: 123
+-- Khach test moi: 12345678
 -- ============================================================
 CREATE TABLE IF NOT EXISTS NguoiDung (
     MaND        VARCHAR(50) PRIMARY KEY,
@@ -61,9 +64,12 @@ CREATE TABLE IF NOT EXISTS KhachHang (
 -- ============================================================
 CREATE TABLE IF NOT EXISTS Ban (
     MaBan       VARCHAR(50) PRIMARY KEY,
+    TenBan      VARCHAR(50),
+    KhuVuc      VARCHAR(50),
     SoBan       INT NOT NULL,
     SoChoNgoi   INT NOT NULL,
     ViTri       VARCHAR(100),
+    GhiChu      VARCHAR(255),
     TrangThai   ENUM('Available','Occupied','Reserved','Maintenance') NOT NULL DEFAULT 'Available',
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
@@ -160,9 +166,10 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaDonHang   VARCHAR(50) PRIMARY KEY,
     MaKH        VARCHAR(50),
     MaBan       VARCHAR(50),
+    MaBanAn     VARCHAR(20),
     MaNV        VARCHAR(50),
     MaDatBan    VARCHAR(50),
-    LoaiDon     ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG') NOT NULL DEFAULT 'TAI_QUAN',
+    LoaiDon     ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG','TAI_BAN') NOT NULL DEFAULT 'TAI_QUAN',
     DiaChiGiao  VARCHAR(255),
     PhiShip     DECIMAL(10,2) NOT NULL DEFAULT 0,
     TongTien    DECIMAL(15,2) NOT NULL DEFAULT 0,
@@ -306,6 +313,7 @@ CREATE INDEX IDX_ThucDon_TrangThai ON ThucDon(TrangThai);
 CREATE INDEX IDX_DonHang_NgayTao ON DonHang(NgayTao);
 CREATE INDEX IDX_DonHang_TrangThai ON DonHang(TrangThai);
 CREATE INDEX IDX_DonHang_MaBan ON DonHang(MaBan);
+CREATE INDEX IDX_DonHang_MaBanAn ON DonHang(MaBanAn);
 CREATE INDEX IDX_DonHang_MaKH ON DonHang(MaKH);
 CREATE INDEX IDX_ChiTiet_DonHang ON ChiTietDonHang(MaDonHang);
 CREATE INDEX IDX_ChiTiet_TrangThai ON ChiTietDonHang(TrangThai);
@@ -350,9 +358,12 @@ ORDER BY TongSoLuong DESC;
 CREATE OR REPLACE VIEW V_TinhTrangBan AS
 SELECT
     b.MaBan,
+    b.TenBan,
+    b.KhuVuc,
     b.SoBan,
     b.SoChoNgoi,
     b.ViTri,
+    b.GhiChu,
     b.TrangThai,
     dh.MaDonHang,
     dh.TrangThai AS TrangThaiDon
@@ -363,23 +374,32 @@ LEFT JOIN DonHang dh
 
 -- ============================================================
 -- DU LIEU MAU
+-- Password mac dinh:
+-- admin@nhahang.com / 123
+-- an.nv@nhahang.com / 123
+-- bich.lt@nhahang.com / 123
+-- khach1@gmail.com / 123
+-- mai.pt@gmail.com / 123
+-- khachtest01@gmail.com / 12345678
 -- ============================================================
-INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro) VALUES
-('ND001', 'Admin System', 'admin@nhahang.com', '$2y$10$hashed_admin', 'Admin'),
-('ND002', 'Nguyen Van An', 'an.nv@nhahang.com', '$2y$10$hashed_nv001', 'NhanVien'),
-('ND003', 'Le Thi Bich', 'bich.lt@nhahang.com', '$2y$10$hashed_nv002', 'NhanVien'),
-('ND004', 'Tran Van Khach', 'khach1@gmail.com', '$2y$10$hashed_kh001', 'KhachHang'),
-('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2y$10$hashed_kh002', 'KhachHang');
+INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro, TrangThai) VALUES
+('ND001', 'Admin System', 'admin@nhahang.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'Admin', 'Active'),
+('ND002', 'Nguyen Van An', 'an.nv@nhahang.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'NhanVien', 'Active'),
+('ND003', 'Le Thi Bich', 'bich.lt@nhahang.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'NhanVien', 'Active'),
+('ND004', 'Tran Van Khach', 'khach1@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND_KH_TEST_01', 'Nguyen Van Test', 'khachtest01@gmail.com', '$2a$11$dtmZV4AJS/fB16ymIqO4AuCZuj21tj08dUYpY3uons9iJor0n1omW', 'KhachHang', 'Active');
 
 INSERT INTO NhanVien (MaNV, MaND, HoTen, GioiTinh, SDT, ChucVu, NgayVaoLam) VALUES
 ('NV001', 'ND001', 'Admin System', 'Nam', '0901111111', 'Admin', '2024-01-01'),
 ('NV002', 'ND002', 'Nguyen Van An', 'Nam', '0901234567', 'QuanLy', '2024-06-01'),
 ('NV003', 'ND003', 'Le Thi Bich', 'Nu', '0907654321', 'ThuNgan', '2025-01-15');
 
-INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiemTichLuy) VALUES
-('KH001', 'ND004', 'Tran Van Khach', '0912345678', 150),
-('KH002', 'ND005', 'Pham Thi Mai', '0987654321', 80),
-('KH003', NULL, 'Khach Vang Lai', NULL, 0);
+INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES
+('KH001', 'ND004', 'Tran Van Khach', '0912345678', NULL, 150),
+('KH002', 'ND005', 'Pham Thi Mai', '0987654321', NULL, 80),
+('KH003', NULL, 'Khach Vang Lai', NULL, NULL, 0),
+('KH_TEST_01', 'ND_KH_TEST_01', 'Nguyen Van Test', '0901239999', '123 Nguyen Hue, Q1, TP.HCM', 0);
 
 INSERT INTO DanhMuc (MaDanhMuc, TenDanhMuc, ThuTu) VALUES
 ('DM001', 'Khai Vi', 1),
@@ -388,82 +408,91 @@ INSERT INTO DanhMuc (MaDanhMuc, TenDanhMuc, ThuTu) VALUES
 ('DM004', 'Do Uong', 4),
 ('DM005', 'Combo', 5);
 
-INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, Gia, ThoiGianChuanBi) VALUES
-('M001', 'DM001', 'Goi Cuon Tom Thit', 35000, 10),
-('M002', 'DM001', 'Cha Gio Hai San', 45000, 15),
-('M003', 'DM002', 'Com Rang Duong Chau', 55000, 20),
-('M004', 'DM002', 'Pho Bo Dac Biet', 75000, 25),
-('M005', 'DM002', 'Bun Bo Hue', 65000, 25),
-('M006', 'DM003', 'Kem Dau Tay', 30000, 5),
-('M007', 'DM003', 'Banh Flan Caramel', 25000, 5),
-('M008', 'DM004', 'Ca Phe Sua Da', 25000, 5),
-('M009', 'DM004', 'Tra Dao Cam Sa', 35000, 5),
-('M010', 'DM004', 'Nuoc Ep Cam', 30000, 5);
-
-INSERT INTO Ban (MaBan, SoBan, SoChoNgoi, ViTri) VALUES
-('B001', 1, 2, 'Tang 1 - Cua so'),
-('B002', 2, 4, 'Tang 1 - Khu A'),
-('B003', 3, 4, 'Tang 1 - Khu B'),
-('B004', 4, 6, 'Tang 2 - View dep'),
-('B005', 5, 8, 'Tang 2 - Khu rieng'),
-('B006', 6, 2, 'Ngoai troi');
-
-INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan) VALUES
-('QR001', 'B001', 'https://nhahang.com/order?ban=B001', '2027-12-31 23:59:59'),
-('QR002', 'B002', 'https://nhahang.com/order?ban=B002', '2027-12-31 23:59:59'),
-('QR003', 'B003', 'https://nhahang.com/order?ban=B003', '2027-12-31 23:59:59'),
-('QR004', 'B004', 'https://nhahang.com/order?ban=B004', '2027-12-31 23:59:59'),
-('QR005', 'B005', 'https://nhahang.com/order?ban=B005', '2027-12-31 23:59:59'),
-('QR006', 'B006', 'https://nhahang.com/order?ban=B006', '2027-12-31 23:59:59');
-
-INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa) VALUES
-('WELCOME10', 'Chao mung KH moi', 10, 'PhanTram', 50000, 100000, '2026-01-01', '2026-12-31', 1),
-('SUMMER20', 'Khuyen mai He', 20, 'PhanTram', 100000, 200000, '2026-06-01', '2026-08-31', NULL),
-('GIAM50K', 'Giam thang 50k', 50000, 'SoTien', NULL, 300000, '2026-01-01', '2026-12-31', 500);
-
-INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai) VALUES
-('DB001', 'KH001', 'B004', 'NV002', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhat, can banh kem', 'Confirmed');
-
-INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, TongTien, TrangThai, NguonTao) VALUES
-('DH001', 'KH001', 'B004', 'NV002', 'DB001', 215000, 'Paid', 'DatBan');
-
-INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, TrangThai) VALUES
-('CT001', 'DH001', 'M001', 2, 35000, 70000, 'Done'),
-('CT002', 'DH001', 'M004', 1, 75000, 75000, 'Done'),
-('CT003', 'DH001', 'M008', 2, 25000, 50000, 'Done'),
-('CT004', 'DH001', 'M006', 1, 20000, 20000, 'Done');
-
-INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien) VALUES
-('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850);
-
-INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, TrangThai) VALUES
-('TT001', 'HD001', 'ChuyenKhoan', 212850, 'Success');
-
-INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung) VALUES
-('DG001', 'KH001', 'DH001', 5, 'Mon ngon, phuc vu nhiet tinh, khong gian dep!');
-
-INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, NguoiThucHien) VALUES
-('LS001', 'DH001', NULL, 'Pending', 'System'),
-('LS002', 'DH001', 'Pending', 'Confirmed', 'NV002'),
-('LS003', 'DH001', 'Confirmed', 'Preparing', 'NV002'),
-('LS004', 'DH001', 'Preparing', 'Ready', 'System'),
-('LS005', 'DH001', 'Ready', 'Served', 'NV002'),
-('LS006', 'DH001', 'Served', 'Paid', 'NV003');
-
-SET SQL_SAFE_UPDATES = 0;
-
-UPDATE NguoiDung
-SET MatKhau = '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K';
-
-SET SQL_SAFE_UPDATES = 1;
-
-INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai, NgayTao, NgayCapNhat)
-VALUES
-('M011', 'DM005', 'Combo Gia Đình', 'Combo danh cho 4 nguoi gom mon chinh, khai vi va do uong.', 299000, NULL, 20, 'Available', NOW(), NOW()),
+INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai, NgayTao, NgayCapNhat) VALUES
+('M001', 'DM001', 'Goi Cuon Tom Thit', 'Goi cuon tuoi, thanh nhe, an cung nuoc cham dac biet.', 35000, NULL, 10, 'Available', NOW(), NOW()),
+('M002', 'DM001', 'Cha Gio Hai San', 'Cha gio hai san gion rum, nhan day va dam vi.', 45000, NULL, 15, 'Available', NOW(), NOW()),
+('M003', 'DM002', 'Com Rang Duong Chau', 'Com rang duong chau day dan va de an.', 55000, NULL, 20, 'Available', NOW(), NOW()),
+('M004', 'DM002', 'Pho Bo Dac Biet', 'Pho bo dam da, nuoc dung ngot thanh tu nhien.', 75000, NULL, 25, 'Available', NOW(), NOW()),
+('M005', 'DM002', 'Bun Bo Hue', 'Bun bo hue cay nhe, huong vi dac trung.', 65000, NULL, 25, 'Available', NOW(), NOW()),
+('M006', 'DM003', 'Kem Dau Tay', 'Kem mat lanh, vi dau tay thanh mat.', 30000, NULL, 5, 'Available', NOW(), NOW()),
+('M007', 'DM003', 'Banh Flan Caramel', 'Banh flan caramel mem min, ngot nhe.', 25000, NULL, 5, 'Available', NOW(), NOW()),
+('M008', 'DM004', 'Ca Phe Sua Da', 'Ca phe sua da dam vi, dung chat Viet Nam.', 25000, NULL, 5, 'Available', NOW(), NOW()),
+('M009', 'DM004', 'Tra Dao Cam Sa', 'Tra dao cam sa thanh mat, de uong.', 35000, NULL, 5, 'Available', NOW(), NOW()),
+('M010', 'DM004', 'Nuoc Ep Cam', 'Nuoc ep cam tuoi, bo sung nang luong.', 30000, NULL, 5, 'Available', NOW(), NOW()),
+('M011', 'DM005', 'Combo Gia Dinh', 'Combo danh cho 4 nguoi gom mon chinh, khai vi va do uong.', 299000, NULL, 20, 'Available', NOW(), NOW()),
 ('M012', 'DM005', 'Combo Couple', 'Combo gon nhe cho 2 nguoi voi mon chinh va do uong.', 199000, NULL, 15, 'Available', NOW(), NOW()),
 ('M013', 'DM005', 'Combo Solo', 'Combo ca nhan tiet kiem, phuc vu nhanh.', 129000, NULL, 10, 'Available', NOW(), NOW());
 
+INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
+('B001', 'Ban 1', 'Trong nha', 1, 2, 'Tang 1 - Cua so', NULL, 'Available', NOW(), NOW()),
+('B002', 'Ban 2', 'Trong nha', 2, 4, 'Tang 1 - Khu A', NULL, 'Available', NOW(), NOW()),
+('B003', 'Ban 3', 'Trong nha', 3, 4, 'Tang 1 - Khu B', NULL, 'Available', NOW(), NOW()),
+('B004', 'Ban 4', 'Tang 2', 4, 6, 'Tang 2 - View dep', NULL, 'Available', NOW(), NOW()),
+('B005', 'Ban VIP', 'Khu rieng', 5, 8, 'Tang 2 - Khu rieng', NULL, 'Available', NOW(), NOW()),
+('B006', 'Ban 6', 'Ngoai troi', 6, 2, 'Ngoai troi', NULL, 'Available', NOW(), NOW()),
+('B007', 'Ban 7', 'Trong nha', 7, 4, 'Tang 1 - Khu C', NULL, 'Available', NOW(), NOW()),
+('B008', 'Ban 8', 'Trong nha', 8, 4, 'Tang 1 - Khu C', NULL, 'Available', NOW(), NOW()),
+('B009', 'Ban 9', 'Tang 2', 9, 6, 'Tang 2 - Ban cong', NULL, 'Available', NOW(), NOW()),
+('B010', 'Ban 10', 'Ngoai troi', 10, 2, 'Ngoai troi', NULL, 'Available', NOW(), NOW()),
+('B011', 'Ban 11', 'Khu rieng', 11, 8, 'Tang 2 - Phong VIP', NULL, 'Available', NOW(), NOW());
 
-ALTER TABLE DonHang 
-ADD COLUMN LoaiDon ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG') 
-DEFAULT 'TAI_QUAN';
+INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan, TrangThai) VALUES
+('QR001', 'B001', 'http://localhost:5173/ban/B001', '2027-12-31 23:59:59', 'Active'),
+('QR002', 'B002', 'http://localhost:5173/ban/B002', '2027-12-31 23:59:59', 'Active'),
+('QR003', 'B003', 'http://localhost:5173/ban/B003', '2027-12-31 23:59:59', 'Active'),
+('QR004', 'B004', 'http://localhost:5173/ban/B004', '2027-12-31 23:59:59', 'Active'),
+('QR005', 'B005', 'http://localhost:5173/ban/B005', '2027-12-31 23:59:59', 'Active'),
+('QR006', 'B006', 'http://localhost:5173/ban/B006', '2027-12-31 23:59:59', 'Active'),
+('QR007', 'B007', 'http://localhost:5173/ban/B007', '2027-12-31 23:59:59', 'Active'),
+('QR008', 'B008', 'http://localhost:5173/ban/B008', '2027-12-31 23:59:59', 'Active'),
+('QR009', 'B009', 'http://localhost:5173/ban/B009', '2027-12-31 23:59:59', 'Active'),
+('QR010', 'B010', 'http://localhost:5173/ban/B010', '2027-12-31 23:59:59', 'Active'),
+('QR011', 'B011', 'http://localhost:5173/ban/B011', '2027-12-31 23:59:59', 'Active');
+
+INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai) VALUES
+('WELCOME10', 'Chao mung KH moi', 10, 'PhanTram', 50000, 100000, '2026-01-01', '2026-12-31', 1, 0, 'Active'),
+('SUMMER20', 'Khuyen mai He', 20, 'PhanTram', 100000, 200000, '2026-06-01', '2026-08-31', NULL, 0, 'Active'),
+('GIAM50K', 'Giam thang 50k', 50000, 'SoTien', NULL, 300000, '2026-01-01', '2026-12-31', 500, 0, 'Active');
+
+INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
+('DB001', 'KH001', 'B004', 'NV002', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhat, can banh kem', 'Confirmed', NOW(), NOW());
+
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH001', 'KH001', 'B004', NULL, 'NV002', 'DB001', 'TAI_QUAN', NULL, 0, 215000, 'Paid', 'DatBan', NULL, NOW(), NOW());
+
+INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
+('CT001', 'DH001', 'M001', 2, 35000, 70000, NULL, 'Done', NOW()),
+('CT002', 'DH001', 'M004', 1, 75000, 75000, NULL, 'Done', NOW()),
+('CT003', 'DH001', 'M008', 2, 25000, 50000, NULL, 'Done', NOW()),
+('CT004', 'DH001', 'M006', 1, 20000, 20000, NULL, 'Done', NOW());
+
+INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
+('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW());
+
+INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
+('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW());
+
+INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, NgayDanhGia, NgayCapNhat, TrangThai) VALUES
+('DG001', 'KH001', 'DH001', 5, 'Mon ngon, phuc vu nhiet tinh, khong gian dep!', NULL, NOW(), NOW(), 'Pending');
+
+INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES
+('LS001', 'DH001', NULL, 'Pending', NULL, 'System', NOW()),
+('LS002', 'DH001', 'Pending', 'Confirmed', NULL, 'NV002', NOW()),
+('LS003', 'DH001', 'Confirmed', 'Preparing', NULL, 'NV002', NOW()),
+('LS004', 'DH001', 'Preparing', 'Ready', NULL, 'System', NOW()),
+('LS005', 'DH001', 'Ready', 'Served', NULL, 'NV002', NOW()),
+('LS006', 'DH001', 'Served', 'Paid', NULL, 'NV003', NOW());
+
+-- Tài khoản khách test mới
+SELECT MaND, TenND, Email, VaiTro, TrangThai
+FROM NguoiDung
+WHERE MaND = 'ND_KH_TEST_01';
+
+SELECT MaKH, MaND, TenKH, SDT
+FROM KhachHang
+WHERE MaKH = 'KH_TEST_01';
+
+
+UPDATE NguoiDung
+SET MatKhau = '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K'
+WHERE MaND = 'ND_KH_TEST_01';
