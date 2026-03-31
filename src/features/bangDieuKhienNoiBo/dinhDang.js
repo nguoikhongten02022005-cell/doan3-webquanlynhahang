@@ -4,7 +4,14 @@ import { laySacThaiDonHang as laySacThaiDonHangChuan } from '../../utils/donHang
 export const dinhDangNgay = (giaTri) => {
   if (!giaTri) return '--'
 
-  const ngay = new Date(giaTri)
+  const chuoiGiaTri = String(giaTri).trim()
+  const ketQuaNgay = chuoiGiaTri.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (ketQuaNgay) {
+    const [, nam, thang, ngay] = ketQuaNgay
+    return `${ngay}/${thang}/${nam}`
+  }
+
+  const ngay = new Date(chuoiGiaTri)
   if (Number.isNaN(ngay.getTime())) {
     return '--'
   }

@@ -33,15 +33,18 @@ public class AuthService
         }
 
         var maKh = string.Empty;
+        var soDienThoai = string.Empty;
 
         if (nguoiDung.VaiTro == "KhachHang")
         {
-            maKh = await _dbContext.KhachHang
+            var thongTinKhachHang = await _dbContext.KhachHang
                 .AsNoTracking()
                 .Where(x => x.MaND == nguoiDung.MaND)
-                .Select(x => x.MaKH)
-                .FirstOrDefaultAsync(cancellationToken)
-                ?? string.Empty;
+                .Select(x => new { x.MaKH, x.SDT })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            maKh = thongTinKhachHang?.MaKH ?? string.Empty;
+            soDienThoai = thongTinKhachHang?.SDT ?? string.Empty;
         }
 
         return new DuLieuDangNhapDto
@@ -50,6 +53,7 @@ public class AuthService
             MaKH = maKh,
             TenND = nguoiDung.TenND,
             Email = nguoiDung.Email,
+            SDT = soDienThoai,
             VaiTro = nguoiDung.VaiTro,
         };
     }
@@ -97,15 +101,18 @@ public class AuthService
         }
 
         var maKh = string.Empty;
+        var soDienThoai = string.Empty;
 
         if (nguoiDung.VaiTro == "KhachHang")
         {
-            maKh = await _dbContext.KhachHang
+            var thongTinKhachHang = await _dbContext.KhachHang
                 .AsNoTracking()
                 .Where(x => x.MaND == nguoiDung.MaND)
-                .Select(x => x.MaKH)
-                .FirstOrDefaultAsync(cancellationToken)
-                ?? string.Empty;
+                .Select(x => new { x.MaKH, x.SDT })
+                .FirstOrDefaultAsync(cancellationToken);
+
+            maKh = thongTinKhachHang?.MaKH ?? string.Empty;
+            soDienThoai = thongTinKhachHang?.SDT ?? string.Empty;
         }
 
         return (new DuLieuDangNhapDto
@@ -115,6 +122,7 @@ public class AuthService
             MaKH = maKh,
             TenND = nguoiDung.TenND,
             Email = nguoiDung.Email,
+            SDT = soDienThoai,
             VaiTro = nguoiDung.VaiTro,
         }, null);
     }
@@ -199,6 +207,7 @@ public class AuthService
             MaKH = khachHang.MaKH,
             TenND = nguoiDung.TenND,
             Email = nguoiDung.Email,
+            SDT = khachHang.SDT ?? string.Empty,
             VaiTro = nguoiDung.VaiTro,
         }, null);
     }
@@ -261,6 +270,7 @@ public class AuthService
             MaKH = khachHang.MaKH,
             TenND = nguoiDung.TenND,
             Email = nguoiDung.Email,
+            SDT = khachHang.SDT ?? string.Empty,
             VaiTro = nguoiDung.VaiTro,
         }, null);
     }

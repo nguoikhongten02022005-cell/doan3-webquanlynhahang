@@ -90,11 +90,18 @@ export const chuanHoaDatBan = (booking) => {
 export const anhXaMucDatBan = (booking) => ({
   bookingId: booking.id,
   id: booking.bookingCode || booking.id,
+  bookingCode: booking.bookingCode || booking.id,
+  date: booking.date,
+  time: booking.time,
+  guestCount: Number(booking.guests) || 0,
+  area: NHAN_KHU_VUC_DAT_BAN[booking.seatingArea] || booking.seatingArea || 'Không ưu tiên',
   dateTime: dinhDangNgayGioDatBan(booking),
   guests: Number(booking.guests) || 0,
   seatingArea: NHAN_KHU_VUC_DAT_BAN[booking.seatingArea] || '',
   rawStatus: booking.status || 'CHO_XAC_NHAN',
   status: anhXaTrangThaiDatBan(booking.status),
+  statusLabel: anhXaTrangThaiDatBan(booking.status).replace(/^[^\s]+\s/, ''),
+  statusTone: booking.status === 'Confirmed' ? 'success' : booking.status === 'Cancelled' ? 'danger' : booking.status === 'Completed' ? 'neutral' : 'warning',
 })
 
 export const layBangTraCuuBan = (tables) => new Map(tables.map((table) => [table.id, table]))

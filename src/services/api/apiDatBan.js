@@ -2,6 +2,16 @@ import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
 
 const sinhMaDatBan = () => `DB_${Date.now()}`
 
+const chuanHoaNgayDat = (giaTri) => {
+  if (!giaTri) return ''
+
+  const chuoiGiaTri = String(giaTri).trim()
+  const ketQuaNgayThang = chuoiGiaTri.match(/^(\d{4}-\d{2}-\d{2})/)
+  if (ketQuaNgayThang) return ketQuaNgayThang[1]
+
+  return chuoiGiaTri
+}
+
 const chuanHoaDatBan = (booking) => {
   if (!booking || typeof booking !== 'object') return null
 
@@ -9,7 +19,7 @@ const chuanHoaDatBan = (booking) => {
     ...booking,
     bookingCode: booking.maDatBan || booking.MaDatBan,
     guests: String(booking.soNguoi ?? booking.SoNguoi ?? ''),
-    date: booking.ngayDat || booking.NgayDat,
+    date: chuanHoaNgayDat(booking.ngayDat || booking.NgayDat),
     time: booking.gioDat || booking.GioDat,
     endTime: booking.gioKetThuc || booking.GioKetThuc || '',
     note: booking.ghiChu || booking.GhiChu || '',
@@ -32,7 +42,7 @@ const chuanHoaDatBanPayload = (payload = {}) => ({
   maKH: payload.maKH || payload.customerCode || 'KH001',
   maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
   maNV: payload.maNV || payload.staffCode || 'NV002',
-  ngayDat: payload.ngayDat || payload.date || '',
+  ngayDat: chuanHoaNgayDat(payload.ngayDat || payload.date || ''),
   gioDat: payload.gioDat || payload.time || '',
   gioKetThuc: payload.gioKetThuc || payload.endTime || null,
   soNguoi: Number(payload.soNguoi || payload.guests || 0),

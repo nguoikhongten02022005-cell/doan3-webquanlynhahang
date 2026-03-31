@@ -8,5 +8,6 @@ public class DuLieuDangNhapDto
     public string MaKH { get; set; } = string.Empty;
     public string TenND { get; set; } = string.Empty;
     public string Email { get; set; } = string.Empty;
+    public string SDT { get; set; } = string.Empty;
     public string VaiTro { get; set; } = string.Empty;
 }

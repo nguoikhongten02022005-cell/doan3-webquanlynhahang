@@ -5,17 +5,16 @@ import DonHangMangVeTab from '../components/hoSo/DonHangMangVeTab'
 import LichSuDatBanTab from '../components/hoSo/LichSuDatBanTab'
 import ThongTinCaNhanTab from '../components/hoSo/ThongTinCaNhanTab'
 import { PROFILE_TABS } from '../data/duLieuHoSo'
-import { BOOKINGS_HO_SO_MOCK } from '../data/duLieuHoSoMock'
 import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
+import { useDatBan } from '../hooks/useDatBan'
 import { huyDonMangVeApi, layLichSuDonMangVeApi } from '../services/api/apiMangVe'
-
-const cloneBookings = () => BOOKINGS_HO_SO_MOCK.map((booking) => ({ ...booking }))
 
 function HoSoPage() {
   const navigate = useNavigate()
   const { hienThongBao } = useThongBao()
   const { nguoiDungHienTai, dangKhoiTaoXacThuc, dangXuat, capNhatHoSo, capNhatMatKhau } = useXacThuc()
+  const { layLichSuDatBan, huyDatBan } = useDatBan()
   const [tabDangMo, setTabDangMo] = useState('personal')
   const [lichSuDatBan, setLichSuDatBan] = useState([])
   const [lichSuDonHang, setLichSuDonHang] = useState([])
@@ -30,42 +29,57 @@ function HoSoPage() {
       return
     }
 
-    setLichSuDatBan(cloneBookings())
     setMaDonDangXem('')
     ;(async () => {
       try {
+        const danhSachDatBan = await layLichSuDatBan()
+        setLichSuDatBan(Array.isArray(danhSachDatBan) ? danhSachDatBan : [])
+
         const { duLieu } = await layLichSuDonMangVeApi()
         setLichSuDonHang(Array.isArray(duLieu) ? duLieu : [])
       } catch {
+        setLichSuDatBan([])
         setLichSuDonHang([])
       }
     })()
-  }, [nguoiDungHienTai])
+  }, [layLichSuDatBan, nguoiDungHienTai])
 
   const donHangDangXem = useMemo(
     () => lichSuDonHang.find((order) => order.maDonHang === maDonDangXem) || null,
     [lichSuDonHang, maDonDangXem],
   )
 
-  const handleCancelBooking = (bookingCode) => {
-    // TODO: Replace mock booking cancellation with the real booking cancel API.
-    setLichSuDatBan((currentBookings) => currentBookings.map((booking) => (
-      booking.bookingCode === bookingCode
-        ? {
-            ...booking,
-            statusLabel: 'Đã hủy',
-            statusTone: 'danger',
-            rawStatus: 'DA_HUY',
-          }
-        : booking
-    )))
+  const handleCancelBooking = async (bookingCode) => {
+    const xacNhan = window.confirm(`Bạn có chắc muốn hủy booking ${bookingCode}?`)
+    if (!xacNhan) return
 
-    hienThongBao({
-      message: `Đã hủy booking ${bookingCode}.`,
-      tone: 'success',
-      duration: 3000,
-      title: '',
-    })
+    try {
+      const ketQua = await huyDatBan(bookingCode, bookingCode)
+      if (!ketQua.success) {
+        hienThongBao({
+          message: ketQua.error || 'Không thể hủy đặt bàn lúc này.',
+          tone: 'error',
+          duration: 3000,
+          title: '',
+        })
+        return
+      }
+
+      setLichSuDatBan(Array.isArray(ketQua.lichSuDatBan) ? ketQua.lichSuDatBan : [])
+      hienThongBao({
+        message: ketQua.message || `Đã hủy booking ${bookingCode}.`,
+        tone: 'success',
+        duration: 3000,
+        title: '',
+      })
+    } catch (error) {
+      hienThongBao({
+        message: error?.message || 'Không thể hủy đặt bàn lúc này.',
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+    }
   }
 
   const handleRebook = () => {

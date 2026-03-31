@@ -49,7 +49,7 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
             <div key={booking.bookingCode} className="ho-so-history-card">
               <div className="ho-so-history-header">
                 <strong>{booking.bookingCode}</strong>
-                <span className={`nhan-trang-thai tone-${booking.statusTone}`}>{booking.statusLabel}</span>
+                <span className={`nhan-trang-thai tone-${booking.statusTone || 'warning'}`}>{booking.statusLabel || booking.status || 'Chờ xác nhận'}</span>
               </div>
 
               <div className="ho-so-history-meta-grid">
@@ -65,7 +65,7 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
                   <span className="ho-so-history-meta-icon"><GuestIcon /></span>
                   <div>
                     <span>Số khách</span>
-                    <strong>{booking.guestCount} người</strong>
+                    <strong>{booking.guestCount || booking.guests || 0} người</strong>
                   </div>
                 </div>
 
@@ -73,19 +73,19 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
                   <span className="ho-so-history-meta-icon"><AreaIcon /></span>
                   <div>
                     <span>Khu vực</span>
-                    <strong>{booking.area}</strong>
+                    <strong>{booking.area || booking.seatingArea || 'Không ưu tiên'}</strong>
                   </div>
                 </div>
               </div>
 
               <div className="ho-so-history-actions">
-                {booking.rawStatus === 'DA_XAC_NHAN' && (
+                {['DA_XAC_NHAN', 'Confirmed'].includes(booking.rawStatus || booking.status) && (
                   <button type="button" className="btn ho-so-action-btn ho-so-action-btn--danger" onClick={() => onCancelBooking(booking.bookingCode)}>
                     Hủy đặt bàn
                   </button>
                 )}
 
-                {['DA_HOAN_THANH', 'DA_HUY'].includes(booking.rawStatus) && (
+                {['DA_HOAN_THANH', 'DA_HUY', 'Completed', 'Cancelled'].includes(booking.rawStatus || booking.status) && (
                   <button type="button" className="btn ho-so-action-btn ho-so-action-btn--warm" onClick={() => onRebook(booking.bookingCode)}>
                     Đặt lại
                   </button>
