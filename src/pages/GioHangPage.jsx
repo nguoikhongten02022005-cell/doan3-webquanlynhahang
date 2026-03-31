@@ -13,13 +13,7 @@ import {
   layPhieuGiamGiaDaApDung as getStoredVoucher,
   luuPhieuGiamGiaDaApDung as saveVoucher,
 } from '../services/dichVuPhieuGiamGia'
-
-// TODO: thay validate mock này bằng API voucher thật khi backend sẵn sàng.
-const VOUCHER_MOCK_DATA = Object.freeze({
-  SUMMER30: 30,
-  WELCOME10: 10,
-  FREESHIP: 20,
-})
+import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
 
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 
@@ -100,7 +94,7 @@ function GioHangPage() {
     navigate('/thanh-toan')
   }
 
-  const handleApplyVoucher = () => {
+  const handleApplyVoucher = async () => {
     if (tamTinh <= 0) {
       setVoucherDaApDung(null)
       setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
@@ -119,33 +113,48 @@ function GioHangPage() {
 
     setDangApVoucher(true)
 
-    const phanTramGiam = VOUCHER_MOCK_DATA[maVoucher]
-    if (!phanTramGiam) {
+    try {
+      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tamTinh)
+      if (!duLieu) {
+        setVoucherDaApDung(null)
+        setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
+        clearStoredVoucher()
+        return
+      }
+
+      const laGiamPhanTram = String(duLieu.discountType || '').toLowerCase() === 'phantram'
+      const phanTramGiam = laGiamPhanTram ? Number(duLieu.discountValue || 0) : 0
+      const soTienGiamCoDinh = laGiamPhanTram ? 0 : Number(duLieu.discountValue || 0)
+      const soTienGiamTamTinh = laGiamPhanTram
+        ? Math.round((tamTinh * phanTramGiam) / 100)
+        : soTienGiamCoDinh
+      const soTienGiamToiDa = duLieu.maxDiscountAmount == null
+        ? soTienGiamTamTinh
+        : Math.min(soTienGiamTamTinh, Number(duLieu.maxDiscountAmount || 0))
+
+      const voucherHopLe = saveVoucher({
+        code: duLieu.code || maVoucher,
+        discountPercent: phanTramGiam,
+        amount: soTienGiamToiDa,
+      })
+
+      if (!voucherHopLe) {
+        setVoucherDaApDung(null)
+        setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
+        clearStoredVoucher()
+        return
+      }
+
+      setVoucherDaApDung(voucherHopLe)
+      setMaVoucherNhap(voucherHopLe.code)
+      setLoiVoucher('')
+    } catch (error) {
       setVoucherDaApDung(null)
-      setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
+      setLoiVoucher(`❌ ${error?.message || 'Mã không hợp lệ hoặc đã hết hạn'}`)
       clearStoredVoucher()
+    } finally {
       setDangApVoucher(false)
-      return
     }
-
-    const voucherHopLe = saveVoucher({
-      code: maVoucher,
-      discountPercent: phanTramGiam,
-      amount: Math.round((tamTinh * phanTramGiam) / 100),
-    })
-
-    if (!voucherHopLe) {
-      setVoucherDaApDung(null)
-      setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
-      clearStoredVoucher()
-      setDangApVoucher(false)
-      return
-    }
-
-    setVoucherDaApDung(voucherHopLe)
-    setMaVoucherNhap(voucherHopLe.code)
-    setLoiVoucher('')
-    setDangApVoucher(false)
   }
 
   const handleClearVoucher = () => {

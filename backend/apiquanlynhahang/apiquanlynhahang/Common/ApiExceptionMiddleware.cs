@@ -35,6 +35,10 @@ public class ApiExceptionMiddleware
         {
             await GhiLoiAsync(context, StatusCodes.Status400BadRequest, ex.Message);
         }
+        catch (InvalidOperationException ex)
+        {
+            await GhiLoiAsync(context, StatusCodes.Status409Conflict, ex.Message);
+        }
         catch (Exception ex)
         {
             _logger.LogError(ex, "Loi khong xac dinh");
