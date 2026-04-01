@@ -29,8 +29,8 @@ function TheMonAn({ dish, onOpenDetail, variant = 'default' }) {
           <div className="the-mon-hinh-overlay" aria-hidden="true" />
 
           <div className="the-mon-hinh-head">
-            <Tag className="nhan-mon" bordered={false}>{dishBadge}</Tag>
-            {isMenuVariant ? <Tag className="the-mon-hinh-label" bordered={false}>Xem chi tiết</Tag> : null}
+            <Tag className="nhan-mon" variant="filled">{dishBadge}</Tag>
+            {isMenuVariant ? <Tag className="the-mon-hinh-label" variant="filled">Xem chi tiết</Tag> : null}
           </div>
 
           {isMenuVariant && !hasImage ? (
@@ -53,7 +53,7 @@ function TheMonAn({ dish, onOpenDetail, variant = 'default' }) {
         </button>
       }
     >
-      <Space direction="vertical" size={12} className={`than-mon ${isMenuVariant ? 'than-mon--menu' : ''}`} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={12} className={`than-mon ${isMenuVariant ? 'than-mon--menu' : ''}`} style={{ width: '100%' }}>
         <div className="noi-dung-mon">
           <Typography.Title level={3} title={dishName}>{dishName}</Typography.Title>
           <Typography.Paragraph title={dishDescription}>{dishDescription}</Typography.Paragraph>

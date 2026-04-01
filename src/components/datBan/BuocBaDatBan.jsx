@@ -2,7 +2,7 @@ import { Alert, Button, Card, Col, Descriptions, Row, Space, Typography } from '
 
 function BuocBaDatBan({ summary, contactSummary, reviewNotice, submitError, isSubmitting, onBack, onSubmit }) {
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={12}>
           <Card title="Thông tin đặt bàn">
@@ -32,7 +32,7 @@ function BuocBaDatBan({ summary, contactSummary, reviewNotice, submitError, isSu
         </ul>
       </Card>
 
-      {submitError ? <Alert type="error" showIcon message={submitError} /> : null}
+      {submitError ? <Alert type="error" showIcon title={submitError} /> : null}
 
       <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
         <Button onClick={onBack}>Quay lại</Button>

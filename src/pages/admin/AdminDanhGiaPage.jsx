@@ -45,7 +45,7 @@ function AdminDanhGiaPage() {
   }
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={8}>
           <Card><Statistic title="Tổng đánh giá" value={danhSachSapXep.length} prefix={<CommentOutlined />} /></Card>
@@ -59,19 +59,19 @@ function AdminDanhGiaPage() {
       </Row>
 
       <Card>
-        <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={12} style={{ width: '100%' }}>
           <div>
             <Title level={2} style={{ margin: 0 }}>Duyệt đánh giá khách hàng</Title>
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>Duyệt hoặc từ chối phản hồi trước khi hiển thị trên trang công khai.</Paragraph>
           </div>
 
-          {thongBao ? <Alert type="success" showIcon message={thongBao} /> : null}
-          {loi ? <Alert type="error" showIcon message={loi} /> : null}
+          {thongBao ? <Alert type="success" showIcon title={thongBao} /> : null}
+          {loi ? <Alert type="error" showIcon title={loi} /> : null}
 
           {danhSachSapXep.length === 0 ? (
-            <Card bordered={false}><Empty description="Chưa có đánh giá nào trong hệ thống." /></Card>
+            <Card variant="borderless"><Empty description="Chưa có đánh giá nào trong hệ thống." /></Card>
           ) : (
-            <Space direction="vertical" size={16} style={{ width: '100%' }}>
+            <Space orientation="vertical" size={16} style={{ width: '100%' }}>
               {danhSachSapXep.map((danhGia) => {
                 const dangChoDuyet = danhGia.trangThai === 'Pending'
                 const dangDuyet = dangXuLy === `${danhGia.maDanhGia}-Approved`
@@ -79,7 +79,7 @@ function AdminDanhGiaPage() {
 
                 return (
                   <Card key={danhGia.maDanhGia} size="small" title={<Space wrap><Text strong>{danhGia.maDanhGia}</Text>{layTagTrangThai(danhGia.trangThai)}<Tag>{danhGia.soSao}/5 sao</Tag></Space>} extra={dangChoDuyet ? null : <Text type="secondary">Đã xử lý</Text>}>
-                    <Space direction="vertical" size={12} style={{ width: '100%' }}>
+                    <Space orientation="vertical" size={12} style={{ width: '100%' }}>
                       <Row gutter={[12, 12]}>
                         <Col xs={24} md={8}>
                           <Card size="small" styles={{ body: { padding: 12 } }}>
@@ -106,7 +106,7 @@ function AdminDanhGiaPage() {
                       </Card>
 
                       {danhGia.phanHoi ? (
-                        <Alert type="info" showIcon message={<span><strong>Phản hồi nội bộ:</strong> {danhGia.phanHoi}</span>} />
+                        <Alert type="info" showIcon title={<span><strong>Phản hồi nội bộ:</strong> {danhGia.phanHoi}</span>} />
                       ) : null}
 
                       {dangChoDuyet ? (
@@ -115,7 +115,7 @@ function AdminDanhGiaPage() {
                           <Button danger onClick={() => xuLyCapNhat(danhGia.maDanhGia, 'Rejected')} loading={dangTuChoi} icon={<CloseCircleOutlined />}>Từ chối</Button>
                         </Space>
                       ) : (
-                        <Alert type="success" message="Đánh giá này đã được xử lý và không cần thao tác thêm." />
+                        <Alert type="success" title="Đánh giá này đã được xử lý và không cần thao tác thêm." />
                       )}
                     </Space>
                   </Card>

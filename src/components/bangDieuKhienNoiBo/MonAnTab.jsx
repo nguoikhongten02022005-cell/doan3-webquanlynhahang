@@ -204,7 +204,7 @@ function MonAnTab({ dishes, reloadDishes }) {
   }
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Card>
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} xl={8}>
@@ -213,7 +213,7 @@ function MonAnTab({ dishes, reloadDishes }) {
             <Paragraph type="secondary" style={{ marginBottom: 0 }}>Tìm nhanh, lọc theo danh mục và điều khiển trạng thái hiển thị món theo chuẩn POS hiện đại.</Paragraph>
           </Col>
           <Col xs={24} xl={16}>
-            <Space direction="vertical" size={12} style={{ width: '100%' }}>
+            <Space orientation="vertical" size={12} style={{ width: '100%' }}>
               <Space wrap style={{ width: '100%', justifyContent: 'flex-end' }}>
                 <Search allowClear placeholder="Tìm tên món..." value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} enterButton={<SearchOutlined />} style={{ width: 280 }} />
                 <Button type="primary" icon={<PlusOutlined />} onClick={moDrawerTaoMoi}>Thêm món mới</Button>
@@ -243,7 +243,7 @@ function MonAnTab({ dishes, reloadDishes }) {
                       <Button type="link" icon={meta.isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />} onClick={() => handleToggleVisibility(dish)}>{meta.isVisible ? 'Ẩn' : 'Hiện'}</Button>,
                     ]}
                   >
-                    <Space direction="vertical" size={10} style={{ width: '100%' }}>
+                    <Space orientation="vertical" size={10} style={{ width: '100%' }}>
                       <Space wrap>
                         <Tag color={meta.isVisible ? 'green' : 'red'}>{meta.isVisible ? 'Đang bán' : 'Tạm ẩn'}</Tag>
                         {dish.badge ? <Tag color="gold">{dish.badge}</Tag> : null}
@@ -276,7 +276,7 @@ function MonAnTab({ dishes, reloadDishes }) {
         footer={<Space style={{ width: '100%', justifyContent: 'space-between' }}>{cheDoForm === 'edit' ? <Button danger onClick={handleDeleteDish}>Xóa món</Button> : <span />}{<Space><Button onClick={resetForm}>Hủy</Button><Button form="mon-an-form" htmlType="submit" type="primary">{cheDoForm === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}</Button></Space>}</Space>}
       >
         <Form id="mon-an-form" layout="vertical" onSubmitCapture={handleSubmit}>
-          {loiForm ? <Alert type="error" showIcon message={loiForm} style={{ marginBottom: 16 }} /> : null}
+          {loiForm ? <Alert type="error" showIcon title={loiForm} style={{ marginBottom: 16 }} /> : null}
           <Form.Item label="Ảnh món">
             <Upload accept="image/*" listType="picture-card" maxCount={1} beforeUpload={() => false} fileList={uploadFileList} onChange={handleUploadChange} onRemove={handleRemoveUpload}>
               {uploadFileList.length >= 1 ? null : <div><PictureOutlined /><div style={{ marginTop: 8 }}>Tải ảnh lên</div></div>}

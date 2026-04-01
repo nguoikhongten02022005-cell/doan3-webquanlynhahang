@@ -143,7 +143,7 @@ function DatBanToolbar({
 }) {
   return (
     <Card>
-      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={12} style={{ width: '100%' }}>
         <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
           <div>
             <Typography.Title level={4} style={{ margin: 0 }}>Danh sách booking</Typography.Title>
@@ -221,7 +221,7 @@ function DatBanFormCard({
           <Form.Item label="Ghi chú nội bộ"><TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." /></Form.Item>
         </Card>
 
-        {formError ? <Alert type="error" showIcon message={formError} style={{ marginBottom: 16 }} /> : null}
+        {formError ? <Alert type="error" showIcon title={formError} style={{ marginBottom: 16 }} /> : null}
 
         <Divider style={{ marginTop: 0 }} />
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
@@ -459,7 +459,7 @@ function DatBanAssignModal({ booking, open, selectedTableIds, assignableTables, 
             })}
           </div>
 
-          {error ? <Alert type="error" showIcon message={error} /> : null}
+          {error ? <Alert type="error" showIcon title={error} /> : null}
 
           <div className="flex items-center justify-end gap-2">
             <Button size="middle" onClick={onClose}>Hủy</Button>
@@ -488,7 +488,7 @@ function DatBanConfirmModal({ pendingAction, open, onClose, onConfirm }) {
       centered
     >
       <div className="space-y-3">
-        <Alert type="warning" showIcon message={copy.message} />
+        <Alert type="warning" showIcon title={copy.message} />
         <p className="mb-0 text-sm leading-6 text-slate-600">{copy.getMessage(pendingAction.booking)}</p>
       </div>
     </Modal>

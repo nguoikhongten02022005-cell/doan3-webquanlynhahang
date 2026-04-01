@@ -34,8 +34,27 @@ export const layNhanChoNgoi = (giaTri) => NHAN_KHU_VUC_DAT_BAN[giaTri] || giaTri
 export const laySacThaiTrangThaiDatBan = (trangThai) => {
   if (trangThai === 'DA_HUY' || trangThai === 'TU_CHOI_HET_CHO' || trangThai === 'KHONG_DEN') return 'danger'
   if (trangThai === 'DA_CHECK_IN' || trangThai === 'DA_XEP_BAN') return 'neutral'
+  if (trangThai === 'Cancelled') return 'danger'
+  if (trangThai === 'Completed') return 'neutral'
   if (trangThai === 'DA_XAC_NHAN' || trangThai === 'DA_GHI_NHAN' || trangThai === 'DA_HOAN_THANH' || trangThai === 'GIU_CHO_TAM' || trangThai === 'Confirmed') return 'success'
   return 'warning'
+}
+
+export const layNhanTrangThaiDatBan = (trangThai) => {
+  if (!trangThai) return 'Chờ xác nhận'
+  const banDo = {
+    Pending: 'Chờ xác nhận',
+    Confirmed: 'Đã xác nhận',
+    Cancelled: 'Đã hủy',
+    Completed: 'Đã hoàn thành',
+    DA_HUY: 'Đã hủy',
+    DA_XAC_NHAN: 'Đã xác nhận',
+    DA_HOAN_THANH: 'Đã hoàn thành',
+    DA_CHECK_IN: 'Đang phục vụ',
+    KHONG_DEN: 'Không đến',
+  }
+
+  return banDo[trangThai] || trangThai
 }
 
 export const laySacThaiDonHang = (trangThai) => laySacThaiDonHangChuan(trangThai)

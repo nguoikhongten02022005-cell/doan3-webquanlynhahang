@@ -60,8 +60,8 @@ function TrangChuPage() {
       <section className="hero" id="home">
         <div className="container mo-dau-grid">
           <div className="mo-dau-copy">
-            <Space direction="vertical" size={16} style={{ width: '100%', alignItems: 'flex-start' }}>
-              <Tag color="orange-inverse" bordered={false}>Khơi mở hương vị mới</Tag>
+            <Space orientation="vertical" size={16} style={{ width: '100%', alignItems: 'flex-start' }}>
+              <Tag color="orange" variant="solid">Khơi mở hương vị mới</Tag>
               <Title level={1} style={{ margin: 0 }}>Tinh hoa ẩm thực</Title>
               <Paragraph className="subtitle" style={{ marginBottom: 0 }}>
                 Thưởng thức những món ăn được chuẩn bị chỉn chu, đậm đà bản sắc và phù hợp cho những buổi gặp gỡ ấm cúng lẫn các dịp đặc biệt.
@@ -119,13 +119,13 @@ function TrangChuPage() {
         <div className="container">
           <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 24 }}>
             <Col xs={24} lg={12}>
-              <Space direction="vertical" size={8}>
+              <Space orientation="vertical" size={8}>
                 <Text className="eyebrow">Món được chọn nhiều</Text>
                 <Title level={2} style={{ margin: 0 }}>Món Ngon Phải Thử</Title>
               </Space>
             </Col>
             <Col xs={24} lg={12}>
-              <Space direction="vertical" size={8} style={{ width: '100%', alignItems: 'flex-start' }}>
+              <Space orientation="vertical" size={8} style={{ width: '100%', alignItems: 'flex-start' }}>
                 <Button type="link" href="/thuc-don" style={{ paddingInline: 0 }}>Xem toàn bộ thực đơn</Button>
               </Space>
             </Col>

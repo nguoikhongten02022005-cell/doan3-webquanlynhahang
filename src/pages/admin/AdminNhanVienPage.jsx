@@ -43,7 +43,7 @@ function AdminNhanVienPage() {
   ]
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={8}><Card><Statistic title="Tổng nhân sự nội bộ" value={danhSachNhanVien.length} prefix={<TeamOutlined />} /></Card></Col>
         <Col xs={24} md={8}><Card><Statistic title="Quản lý" value={danhSachNhanVien.filter((item) => item.role === 'admin').length} valueStyle={{ color: '#dc2626' }} /></Card></Col>

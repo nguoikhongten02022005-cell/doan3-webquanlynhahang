@@ -33,10 +33,10 @@ function ThanhBenDatBan({
   return (
     <Card>
       <Steps
-        direction="vertical"
+        orientation="vertical"
         size="small"
         current={Math.max(0, currentStep - 1)}
-        items={steps.map((step) => ({ title: step.label, description: step.description }))}
+        items={steps.map((step) => ({ title: step.label, content: step.description }))}
       />
 
       <Descriptions column={1} bordered size="small" style={{ marginTop: 16, marginBottom: 16 }}>
@@ -49,7 +49,7 @@ function ThanhBenDatBan({
       <Button type="primary" block onClick={onContinue} disabled={!canProceed || currentStep === 3}>
         {layNhanNutTheoBuoc(currentStep, nextStage)}
       </Button>
-      {continueBlockedMessage ? <Alert style={{ marginTop: 12 }} type="warning" showIcon message={continueBlockedMessage} /> : null}
+      {continueBlockedMessage ? <Alert style={{ marginTop: 12 }} type="warning" showIcon title={continueBlockedMessage} /> : null}
     </Card>
   )
 }

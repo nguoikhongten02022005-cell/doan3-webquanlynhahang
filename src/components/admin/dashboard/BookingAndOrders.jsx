@@ -1,7 +1,6 @@
 import { Card, Col, Row, Table, Tabs, Tag, Typography } from 'antd'
 import { ClockCircleOutlined, EnvironmentOutlined, InboxOutlined, TableOutlined } from '@ant-design/icons'
-import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../../data/duLieuDatBan'
-import { dinhDangSoKhach, layNhanChoNgoi } from '../../../features/bangDieuKhienNoiBo/dinhDang'
+import { dinhDangSoKhach, layNhanChoNgoi, layNhanTrangThaiDatBan } from '../../../features/bangDieuKhienNoiBo/dinhDang'
 import { layNhanTrangThaiDonHang } from '../../../utils/donHang'
 import { laySacThaiTrangThaiDatBan, laySacThaiDonHang } from '../../../features/bangDieuKhienNoiBo/dinhDang'
 import { dinhDangTienTe } from '../../../utils/tienTe'
@@ -45,7 +44,7 @@ function BookingAndOrders({ bookings, orders }) {
       key: 'status',
       render: (status) => (
         <Tag color={BOOKING_TAG_COLOR[laySacThaiTrangThaiDatBan(status)] || 'default'}>
-          {HOST_NHAN_TRANG_THAI_DAT_BAN[status] || status}
+          {layNhanTrangThaiDatBan(status)}
         </Tag>
       ),
     },

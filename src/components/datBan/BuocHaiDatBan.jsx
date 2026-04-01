@@ -13,7 +13,7 @@ function BuocHaiDatBan({
   const noteLength = formData.notes.length
 
   return (
-    <Card title="Thông tin liên hệ" bordered={false}>
+    <Card title="Thông tin liên hệ" variant="borderless">
       <Form layout="vertical">
         <Row gutter={16}>
           <Col xs={24} md={12}>

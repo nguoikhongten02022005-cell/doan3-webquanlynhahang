@@ -38,7 +38,7 @@ function BuocMotDatBan({
   const hasSelectedGuests = Boolean(Number(formData.guests) > 0)
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Card>
         <Title level={3} style={{ margin: 0 }}>Chọn số khách, ngày, giờ và khu vực bạn muốn ưu tiên.</Title>
       </Card>
@@ -65,7 +65,7 @@ function BuocMotDatBan({
         </Row>
 
         {largePartyNotice ? (
-          <Alert type="warning" showIcon message={<span><strong>Nhóm lớn vui lòng gọi hotline.</strong> <a href="tel:02838256789">{largePartyNotice}</a></span>} style={{ marginTop: 16 }} />
+          <Alert type="warning" showIcon title={<span><strong>Nhóm lớn vui lòng gọi hotline.</strong> <a href="tel:02838256789">{largePartyNotice}</a></span>} style={{ marginTop: 16 }} />
         ) : null}
       </Card>
 
@@ -105,9 +105,9 @@ function BuocMotDatBan({
         </div>
 
         {!hasSelectedDate ? (
-          <Alert type="info" showIcon message="Chọn ngày trước để xem khung giờ." description="Ngay khi có ngày dùng bữa, chúng tôi sẽ gợi ý các khung giờ còn phù hợp với lựa chọn của bạn." />
+          <Alert type="info" showIcon title="Chọn ngày trước để xem khung giờ." description="Ngay khi có ngày dùng bữa, chúng tôi sẽ gợi ý các khung giờ còn phù hợp với lựa chọn của bạn." />
         ) : (
-          <Space direction="vertical" size={16} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={16} style={{ width: '100%' }}>
             {CAC_CA_KHUNG_GIO_DAT_BAN.map((period) => (
               <Card key={period.id} size="small" title={<span>{period.icon} {period.label}</span>} extra={<Text type="secondary">{period.timeRange}</Text>}>
                 <div className="dat-ban-time-period-head">
@@ -138,9 +138,9 @@ function BuocMotDatBan({
       <Card title="Chọn khu vực (tuỳ chọn)" extra={<Text type="secondary">Nhà hàng sẽ cố gắng sắp xếp theo ưu tiên này nhưng không cam kết 100%.</Text>}>
 
         {!hasSelectedTime ? (
-          <Alert type="info" showIcon message="Chọn giờ dùng bữa để xem khu vực phù hợp." description="Khi đã có ngày và giờ, hệ thống sẽ gợi ý mức độ khả dụng của từng khu vực để bạn chọn nhanh hơn." />
+          <Alert type="info" showIcon title="Chọn giờ dùng bữa để xem khu vực phù hợp." description="Khi đã có ngày và giờ, hệ thống sẽ gợi ý mức độ khả dụng của từng khu vực để bạn chọn nhanh hơn." />
         ) : !hasSelectedGuests ? (
-          <Alert type="info" showIcon message="Chọn số khách để xem bàn phù hợp." description="Sau khi biết số khách, hệ thống sẽ tính số bàn phù hợp theo từng khu vực để bạn chọn nhanh và chính xác hơn." />
+          <Alert type="info" showIcon title="Chọn số khách để xem bàn phù hợp." description="Sau khi biết số khách, hệ thống sẽ tính số bàn phù hợp theo từng khu vực để bạn chọn nhanh và chính xác hơn." />
         ) : (
           <>
             <Row gutter={[12, 12]}>
@@ -150,7 +150,7 @@ function BuocMotDatBan({
                 return (
                   <Col xs={24} md={12} xl={8} key={area.value}>
                     <Card hoverable size="small" style={availability.count === 0 ? MAU_ANTD_DAT_BAN.nutVoHieu : isActive ? MAU_ANTD_DAT_BAN.nutDangChon : MAU_ANTD_DAT_BAN.nutChon} onClick={() => availability.count > 0 && onAreaToggle(area.value)}>
-                      <Space direction="vertical" size={8} style={{ width: '100%' }}>
+                      <Space orientation="vertical" size={8} style={{ width: '100%' }}>
                         <Space>
                           <span>{area.icon}</span>
                           <Text strong>{area.label}</Text>
@@ -168,7 +168,7 @@ function BuocMotDatBan({
                 )
               })}
             </Row>
-            {selectedAreaUnavailableMessage ? <Alert style={{ marginTop: 16 }} type="error" showIcon message={selectedAreaUnavailableMessage} /> : null}
+            {selectedAreaUnavailableMessage ? <Alert style={{ marginTop: 16 }} type="error" showIcon title={selectedAreaUnavailableMessage} /> : null}
           </>
         )}
       </Card>

@@ -76,8 +76,8 @@ function DangNhapNoiBoPage() {
     <div style={{ minHeight: '100vh', padding: 24, background: '#f5f5f5' }}>
       <Row align="middle" justify="center" style={{ minHeight: '100vh' }}>
         <Col xs={24} sm={20} md={16} lg={12} xl={9}>
-          <Card bordered={false} style={{ boxShadow: '0 20px 48px rgba(15,23,42,0.10)' }}>
-            <Space direction="vertical" size={18} style={{ width: '100%' }}>
+            <Card variant="borderless" style={{ boxShadow: '0 20px 48px rgba(15,23,42,0.10)' }}>
+              <Space orientation="vertical" size={18} style={{ width: '100%' }}>
               <Space align="center" size={14}>
                 <Avatar size={56} style={{ background: '#e96c4a' }}>NH</Avatar>
                 <div>
@@ -95,8 +95,8 @@ function DangNhapNoiBoPage() {
                 </Paragraph>
               </div>
 
-              {canhBaoPhienHetHan ? <Alert type="warning" showIcon message="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." /> : null}
-              {loiDangNhap ? <Alert type="error" showIcon message={loiDangNhap} /> : null}
+              {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." /> : null}
+              {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} /> : null}
 
               <Card size="small" title="Tài khoản nội bộ local">
                 <List

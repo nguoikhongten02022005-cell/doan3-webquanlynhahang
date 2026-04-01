@@ -25,6 +25,18 @@ export const useXacThuc = () => {
   const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(true)
 
   useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const duongDanHienTai = window.location.pathname || '/'
+      const laKhuVucCongKhai = duongDanHienTai === '/' || duongDanHienTai === '/thuc-don' || duongDanHienTai === '/gioi-thieu'
+      const maXacThuc = layMaXacThuc()
+
+      if (laKhuVucCongKhai && !maXacThuc) {
+        setNguoiDungHienTai(null)
+        setIsAuthBootstrapping(false)
+        return undefined
+      }
+    }
+
     const dongBoNguoiDungHienTai = () => {
       setNguoiDungHienTai(layNguoiDungHienTai())
     }

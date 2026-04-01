@@ -406,7 +406,7 @@ const buildItemsTableColumns = () => [
 function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, totalCount, donChoXuLy }) {
   return (
     <Card>
-      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={12} style={{ width: '100%' }}>
         <div>
           <Typography.Title level={4} style={{ margin: 0 }}>Quản lý đơn hàng</Typography.Title>
           <Typography.Text type="secondary">{visibleCount}/{totalCount} đơn hiển thị · {donChoXuLy} đơn cần xử lý ngay</Typography.Text>
@@ -444,7 +444,7 @@ function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
 
         return (
           <List.Item key={order.id} onClick={() => onSelectOrder(order.id)} style={{ cursor: 'pointer', borderRadius: 16, padding: 14, marginBottom: 10, border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb', background: isSelected ? '#fff7ed' : '#fff' }}>
-            <Space direction="vertical" size={10} style={{ width: '100%' }}>
+            <Space orientation="vertical" size={10} style={{ width: '100%' }}>
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <div>
                   <Typography.Text type="secondary">#{formatOrderCode(order)}</Typography.Text>
@@ -575,7 +575,7 @@ function OrderDetailPanel({
             <TextArea size="middle" rows={3} value={sourceOrder.note || 'Không có ghi chú cho đơn này.'} readOnly />
           </label>
 
-          {detailError ? <Alert type="warning" showIcon message={detailError} /> : null}
+          {detailError ? <Alert type="warning" showIcon title={detailError} /> : null}
         </section>
 
         <section className="space-y-3 rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">

@@ -95,7 +95,7 @@ function AdminDonMangVePage() {
   ]
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={8}><Card><Statistic title="Tổng đơn hôm nay" value={thongKe.tongDonHomNay} prefix={<ShoppingOutlined />} /></Card></Col>
         <Col xs={24} md={8}><Card><Statistic title="Đang xử lý" value={thongKe.dangXuLy} valueStyle={{ color: '#d97706' }} prefix={<ClockCircleOutlined />} /></Card></Col>
@@ -103,7 +103,7 @@ function AdminDonMangVePage() {
       </Row>
 
       <Card title="Đơn mang về">
-        <Space direction="vertical" size={16} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={16} style={{ width: '100%' }}>
           <Segmented options={BO_LOC} value={boLoc} onChange={setBoLoc} />
           <Table rowKey="maDonHang" loading={dangTai} columns={cot} dataSource={danhSachHienThi} scroll={{ x: 1200 }} pagination={{ pageSize: 8 }} />
         </Space>
