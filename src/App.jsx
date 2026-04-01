@@ -7,6 +7,7 @@ import BoCucChinh from './layouts/BoCucChinh'
 import AdminLayout from './layouts/AdminLayout'
 import GioiThieuPage from './pages/GioiThieuPage'
 import DatBanPage from './pages/DatBanPage'
+import GioHangPage from './pages/GioHangPage'
 import ThanhToanPage from './pages/ThanhToanPage'
 import TrangChuPage from './pages/TrangChuPage'
 import DangNhapNoiBoPage from './pages/DangNhapNoiBoPage'
@@ -41,7 +42,7 @@ function App() {
           <Route path="/" element={<TrangChuPage />} />
           <Route path="/thuc-don" element={<ThucDonPage />} />
           <Route path="/gioi-thieu" element={<GioiThieuPage />} />
-          <Route path="/gio-hang" element={<Navigate to="/thuc-don" replace />} />
+          <Route path="/gio-hang" element={<GioHangPage />} />
           <Route path="/thanh-toan" element={<ThanhToanPage />} />
           <Route path="/ho-so" element={<HoSoPage />} />
           <Route path="/profile" element={<Navigate to="/ho-so" replace />} />
