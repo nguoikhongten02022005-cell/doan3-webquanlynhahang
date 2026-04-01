@@ -67,22 +67,37 @@ const getInitialCartItems = () => {
   }
 }
 
+const capNhatVaLuuGioHang = (hamCapNhat, giaTriHienTai) => {
+  const gioHangMoi = hamCapNhat(giaTriHienTai)
+  datJsonLuuTru(STORAGE_KEYS.GIO_HANG, gioHangMoi)
+  return gioHangMoi
+}
+
 export function GioHangProvider({ children }) {
   const [cartItems, setCartItems] = useState(getInitialCartItems)
 
   useEffect(() => {
-    datJsonLuuTru(STORAGE_KEYS.GIO_HANG, cartItems)
-  }, [cartItems])
+    const dongBoGioHang = (event) => {
+      if (event.key !== STORAGE_KEYS.GIO_HANG) {
+        return
+      }
+
+      setCartItems(getInitialCartItems())
+    }
+
+    window.addEventListener('storage', dongBoGioHang)
+    return () => window.removeEventListener('storage', dongBoGioHang)
+  }, [])
 
   const themVaoGio = (dish) => {
     const normalizedDish = normalizeCartItem(dish)
     const dishKey = getItemKey(normalizedDish)
 
-    setCartItems((prevItems) => {
-      const existingItem = prevItems.find((item) => getItemKey(item) === dishKey)
+    setCartItems((prevItems) => capNhatVaLuuGioHang((danhSachCu) => {
+      const existingItem = danhSachCu.find((item) => getItemKey(item) === dishKey)
 
       if (existingItem) {
-        return prevItems.map((item) =>
+        return danhSachCu.map((item) =>
           getItemKey(item) === dishKey
             ? {
                 ...item,
@@ -92,8 +107,8 @@ export function GioHangProvider({ children }) {
         )
       }
 
-      return [...prevItems, normalizedDish]
-    })
+      return [...danhSachCu, normalizedDish]
+    }, prevItems))
   }
 
   const xoaKhoiGio = (variantKey) => {
@@ -101,7 +116,7 @@ export function GioHangProvider({ children }) {
       return
     }
 
-    setCartItems((prevItems) => prevItems.filter((item) => getItemKey(item) !== variantKey))
+    setCartItems((prevItems) => capNhatVaLuuGioHang((danhSachCu) => danhSachCu.filter((item) => getItemKey(item) !== variantKey), prevItems))
   }
 
   const capNhatSoLuong = (variantKey, delta) => {
@@ -109,7 +124,7 @@ export function GioHangProvider({ children }) {
       return
     }
 
-    setCartItems((prevItems) => prevItems.reduce((danhSachMoi, item) => {
+    setCartItems((prevItems) => capNhatVaLuuGioHang((danhSachCu) => danhSachCu.reduce((danhSachMoi, item) => {
       if (getItemKey(item) !== variantKey) {
         danhSachMoi.push(item)
         return danhSachMoi
@@ -124,11 +139,11 @@ export function GioHangProvider({ children }) {
       }
 
       return danhSachMoi
-    }, []))
+    }, []), prevItems))
   }
 
   const xoaToanBoGio = () => {
-    setCartItems([])
+    setCartItems((prevItems) => capNhatVaLuuGioHang(() => [], prevItems))
   }
 
   const layKhoaMonTrongGio = (item) => getItemKey(item)

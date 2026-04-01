@@ -117,6 +117,11 @@ export const anhXaMonTrongGioThanhMonDonHang = (monTrongGio) => ({
 })
 
 export const taoDuLieuTaoDonHang = ({ cartItems, voucherCode, customer, note, tableNumber, paymentMethod }) => ({
+  maKH: chuanHoaVanBan(customer?.customerCode || customer?.maKH),
+  maBan: chuanHoaVanBan(tableNumber) || null,
+  maNV: null,
+  maDatBan: null,
+  nguonTao: 'Online',
   items: Array.isArray(cartItems) ? cartItems.map(anhXaMonTrongGioThanhMonDonHang) : [],
   voucherCode: chuanHoaVanBan(voucherCode).toUpperCase(),
   customer: {

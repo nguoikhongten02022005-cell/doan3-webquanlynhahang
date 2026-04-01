@@ -23,6 +23,13 @@ public class DatBanService
     public Task<List<DatBan>> LayTheoKhachAsync(string maKh, CancellationToken cancellationToken = default)
         => _dbContext.DatBan.AsNoTracking().Where(x => x.MaKH == maKh).OrderByDescending(x => x.NgayTao).ToListAsync(cancellationToken);
 
+    public async Task<string?> LayMaKhTheoNguoiDungAsync(string maNd, CancellationToken cancellationToken = default)
+        => await _dbContext.KhachHang
+            .AsNoTracking()
+            .Where(x => x.MaND == maNd)
+            .Select(x => x.MaKH)
+            .FirstOrDefaultAsync(cancellationToken);
+
     public async Task<DatBan> TaoAsync(TaoDatBanDto dto, CancellationToken cancellationToken = default)
     {
         if (!string.IsNullOrWhiteSpace(dto.MaBan))

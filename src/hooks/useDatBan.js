@@ -18,6 +18,7 @@ import {
   anhXaMucDatBan,
   chuanHoaDatBan,
 } from './datBan/anhXaDatBan'
+import { useXacThuc } from './useXacThuc'
 
 export const SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN = 'booking:data-changed'
 
@@ -51,6 +52,7 @@ const locBanPhuHopChoDatBan = (booking, danhSachBanGhiDe = []) => {
 }
 
 export const useDatBan = () => {
+  const { nguoiDungHienTai } = useXacThuc()
   const updateBookingStatus = useCallback(async (bookingId, nextStatus, fallbackError) => {
     try {
       const { duLieu, thongDiep } = await capNhatTrangThaiDatBanApi(bookingId, nextStatus)
@@ -175,7 +177,8 @@ export const useDatBan = () => {
   }), [])
 
   const layLichSuDatBan = useCallback(async () => {
-    const { duLieu } = await layLichSuDatBanApi()
+    const maKh = nguoiDungHienTai?.maKH || 'KH001'
+    const { duLieu } = await layLichSuDatBanApi(maKh)
 
     if (!Array.isArray(duLieu)) {
       return []
@@ -191,7 +194,7 @@ export const useDatBan = () => {
         return normalized ? anhXaMucDatBan(normalized) : null
       })
       .filter(Boolean)
-  }, [])
+  }, [nguoiDungHienTai?.maKH])
 
   const huyDatBan = useCallback(async (bookingId, maDatBan) => {
     try {

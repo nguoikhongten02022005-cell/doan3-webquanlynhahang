@@ -96,6 +96,41 @@ public class DonHangService
         _dbContext.ChiTietDonHang.AddRange(chiTietMoi);
         await _dbContext.SaveChangesAsync(cancellationToken);
 
+        if (string.Equals(dto.NguonTao, "Online", StringComparison.OrdinalIgnoreCase))
+        {
+            var maHoaDon = $"HD_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}";
+            var hoaDon = new HoaDon
+            {
+                MaHoaDon = maHoaDon,
+                MaDonHang = donHang.MaDonHang,
+                MaKH = donHang.MaKH,
+                MaCode = null,
+                TongTien = tongTien,
+                GiamGia = 0,
+                ThueSuat = 0,
+                TienThue = 0,
+                ThanhTien = tongTien,
+                GhiChu = donHang.GhiChu,
+                NgayXuat = DateTime.UtcNow,
+            };
+
+            _dbContext.HoaDon.Add(hoaDon);
+
+            var thanhToan = new ThanhToan
+            {
+                MaThanhToan = $"TT_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}_{Random.Shared.Next(100, 999)}",
+                MaHoaDon = maHoaDon,
+                PhuongThuc = "TienMat",
+                SoTien = tongTien,
+                MaGiaoDich = $"GD_{DateTimeOffset.UtcNow.ToUnixTimeMilliseconds()}",
+                TrangThai = "Success",
+                ThoiGian = DateTime.UtcNow,
+            };
+
+            _dbContext.ThanhToan.Add(thanhToan);
+            await _dbContext.SaveChangesAsync(cancellationToken);
+        }
+
         return donHang;
     }
 

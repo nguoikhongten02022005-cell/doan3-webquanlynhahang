@@ -79,7 +79,7 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
               </div>
 
               <div className="ho-so-history-actions">
-                {['DA_XAC_NHAN', 'Confirmed'].includes(booking.rawStatus || booking.status) && (
+                {['Pending', 'DA_XAC_NHAN', 'Confirmed'].includes(booking.rawStatus || booking.status) && (
                   <button type="button" className="btn ho-so-action-btn ho-so-action-btn--danger" onClick={() => onCancelBooking(booking.bookingCode)}>
                     Hủy đặt bàn
                   </button>

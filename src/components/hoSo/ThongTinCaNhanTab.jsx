@@ -17,6 +17,7 @@ const taoGiaTriHoSoBanDau = (nguoiDung) => ({
 function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau }) {
   const { hienThongBao } = useThongBao()
   const [formData, setFormData] = useState(() => taoGiaTriHoSoBanDau(nguoiDung))
+  const [daChinhSuaHoSo, setDaChinhSuaHoSo] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState('')
   const [matKhauForm, setMatKhauForm] = useState({
     currentPassword: '',
@@ -28,8 +29,12 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
   const avatarMacDinh = String(nguoiDung?.avatarUrl ?? nguoiDung?.avatar ?? '')
 
   useEffect(() => {
+    if (daChinhSuaHoSo) {
+      return
+    }
+
     setFormData(taoGiaTriHoSoBanDau(nguoiDung))
-  }, [nguoiDung])
+  }, [daChinhSuaHoSo, nguoiDung])
 
   useEffect(() => () => {
     if (avatarPreview) {
@@ -39,6 +44,7 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
 
   const handleProfileFieldChange = (field) => (event) => {
     const value = event.target.value
+    setDaChinhSuaHoSo(true)
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
@@ -68,6 +74,8 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
       })
       return
     }
+
+    setDaChinhSuaHoSo(false)
 
     hienThongBao({
       message: '✅ Đã lưu thông tin thành công',

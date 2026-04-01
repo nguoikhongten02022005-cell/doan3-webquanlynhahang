@@ -6,8 +6,6 @@ import { useThongBao } from '../context/ThongBaoContext'
 import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
 import { taoDonHangApi } from '../services/api/apiDonHang'
-import { taoHoaDonApi } from '../services/api/apiHoaDon'
-import { taoThanhToanApi } from '../services/api/apiThanhToan'
 import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung } from '../services/dichVuPhieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
@@ -120,48 +118,25 @@ function ThanhToanPage() {
     }
 
     try {
-      const orderPayload = taoDuLieuTaoDonHang({
-        cartItems,
-        voucherCode: appliedVoucher?.code,
-        customer: {
-          fullName: formData.fullName,
-          phone: formData.phone,
-          email: nguoiDungHienTai?.email ?? '',
-          address: formData.address,
-        },
+        const orderPayload = taoDuLieuTaoDonHang({
+          cartItems,
+          voucherCode: appliedVoucher?.code,
+          customer: {
+            customerCode: nguoiDungHienTai?.maKH ?? '',
+            fullName: formData.fullName,
+            phone: formData.phone,
+            email: nguoiDungHienTai?.email ?? '',
+            address: formData.address,
+          },
         note: formData.note,
         tableNumber: formData.tableNumber,
         paymentMethod: formData.paymentMethod,
       })
 
-      const ketQuaDonHang = await taoDonHangApi(orderPayload)
-      const maDonHang = ketQuaDonHang?.duLieu?.orderCode || ketQuaDonHang?.duLieu?.maDonHang || `DH_${Date.now()}`
-      const maHoaDon = `HD_${Date.now()}`
-      const maThanhToan = `TT_${Date.now()}`
+        const ketQuaDonHang = await taoDonHangApi(orderPayload)
 
-      await taoHoaDonApi({
-        maHoaDon,
-        maDonHang,
-        maKH: nguoiDungHienTai?.maKH || 'KH001',
-        maCode: appliedVoucher?.code || null,
-        tongTien: subtotal + serviceFee,
-        giamGia: discountAmount,
-        thueSuat: 0,
-        tienThue: 0,
-        thanhTien: tongCong,
-        ghiChu: formData.note,
-      })
-
-      await taoThanhToanApi({
-        maThanhToan,
-        maHoaDon,
-        phuongThuc: formData.paymentMethod,
-        soTien: tongCong,
-        maGiaoDich: `GD_${Date.now()}`,
-      })
-
-      xoaPhieuGiamGiaDaApDung()
-      xoaBanNhapTamThanhToan()
+        xoaPhieuGiamGiaDaApDung()
+        xoaBanNhapTamThanhToan()
 
       if (typeof xoaToanBoGio === 'function') {
         xoaToanBoGio()

@@ -62,18 +62,18 @@ const sinhMa = (prefix) => `${prefix}_${Date.now()}`
 
 const chuanHoaPayloadTaoDonHang = (payload = {}) => ({
   maDonHang: payload.maDonHang || payload.orderCode || sinhMa('DH'),
-  maKH: payload.maKH || payload.customerCode || 'KH001',
-  maBan: payload.maBan || payload.tableCode || payload.tableNumber || 'B001',
-  maNV: payload.maNV || payload.staffCode || 'NV002',
+  maKH: payload.maKH || payload.customerCode || null,
+  maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
+  maNV: payload.maNV || payload.staffCode || null,
   maDatBan: payload.maDatBan || payload.bookingCode || null,
-  nguonTao: payload.nguonTao || payload.source || 'TaiQuay',
+  nguonTao: payload.nguonTao || payload.source || 'Online',
   ghiChu: payload.ghiChu || payload.note || '',
   chiTiet: Array.isArray(payload.items)
     ? payload.items.map((item, index) => ({
         maChiTiet: item.maChiTiet || item.id || sinhMa(`CT${index + 1}`),
         maMon: item.maMon || item.menuItemId,
         soLuong: Number(item.soLuong || item.quantity || 0),
-        donGia: Number(item.donGia || item.price || 0),
+        donGia: item.donGia ?? item.price ?? null,
         ghiChu: item.ghiChu || item.note || '',
       }))
     : [],
