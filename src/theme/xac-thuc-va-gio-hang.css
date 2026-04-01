@@ -11,33 +11,74 @@
   background: linear-gradient(135deg, var(--bg) 0%, var(--surface-warm) 100%);
 }
 .xac-thuc-card {
-  width: min(100%, 26rem);
-  background: #fff;
-  border-radius: var(--radius-xl);
+  width: min(100%, 34rem);
+  background: transparent;
+  border-radius: 0;
   padding: 2.5rem 2rem;
-  box-shadow: var(--shadow-lg);
-  border: 1px solid var(--line-light);
+  box-shadow: none;
+  border: 0;
+}
+.xac-thuc-card-antd {
+  width: min(100%, 34rem);
+}
+.xac-thuc-card-antd.ant-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.xac-thuc-card-antd .ant-card-body {
+  padding: 0 !important;
+}
+.xac-thuc-card-noi-bo.ant-card {
+  background: transparent !important;
+  border: 0 !important;
+  box-shadow: none !important;
+}
+.xac-thuc-card-noi-bo .ant-card-body {
+  padding: 0 !important;
 }
 .xac-thuc-title {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1.8rem; font-weight: 600; color: var(--dark);
-  text-align: center; margin-bottom: 1.8rem;
+  text-align: center !important;
+  margin-bottom: 0.75rem !important;
+}
+.xac-thuc-subtitle {
+  text-align: center;
+  color: var(--text-secondary);
+  margin-bottom: 1.5rem !important;
 }
 .xac-thuc-form { display: flex; flex-direction: column; gap: 1.1rem; }
-.nhom-truong { display: flex; flex-direction: column; gap: 0.35rem; }
-.nhan-truong {
-  font-size: 0.78rem; font-weight: 600; color: var(--text-secondary);
-  letter-spacing: 0.04em;
+.xac-thuc-form-antd .ant-form-item {
+  margin-bottom: 1rem;
 }
-.truong-nhap {
-  padding: 0.65rem 0.9rem; border: 1.5px solid var(--line);
-  border-radius: var(--radius-md); font-size: 0.9rem;
-  transition: border-color 0.2s; background: var(--surface);
-  color: var(--text-primary);
+.xac-thuc-form-antd .ant-form-item-label > label {
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--dark);
 }
-.truong-nhap:focus {
-  outline: none; border-color: var(--primary);
-  box-shadow: 0 0 0 3px rgba(26,107,74,0.08);
+.xac-thuc-form-antd .ant-input,
+.xac-thuc-form-antd .ant-input-affix-wrapper {
+  border-radius: 0;
+  padding-block: 0.5rem;
+}
+.xac-thuc-form-antd .ant-btn-primary {
+  min-width: 10rem;
+  background: #E8664A;
+  border-color: #E8664A;
+}
+.xac-thuc-form-antd .ant-form-item-control-input-content > .ant-btn-primary {
+  min-width: 10rem;
+  border-radius: 0;
+}
+.xac-thuc-form-antd .ant-btn-primary:hover,
+.xac-thuc-form-antd .ant-btn-primary:focus {
+  background: #d95b41 !important;
+  border-color: #d95b41 !important;
+}
+.xac-thuc-form-antd .ant-checkbox-wrapper {
+  color: var(--text-secondary);
+  font-size: 0.92rem;
 }
 .truong-nhap[type='number'] {
   appearance: textfield;

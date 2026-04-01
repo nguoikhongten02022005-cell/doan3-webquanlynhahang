@@ -1,36 +1,26 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
-import { Alert, Avatar, Button, Card, Col, Form, Input, List, Row, Space, Typography } from 'antd'
-import { LockOutlined, LoginOutlined, MailOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Checkbox, Col, Form, Input, Row, Typography } from 'antd'
+import { LockOutlined, MailOutlined } from '@ant-design/icons'
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
-import { layMucLuuTru, xoaMucLuuTru } from '../services/dichVuLuuTru'
+import { datMucLuuTru, layMucLuuTru, xoaMucLuuTru } from '../services/dichVuLuuTru'
 
 const { Title, Paragraph, Text } = Typography
-
-const TAI_KHOAN_NOI_BO_LOCAL = Object.freeze([
-  {
-    identifier: 'admin@nhahang.com',
-    username: 'ND001',
-    password: '123',
-    roleLabel: 'Admin local',
-  },
-  {
-    identifier: 'an.nv@nhahang.com',
-    username: 'ND002',
-    password: '123',
-    roleLabel: 'Nhân viên local',
-  },
-])
+const KHOA_NHO_NOI_BO = 'restaurant_remember_internal_login'
+const KHOA_EMAIL_NOI_BO = 'restaurant_remembered_internal_email'
 
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
   const [matKhau, setMatKhau] = useState('')
+  const [hienMatKhau, setHienMatKhau] = useState(false)
+  const [nhoDangNhap, setNhoDangNhap] = useState(false)
   const [loiDangNhap, setLoiDangNhap] = useState('')
   const [dangGui, setDangGui] = useState(false)
   const [canhBaoPhienHetHan, setCanhBaoPhienHetHan] = useState(false)
+  const [form] = Form.useForm()
   const location = useLocation()
   const navigate = useNavigate()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
@@ -45,7 +35,15 @@ function DangNhapNoiBoPage() {
       setCanhBaoPhienHetHan(true)
       xoaMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)
     }
-  }, [])
+    const coNhoDangNhap = layMucLuuTru(KHOA_NHO_NOI_BO) === '1'
+    const emailDaNho = layMucLuuTru(KHOA_EMAIL_NOI_BO) || ''
+
+    setNhoDangNhap(coNhoDangNhap)
+    if (coNhoDangNhap && emailDaNho) {
+      setTenDangNhapHoacEmail(emailDaNho)
+      form.setFieldValue('identifier', emailDaNho)
+    }
+  }, [form])
 
   const handleSubmit = async () => {
     if (dangGui) return
@@ -65,6 +63,14 @@ function DangNhapNoiBoPage() {
         return
       }
 
+      if (nhoDangNhap) {
+        datMucLuuTru(KHOA_NHO_NOI_BO, '1')
+        datMucLuuTru(KHOA_EMAIL_NOI_BO, tenDangNhapHoacEmail)
+      } else {
+        xoaMucLuuTru(KHOA_NHO_NOI_BO)
+        xoaMucLuuTru(KHOA_EMAIL_NOI_BO)
+      }
+
       setLoiDangNhap('')
       navigate(location.state?.from || '/admin/dashboard', { replace: true })
     } finally {
@@ -76,69 +82,65 @@ function DangNhapNoiBoPage() {
     <div style={{ minHeight: '100vh', padding: 24, background: '#f5f5f5' }}>
       <Row align="middle" justify="center" style={{ minHeight: '100vh' }}>
         <Col xs={24} sm={20} md={16} lg={12} xl={9}>
-            <Card variant="borderless" style={{ boxShadow: '0 20px 48px rgba(15,23,42,0.10)' }}>
-              <Space orientation="vertical" size={18} style={{ width: '100%' }}>
-              <Space align="center" size={14}>
-                <Avatar size={56} style={{ background: '#e96c4a' }}>NH</Avatar>
-                <div>
-                  <Text type="secondary" style={{ textTransform: 'uppercase', letterSpacing: '0.16em' }}>Nguyên Vị</Text>
-                  <Title level={4} style={{ margin: 0 }}>Operations Console</Title>
-                </div>
-              </Space>
+          <Card className="xac-thuc-card xac-thuc-card-antd" variant="borderless">
+            <Title level={1} className="xac-thuc-title">Đăng nhập quản trị</Title>
+            <Paragraph className="xac-thuc-subtitle">
+              {backendMode
+                ? 'Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.'
+                : 'Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
+            </Paragraph>
 
-              <div>
-                <Title level={2} style={{ marginBottom: 8 }}>Đăng nhập quản trị</Title>
-                <Paragraph type="secondary" style={{ marginBottom: 0 }}>
-                  {backendMode
-                    ? 'Đăng nhập bằng tài khoản nội bộ thật để truy cập Admin Panel và dữ liệu backend local.'
-                    : 'Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
-                </Paragraph>
-              </div>
+            {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." style={{ marginBottom: 16 }} /> : null}
+            {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} style={{ marginBottom: 16 }} /> : null}
 
-              {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." /> : null}
-              {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} /> : null}
-
-              <Card size="small" title="Tài khoản nội bộ local">
-                <List
-                  dataSource={TAI_KHOAN_NOI_BO_LOCAL}
-                  renderItem={(account) => (
-                    <List.Item>
-                      <Button
-                        type="text"
-                        style={{ width: '100%', height: 'auto', padding: 0, textAlign: 'left' }}
-                        onClick={() => {
-                          setTenDangNhapHoacEmail(account.identifier)
-                          setMatKhau(account.password)
-                          setLoiDangNhap('')
-                        }}
-                      >
-                        <Space align="start" style={{ width: '100%', justifyContent: 'space-between' }}>
-                          <div>
-                            <Text strong>{account.roleLabel}</Text>
-                            <div><Text type="secondary">{account.identifier}</Text></div>
-                          </div>
-                          <Text style={{ color: '#ea580c', fontWeight: 700 }}>{account.username} / {account.password}</Text>
-                        </Space>
-                      </Button>
-                    </List.Item>
-                  )}
+            <Form
+              form={form}
+              layout="horizontal"
+              labelCol={{ span: 6 }}
+              wrapperCol={{ span: 18 }}
+              onFinish={handleSubmit}
+              className="xac-thuc-form xac-thuc-form-antd"
+              initialValues={{ identifier: tenDangNhapHoacEmail, password: '', remember: nhoDangNhap }}
+            >
+              <Form.Item label="Email" name="identifier" rules={[{ required: true, message: 'Vui lòng nhập email nội bộ' }]}>
+                <Input
+                  prefix={<MailOutlined />}
+                  size="large"
+                  placeholder="Nhập email nội bộ"
+                  value={tenDangNhapHoacEmail}
+                  onChange={(e) => {
+                    setTenDangNhapHoacEmail(e.target.value)
+                    if (loiDangNhap) setLoiDangNhap('')
+                  }}
                 />
-              </Card>
+              </Form.Item>
 
-              <Form layout="vertical" onFinish={handleSubmit} requiredMark={false}>
-                <Form.Item label="Email nội bộ" required>
-                  <Input prefix={<MailOutlined />} size="large" value={tenDangNhapHoacEmail} onChange={(e) => { setTenDangNhapHoacEmail(e.target.value); if (loiDangNhap) setLoiDangNhap('') }} placeholder="Nhập email nội bộ" />
-                </Form.Item>
-                <Form.Item label="Mật khẩu" required>
-                  <Input.Password prefix={<LockOutlined />} size="large" value={matKhau} onChange={(e) => { setMatKhau(e.target.value); if (loiDangNhap) setLoiDangNhap('') }} placeholder="Nhập mật khẩu" />
-                </Form.Item>
-                <Button htmlType="submit" type="primary" icon={<LoginOutlined />} loading={dangGui} block size="large">
-                  {dangGui ? 'Đang đăng nhập...' : 'Vào Admin Panel'}
+              <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}>
+                <Input.Password
+                  prefix={<LockOutlined />}
+                  size="large"
+                  placeholder="Nhập mật khẩu"
+                  visibilityToggle={{ visible: hienMatKhau, onVisibleChange: setHienMatKhau }}
+                  value={matKhau}
+                  onChange={(e) => {
+                    setMatKhau(e.target.value)
+                    if (loiDangNhap) setLoiDangNhap('')
+                  }}
+                />
+              </Form.Item>
+
+              <Form.Item wrapperCol={{ offset: 6, span: 18 }} name="remember" valuePropName="checked">
+                <Checkbox checked={nhoDangNhap} onChange={(e) => setNhoDangNhap(e.target.checked)}>
+                  Nhớ mật khẩu
+                </Checkbox>
+              </Form.Item>
+
+              <Form.Item wrapperCol={{ offset: 6, span: 18 }}>
+                <Button htmlType="submit" type="primary" size="large" loading={dangGui}>
+                  {dangGui ? 'Đang đăng nhập...' : 'Đăng nhập'}
                 </Button>
-              </Form>
-
-              <Text type="secondary">Bạn là khách hàng? <Link to="/dang-nhap">Đăng nhập tại đây</Link></Text>
-            </Space>
+              </Form.Item>
+            </Form>
           </Card>
         </Col>
       </Row>
