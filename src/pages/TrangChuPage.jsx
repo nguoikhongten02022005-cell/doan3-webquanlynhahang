@@ -61,7 +61,6 @@ function TrangChuPage() {
         <div className="container mo-dau-grid">
           <div className="mo-dau-copy">
             <Space orientation="vertical" size={16} style={{ width: '100%', alignItems: 'flex-start' }}>
-              <Tag color="orange" variant="solid">Khơi mở hương vị mới</Tag>
               <Title level={1} style={{ margin: 0 }}>Tinh hoa ẩm thực</Title>
               <Paragraph className="subtitle" style={{ marginBottom: 0 }}>
                 Thưởng thức những món ăn được chuẩn bị chỉn chu, đậm đà bản sắc và phù hợp cho những buổi gặp gỡ ấm cúng lẫn các dịp đặc biệt.

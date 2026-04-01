@@ -8,12 +8,7 @@ USE QuanNhaHang;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- ============================================================
--- 1. NGUOI DUNG
--- Password mac dinh:
--- Admin/NhanVien/Khach cu: 123
--- Khach test moi: 12345678
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS NguoiDung (
     MaND        VARCHAR(50) PRIMARY KEY,
     TenND       VARCHAR(100) NOT NULL,
