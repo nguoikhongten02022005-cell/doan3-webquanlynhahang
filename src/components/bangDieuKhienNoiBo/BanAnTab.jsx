@@ -97,6 +97,38 @@ const getAreaGridColumns = (tableCount) => {
 
 const getAreaDotClass = (occupancyRate) => (occupancyRate >= 1 ? 'bg-orange-500' : 'bg-slate-300')
 
+const getTableShapeClasses = (capacity) => {
+  if (capacity <= 2) {
+    return {
+      khung: 'rounded-[999px] min-h-[138px]',
+      matBan: 'rounded-[999px] px-5 py-4',
+      vienTrangTri: 'rounded-[999px]',
+    }
+  }
+
+  if (capacity <= 4) {
+    return {
+      khung: 'rounded-[34px] min-h-[148px]',
+      matBan: 'rounded-[30px] px-5 py-4',
+      vienTrangTri: 'rounded-[30px]',
+    }
+  }
+
+  if (capacity <= 6) {
+    return {
+      khung: 'rounded-[999px] min-h-[150px]',
+      matBan: 'rounded-[999px] px-6 py-4',
+      vienTrangTri: 'rounded-[999px]',
+    }
+  }
+
+  return {
+    khung: 'rounded-[32px] min-h-[156px]',
+    matBan: 'rounded-[28px] px-6 py-4',
+    vienTrangTri: 'rounded-[28px]',
+  }
+}
+
 const formatBookingTime = (booking) => {
   if (!booking?.time) return ''
 
@@ -407,56 +439,66 @@ function PosBanAnTab({
       children: areaTables.length ? (
         <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${areaGridColumns}, minmax(126px, 1fr))` }}>
           {areaTables.map((table) => (
-            <button
-              key={table.id}
-              type="button"
-              onClick={() => handleOpenDrawer(table.id)}
-              className={`group relative flex min-h-[138px] flex-col justify-between rounded-[20px] border p-3 text-left shadow-sm transition-all duration-200 hover:-translate-y-0.5 hover:shadow-md focus:outline-none focus:ring-2 focus:ring-orange-300 ${table.statusStyle.card}`}
-            >
-              <div className="flex items-start justify-between gap-2">
-                <span className={`mt-1 inline-flex h-2.5 w-2.5 rounded-full ${table.statusStyle.dot}`} />
+            (() => {
+              const shapeClasses = getTableShapeClasses(table.capacity)
 
-                <div className="flex items-center gap-2">
-                  {table.status === 'DIRTY' && (
-                    <Button
-                      size="small"
-                      shape="circle"
-                      type="text"
-                      icon={<CheckOutlined />}
-                      onClick={(event) => handleMarkReady(event, table.id)}
-                      aria-label={`Đánh dấu ${table.displayName} sẵn sàng lại`}
-                      className="!h-7 !w-7 !border !border-emerald-200 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100"
-                    />
-                  )}
+              return (
+                <button
+                  key={table.id}
+                  type="button"
+                  onClick={() => handleOpenDrawer(table.id)}
+                  className={`group relative flex flex-col justify-center overflow-hidden border border-white/70 bg-gradient-to-br from-white via-white to-slate-50/90 p-3 text-left shadow-[0_18px_32px_rgba(148,163,184,0.14)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_22px_38px_rgba(249,115,22,0.18)] focus:outline-none focus:ring-2 focus:ring-orange-300 ${shapeClasses.khung} ${table.statusStyle.card}`}
+                >
+                  <span className={`pointer-events-none absolute inset-[9px] border border-white/80 opacity-80 ${shapeClasses.vienTrangTri}`} />
 
-                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold ${table.statusStyle.surface}`}>
-                    <UserOutlined className="text-[10px]" />
-                    {table.capacity}
-                  </span>
-                </div>
-              </div>
+                  <div className={`relative flex h-full flex-col justify-between border border-black/5 bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-sm ${shapeClasses.matBan}`}>
+                    <div className="flex items-start justify-between gap-2">
+                      <span className={`mt-1 inline-flex h-2.5 w-2.5 rounded-full ${table.statusStyle.dot}`} />
 
-              <div className="flex flex-1 flex-col items-center justify-center px-1 text-center">
-                <div className="text-[1.35rem] font-black leading-none tracking-[-0.04em] text-inherit md:text-[1.45rem]">
-                  {table.displayName}
-                </div>
-                {table.bookingCode ? (
-                  <div className={`mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] ${table.statusStyle.subtle}`}>
-                    {table.bookingCode}
+                      <div className="flex items-center gap-2">
+                        {table.status === 'DIRTY' && (
+                          <Button
+                            size="small"
+                            shape="circle"
+                            type="text"
+                            icon={<CheckOutlined />}
+                            onClick={(event) => handleMarkReady(event, table.id)}
+                            aria-label={`Đánh dấu ${table.displayName} sẵn sàng lại`}
+                            className="!h-7 !w-7 !border !border-emerald-200 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100"
+                          />
+                        )}
+
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold shadow-sm ${table.statusStyle.surface}`}>
+                          <UserOutlined className="text-[10px]" />
+                          {table.capacity}
+                        </span>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
+                      <div className="text-[1.35rem] font-black leading-none tracking-[-0.04em] text-inherit md:text-[1.5rem]">
+                        {table.displayName}
+                      </div>
+                      {table.bookingCode ? (
+                        <div className={`mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] ${table.statusStyle.subtle}`}>
+                          {table.bookingCode}
+                        </div>
+                      ) : null}
+                    </div>
+
+                    <div className="flex items-end justify-between gap-2 text-[11px]">
+                      <span className={`font-semibold ${table.statusStyle.accent}`}>{table.statusLabel}</span>
+                      {table.timeText ? (
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold shadow-sm ${table.statusStyle.surface}`}>
+                          <ClockCircleOutlined className="text-[10px]" />
+                          {table.timeText}
+                        </span>
+                      ) : <span />}
+                    </div>
                   </div>
-                ) : null}
-              </div>
-
-              <div className="flex items-end justify-between gap-2 text-[11px]">
-                <span className={`font-semibold ${table.statusStyle.accent}`}>{table.statusLabel}</span>
-                {table.timeText ? (
-                  <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold ${table.statusStyle.surface}`}>
-                    <ClockCircleOutlined className="text-[10px]" />
-                    {table.timeText}
-                  </span>
-                ) : <span />}
-              </div>
-            </button>
+                </button>
+              )
+            })()
           ))}
         </div>
       ) : (
@@ -515,7 +557,7 @@ function PosBanAnTab({
       <Drawer
         open={Boolean(selectedTable)}
         onClose={handleCloseDrawer}
-        width={420}
+        size={420}
         destroyOnClose
         title={selectedTable ? (
           <div className="flex items-center justify-between gap-3 pr-6">

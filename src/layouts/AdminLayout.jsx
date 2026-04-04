@@ -124,7 +124,7 @@ function AdminLayout() {
         <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>{menuNode}</div>
       </Sider>
 
-      <Drawer placement="left" open={drawerOpen} onClose={() => setDrawerOpen(false)} width={280} styles={{ body: { padding: 0 } }}>
+      <Drawer placement="left" open={drawerOpen} onClose={() => setDrawerOpen(false)} size={280} styles={{ body: { padding: 0 } }}>
         <div style={{ minHeight: '100%', display: 'flex', flexDirection: 'column' }}>{menuNode}</div>
       </Drawer>
 

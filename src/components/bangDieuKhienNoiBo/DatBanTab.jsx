@@ -14,7 +14,7 @@ import {
   SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, Badge, Button, Card, Col, Descriptions, Divider, Drawer, Empty, Form, Input, InputNumber, List, Modal, Row, Select, Segmented, Space, Tag, Typography } from 'antd'
+import { Alert, Badge, Button, Card, Col, Descriptions, Divider, Drawer, Empty, Form, Input, InputNumber, Modal, Row, Select, Segmented, Space, Tag, Typography } from 'antd'
 import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../data/duLieuDatBan'
 import {
   dinhDangNgayGio,
@@ -243,10 +243,8 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuic
   }
 
   return (
-    <List
-      grid={{ gutter: 12, column: 1 }}
-      dataSource={bookings}
-      renderItem={(booking) => {
+    <div className="grid gap-3">
+      {bookings.map((booking) => {
         const assignedTables = booking.assignedTables || []
         const isUnassigned = !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
         const isPending = PENDING_STATUS_SET.has(booking.status)
@@ -262,8 +260,7 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuic
           : ''
 
         return (
-          <List.Item key={booking.id}>
-          <Card style={{ borderLeft: isUrgentCard ? '4px solid #ef4444' : undefined, background: isUrgentCard ? '#fff7f7' : '#fff' }}>
+          <Card key={booking.id} style={{ borderLeft: isUrgentCard ? '4px solid #ef4444' : undefined, background: isUrgentCard ? '#fff7f7' : '#fff' }}>
             <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
               <div className="min-w-0 flex-1">
                 <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
@@ -380,10 +377,9 @@ function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuic
               </div>
             </div>
           </Card>
-          </List.Item>
         )
-      }}
-    />
+      })}
+    </div>
   )
 }
 
@@ -393,8 +389,8 @@ function DatBanAssignModal({ booking, open, selectedTableIds, assignableTables, 
       open={open}
       onClose={onClose}
       title={booking ? `Gán bàn · ${booking.bookingCode}` : 'Gán bàn'}
-      width={420}
-      destroyOnClose
+      size={420}
+      destroyOnHidden
     >
       {booking ? (
         <div className="space-y-4">

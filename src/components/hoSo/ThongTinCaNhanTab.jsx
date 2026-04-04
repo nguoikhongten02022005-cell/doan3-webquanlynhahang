@@ -118,7 +118,9 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
     })
   }
 
-  const handleUpdatePassword = async () => {
+  const handleUpdatePassword = async (event) => {
+    event?.preventDefault()
+
     const nextErrors = validatePasswordForm(matKhauForm)
     setMatKhauErrors(nextErrors)
 
@@ -203,52 +205,59 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
           <p>Thiết lập lại mật khẩu đăng nhập để bảo mật tài khoản tốt hơn.</p>
         </div>
 
-        <div className="ho-so-form-grid">
-          <div className="nhom-truong full">
-            <label className="nhan-truong" htmlFor="ho-so-current-password">Mật khẩu hiện tại</label>
-            <input
-              id="ho-so-current-password"
-              type="password"
-              className={`truong-nhap ${matKhauErrors.currentPassword ? 'truong-nhap-error' : ''}`}
-              value={matKhauForm.currentPassword}
-              onChange={handlePasswordFieldChange('currentPassword')}
-            />
-            {matKhauErrors.currentPassword && <p className="ho-so-form-error">{matKhauErrors.currentPassword}</p>}
+        <form onSubmit={handleUpdatePassword}>
+          <input type="text" name="username" autoComplete="username" value={formData.email || ''} readOnly hidden />
+
+          <div className="ho-so-form-grid">
+            <div className="nhom-truong full">
+              <label className="nhan-truong" htmlFor="ho-so-current-password">Mật khẩu hiện tại</label>
+              <input
+                id="ho-so-current-password"
+                type="password"
+                autoComplete="current-password"
+                className={`truong-nhap ${matKhauErrors.currentPassword ? 'truong-nhap-error' : ''}`}
+                value={matKhauForm.currentPassword}
+                onChange={handlePasswordFieldChange('currentPassword')}
+              />
+              {matKhauErrors.currentPassword && <p className="ho-so-form-error">{matKhauErrors.currentPassword}</p>}
+            </div>
+
+            <div className="nhom-truong">
+              <label className="nhan-truong" htmlFor="ho-so-new-password">Mật khẩu mới</label>
+              <input
+                id="ho-so-new-password"
+                type="password"
+                autoComplete="new-password"
+                className={`truong-nhap ${matKhauErrors.newPassword ? 'truong-nhap-error' : ''}`}
+                value={matKhauForm.newPassword}
+                onChange={handlePasswordFieldChange('newPassword')}
+              />
+              {matKhauErrors.newPassword && <p className="ho-so-form-error">{matKhauErrors.newPassword}</p>}
+            </div>
+
+            <div className="nhom-truong">
+              <label className="nhan-truong" htmlFor="ho-so-confirm-password">Xác nhận mật khẩu mới</label>
+              <input
+                id="ho-so-confirm-password"
+                type="password"
+                autoComplete="new-password"
+                className={`truong-nhap ${matKhauErrors.confirmPassword ? 'truong-nhap-error' : ''}`}
+                value={matKhauForm.confirmPassword}
+                onChange={handlePasswordFieldChange('confirmPassword')}
+              />
+              {matKhauErrors.confirmPassword && <p className="ho-so-form-error">{matKhauErrors.confirmPassword}</p>}
+            </div>
           </div>
 
-          <div className="nhom-truong">
-            <label className="nhan-truong" htmlFor="ho-so-new-password">Mật khẩu mới</label>
-            <input
-              id="ho-so-new-password"
-              type="password"
-              className={`truong-nhap ${matKhauErrors.newPassword ? 'truong-nhap-error' : ''}`}
-              value={matKhauForm.newPassword}
-              onChange={handlePasswordFieldChange('newPassword')}
-            />
-            {matKhauErrors.newPassword && <p className="ho-so-form-error">{matKhauErrors.newPassword}</p>}
+          <div className="ho-so-profile-actions">
+            <button type="submit" className="btn nut-chinh ho-so-save-btn">
+              Cập nhật mật khẩu
+            </button>
+            <button type="button" className="btn ho-so-logout-btn ho-so-logout-btn--mobile" onClick={onLogout}>
+              Đăng xuất
+            </button>
           </div>
-
-          <div className="nhom-truong">
-            <label className="nhan-truong" htmlFor="ho-so-confirm-password">Xác nhận mật khẩu mới</label>
-            <input
-              id="ho-so-confirm-password"
-              type="password"
-              className={`truong-nhap ${matKhauErrors.confirmPassword ? 'truong-nhap-error' : ''}`}
-              value={matKhauForm.confirmPassword}
-              onChange={handlePasswordFieldChange('confirmPassword')}
-            />
-            {matKhauErrors.confirmPassword && <p className="ho-so-form-error">{matKhauErrors.confirmPassword}</p>}
-          </div>
-        </div>
-
-        <div className="ho-so-profile-actions">
-          <button type="button" className="btn nut-chinh ho-so-save-btn" onClick={handleUpdatePassword}>
-            Cập nhật mật khẩu
-          </button>
-          <button type="button" className="btn ho-so-logout-btn ho-so-logout-btn--mobile" onClick={onLogout}>
-            Đăng xuất
-          </button>
-        </div>
+        </form>
       </div>
     </article>
   )

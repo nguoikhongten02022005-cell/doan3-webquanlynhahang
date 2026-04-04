@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, PictureOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { Alert, Badge, Button, Card, Col, Drawer, Empty, Form, Input, List, Row, Segmented, Select, Space, Switch, Tag, Typography, Upload } from 'antd'
+import { Alert, Badge, Button, Card, Col, Drawer, Empty, Form, Input, Row, Segmented, Select, Space, Switch, Tag, Typography, Upload } from 'antd'
 import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../constants/danhMucThucDon'
 import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, ANH_DU_PHONG_THUC_DON } from '../../constants/tuyChonThucDon'
 import { taoMonApi, xoaMonApi, capNhatMonApi } from '../../services/api/apiThucDon'
@@ -228,49 +228,46 @@ function MonAnTab({ dishes, reloadDishes }) {
         {filteredDishes.length === 0 ? (
           <Empty description="Chưa có món ăn phù hợp với bộ lọc hiện tại." />
         ) : (
-          <List
-            grid={{ gutter: 16, xs: 1, sm: 2, lg: 3, xl: 4 }}
-            dataSource={filteredDishes}
-            renderItem={(dish) => {
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
+            {filteredDishes.map((dish) => {
               const meta = layMetaMon(dish, dishMetaById)
               return (
-                <List.Item>
-                  <Card
-                    hoverable
-                    cover={dish.image ? <img alt={dish.name} src={dish.image} style={{ aspectRatio: '1 / 1', objectFit: 'cover' }} /> : <div style={{ aspectRatio: '1 / 1', display: 'grid', placeItems: 'center', background: '#f1f5f9' }}><PictureOutlined style={{ fontSize: 32, color: '#94a3b8' }} /></div>}
-                    actions={[
-                      <Button type="link" icon={<EditOutlined />} onClick={() => handleEditDish(dish)}>Sửa</Button>,
-                      <Button type="link" icon={meta.isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />} onClick={() => handleToggleVisibility(dish)}>{meta.isVisible ? 'Ẩn' : 'Hiện'}</Button>,
-                    ]}
-                  >
-                    <Space orientation="vertical" size={10} style={{ width: '100%' }}>
-                      <Space wrap>
-                        <Tag color={meta.isVisible ? 'green' : 'red'}>{meta.isVisible ? 'Đang bán' : 'Tạm ẩn'}</Tag>
-                        {dish.badge ? <Tag color="gold">{dish.badge}</Tag> : null}
-                      </Space>
-                      <Typography.Text type="secondary">{dish.category || 'Chưa phân loại'}</Typography.Text>
-                      <Typography.Title level={5} style={{ margin: 0 }}>{dish.name}</Typography.Title>
-                      <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                        <Typography.Text strong style={{ color: '#ea580c', fontSize: 18 }}>{dinhDangGiaMon(dish)}</Typography.Text>
-                        <Typography.Text type="secondary">#{dish.id}</Typography.Text>
-                      </Space>
-                      <Space wrap>
-                        {meta.tags.slice(0, 2).map((tag) => <Tag key={`${dish.id}-${tag}`}>{tag}</Tag>)}
-                        {meta.tags.length > 2 ? <Tag>+{meta.tags.length - 2}</Tag> : null}
-                      </Space>
+                <Card
+                  key={dish.id}
+                  hoverable
+                  cover={dish.image ? <img alt={dish.name} src={dish.image} style={{ aspectRatio: '1 / 1', objectFit: 'cover' }} /> : <div style={{ aspectRatio: '1 / 1', display: 'grid', placeItems: 'center', background: '#f1f5f9' }}><PictureOutlined style={{ fontSize: 32, color: '#94a3b8' }} /></div>}
+                  actions={[
+                    <Button key={`sua-${dish.id}`} type="link" icon={<EditOutlined />} onClick={() => handleEditDish(dish)}>Sửa</Button>,
+                    <Button key={`an-hien-${dish.id}`} type="link" icon={meta.isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />} onClick={() => handleToggleVisibility(dish)}>{meta.isVisible ? 'Ẩn' : 'Hiện'}</Button>,
+                  ]}
+                >
+                  <Space orientation="vertical" size={10} style={{ width: '100%' }}>
+                    <Space wrap>
+                      <Tag color={meta.isVisible ? 'green' : 'red'}>{meta.isVisible ? 'Đang bán' : 'Tạm ẩn'}</Tag>
+                      {dish.badge ? <Tag color="gold">{dish.badge}</Tag> : null}
                     </Space>
-                  </Card>
-                </List.Item>
+                    <Typography.Text type="secondary">{dish.category || 'Chưa phân loại'}</Typography.Text>
+                    <Typography.Title level={5} style={{ margin: 0 }}>{dish.name}</Typography.Title>
+                    <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                      <Typography.Text strong style={{ color: '#ea580c', fontSize: 18 }}>{dinhDangGiaMon(dish)}</Typography.Text>
+                      <Typography.Text type="secondary">#{dish.id}</Typography.Text>
+                    </Space>
+                    <Space wrap>
+                      {meta.tags.slice(0, 2).map((tag) => <Tag key={`${dish.id}-${tag}`}>{tag}</Tag>)}
+                      {meta.tags.length > 2 ? <Tag>+{meta.tags.length - 2}</Tag> : null}
+                    </Space>
+                  </Space>
+                </Card>
               )
-            }}
-          />
+            })}
+          </div>
         )}
       </Card>
 
       <Drawer
         title={cheDoForm === 'edit' ? `Cập nhật món #${idMonDangSua}` : 'Thêm món ăn mới'}
         placement="right"
-        width={520}
+        size={520}
         open={drawerOpen}
         onClose={resetForm}
         footer={<Space style={{ width: '100%', justifyContent: 'space-between' }}>{cheDoForm === 'edit' ? <Button danger onClick={handleDeleteDish}>Xóa món</Button> : <span />}{<Space><Button onClick={resetForm}>Hủy</Button><Button form="mon-an-form" htmlType="submit" type="primary">{cheDoForm === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}</Button></Space>}</Space>}

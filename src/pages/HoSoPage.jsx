@@ -29,6 +29,13 @@ function HoSoPage() {
       return
     }
 
+    if (!nguoiDungHienTai.maKH) {
+      setLichSuDatBan([])
+      setLichSuDonHang([])
+      setMaDonDangXem('')
+      return
+    }
+
     setMaDonDangXem('')
     ;(async () => {
       try {

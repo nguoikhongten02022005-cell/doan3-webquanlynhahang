@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
-import { Link, useLocation, useNavigate, Navigate } from 'react-router-dom'
-import { Alert, Button, Card, Checkbox, Col, Form, Input, Row, Typography } from 'antd'
-import { LockOutlined, MailOutlined } from '@ant-design/icons'
+import { Link, useLocation, Navigate } from 'react-router-dom'
+import { Alert, Button, Card, Checkbox, Form, Input, Typography } from 'antd'
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
@@ -22,13 +21,9 @@ function DangNhapNoiBoPage() {
   const [canhBaoPhienHetHan, setCanhBaoPhienHetHan] = useState(false)
   const [form] = Form.useForm()
   const location = useLocation()
-  const navigate = useNavigate()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
   const backendMode = coSuDungMayChu()
-
-  if (daDangNhap && coTheVaoNoiBo) {
-    return <Navigate to="/admin/dashboard" replace />
-  }
+  const duongDanChuyenHuongSauDangNhap = location.state?.from || '/admin/dashboard'
 
   useEffect(() => {
     if (layMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)) {
@@ -44,6 +39,10 @@ function DangNhapNoiBoPage() {
       form.setFieldValue('identifier', emailDaNho)
     }
   }, [form])
+
+  if (daDangNhap && coTheVaoNoiBo) {
+    return <Navigate to={duongDanChuyenHuongSauDangNhap} replace />
+  }
 
   const handleSubmit = async () => {
     if (dangGui) return
@@ -72,18 +71,15 @@ function DangNhapNoiBoPage() {
       }
 
       setLoiDangNhap('')
-      navigate(location.state?.from || '/admin/dashboard', { replace: true })
     } finally {
       setDangGui(false)
     }
   }
 
   return (
-    <div style={{ minHeight: '100vh', padding: 24, background: '#f5f5f5' }}>
-      <Row align="middle" justify="center" style={{ minHeight: '100vh' }}>
-        <Col xs={24} sm={20} md={16} lg={12} xl={9}>
-          <Card className="xac-thuc-card xac-thuc-card-antd" variant="borderless">
-            <Title level={1} className="xac-thuc-title">Đăng nhập quản trị</Title>
+    <section className="xac-thuc-page">
+      <Card className="xac-thuc-card xac-thuc-card-antd" variant="borderless">
+            <Title level={1} className="xac-thuc-title">Đăng nhập</Title>
             <Paragraph className="xac-thuc-subtitle">
               {backendMode
                 ? 'Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.'
@@ -104,9 +100,10 @@ function DangNhapNoiBoPage() {
             >
               <Form.Item label="Email" name="identifier" rules={[{ required: true, message: 'Vui lòng nhập email nội bộ' }]}>
                 <Input
-                  prefix={<MailOutlined />}
+                  prefix={null}
                   size="large"
                   placeholder="Nhập email nội bộ"
+                  autoComplete="username"
                   value={tenDangNhapHoacEmail}
                   onChange={(e) => {
                     setTenDangNhapHoacEmail(e.target.value)
@@ -117,9 +114,10 @@ function DangNhapNoiBoPage() {
 
               <Form.Item label="Mật khẩu" name="password" rules={[{ required: true, message: 'Vui lòng nhập mật khẩu' }]}>
                 <Input.Password
-                  prefix={<LockOutlined />}
+                  prefix={null}
                   size="large"
                   placeholder="Nhập mật khẩu"
+                  autoComplete="current-password"
                   visibilityToggle={{ visible: hienMatKhau, onVisibleChange: setHienMatKhau }}
                   value={matKhau}
                   onChange={(e) => {
@@ -141,10 +139,13 @@ function DangNhapNoiBoPage() {
                 </Button>
               </Form.Item>
             </Form>
-          </Card>
-        </Col>
-      </Row>
-    </div>
+
+            <p className="xac-thuc-switch-text">
+              <Text type="secondary">Bạn là khách hàng? </Text>
+              <Link to="/dang-nhap">Đăng nhập tại đây</Link>
+            </p>
+      </Card>
+    </section>
   )
 }
 

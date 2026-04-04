@@ -79,31 +79,31 @@ function DangKyPage() {
         <form onSubmit={handleSubmit} className="xac-thuc-form">
           <div className="nhom-truong">
             <label htmlFor="register-full-name" className="nhan-truong">Họ và tên</label>
-            <input id="register-full-name" className={`truong-nhap ${formErrors.hoTen ? 'truong-nhap-error' : ''}`} value={formData.hoTen} onChange={handleFieldChange('hoTen')} required />
+            <input id="register-full-name" autoComplete="name" className={`truong-nhap ${formErrors.hoTen ? 'truong-nhap-error' : ''}`} value={formData.hoTen} onChange={handleFieldChange('hoTen')} required />
             {formErrors.hoTen ? <p className="loi-bieu-mau">{formErrors.hoTen}</p> : null}
           </div>
 
           <div className="nhom-truong">
             <label htmlFor="register-email" className="nhan-truong">Email</label>
-            <input id="register-email" type="email" className={`truong-nhap ${formErrors.email ? 'truong-nhap-error' : ''}`} value={formData.email} onChange={handleFieldChange('email')} required />
+            <input id="register-email" type="email" autoComplete="email" className={`truong-nhap ${formErrors.email ? 'truong-nhap-error' : ''}`} value={formData.email} onChange={handleFieldChange('email')} required />
             {formErrors.email ? <p className="loi-bieu-mau">{formErrors.email}</p> : null}
           </div>
 
           <div className="nhom-truong">
             <label htmlFor="register-phone" className="nhan-truong">Số điện thoại</label>
-            <input id="register-phone" className={`truong-nhap ${formErrors.soDienThoai ? 'truong-nhap-error' : ''}`} value={formData.soDienThoai} onChange={handleFieldChange('soDienThoai')} required />
+            <input id="register-phone" autoComplete="tel" className={`truong-nhap ${formErrors.soDienThoai ? 'truong-nhap-error' : ''}`} value={formData.soDienThoai} onChange={handleFieldChange('soDienThoai')} required />
             {formErrors.soDienThoai ? <p className="loi-bieu-mau">{formErrors.soDienThoai}</p> : null}
           </div>
 
           <div className="nhom-truong">
             <label htmlFor="register-password" className="nhan-truong">Mật khẩu</label>
-            <input id="register-password" type="password" className={`truong-nhap ${formErrors.matKhau ? 'truong-nhap-error' : ''}`} value={formData.matKhau} onChange={handleFieldChange('matKhau')} required />
+            <input id="register-password" type="password" autoComplete="new-password" className={`truong-nhap ${formErrors.matKhau ? 'truong-nhap-error' : ''}`} value={formData.matKhau} onChange={handleFieldChange('matKhau')} required />
             {formErrors.matKhau ? <p className="loi-bieu-mau">{formErrors.matKhau}</p> : null}
           </div>
 
           <div className="nhom-truong">
             <label htmlFor="register-confirm-password" className="nhan-truong">Xác nhận mật khẩu</label>
-            <input id="register-confirm-password" type="password" className={`truong-nhap ${formErrors.xacNhanMatKhau ? 'truong-nhap-error' : ''}`} value={formData.xacNhanMatKhau} onChange={handleFieldChange('xacNhanMatKhau')} required />
+            <input id="register-confirm-password" type="password" autoComplete="new-password" className={`truong-nhap ${formErrors.xacNhanMatKhau ? 'truong-nhap-error' : ''}`} value={formData.xacNhanMatKhau} onChange={handleFieldChange('xacNhanMatKhau')} required />
             {formErrors.xacNhanMatKhau ? <p className="loi-bieu-mau">{formErrors.xacNhanMatKhau}</p> : null}
           </div>
 

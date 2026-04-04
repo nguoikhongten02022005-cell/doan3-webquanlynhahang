@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react'
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from 'react'
 import { layThongTinToiApi, dangNhapApi, dangKyApi, dangNhapNoiBoApi, dangXuatApi, capNhatHoSoApi, doiMatKhauApi } from '../services/api/apiXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 import {
@@ -20,7 +20,9 @@ import {
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
 
-export const useXacThuc = () => {
+const XacThucContext = createContext(null)
+
+function useXacThucState() {
   const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => layNguoiDungHienTai())
   const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(true)
 
@@ -288,7 +290,7 @@ export const useXacThuc = () => {
   const laNhanVien = vaiTro === VAI_TRO_XAC_THUC.NHAN_VIEN
   const coTheVaoNoiBo = laAdmin || laNhanVien
 
-  return {
+  return useMemo(() => ({
     nguoiDungHienTai,
     vaiTro,
     laAdmin,
@@ -302,5 +304,34 @@ export const useXacThuc = () => {
     dangXuat,
     capNhatHoSo,
     capNhatMatKhau,
+  }), [
+    nguoiDungHienTai,
+    vaiTro,
+    laAdmin,
+    laNhanVien,
+    coTheVaoNoiBo,
+    dangKhoiTaoXacThuc,
+    dangNhap,
+    dangNhapNoiBo,
+    dangKy,
+    dangXuat,
+    capNhatHoSo,
+    capNhatMatKhau,
+  ])
+}
+
+export function XacThucProvider({ children }) {
+  const giaTriXacThuc = useXacThucState()
+
+  return createElement(XacThucContext.Provider, { value: giaTriXacThuc }, children)
+}
+
+export const useXacThuc = () => {
+  const context = useContext(XacThucContext)
+
+  if (!context) {
+    throw new Error('useXacThuc must be used within XacThucProvider')
   }
+
+  return context
 }
