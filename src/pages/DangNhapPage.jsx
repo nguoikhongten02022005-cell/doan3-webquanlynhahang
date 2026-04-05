@@ -3,6 +3,7 @@ import { Alert, Button, Card, Checkbox, Form, Input, Typography } from 'antd'
 import { Link, useLocation, useNavigate } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { datMucLuuTru, layMucLuuTru, xoaMucLuuTru } from '../services/dichVuLuuTru'
+import { coSuDungMayChu } from '../services/trinhKhachApi'
 
 const KHOA_NHO_DANG_NHAP = 'restaurant_remember_login'
 const KHOA_EMAIL_DA_NHO = 'restaurant_remembered_email'
@@ -19,6 +20,7 @@ function DangNhapPage() {
   const navigate = useNavigate()
   const { dangNhap } = useXacThuc()
   const { Title, Paragraph, Text } = Typography
+  const backendMode = coSuDungMayChu()
 
   useEffect(() => {
     const coNhoDangNhap = layMucLuuTru(KHOA_NHO_DANG_NHAP) === '1'
@@ -62,9 +64,13 @@ function DangNhapPage() {
     <section className="xac-thuc-page">
       <Card className="xac-thuc-card xac-thuc-card-antd" variant="borderless">
         <Title level={1} className="xac-thuc-title">Đăng nhập</Title>
-        <Paragraph className="xac-thuc-subtitle">Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.</Paragraph>
+        <Paragraph className="xac-thuc-subtitle">
+          {backendMode
+            ? 'Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.'
+            : 'Đăng nhập bằng tài khoản demo để trải nghiệm nhanh giao diện khách hàng.'}
+        </Paragraph>
 
-        {location.state?.registered ? <Alert type="success" showIcon title="Đăng ký thành công. Vui lòng đăng nhập." style={{ marginBottom: 16 }} /> : null}
+        {!backendMode ? <Alert type="info" showIcon title="Ứng dụng đang ở chế độ demo. Vui lòng dùng tài khoản minh họa đã được cấu hình sẵn." style={{ marginBottom: 16 }} /> : null}
 
         <Form
           form={form}

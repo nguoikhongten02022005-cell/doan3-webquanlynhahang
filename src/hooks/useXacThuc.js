@@ -130,6 +130,7 @@ function useXacThucState() {
       })
 
       const nguoiDungDaLuu = layNguoiDungHienTai()
+      setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
 
       return {
         success: true,
@@ -159,6 +160,7 @@ function useXacThucState() {
         user: TAI_KHOAN_KHACH_HANG_DEMO.user,
         accessToken: TAI_KHOAN_KHACH_HANG_DEMO.accessToken,
       })
+      setNguoiDungHienTai(TAI_KHOAN_KHACH_HANG_DEMO.user)
 
       return {
         success: true,
@@ -189,6 +191,7 @@ function useXacThucState() {
         user: taiKhoanDemo.user,
         accessToken: taiKhoanDemo.accessToken,
       })
+      setNguoiDungHienTai(taiKhoanDemo.user)
 
       return {
         success: true,
@@ -223,6 +226,7 @@ function useXacThucState() {
         })
 
         const nguoiDungDaLuu = layNguoiDungHienTai()
+        setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
 
         return {
           success: true,
@@ -255,6 +259,7 @@ function useXacThucState() {
     }
 
     xoaPhienXacThuc()
+    setNguoiDungHienTai(null)
   }, [])
 
   const capNhatHoSo = useCallback(async (payload) => {
@@ -270,7 +275,10 @@ function useXacThucState() {
         ...duLieu,
       })
 
-      return { success: true, user: layNguoiDungHienTai() }
+      const nguoiDungDaCapNhat = layNguoiDungHienTai()
+      setNguoiDungHienTai(nguoiDungDaCapNhat)
+
+      return { success: true, user: nguoiDungDaCapNhat }
     } catch (error) {
       return { success: false, error: error?.message || 'Cập nhật hồ sơ thất bại.' }
     }

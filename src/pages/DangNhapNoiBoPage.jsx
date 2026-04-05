@@ -83,8 +83,9 @@ function DangNhapNoiBoPage() {
             <Paragraph className="xac-thuc-subtitle">
               {backendMode
                 ? 'Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.'
-                : 'Frontend hiện không kết nối backend. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
+                : 'Ứng dụng đang ở chế độ demo. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
             </Paragraph>
+            {!backendMode ? <Alert type="info" showIcon title="Chế độ demo chỉ hỗ trợ tài khoản minh họa nội bộ được cấu hình sẵn." style={{ marginBottom: 16 }} /> : null}
 
             {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." style={{ marginBottom: 16 }} /> : null}
             {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} style={{ marginBottom: 16 }} /> : null}
