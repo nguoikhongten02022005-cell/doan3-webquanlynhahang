@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { Button, Empty, Segmented } from 'antd'
 import { dinhDangNgay } from '../../features/bangDieuKhienNoiBo/dinhDang'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 
@@ -21,15 +22,16 @@ const NHAN_TRANG_THAI = {
 
 function DonHangMangVeTab({ danhSachDon, boLoc, onDoiBoLoc, onHuyDon, onXemChiTiet }) {
   const danhSachHienThi = danhSachDon.filter((don) => {
+    const trangThai = don.trangThai || don.status
     if (boLoc === 'ALL') return true
-    if (boLoc === 'PROCESSING') return ['Pending', 'Confirmed', 'Preparing', 'Ready', 'Served'].includes(don.trangThai)
-    if (boLoc === 'DONE') return don.trangThai === 'Paid'
-    if (boLoc === 'CANCELLED') return don.trangThai === 'Cancelled'
+    if (boLoc === 'PROCESSING') return ['Pending', 'Confirmed', 'Preparing', 'Ready', 'Served'].includes(trangThai)
+    if (boLoc === 'DONE') return trangThai === 'Paid'
+    if (boLoc === 'CANCELLED') return trangThai === 'Cancelled'
     return true
   })
 
   return (
-    <article className="ho-so-card">
+    <article className="ho-so-card ho-so-don-hang-ant-hybrid">
       <div className="ho-so-section-heading">
         <div>
           <h2>Đơn hàng của tôi</h2>
@@ -38,24 +40,28 @@ function DonHangMangVeTab({ danhSachDon, boLoc, onDoiBoLoc, onHuyDon, onXemChiTi
       </div>
 
       <div className="ho-so-filter-row">
-        {BO_LOC.map((muc) => (
-          <button key={muc.key} type="button" className={`btn ${boLoc === muc.key ? 'nut-chinh' : 'nut-phu'} ho-so-filter-btn`} onClick={() => onDoiBoLoc(muc.key)}>
-            {muc.label}
-          </button>
-        ))}
+        <Segmented options={BO_LOC.map((muc) => ({ label: muc.label, value: muc.key }))} value={boLoc} onChange={onDoiBoLoc} />
       </div>
 
       {danhSachHienThi.length === 0 ? (
         <div className="ho-so-empty-state">
-          <h3>Bạn chưa có đơn hàng nào</h3>
-          <p>Hãy vào menu mang về để tạo đơn đầu tiên.</p>
+          <Empty
+            image={Empty.PRESENTED_IMAGE_SIMPLE}
+            description={(
+              <div className="ho-so-empty-copy">
+                <h3>Bạn chưa có đơn hàng nào</h3>
+                <p>Hãy vào menu mang về để tạo đơn đầu tiên.</p>
+              </div>
+            )}
+          />
           <Link to="/mang-ve/thuc-don" className="btn nut-chinh ho-so-empty-action">Đặt ngay</Link>
         </div>
       ) : (
         <div className="ho-so-history-grid">
           {danhSachHienThi.map((don) => {
-            const nhanTrangThai = NHAN_TRANG_THAI[don.trangThai] || { label: don.trangThai, tone: 'neutral' }
-            const danhSachMon = don.danhSachMon || []
+            const trangThai = don.trangThai || don.status
+            const nhanTrangThai = NHAN_TRANG_THAI[trangThai] || { label: trangThai, tone: 'neutral' }
+            const danhSachMon = don.danhSachMon || don.items || []
             const monThuNhat = danhSachMon.slice(0, 2).map((muc) => `${muc.tenMon} x${muc.soLuong}`)
             const soMonConLai = Math.max(0, danhSachMon.length - 2)
             return (
@@ -80,8 +86,14 @@ function DonHangMangVeTab({ danhSachDon, boLoc, onDoiBoLoc, onHuyDon, onXemChiTi
                 </div>
 
                 <div className="ho-so-history-actions">
-                  {don.trangThai === 'Pending' ? <button type="button" className="btn ho-so-action-btn ho-so-action-btn--danger" onClick={() => onHuyDon(don.maDonHang)}>Hủy đơn</button> : null}
-                  <button type="button" className="btn nut-phu ho-so-action-btn ho-so-action-btn--accent" onClick={() => onXemChiTiet(don.maDonHang)}>Xem chi tiết</button>
+                  {trangThai === 'Pending' ? (
+                    <Button htmlType="button" className="btn ho-so-action-btn ho-so-action-btn--danger" onClick={() => onHuyDon(don.maDonHang)}>
+                      Hủy đơn
+                    </Button>
+                  ) : null}
+                  <Button htmlType="button" className="btn nut-phu ho-so-action-btn ho-so-action-btn--accent" onClick={() => onXemChiTiet(don.maDonHang)}>
+                    Xem chi tiết
+                  </Button>
                 </div>
               </div>
             )

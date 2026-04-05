@@ -23,6 +23,15 @@ public class DonHangController : ControllerBase
         => Ok(new { data = await _service.LayDanhSachAsync(cancellationToken) });
 
     [Authorize]
+    [HttpGet("me")]
+    public async Task<IActionResult> LayDonHangCuaToi(CancellationToken cancellationToken)
+    {
+        var current = User.LayNguoiDungHienTai();
+        if (current is null) return Unauthorized(new { message = "Khong xac dinh duoc nguoi dung hien tai" });
+        return Ok(new { data = await _service.LayDanhSachCuaToiKemChiTietAsync(current.MaND, cancellationToken) });
+    }
+
+    [Authorize]
     [HttpGet("{maDonHang}")]
     public async Task<IActionResult> LayTheoMa(string maDonHang, CancellationToken cancellationToken)
         => Ok(new { data = await _service.LayTheoMaAsync(maDonHang, cancellationToken), chiTiet = await _service.LayChiTietAsync(maDonHang, cancellationToken) });

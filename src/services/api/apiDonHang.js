@@ -84,13 +84,48 @@ const tachVaChuanHoa = (phanHoi) => ({
   duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonHang).filter(Boolean) : chuanHoaDonHang(phanHoi.duLieu),
 })
 
+const chuanHoaDonHangHoSo = (order) => {
+  const donHang = chuanHoaDonHang(order)
+  if (!donHang) return null
+
+  const danhSachMon = chuanHoaDanhSachChiTiet(order?.chiTiet || order?.ChiTiet || order?.items || order?.Items).map((item) => ({
+    tenMon: item.name,
+    soLuong: item.quantity,
+    donGia: item.price,
+    thanhTien: item.thanhTien ?? (item.quantity * item.price),
+  }))
+
+  return {
+    maDonHang: donHang.orderCode,
+    loaiDon: 'MANG_VE_PICKUP',
+    trangThai: donHang.status,
+    tongTien: donHang.total,
+    phiShip: 0,
+    diaChiGiao: donHang.customer?.address || '',
+    gioLayHang: '',
+    gioGiao: '',
+    ngayTao: donHang.orderDate,
+    danhSachMon,
+  }
+}
+
+const tachVaChuanHoaHoSo = (phanHoi) => ({
+  ...phanHoi,
+  duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonHangHoSo).filter(Boolean) : [],
+})
+
+export const layDonHangCuaToiApi = async () => tachVaChuanHoaHoSo(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/me')))
+
+export const layDanhSachDonHangHoSoApi = async () => layDonHangCuaToiApi()
+
+export const chuanHoaDonHangHoSoApi = chuanHoaDonHangHoSo
+
 const tachVaChuanHoaChiTiet = (phanHoi) => ({
   ...phanHoi,
   duLieu: chuanHoaChiTietResponse(phanHoi.duLieu),
 })
 
 export const layDanhSachDonHangApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang')))
-export const layDonHangCuaToiApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang')))
 export const layChiTietDonHangApi = async (id) => tachVaChuanHoaChiTiet(tachPhanHoiApi(await trinhKhachApi.get(`/don-hang/${id}`)))
 export const taoDonHangApi = async (payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', chuanHoaPayloadTaoDonHang(payload))))
 export const capNhatTrangThaiDonHangApi = async (id, status) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/don-hang/${id}/status`, { trangThai: status })))

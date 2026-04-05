@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { Tabs } from 'antd'
 import { Navigate, useNavigate } from 'react-router-dom'
 import ChiTietDonHangModal from '../components/hoSo/ChiTietDonHangModal'
 import DonHangMangVeTab from '../components/hoSo/DonHangMangVeTab'
@@ -8,7 +9,8 @@ import { PROFILE_TABS } from '../data/duLieuHoSo'
 import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useDatBan } from '../hooks/useDatBan'
-import { huyDonMangVeApi, layLichSuDonMangVeApi } from '../services/api/apiMangVe'
+import { huyDonMangVeApi } from '../services/api/apiMangVe'
+import { layDanhSachDonHangHoSoApi } from '../services/api/apiDonHang'
 
 function HoSoPage() {
   const navigate = useNavigate()
@@ -22,14 +24,15 @@ function HoSoPage() {
   const [boLocDonHang, setBoLocDonHang] = useState('ALL')
 
   useEffect(() => {
-    if (!nguoiDungHienTai) {
-      setLichSuDatBan([])
-      setLichSuDonHang([])
-      setMaDonDangXem('')
-      return
-    }
+    document.body.classList.add('ho-so-an-thanh-cuon')
 
-    if (!nguoiDungHienTai.maKH) {
+    return () => {
+      document.body.classList.remove('ho-so-an-thanh-cuon')
+    }
+  }, [])
+
+  useEffect(() => {
+    if (!nguoiDungHienTai) {
       setLichSuDatBan([])
       setLichSuDonHang([])
       setMaDonDangXem('')
@@ -39,10 +42,14 @@ function HoSoPage() {
     setMaDonDangXem('')
     ;(async () => {
       try {
-        const danhSachDatBan = await layLichSuDatBan()
-        setLichSuDatBan(Array.isArray(danhSachDatBan) ? danhSachDatBan : [])
+        if (nguoiDungHienTai.maKH) {
+          const danhSachDatBan = await layLichSuDatBan()
+          setLichSuDatBan(Array.isArray(danhSachDatBan) ? danhSachDatBan : [])
+        } else {
+          setLichSuDatBan([])
+        }
 
-        const { duLieu } = await layLichSuDonMangVeApi()
+        const { duLieu } = await layDanhSachDonHangHoSoApi()
         setLichSuDonHang(Array.isArray(duLieu) ? duLieu : [])
       } catch {
         setLichSuDatBan([])
@@ -54,6 +61,11 @@ function HoSoPage() {
   const donHangDangXem = useMemo(
     () => lichSuDonHang.find((order) => order.maDonHang === maDonDangXem) || null,
     [lichSuDonHang, maDonDangXem],
+  )
+
+  const danhSachTabHoSo = useMemo(
+    () => PROFILE_TABS.map((tab) => ({ key: tab.key, label: tab.label })),
+    [],
   )
 
   const handleCancelBooking = async (bookingCode) => {
@@ -103,7 +115,7 @@ function HoSoPage() {
 
     try {
       await huyDonMangVeApi(maDonHang)
-      const { duLieu } = await layLichSuDonMangVeApi()
+      const { duLieu } = await layDanhSachDonHangHoSoApi()
       setLichSuDonHang(Array.isArray(duLieu) ? duLieu : [])
       hienThongBao({ message: `Đã hủy đơn ${maDonHang}.`, tone: 'success', duration: 3000, title: '' })
     } catch (error) {
@@ -128,18 +140,14 @@ function HoSoPage() {
     <div className="ho-so-page ho-so-page-editorial">
       <div className="container">
         <div className="ho-so-shell">
-          <aside className="ho-so-tabs" aria-label="Điều hướng hồ sơ">
-            {PROFILE_TABS.map((tab) => (
-              <button
-                key={tab.key}
-                type="button"
-                className={`ho-so-tab-btn ${tabDangMo === tab.key ? 'active' : ''}`}
-                onClick={() => setTabDangMo(tab.key)}
-              >
-                {tab.label}
-              </button>
-            ))}
-          </aside>
+          <Tabs
+            className="ho-so-tabs ho-so-tabs-ant-hybrid"
+            activeKey={tabDangMo}
+            items={danhSachTabHoSo}
+            onChange={setTabDangMo}
+            tabBarGutter={0}
+            animated={false}
+          />
 
           <section className="ho-so-content-panel">
             {tabDangMo === 'personal' && (

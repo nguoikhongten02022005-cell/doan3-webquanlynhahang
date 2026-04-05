@@ -39,8 +39,85 @@ public class DonHangService
     public Task<List<DonHang>> LayDanhSachAsync(CancellationToken cancellationToken = default)
         => _dbContext.DonHang.AsNoTracking().OrderByDescending(x => x.NgayTao).ToListAsync(cancellationToken);
 
+    public async Task<List<DonHang>> LayDanhSachCuaToiAsync(string maNd, CancellationToken cancellationToken = default)
+    {
+        var maKh = await _dbContext.KhachHang
+            .AsNoTracking()
+            .Where(x => x.MaND == maNd)
+            .Select(x => x.MaKH)
+            .FirstOrDefaultAsync(cancellationToken);
+
+        if (string.IsNullOrWhiteSpace(maKh))
+        {
+            return new List<DonHang>();
+        }
+
+        return await _dbContext.DonHang
+            .AsNoTracking()
+            .Where(x => x.MaKH == maKh)
+            .OrderByDescending(x => x.NgayTao)
+            .ToListAsync(cancellationToken);
+    }
+
     public Task<DonHang?> LayTheoMaAsync(string maDonHang, CancellationToken cancellationToken = default)
         => _dbContext.DonHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaDonHang == maDonHang, cancellationToken);
+
+    public async Task<List<ChiTietDonHang>> LayChiTietTheoDanhSachAsync(List<string> maDonHang, CancellationToken cancellationToken = default)
+    {
+        if (maDonHang.Count == 0)
+        {
+            return new List<ChiTietDonHang>();
+        }
+
+        return await _dbContext.ChiTietDonHang
+            .AsNoTracking()
+            .Where(x => maDonHang.Contains(x.MaDonHang))
+            .OrderBy(x => x.MaDonHang)
+            .ThenBy(x => x.MaChiTiet)
+            .ToListAsync(cancellationToken);
+    }
+
+    public Task<ChiTietDonHang?> LayTheoMaChiTietAsync(string maChiTiet, CancellationToken cancellationToken = default)
+        => _dbContext.ChiTietDonHang.AsNoTracking().FirstOrDefaultAsync(x => x.MaChiTiet == maChiTiet, cancellationToken);
+
+    public async Task<List<object>> LayDanhSachCuaToiKemChiTietAsync(string maNd, CancellationToken cancellationToken = default)
+    {
+        var danhSachDon = await LayDanhSachCuaToiAsync(maNd, cancellationToken);
+        var maDon = danhSachDon.Select(x => x.MaDonHang).ToList();
+        var chiTiet = await LayChiTietTheoDanhSachAsync(maDon, cancellationToken);
+        var maMon = chiTiet.Select(x => x.MaMon).Distinct().ToList();
+
+        var tenMonLookup = await _dbContext.ThucDon
+            .AsNoTracking()
+            .Where(x => maMon.Contains(x.MaMon))
+            .ToDictionaryAsync(x => x.MaMon, x => x.TenMon, cancellationToken);
+
+        return danhSachDon.Select(don => (object)new
+        {
+            don.MaDonHang,
+            don.MaKH,
+            don.MaBan,
+            don.LoaiDon,
+            don.TongTien,
+            don.TrangThai,
+            don.GhiChu,
+            don.NgayTao,
+            ChiTiet = chiTiet
+                .Where(x => x.MaDonHang == don.MaDonHang)
+                .Select(x => new
+                {
+                    x.MaChiTiet,
+                    x.MaMon,
+                    TenMon = tenMonLookup.TryGetValue(x.MaMon, out var tenMon) ? tenMon : x.MaMon,
+                    x.SoLuong,
+                    x.DonGia,
+                    x.ThanhTien,
+                    x.GhiChu,
+                    x.TrangThai,
+                })
+                .ToList(),
+        }).ToList();
+    }
 
     public Task<List<ChiTietDonHang>> LayChiTietAsync(string maDonHang, CancellationToken cancellationToken = default)
         => _dbContext.ChiTietDonHang.AsNoTracking().Where(x => x.MaDonHang == maDonHang).OrderBy(x => x.MaChiTiet).ToListAsync(cancellationToken);

@@ -67,14 +67,14 @@ const getInitialCartItems = () => {
   }
 }
 
-const capNhatVaLuuGioHang = (hamCapNhat, giaTriHienTai) => {
-  const gioHangMoi = hamCapNhat(giaTriHienTai)
-  datJsonLuuTru(STORAGE_KEYS.GIO_HANG, gioHangMoi)
-  return gioHangMoi
-}
+const capNhatGioHang = (hamCapNhat, giaTriHienTai) => hamCapNhat(giaTriHienTai)
 
 export function GioHangProvider({ children }) {
   const [cartItems, setCartItems] = useState(getInitialCartItems)
+
+  useEffect(() => {
+    datJsonLuuTru(STORAGE_KEYS.GIO_HANG, cartItems)
+  }, [cartItems])
 
   useEffect(() => {
     const dongBoGioHang = (event) => {
@@ -93,7 +93,7 @@ export function GioHangProvider({ children }) {
     const normalizedDish = normalizeCartItem(dish)
     const dishKey = getItemKey(normalizedDish)
 
-    setCartItems((prevItems) => capNhatVaLuuGioHang((danhSachCu) => {
+    setCartItems((prevItems) => capNhatGioHang((danhSachCu) => {
       const existingItem = danhSachCu.find((item) => getItemKey(item) === dishKey)
 
       if (existingItem) {
@@ -116,7 +116,7 @@ export function GioHangProvider({ children }) {
       return
     }
 
-    setCartItems((prevItems) => capNhatVaLuuGioHang((danhSachCu) => danhSachCu.filter((item) => getItemKey(item) !== variantKey), prevItems))
+    setCartItems((prevItems) => capNhatGioHang((danhSachCu) => danhSachCu.filter((item) => getItemKey(item) !== variantKey), prevItems))
   }
 
   const capNhatSoLuong = (variantKey, delta) => {
@@ -124,7 +124,7 @@ export function GioHangProvider({ children }) {
       return
     }
 
-    setCartItems((prevItems) => capNhatVaLuuGioHang((danhSachCu) => danhSachCu.reduce((danhSachMoi, item) => {
+    setCartItems((prevItems) => capNhatGioHang((danhSachCu) => danhSachCu.reduce((danhSachMoi, item) => {
       if (getItemKey(item) !== variantKey) {
         danhSachMoi.push(item)
         return danhSachMoi
@@ -143,7 +143,7 @@ export function GioHangProvider({ children }) {
   }
 
   const xoaToanBoGio = () => {
-    setCartItems((prevItems) => capNhatVaLuuGioHang(() => [], prevItems))
+    setCartItems((prevItems) => capNhatGioHang(() => [], prevItems))
   }
 
   const layKhoaMonTrongGio = (item) => getItemKey(item)
