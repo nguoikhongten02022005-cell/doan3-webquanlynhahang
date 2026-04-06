@@ -84,7 +84,8 @@ function AdminDanhGiaPage() {
                         <Col xs={24} md={8}>
                           <Card size="small" styles={{ body: { padding: 12 } }}>
                             <Text type="secondary">Khách</Text>
-                            <div><Text strong>{danhGia.maKH}</Text></div>
+                            <div><Text strong>{danhGia.tenKhachHang || danhGia.maKH}</Text></div>
+                            {danhGia.email ? <div><Text type="secondary">{danhGia.email}</Text></div> : null}
                           </Card>
                         </Col>
                         <Col xs={24} md={8}>

@@ -10,6 +10,19 @@ const chuanHoaChuoi = (value = '') => String(value)
   .toLowerCase()
   .replace(/[^a-z0-9]+/g, '')
 
+const doanTenThuoc = (tenMon = '', danhSachTuKhoa = []) => {
+  const tenDaChuanHoa = chuanHoaChuoi(tenMon)
+  return danhSachTuKhoa.some((tuKhoa) => tenDaChuanHoa.includes(chuanHoaChuoi(tuKhoa)))
+}
+
+const suyRaDanhMucTuTenMon = (tenMon = '') => {
+  if (doanTenThuoc(tenMon, ['combo'])) return 'Combo'
+  if (doanTenThuoc(tenMon, ['ca phe', 'tra', 'nuoc ep', 'sinh to', 'cam sa', 'dao'])) return 'Đồ Uống'
+  if (doanTenThuoc(tenMon, ['kem', 'banh', 'flan', 'tiramisu', 'panna cotta'])) return 'Tráng Miệng'
+  if (doanTenThuoc(tenMon, ['goi', 'cha gio', 'salad', 'sup', 'súp', 'khoai'])) return 'Khai Vị'
+  return 'Món Chính'
+}
+
 const taoMocBatDauNgay = (date) => {
   const clone = new Date(date)
   clone.setHours(0, 0, 0, 0)
@@ -147,16 +160,19 @@ const buildTopDishes = (orders = []) => {
   }))
 }
 
-const buildCategoryShares = (topDishes = []) => {
+const buildCategoryShares = (orders = []) => {
   const dishLookup = new Map(DANH_SACH_MON.map((dish) => [String(dish.id), dish]))
   const dishNameLookup = new Map(DANH_SACH_MON.map((dish) => [chuanHoaChuoi(dish.name), dish]))
   const categoryRevenueMap = new Map(CAC_DANH_MUC_CHUAN_THUC_DON.map((category) => [category, 0]))
 
-  topDishes.forEach((dish) => {
-    const matchedDish = dishLookup.get(String(dish.id)) || dishNameLookup.get(chuanHoaChuoi(dish.name))
-    const category = matchedDish?.category || matchedDish?.danhMuc
-    if (!categoryRevenueMap.has(category)) return
-    categoryRevenueMap.set(category, categoryRevenueMap.get(category) + dish.revenue)
+  orders.forEach((order) => {
+    ;(order?.items || []).forEach((item) => {
+      const revenue = (Number(item?.quantity) || 0) * (Number(item?.price) || 0)
+      const matchedDish = dishLookup.get(String(item?.menuItemId || item?.id || '')) || dishNameLookup.get(chuanHoaChuoi(item?.name || ''))
+      const category = matchedDish?.category || matchedDish?.danhMuc || suyRaDanhMucTuTenMon(item?.name || '')
+      if (!categoryRevenueMap.has(category)) return
+      categoryRevenueMap.set(category, categoryRevenueMap.get(category) + revenue)
+    })
   })
 
   const totalRevenue = [...categoryRevenueMap.values()].reduce((sum, value) => sum + value, 0)
@@ -176,7 +192,7 @@ export const taoDuLieuThongKeDoanhThu = ({ orders = [], bookings = [], timeRange
   const revenueSeries = buildRevenueSeries(filteredOrders)
   const giaTriLonNhat = Math.max(...revenueSeries.map((item) => item.revenue), 1)
   const topDishes = buildTopDishes(filteredOrders)
-  const categoryShares = buildCategoryShares(topDishes)
+  const categoryShares = buildCategoryShares(filteredOrders)
   const totalBookings = filteredBookings.length
   const completedBookings = filteredBookings.filter(isBookingCompleted).length
   const cancelledBookings = filteredBookings.filter(isBookingCancelled).length

@@ -7,6 +7,8 @@ const chuanHoaDanhGia = (review) => {
     maDanhGia: review.maDanhGia || review.MaDanhGia || '',
     maKH: review.maKH || review.MaKH || '',
     maDonHang: review.maDonHang || review.MaDonHang || '',
+    tenKhachHang: review.tenKhachHang || review.TenKhachHang || '',
+    email: review.email || review.Email || '',
     soSao: Number(review.soSao ?? review.SoSao ?? 0),
     noiDung: review.noiDung || review.NoiDung || '',
     phanHoi: review.phanHoi || review.PhanHoi || '',

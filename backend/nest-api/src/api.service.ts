@@ -647,7 +647,13 @@ export class ApiService {
   }
 
   async layDanhSachDanhGia() {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM DanhGia ORDER BY NgayDanhGia DESC');
+    const danhSach = await this.mysql.truyVan(
+      `SELECT dg.*, kh.TenKH, nd.Email
+       FROM DanhGia dg
+       LEFT JOIN KhachHang kh ON kh.MaKH = dg.MaKH
+       LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
+       ORDER BY dg.NgayDanhGia DESC`,
+    );
     return this.taoPhanHoi(danhSach.map((danhGia) => ({
       maDanhGia: danhGia.MaDanhGia,
       maKH: danhGia.MaKH,
@@ -657,6 +663,8 @@ export class ApiService {
       phanHoi: danhGia.PhanHoi || '',
       trangThai: danhGia.TrangThai,
       ngayDanhGia: danhGia.NgayDanhGia,
+      tenKhachHang: danhGia.TenKH || '',
+      email: danhGia.Email || '',
     })), 'Lay danh sach danh gia thanh cong');
   }
 
@@ -717,15 +725,21 @@ export class ApiService {
   }
 
   async layDonMangVeChoAdmin() {
-    const danhSach = await this.mysql.truyVan("SELECT * FROM DonHang WHERE LoaiDon IN ('MANG_VE_PICKUP', 'MANG_VE_GIAO_HANG') ORDER BY NgayTao DESC");
+    const danhSach = await this.mysql.truyVan(
+      `SELECT dh.*, kh.TenKH, kh.SDT
+       FROM DonHang dh
+       LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
+       WHERE dh.LoaiDon IN ('MANG_VE_PICKUP', 'MANG_VE_GIAO_HANG')
+       ORDER BY dh.NgayTao DESC`,
+    );
     const ketQua = await Promise.all(danhSach.map(async (don) => {
       const danhSachMon = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
 
       return {
         MaDonHang: don.MaDonHang,
         MaKH: don.MaKH,
-        HoTen: '',
-        SoDienThoai: '',
+        HoTen: don.TenKH || '',
+        SoDienThoai: don.SDT || '',
         LoaiDon: don.LoaiDon,
         GioLayHang: '',
         GioGiao: '',
