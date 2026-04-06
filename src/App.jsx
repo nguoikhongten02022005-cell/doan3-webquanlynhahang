@@ -51,6 +51,7 @@ function App() {
           <Route path="/dang-ky" element={<DangKyPage />} />
           <Route path="/mang-ve" element={<MangVePage />} />
           <Route path="/ban/:maBan" element={<BanGoiMonPage />} />
+          <Route path="/ban/:maBan/goi-mon" element={<BanGoiMonPage />} />
           <Route path="/mang-ve/thuc-don" element={<MangVeThucDonPage />} />
           <Route element={<TuyenDuongBaoVe loginPath="/dang-nhap" chiCanDangNhap />}>
             <Route path="/mang-ve/gio-hang" element={<MangVeGioHangPage />} />
