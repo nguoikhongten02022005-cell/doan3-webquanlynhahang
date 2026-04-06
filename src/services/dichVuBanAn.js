@@ -8,13 +8,18 @@ export const TRANG_THAI_BAN = Object.freeze({
 export const chuanHoaBanChoNoiBo = (table) => {
   if (!table || typeof table !== 'object') return null
   const status = table.status || table.trangThai || table.TrangThai || TRANG_THAI_BAN.TRONG
+  const rawAreaText = table.rawAreaText || table.khuVuc || table.KhuVuc || table.viTri || table.ViTri || ''
+  const note = table.note || table.ghiChu || table.GhiChu || ''
+
   return {
     ...table,
     id: table.id || table.code || table.maBan || table.MaBan,
     code: table.code || table.maBan || table.MaBan,
     name: table.name || `Bàn ${table.tableNumber || table.soBan || table.SoBan || ''}`.trim(),
-    areaId: table.areaId || table.viTri || table.ViTri || '',
+    areaId: table.areaId || rawAreaText,
+    rawAreaText,
     capacity: Number(table.capacity ?? table.soChoNgoi ?? table.SoChoNgoi ?? 0),
     status,
+    note,
   }
 }

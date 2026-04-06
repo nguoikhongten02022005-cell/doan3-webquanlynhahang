@@ -1,7 +1,8 @@
 import { useMemo, useState } from 'react'
 import { Card, Col, Row, Segmented, Space, Statistic, Table, Typography } from 'antd'
 import RevenueChart from '../../components/admin/dashboard/RevenueChart'
-import { ADMIN_TIME_RANGE_OPTIONS, taoDuLieuThongKeDoanhThu } from '../../features/admin/mockData'
+import { ADMIN_TIME_RANGE_OPTIONS } from '../../features/admin/mockData'
+import { taoDuLieuThongKeDoanhThu } from '../../features/admin/thongKeAdmin'
 import { dinhDangTienTe } from '../../utils/tienTe'
 import { useOutletContext } from 'react-router-dom'
 

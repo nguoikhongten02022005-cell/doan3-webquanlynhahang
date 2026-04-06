@@ -4,6 +4,12 @@ import { ADMIN_REVENUE_SERIES } from './mockData'
 
 const pad = (value) => String(value).padStart(2, '0')
 
+const chuanHoaChuoi = (value = '') => String(value)
+  .normalize('NFD')
+  .replace(/[\u0300-\u036f]/g, '')
+  .toLowerCase()
+  .replace(/[^a-z0-9]+/g, '')
+
 const taoMocBatDauNgay = (date) => {
   const clone = new Date(date)
   clone.setHours(0, 0, 0, 0)
@@ -99,11 +105,11 @@ const buildTopDishes = (orders = []) => {
   const dishMap = new Map()
 
   orders.forEach((order) => {
-    ;(order?.items || []).forEach((item, index) => {
+    ;(order?.items || []).forEach((item) => {
       const quantity = Number(item?.quantity) || 0
       const price = Number(item?.price) || 0
       const revenue = quantity * price
-      const key = item?.menuItemId || item?.id || `${item?.name || 'dish'}-${index}`
+      const key = item?.menuItemId || item?.name || item?.id || 'dish'
 
       if (!dishMap.has(key)) {
         dishMap.set(key, {
@@ -143,11 +149,12 @@ const buildTopDishes = (orders = []) => {
 
 const buildCategoryShares = (topDishes = []) => {
   const dishLookup = new Map(DANH_SACH_MON.map((dish) => [String(dish.id), dish]))
+  const dishNameLookup = new Map(DANH_SACH_MON.map((dish) => [chuanHoaChuoi(dish.name), dish]))
   const categoryRevenueMap = new Map(CAC_DANH_MUC_CHUAN_THUC_DON.map((category) => [category, 0]))
 
   topDishes.forEach((dish) => {
-    const matchedDish = dishLookup.get(String(dish.id)) || DANH_SACH_MON.find((item) => item.name === dish.name)
-    const category = matchedDish?.category
+    const matchedDish = dishLookup.get(String(dish.id)) || dishNameLookup.get(chuanHoaChuoi(dish.name))
+    const category = matchedDish?.category || matchedDish?.danhMuc
     if (!categoryRevenueMap.has(category)) return
     categoryRevenueMap.set(category, categoryRevenueMap.get(category) + dish.revenue)
   })

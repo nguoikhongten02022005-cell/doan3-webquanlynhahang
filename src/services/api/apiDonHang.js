@@ -44,10 +44,10 @@ const chuanHoaDonHang = (order) => {
     status: layGiaTri(order, 'trangThai', 'TrangThai') || '',
     customer: {
       code: layGiaTri(order, 'maKH', 'MaKH') || '',
-      fullName: '',
-      phone: '',
-      email: '',
-      address: '',
+      fullName: layGiaTri(order, 'tenKhachHang', 'TenKhachHang') || '',
+      phone: layGiaTri(order, 'soDienThoai', 'SoDienThoai') || '',
+      email: layGiaTri(order, 'email', 'Email') || '',
+      address: layGiaTri(order, 'diaChiGiao', 'DiaChiGiao', 'diaChiKhachHang', 'DiaChiKhachHang') || '',
     },
     items,
   }

@@ -110,11 +110,16 @@ export const layTomTatBan = (tables) => {
 
     if (!boDem[khuVuc]) {
       boDem[khuVuc] = {
+        id: khuVuc,
+        name: table.rawAreaText || khuVuc,
+        total: 0,
         occupied: 0,
         dirty: 0,
         held: 0,
       }
     }
+
+    boDem[khuVuc].total += 1
 
     if (table.status === TRANG_THAI_BAN.DANG_SU_DUNG) {
       boDem[khuVuc].occupied += 1
@@ -131,21 +136,29 @@ export const layTomTatBan = (tables) => {
     return boDem
   }, {})
 
-  return CAC_KHU_VUC_BAN.map((area) => {
-    const thongKeKhuVuc = thongKe[area.id] || { occupied: 0, dirty: 0, held: 0 }
-    const khongKhaDung = thongKeKhuVuc.occupied + thongKeKhuVuc.held + thongKeKhuVuc.dirty
-    const trong = Math.max(area.total - khongKhaDung, 0)
-    const tyLeLapDay = area.total > 0 ? khongKhaDung / area.total : 0
+  const khuVucDong = Object.values(thongKe).map((khuVuc) => {
+    const khongKhaDung = khuVuc.occupied + khuVuc.held + khuVuc.dirty
+    const available = Math.max(khuVuc.total - khongKhaDung, 0)
 
     return {
-      ...area,
-      occupied: thongKeKhuVuc.occupied,
-      held: thongKeKhuVuc.held,
-      dirty: thongKeKhuVuc.dirty,
-      available: trong,
-      occupancyRate: tyLeLapDay,
+      ...khuVuc,
+      available,
+      occupancyRate: khuVuc.total > 0 ? khongKhaDung / khuVuc.total : 0,
     }
   })
+
+  if (khuVucDong.length > 0) {
+    return khuVucDong
+  }
+
+  return CAC_KHU_VUC_BAN.map((area) => ({
+    ...area,
+    occupied: 0,
+    held: 0,
+    dirty: 0,
+    available: area.total,
+    occupancyRate: 0,
+  }))
 }
 
 export const layTomTatTonKhoBan = (tables) => ({

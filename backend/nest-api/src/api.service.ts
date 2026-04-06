@@ -464,7 +464,13 @@ export class ApiService {
   }
 
   async layDanhSachDonHang() {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM DonHang ORDER BY NgayTao DESC');
+    const danhSach = await this.mysql.truyVan(
+      `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email
+       FROM DonHang dh
+       LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
+       LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
+       ORDER BY dh.NgayTao DESC`,
+    );
     const ketQua = await Promise.all(danhSach.map(async (don) => ({
       maDonHang: don.MaDonHang,
       maKH: don.MaKH,
@@ -478,6 +484,10 @@ export class ApiService {
       loaiDon: don.LoaiDon,
       diaChiGiao: don.DiaChiGiao || '',
       phiShip: Number(don.PhiShip || 0),
+      tenKhachHang: don.TenKH || '',
+      soDienThoai: don.SDT || '',
+      email: don.Email || '',
+      diaChiKhachHang: don.DiaChi || '',
       chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
     })));
 
@@ -485,7 +495,15 @@ export class ApiService {
   }
 
   async layChiTietDonHang(maDonHang: string) {
-    const [donHang] = await this.mysql.truyVan('SELECT * FROM DonHang WHERE MaDonHang = ? LIMIT 1', [maDonHang]);
+    const [donHang] = await this.mysql.truyVan(
+      `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email
+       FROM DonHang dh
+       LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
+       LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
+       WHERE dh.MaDonHang = ?
+       LIMIT 1`,
+      [maDonHang],
+    );
     if (!donHang) {
       throw new NotFoundException('Khong tim thay don hang.');
     }
@@ -505,6 +523,10 @@ export class ApiService {
         loaiDon: donHang.LoaiDon,
         diaChiGiao: donHang.DiaChiGiao || '',
         phiShip: Number(donHang.PhiShip || 0),
+        tenKhachHang: donHang.TenKH || '',
+        soDienThoai: donHang.SDT || '',
+        email: donHang.Email || '',
+        diaChiKhachHang: donHang.DiaChi || '',
       },
       chiTiet,
     }, 'Lay chi tiet don hang thanh cong');

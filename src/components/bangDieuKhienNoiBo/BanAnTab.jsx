@@ -251,7 +251,6 @@ function PosBanAnTab({
   phamViLabel,
   tomTatBan,
   tables,
-  tomTatTonKhoBan,
   bookings,
   orders,
   xuLyCheckIn,
@@ -278,6 +277,14 @@ function PosBanAnTab({
     [bookingById, tables],
   )
 
+  const tomTatBanPos = useMemo(() => ({
+    total: tableViewModels.length,
+    available: tableViewModels.filter((table) => table.status === 'AVAILABLE').length,
+    held: tableViewModels.filter((table) => table.status === 'HELD').length,
+    occupied: tableViewModels.filter((table) => table.status === 'OCCUPIED').length,
+    dirty: tableViewModels.filter((table) => table.status === 'DIRTY').length,
+  }), [tableViewModels])
+
   const selectedTable = useMemo(
     () => tableViewModels.find((table) => table.id === selectedTableId) || null,
     [selectedTableId, tableViewModels],
@@ -289,11 +296,11 @@ function PosBanAnTab({
   }, [ordersByTableCode, selectedTable])
 
   const summaryItems = [
-    { key: 'total', label: 'Tổng bàn', value: tomTatTonKhoBan.total, dot: 'bg-slate-400' },
-    { key: 'available', label: 'Trống', value: tomTatTonKhoBan.available, dot: TABLE_STATUS_STYLES.AVAILABLE.dot },
-    { key: 'occupied', label: 'Đang phục vụ', value: tomTatTonKhoBan.occupied, dot: TABLE_STATUS_STYLES.OCCUPIED.dot },
-    { key: 'held', label: 'Đã đặt', value: tomTatTonKhoBan.held, dot: TABLE_STATUS_STYLES.HELD.dot },
-    { key: 'dirty', label: 'Chờ dọn', value: tomTatTonKhoBan.dirty, dot: TABLE_STATUS_STYLES.DIRTY.dot },
+    { key: 'total', label: 'Tổng bàn', value: tomTatBanPos.total, dot: 'bg-slate-400' },
+    { key: 'available', label: 'Trống', value: tomTatBanPos.available, dot: TABLE_STATUS_STYLES.AVAILABLE.dot },
+    { key: 'occupied', label: 'Đang phục vụ', value: tomTatBanPos.occupied, dot: TABLE_STATUS_STYLES.OCCUPIED.dot },
+    { key: 'held', label: 'Đã đặt', value: tomTatBanPos.held, dot: TABLE_STATUS_STYLES.HELD.dot },
+    { key: 'dirty', label: 'Chờ dọn', value: tomTatBanPos.dirty, dot: TABLE_STATUS_STYLES.DIRTY.dot },
   ]
 
   const handleOpenDrawer = (tableId) => setSelectedTableId(tableId)

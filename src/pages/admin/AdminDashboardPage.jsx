@@ -15,7 +15,7 @@ function AdminDashboardPage() {
 
   return (
     <Flex vertical gap={laMobile ? 14 : 20} style={{ width: '100%' }}>
-      <Space direction="vertical" size={4} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={4} style={{ width: '100%' }}>
         <Typography.Text className="admin-dashboard-kicker">Toàn cảnh vận hành</Typography.Text>
         <Typography.Title level={laMobile ? 4 : 3} style={{ margin: 0 }}>
           Dashboard nhà hàng hôm nay
