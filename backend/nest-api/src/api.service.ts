@@ -97,6 +97,44 @@ export class ApiService {
     return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   }
 
+  private chuanHoaChuoiKhongDau(giaTri: string) {
+    return String(giaTri || '')
+      .normalize('NFD')
+      .replace(/[\u0300-\u036f]/g, '')
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '');
+  }
+
+  private async timMaDanhMucHopLe(giaTriDanhMuc: unknown) {
+    const giaTri = String(giaTriDanhMuc || '').trim();
+    if (!giaTri) {
+      return null;
+    }
+
+    const [khopMa] = await this.mysql.truyVan('SELECT MaDanhMuc FROM DanhMuc WHERE MaDanhMuc = ? LIMIT 1', [giaTri]);
+    if (khopMa?.MaDanhMuc) {
+      return String(khopMa.MaDanhMuc);
+    }
+
+    const danhSachDanhMuc = await this.mysql.truyVan('SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc');
+    const bangAnhXaMacDinh: Record<string, string> = {
+      khaivi: 'DM001',
+      monchinh: 'DM002',
+      trangmieng: 'DM003',
+      douong: 'DM004',
+      combo: 'DM005',
+    };
+
+    const khoaTim = this.chuanHoaChuoiKhongDau(giaTri);
+    for (const danhMuc of danhSachDanhMuc) {
+      if (this.chuanHoaChuoiKhongDau(String(danhMuc.TenDanhMuc || '')) === khoaTim) {
+        return String(danhMuc.MaDanhMuc);
+      }
+    }
+
+    return bangAnhXaMacDinh[khoaTim] || null;
+  }
+
   private chuanHoaDanhSachChiTiet(dsDauVao: unknown, tienToMaChiTiet: string) {
     if (!Array.isArray(dsDauVao)) {
       return [];
@@ -260,11 +298,23 @@ export class ApiService {
   }
 
   async taoMon(payload: BanGhi) {
+    const maMon = String(payload.maMon || this.taoMa('M')).trim();
+    const maDanhMuc = await this.timMaDanhMucHopLe(payload.maDanhMuc);
+    const tenMon = String(payload.tenMon || '').trim();
+    const moTa = payload.moTa == null || String(payload.moTa).trim() === '' ? null : String(payload.moTa).trim();
+    const hinhAnh = payload.hinhAnh == null || String(payload.hinhAnh).trim() === '' ? null : String(payload.hinhAnh).trim();
+    const thoiGianChuanBi = Number(payload.thoiGianChuanBi ?? 0);
+    const trangThai = String(payload.trangThai || 'Available').trim() || 'Available';
+
+    if (!tenMon) {
+      throw new BadRequestException('Ten mon la bat buoc.');
+    }
+
     await this.mysql.thucThi(
       'INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [payload.maMon, payload.maDanhMuc || null, payload.tenMon, payload.moTa || null, Number(payload.gia || 0), payload.hinhAnh || null, Number(payload.thoiGianChuanBi || 0), 'Available'],
+      [maMon, maDanhMuc, tenMon, moTa, Number(payload.gia || 0), hinhAnh, thoiGianChuanBi, trangThai],
     );
-    const danhSach = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [payload.maMon]);
+    const danhSach = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [maMon]);
     return this.taoPhanHoi({
       maMon: danhSach[0].MaMon,
       maDanhMuc: danhSach[0].MaDanhMuc,
@@ -278,16 +328,27 @@ export class ApiService {
   }
 
   async capNhatMon(maMon: string, payload: BanGhi) {
+    const maDanhMuc = await this.timMaDanhMucHopLe(payload.maDanhMuc);
+    const tenMon = String(payload.tenMon || '').trim();
+    const moTa = payload.moTa == null || String(payload.moTa).trim() === '' ? null : String(payload.moTa).trim();
+    const hinhAnh = payload.hinhAnh == null || String(payload.hinhAnh).trim() === '' ? null : String(payload.hinhAnh).trim();
+    const thoiGianChuanBi = Number(payload.thoiGianChuanBi ?? 0);
+    const trangThai = String(payload.trangThai || 'Available').trim() || 'Available';
+
+    if (!tenMon) {
+      throw new BadRequestException('Ten mon la bat buoc.');
+    }
+
     await this.mysql.thucThi(
       'UPDATE ThucDon SET MaDanhMuc = ?, TenMon = ?, MoTa = ?, Gia = ?, HinhAnh = ?, ThoiGianChuanBi = ?, TrangThai = ? WHERE MaMon = ?',
       [
-        payload.maDanhMuc || null,
-        payload.tenMon,
-        payload.moTa || null,
+        maDanhMuc,
+        tenMon,
+        moTa,
         Number(payload.gia || 0),
-        payload.hinhAnh || null,
-        Number(payload.thoiGianChuanBi || 0),
-        payload.trangThai || 'Available',
+        hinhAnh,
+        thoiGianChuanBi,
+        trangThai,
         maMon,
       ],
     );

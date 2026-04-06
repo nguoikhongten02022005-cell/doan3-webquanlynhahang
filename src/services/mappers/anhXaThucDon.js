@@ -107,15 +107,25 @@ export const layDanhSachMonNoiBatTrangChu = (danhSachMon, gioiHan = 8) => {
 
 export const anhXaFormMonThanhDuLieuGuiDi = (giaTriForm) => {
   const giaTriGia = chuanHoaGiaTriGia(giaTriForm?.price)
+  const tenMon = chuanHoaVanBan(giaTriForm?.name)
+  const moTa = chuanHoaVanBan(giaTriForm?.description)
+  const maDanhMuc = chuanHoaDanhMucThucDon(giaTriForm?.category)
+  const hinhAnh = chuanHoaAnh(giaTriForm?.image)
 
   return {
-    name: chuanHoaVanBan(giaTriForm?.name),
-    description: chuanHoaVanBan(giaTriForm?.description),
-    price: dinhDangTienTe(giaTriGia),
-    category: chuanHoaDanhMucThucDon(giaTriForm?.category),
+    name: tenMon,
+    tenMon,
+    description: moTa,
+    moTa,
+    price: giaTriGia,
+    gia: giaTriGia,
+    category: maDanhMuc,
+    maDanhMuc,
     badge: chuanHoaNhan(giaTriForm?.badge),
     tone: chuanHoaSacDo(giaTriForm?.tone),
-    image: chuanHoaAnh(giaTriForm?.image),
+    image: hinhAnh,
+    hinhAnh,
+    thoiGianChuanBi: Number(giaTriForm?.thoiGianChuanBi ?? 0),
   }
 }
 
