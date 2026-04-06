@@ -8,58 +8,65 @@ import {
   ReloadOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, Badge, Button, Card, Descriptions, Empty, Input, List, Segmented, Select, Space, Spin, Table, Tag, Typography } from 'antd'
+import { Alert, Badge, Button, Card, Descriptions, Empty, Grid, Input, List, Segmented, Select, Space, Spin, Table, Tag, Typography } from 'antd'
 import { dinhDangTienTe } from '../../utils/tienTe'
 import { dinhDangNgay } from '../../features/bangDieuKhienNoiBo/dinhDang'
 import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../utils/donHang'
 
 const { TextArea } = Input
+const { useBreakpoint } = Grid
 
 const ORDER_FILTERS = [
   { key: 'all', label: 'Tất cả' },
-  { key: 'pending', label: 'Chờ xử lý', statuses: ['MOI_TAO', 'DA_XAC_NHAN'] },
-  { key: 'preparing', label: 'Đang chuẩn bị', statuses: ['DANG_CHUAN_BI'] },
-  { key: 'served', label: 'Đã phục vụ', statuses: ['DANG_PHUC_VU'] },
-  { key: 'paid', label: 'Đã thanh toán', statuses: ['DA_HOAN_THANH'] },
-  { key: 'cancelled', label: 'Đã hủy', statuses: ['DA_HUY'] },
+  { key: 'pending', label: 'Chờ xử lý', statuses: ['Pending', 'Confirmed'] },
+  { key: 'preparing', label: 'Đang chuẩn bị', statuses: ['Preparing'] },
+  { key: 'served', label: 'Đã phục vụ', statuses: ['Ready', 'Served'] },
+  { key: 'paid', label: 'Đã thanh toán', statuses: ['Paid'] },
+  { key: 'cancelled', label: 'Đã hủy', statuses: ['Cancelled'] },
 ]
 
 const STATUS_OPTIONS = [
-  { value: 'MOI_TAO', label: 'Mới tạo' },
-  { value: 'DA_XAC_NHAN', label: 'Đã xác nhận' },
-  { value: 'DANG_CHUAN_BI', label: 'Đang chuẩn bị' },
-  { value: 'DANG_PHUC_VU', label: 'Đang phục vụ' },
-  { value: 'DA_HOAN_THANH', label: 'Đã thanh toán' },
-  { value: 'DA_HUY', label: 'Đã hủy' },
+  { value: 'Pending', label: 'Mới tạo' },
+  { value: 'Confirmed', label: 'Đã xác nhận' },
+  { value: 'Preparing', label: 'Đang chuẩn bị' },
+  { value: 'Ready', label: 'Sẵn sàng' },
+  { value: 'Served', label: 'Đang phục vụ' },
+  { value: 'Paid', label: 'Đã thanh toán' },
+  { value: 'Cancelled', label: 'Đã hủy' },
 ]
 
 const STATUS_TICKET_STYLES = {
-  MOI_TAO: {
+  Pending: {
     tone: 'pending',
     badge: 'badge-pending',
     hint: 'Cần xác nhận và ưu tiên điều phối bếp.',
   },
-  DA_XAC_NHAN: {
+  Confirmed: {
     tone: 'pending',
     badge: 'badge-pending',
     hint: 'Đơn đã chốt, chờ bếp nhận lệnh.',
   },
-  DANG_CHUAN_BI: {
+  Preparing: {
     tone: 'preparing',
     badge: 'badge-preparing',
     hint: 'Bếp đang xử lý, ưu tiên theo dõi thời gian ra món.',
   },
-  DANG_PHUC_VU: {
+  Ready: {
+    tone: 'served',
+    badge: 'badge-served',
+    hint: 'Đơn đã sẵn sàng, chờ phục vụ hoặc giao cho khách.',
+  },
+  Served: {
     tone: 'served',
     badge: 'badge-served',
     hint: 'Đơn đang phục vụ tại bàn, sẵn sàng chốt thanh toán.',
   },
-  DA_HOAN_THANH: {
+  Paid: {
     tone: 'paid',
     badge: 'badge-paid',
     hint: 'Đơn đã thanh toán và chốt doanh thu.',
   },
-  DA_HUY: {
+  Cancelled: {
     tone: 'cancelled',
     badge: 'badge-cancelled',
     hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.',
@@ -101,7 +108,7 @@ const formatTableLabel = (tableNumber) => {
 
 const formatOrderCode = (order) => order.orderCode || order.code || `DH-${order.id}`
 
-const getTicketStyle = (status) => STATUS_TICKET_STYLES[status] || STATUS_TICKET_STYLES.MOI_TAO
+const getTicketStyle = (status) => STATUS_TICKET_STYLES[status] || STATUS_TICKET_STYLES.Pending
 
 const buildOrderFinancialSummary = (order) => {
   const items = Array.isArray(order?.items) ? order.items : []
@@ -404,6 +411,9 @@ const buildItemsTableColumns = () => [
 ]
 
 function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, totalCount, donChoXuLy }) {
+  const manHinh = useBreakpoint()
+  const laMobile = manHinh.xs && !manHinh.md
+
   return (
     <Card>
       <Space orientation="vertical" size={12} style={{ width: '100%' }}>
@@ -412,6 +422,7 @@ function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, to
           <Typography.Text type="secondary">{visibleCount}/{totalCount} đơn hiển thị · {donChoXuLy} đơn cần xử lý ngay</Typography.Text>
         </div>
         <Segmented
+          block={laMobile}
           options={ORDER_FILTERS.map((filter) => ({
             label: <Space size={6}><span>{filter.label}</span><Badge count={counts[filter.key] || 0} size="small" /></Space>,
             value: filter.key,
@@ -435,15 +446,13 @@ function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
 
   return (
     <Card title="Danh sách order">
-      <List
-        itemLayout="vertical"
-        dataSource={orders}
-        renderItem={(order) => {
+      <div className="grid gap-2.5">
+        {orders.map((order) => {
         const ticketStyle = getTicketStyle(order.status)
         const isSelected = String(selectedOrderId) === String(order.id)
 
         return (
-          <List.Item key={order.id} onClick={() => onSelectOrder(order.id)} style={{ cursor: 'pointer', borderRadius: 16, padding: 14, marginBottom: 10, border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb', background: isSelected ? '#fff7ed' : '#fff' }}>
+          <div key={order.id} onClick={() => onSelectOrder(order.id)} style={{ cursor: 'pointer', borderRadius: 16, padding: 14, marginBottom: 10, border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb', background: isSelected ? '#fff7ed' : '#fff' }}>
             <Space orientation="vertical" size={10} style={{ width: '100%' }}>
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <div>
@@ -461,10 +470,10 @@ function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
               <Typography.Text type="secondary">{ticketStyle.hint}</Typography.Text>
               {order.note ? <Typography.Text>{order.note}</Typography.Text> : null}
             </Space>
-          </List.Item>
+          </div>
         )
-      }}
-      />
+      })}
+      </div>
     </Card>
   )
 }
@@ -482,6 +491,9 @@ function OrderDetailPanel({
   onPrint,
   savingStatus,
 }) {
+  const manHinh = useBreakpoint()
+  const laMobile = manHinh.xs && !manHinh.md
+
   if (!order) {
     return (
       <div className="noi-bo-don-hang-form-shell rounded-[22px] border border-dashed border-slate-200 bg-white/90 p-6 text-center shadow-sm">
@@ -597,6 +609,7 @@ function OrderDetailPanel({
                 columns={buildItemsTableColumns()}
                 dataSource={items.map((item, index) => ({ ...item, key: item.id || `item-${index + 1}` }))}
                 rowKey="key"
+                scroll={laMobile ? { x: 720 } : undefined}
               />
             </div>
           ) : (
@@ -629,7 +642,7 @@ function OrderDetailPanel({
             size="middle"
             onClick={onQuickPay}
             loading={savingStatus}
-            disabled={order.status === 'DA_HOAN_THANH' || order.status === 'DA_HUY'}
+            disabled={order.status === 'Paid' || order.status === 'Cancelled'}
           >
             Thanh toán
           </Button>
@@ -787,12 +800,12 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
   }
 
   const handleQuickPay = async () => {
-    setFormStatus('DA_HOAN_THANH')
-    await submitStatusUpdate('DA_HOAN_THANH')
+    setFormStatus('Paid')
+    await submitStatusUpdate('Paid')
   }
 
   return (
-    <section className="space-y-4">
+    <section className="space-y-4 admin-page-stack">
       <OrderFilterBar
         activeFilter={activeFilter}
         onFilterChange={setActiveFilter}
@@ -803,7 +816,7 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
       />
 
       <section className="noi-bo-don-hang-layout">
-        <div className="space-y-3">
+        <div className="space-y-3 noi-bo-don-hang-list-col">
           <OrderTicketList orders={filteredOrders} selectedOrderId={selectedOrderId} onSelectOrder={setSelectedOrderId} />
         </div>
 

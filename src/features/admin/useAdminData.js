@@ -1,6 +1,7 @@
 import { useMemo } from 'react'
 import { useDuLieuBangDieuKhienNoiBo } from '../bangDieuKhienNoiBo/useDuLieuBangDieuKhienNoiBo'
-import { taoDuLieuThongKeDoanhThu, ADMIN_NOTIFICATION_COUNT } from './mockData'
+import { ADMIN_NOTIFICATION_COUNT } from './mockData'
+import { taoDuLieuThongKeDoanhThu } from './thongKeAdmin'
 import { useDashboardData } from './useDashboardData'
 
 export const useAdminData = () => {

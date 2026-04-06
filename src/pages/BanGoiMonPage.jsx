@@ -42,8 +42,18 @@ function BanGoiMonPage() {
         setLoi('Không thể tải dữ liệu bàn lúc này')
       }
     }
-    const draft = sessionStorage.getItem(`${STORAGE_KEY_PREFIX}${maBan}`)
-    if (draft) setGioTam(JSON.parse(draft))
+
+    const khoaBanNhapTam = `${STORAGE_KEY_PREFIX}${maBan}`
+    const draft = sessionStorage.getItem(khoaBanNhapTam)
+    if (draft) {
+      try {
+        const gioTamDaLuu = JSON.parse(draft)
+        setGioTam(Array.isArray(gioTamDaLuu) ? gioTamDaLuu : [])
+      } catch {
+        sessionStorage.removeItem(khoaBanNhapTam)
+      }
+    }
+
     load()
   }, [maBan])
 

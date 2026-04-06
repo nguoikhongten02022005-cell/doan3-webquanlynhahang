@@ -18,7 +18,7 @@ test('chuanHoaDatBan giu dung cau truc dat ban chuan', () => {
   })
 
   assert.deepEqual(datBan, {
-    id: 42,
+    id: '42',
     bookingCode: 'DB-000042',
     guests: '4',
     date: '2026-03-20',
@@ -61,10 +61,17 @@ test('anhXaMucDatBan tra ve cau truc lich su dat ban than thien', () => {
   assert.deepEqual(ketQua, {
     bookingId: 42,
     id: 'DB-000042',
+    bookingCode: 'DB-000042',
+    date: '2026-03-20',
+    time: '19:30',
+    guestCount: 4,
+    area: 'Khu riêng / VIP',
     dateTime: '20/03/2026 19:30',
     guests: 4,
-    seatingArea: 'Phòng riêng / VIP',
+    seatingArea: 'Khu riêng / VIP',
     rawStatus: 'DA_XAC_NHAN',
     status: '🟢 Đã xác nhận',
+    statusLabel: 'Đã xác nhận',
+    statusTone: 'warning',
   })
 })

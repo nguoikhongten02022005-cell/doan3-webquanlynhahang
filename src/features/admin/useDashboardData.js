@@ -1,6 +1,6 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { taoDuLieuThongKeDoanhThu } from './mockData'
+import { taoDuLieuThongKeDoanhThu } from './thongKeAdmin'
 
 const laCungNgayLich = (left, right) => (
   left.getFullYear() === right.getFullYear()

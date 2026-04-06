@@ -133,7 +133,7 @@ function ThanhToanPage() {
         paymentMethod: formData.paymentMethod,
       })
 
-        const ketQuaDonHang = await taoDonHangApi(orderPayload)
+        await taoDonHangApi(orderPayload)
 
         xoaPhieuGiamGiaDaApDung()
         xoaBanNhapTamThanhToan()

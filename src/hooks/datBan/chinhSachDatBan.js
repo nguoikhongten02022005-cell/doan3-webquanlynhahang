@@ -90,6 +90,13 @@ export const kiemTraBanDaGan = ({ assignedTableIds, tables, soLuongKhach, prefer
     .map((tableId) => tables.find((table) => table.id === tableId))
     .filter(Boolean)
 
+  const chuanHoaTrangThaiBan = (trangThai) => {
+    if (trangThai === TRANG_THAI_BAN.BAN || trangThai === 'DIRTY') return TRANG_THAI_BAN.BAN
+    if (trangThai === TRANG_THAI_BAN.DANG_SU_DUNG || trangThai === 'OCCUPIED') return TRANG_THAI_BAN.DANG_SU_DUNG
+    if (trangThai === TRANG_THAI_BAN.GIU_CHO || trangThai === 'HELD') return TRANG_THAI_BAN.GIU_CHO
+    return TRANG_THAI_BAN.TRONG
+  }
+
   if (selectedTables.length !== assignedTableIds.length) {
     return { success: false, error: 'Có bàn không tồn tại hoặc đã bị thay đổi. Vui lòng tải lại dữ liệu.' }
   }
@@ -99,7 +106,7 @@ export const kiemTraBanDaGan = ({ assignedTableIds, tables, soLuongKhach, prefer
     return { success: false, error: `Bàn ${busyTable.code} hiện đang được sử dụng.` }
   }
 
-  const invalidStatusTable = selectedTables.find((table) => table.status === TRANG_THAI_BAN.BAN)
+  const invalidStatusTable = selectedTables.find((table) => chuanHoaTrangThaiBan(table.status) === TRANG_THAI_BAN.BAN)
   if (invalidStatusTable) {
     return { success: false, error: `Bàn ${invalidStatusTable.code} đang ở trạng thái dọn bàn.` }
   }

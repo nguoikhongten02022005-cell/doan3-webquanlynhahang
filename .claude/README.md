@@ -8,9 +8,7 @@ Thu muc `.claude/` luu tri thuc dieu phoi danh cho Claude Code theo cau truc de 
 
 Chua cac skill co the invoke theo dang `skills/<ten>/SKILL.md`.
 
-Hien tai co:
-
-- `api-full-test`: quy trinh kiem thu full API cho backend C# local/dev, co uu tien repo discovery, Postman, MySQL verification, safe auto-fix nho va mot vong retest.
+Hien tai repo khong con skill API cu nao gan rieng voi backend C#.
 
 Skill co the di kem thu muc `references/` rieng de chua tai lieu huong dan bo tro.
 
@@ -22,7 +20,7 @@ Hien tai co:
 
 - `frontend.md`
 - `review.md`
-- `backend-csharp.md`
+- `backend-csharp.md` neu con ton tai thi la tai lieu cu, nen xoa hoac bo qua vi repo hien da dung NestJS.
 
 Cac file nay khong phai metadata subagent cua OpenCode, ma la tai lieu role ro rang de Claude doc va ap dung khi lam viec.
 

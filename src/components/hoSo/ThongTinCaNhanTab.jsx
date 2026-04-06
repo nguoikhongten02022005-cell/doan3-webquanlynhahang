@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useState } from 'react'
+import { Button, Form, Input, Upload } from 'antd'
 import { useThongBao } from '../../context/ThongBaoContext'
 
 const UserAvatarIcon = () => (
@@ -16,6 +17,8 @@ const taoGiaTriHoSoBanDau = (nguoiDung) => ({
 
 function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau }) {
   const { hienThongBao } = useThongBao()
+  const [formHoSo] = Form.useForm()
+  const [formMatKhau] = Form.useForm()
   const [formData, setFormData] = useState(() => taoGiaTriHoSoBanDau(nguoiDung))
   const [daChinhSuaHoSo, setDaChinhSuaHoSo] = useState(false)
   const [avatarPreview, setAvatarPreview] = useState('')
@@ -24,8 +27,8 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
     newPassword: '',
     confirmPassword: '',
   })
-  const [matKhauErrors, setMatKhauErrors] = useState({})
-  const fileInputRef = useRef(null)
+  const [dangLuuHoSo, setDangLuuHoSo] = useState(false)
+  const [dangCapNhatMatKhau, setDangCapNhatMatKhau] = useState(false)
   const avatarMacDinh = String(nguoiDung?.avatarUrl ?? nguoiDung?.avatar ?? '')
 
   useEffect(() => {
@@ -33,8 +36,10 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
       return
     }
 
-    setFormData(taoGiaTriHoSoBanDau(nguoiDung))
-  }, [daChinhSuaHoSo, nguoiDung])
+    const giaTriBanDau = taoGiaTriHoSoBanDau(nguoiDung)
+    setFormData(giaTriBanDau)
+    formHoSo.setFieldsValue(giaTriBanDau)
+  }, [daChinhSuaHoSo, formHoSo, nguoiDung])
 
   useEffect(() => () => {
     if (avatarPreview) {
@@ -43,15 +48,24 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
   }, [avatarPreview])
 
   const handleProfileFieldChange = (field) => (event) => {
-    const value = event.target.value
+    const value = event?.target?.value ?? ''
     setDaChinhSuaHoSo(true)
     setFormData((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleAvatarChange = (event) => {
-    const file = event.target.files?.[0]
+  const handleAvatarChange = (file) => {
     if (!file) {
-      return
+      return false
+    }
+
+    if (!file.type?.startsWith('image/')) {
+      hienThongBao({
+        message: 'Vui lòng chọn file ảnh hợp lệ.',
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+      return Upload.LIST_IGNORE
     }
 
     if (avatarPreview) {
@@ -60,143 +74,130 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
 
     const nextPreview = URL.createObjectURL(file)
     setAvatarPreview(nextPreview)
-    event.target.value = ''
+    return false
   }
 
   const handleSaveProfile = async () => {
-    const ketQua = await onCapNhatHoSo?.(formData)
-    if (!ketQua?.success) {
+    try {
+      const giaTriHopLe = await formHoSo.validateFields()
+      setDangLuuHoSo(true)
+      const ketQua = await onCapNhatHoSo?.(giaTriHopLe)
+      if (!ketQua?.success) {
+        hienThongBao({
+          message: ketQua?.error || 'Không thể cập nhật hồ sơ.',
+          tone: 'error',
+          duration: 3000,
+          title: '',
+        })
+        return
+      }
+
+      setFormData(giaTriHopLe)
+      setDaChinhSuaHoSo(false)
+      formHoSo.setFieldsValue(giaTriHopLe)
+
       hienThongBao({
-        message: ketQua?.error || 'Không thể cập nhật hồ sơ.',
-        tone: 'error',
+        message: '✅ Đã lưu thông tin thành công',
+        tone: 'success',
         duration: 3000,
         title: '',
       })
-      return
+    } finally {
+      setDangLuuHoSo(false)
     }
-
-    setDaChinhSuaHoSo(false)
-
-    hienThongBao({
-      message: '✅ Đã lưu thông tin thành công',
-      tone: 'success',
-      duration: 3000,
-      title: '',
-    })
-  }
-
-  const validatePasswordForm = (values) => {
-    const nextErrors = {}
-
-    if (!values.currentPassword.trim()) {
-      nextErrors.currentPassword = 'Vui lòng nhập mật khẩu hiện tại.'
-    }
-
-    if (!values.newPassword.trim()) {
-      nextErrors.newPassword = 'Vui lòng nhập mật khẩu mới.'
-    } else if (values.newPassword.trim().length < 8) {
-      nextErrors.newPassword = 'Mật khẩu mới phải có ít nhất 8 ký tự.'
-    }
-
-    if (!values.confirmPassword.trim()) {
-      nextErrors.confirmPassword = 'Vui lòng xác nhận mật khẩu mới.'
-    } else if (values.confirmPassword !== values.newPassword) {
-      nextErrors.confirmPassword = 'Mật khẩu xác nhận không khớp.'
-    }
-
-    return nextErrors
   }
 
   const handlePasswordFieldChange = (field) => (event) => {
-    const value = event.target.value
-    setMatKhauForm((prev) => {
-      const nextValues = { ...prev, [field]: value }
-      if (Object.keys(matKhauErrors).length > 0) {
-        setMatKhauErrors(validatePasswordForm(nextValues))
-      }
-      return nextValues
-    })
+    const value = event?.target?.value ?? ''
+    setMatKhauForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleUpdatePassword = async (event) => {
-    event?.preventDefault()
+  const handleUpdatePassword = async () => {
+    try {
+      const values = await formMatKhau.validateFields()
+      setDangCapNhatMatKhau(true)
+      const ketQua = await onDoiMatKhau?.(values)
+      if (!ketQua?.success) {
+        hienThongBao({
+          message: ketQua?.error || 'Không thể cập nhật mật khẩu.',
+          tone: 'error',
+          duration: 3000,
+          title: '',
+        })
+        return
+      }
 
-    const nextErrors = validatePasswordForm(matKhauForm)
-    setMatKhauErrors(nextErrors)
-
-    if (Object.keys(nextErrors).length > 0) {
-      return
-    }
-
-    const ketQua = await onDoiMatKhau?.(matKhauForm)
-    if (!ketQua?.success) {
+      const giaTriMacDinh = {
+        currentPassword: '',
+        newPassword: '',
+        confirmPassword: '',
+      }
+      setMatKhauForm(giaTriMacDinh)
+      formMatKhau.setFieldsValue(giaTriMacDinh)
       hienThongBao({
-        message: ketQua?.error || 'Không thể cập nhật mật khẩu.',
-        tone: 'error',
+        message: 'Đã cập nhật mật khẩu thành công.',
+        tone: 'success',
         duration: 3000,
-        title: '',
+        title: 'Thành công',
       })
-      return
+    } finally {
+      setDangCapNhatMatKhau(false)
     }
-
-    setMatKhauForm({
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    })
-    hienThongBao({
-      message: 'Đã cập nhật mật khẩu thành công.',
-      tone: 'success',
-      duration: 3000,
-      title: 'Thành công',
-    })
   }
 
   const avatarSrc = avatarPreview || avatarMacDinh
 
   return (
-    <article className="ho-so-card ho-so-personal-card">
+    <article className="ho-so-card ho-so-personal-card ho-so-ant-hybrid">
       <div className="ho-so-section-heading">
         <div>
           <h2>Thông tin cá nhân</h2>
           <p>Cập nhật hồ sơ cơ bản để việc đặt bàn và thanh toán diễn ra nhanh hơn.</p>
         </div>
-        <button type="button" className="btn ho-so-logout-btn" onClick={onLogout}>
+        <Button htmlType="button" className="btn ho-so-logout-btn" onClick={onLogout}>
           Đăng xuất
-        </button>
+        </Button>
       </div>
 
       <div className="ho-so-avatar-block">
         <div className="ho-so-avatar-preview" aria-label="Ảnh đại diện">
           {avatarSrc ? <img src={avatarSrc} alt="Ảnh đại diện" /> : <UserAvatarIcon />}
         </div>
-        <input ref={fileInputRef} type="file" accept="image/*" className="ho-so-avatar-input" onChange={handleAvatarChange} />
-        <button type="button" className="btn ho-so-avatar-btn" onClick={() => fileInputRef.current?.click()}>
-          Đổi ảnh
-        </button>
+        <Upload accept="image/*" showUploadList={false} beforeUpload={handleAvatarChange}>
+          <Button htmlType="button" className="btn ho-so-avatar-btn">
+            Đổi ảnh
+          </Button>
+        </Upload>
       </div>
 
-      <div className="ho-so-form-grid">
-        <div className="nhom-truong">
-          <label className="nhan-truong" htmlFor="ho-so-full-name">Tên</label>
-          <input id="ho-so-full-name" className="truong-nhap" value={formData.fullName} onChange={handleProfileFieldChange('fullName')} />
-        </div>
+      <Form form={formHoSo} layout="vertical" initialValues={formData}>
+        <div className="ho-so-form-grid">
+          <Form.Item className="nhom-truong" label={<span className="nhan-truong">Tên</span>} name="fullName" rules={[{ required: true, message: 'Vui lòng nhập tên.' }]}>
+            <Input id="ho-so-full-name" className="truong-nhap" onChange={handleProfileFieldChange('fullName')} />
+          </Form.Item>
 
-        <div className="nhom-truong">
-          <label className="nhan-truong" htmlFor="ho-so-email">Email</label>
-          <input id="ho-so-email" type="email" className="truong-nhap" value={formData.email} onChange={handleProfileFieldChange('email')} />
-        </div>
+          <Form.Item
+            className="nhom-truong"
+            label={<span className="nhan-truong">Email</span>}
+            name="email"
+            rules={[
+              { required: true, message: 'Vui lòng nhập email.' },
+              { type: 'email', message: 'Email không hợp lệ.' },
+            ]}
+          >
+            <Input id="ho-so-email" type="email" className="truong-nhap" onChange={handleProfileFieldChange('email')} />
+          </Form.Item>
 
-        <div className="nhom-truong full">
-          <label className="nhan-truong" htmlFor="ho-so-phone">SĐT</label>
-          <input id="ho-so-phone" className="truong-nhap" value={formData.phone} onChange={handleProfileFieldChange('phone')} />
+          <Form.Item className="nhom-truong full" label={<span className="nhan-truong">SĐT</span>} name="phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại.' }]}>
+            <Input id="ho-so-phone" className="truong-nhap" onChange={handleProfileFieldChange('phone')} />
+          </Form.Item>
         </div>
-      </div>
+      </Form>
 
       <div className="ho-so-profile-actions">
-        <button type="button" className="btn nut-chinh ho-so-save-btn" onClick={handleSaveProfile}>
+        <Button htmlType="button" className="btn nut-chinh ho-so-save-btn" loading={dangLuuHoSo} onClick={handleSaveProfile}>
           Lưu thay đổi
-        </button>
+        </Button>
       </div>
 
       <div className="ho-so-password-section">
@@ -205,59 +206,61 @@ function ThongTinCaNhanTab({ nguoiDung, onLogout, onCapNhatHoSo, onDoiMatKhau })
           <p>Thiết lập lại mật khẩu đăng nhập để bảo mật tài khoản tốt hơn.</p>
         </div>
 
-        <form onSubmit={handleUpdatePassword}>
+        <Form form={formMatKhau} layout="vertical" initialValues={matKhauForm} onFinish={handleUpdatePassword}>
           <input type="text" name="username" autoComplete="username" value={formData.email || ''} readOnly hidden />
-
           <div className="ho-so-form-grid">
-            <div className="nhom-truong full">
-              <label className="nhan-truong" htmlFor="ho-so-current-password">Mật khẩu hiện tại</label>
-              <input
-                id="ho-so-current-password"
-                type="password"
-                autoComplete="current-password"
-                className={`truong-nhap ${matKhauErrors.currentPassword ? 'truong-nhap-error' : ''}`}
-                value={matKhauForm.currentPassword}
-                onChange={handlePasswordFieldChange('currentPassword')}
-              />
-              {matKhauErrors.currentPassword && <p className="ho-so-form-error">{matKhauErrors.currentPassword}</p>}
-            </div>
+            <Form.Item
+              className="nhom-truong full"
+              label={<span className="nhan-truong">Mật khẩu hiện tại</span>}
+              name="currentPassword"
+              rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại.' }]}
+            >
+              <Input.Password id="ho-so-current-password" autoComplete="current-password" className="truong-nhap" onChange={handlePasswordFieldChange('currentPassword')} />
+            </Form.Item>
 
-            <div className="nhom-truong">
-              <label className="nhan-truong" htmlFor="ho-so-new-password">Mật khẩu mới</label>
-              <input
-                id="ho-so-new-password"
-                type="password"
-                autoComplete="new-password"
-                className={`truong-nhap ${matKhauErrors.newPassword ? 'truong-nhap-error' : ''}`}
-                value={matKhauForm.newPassword}
-                onChange={handlePasswordFieldChange('newPassword')}
-              />
-              {matKhauErrors.newPassword && <p className="ho-so-form-error">{matKhauErrors.newPassword}</p>}
-            </div>
+            <Form.Item
+              className="nhom-truong"
+              label={<span className="nhan-truong">Mật khẩu mới</span>}
+              name="newPassword"
+              rules={[
+                { required: true, message: 'Vui lòng nhập mật khẩu mới.' },
+                { min: 8, message: 'Mật khẩu mới phải có ít nhất 8 ký tự.' },
+              ]}
+            >
+              <Input.Password id="ho-so-new-password" autoComplete="new-password" className="truong-nhap" onChange={handlePasswordFieldChange('newPassword')} />
+            </Form.Item>
 
-            <div className="nhom-truong">
-              <label className="nhan-truong" htmlFor="ho-so-confirm-password">Xác nhận mật khẩu mới</label>
-              <input
-                id="ho-so-confirm-password"
-                type="password"
-                autoComplete="new-password"
-                className={`truong-nhap ${matKhauErrors.confirmPassword ? 'truong-nhap-error' : ''}`}
-                value={matKhauForm.confirmPassword}
-                onChange={handlePasswordFieldChange('confirmPassword')}
-              />
-              {matKhauErrors.confirmPassword && <p className="ho-so-form-error">{matKhauErrors.confirmPassword}</p>}
-            </div>
+            <Form.Item
+              className="nhom-truong"
+              label={<span className="nhan-truong">Xác nhận mật khẩu mới</span>}
+              name="confirmPassword"
+              dependencies={['newPassword']}
+              rules={[
+                { required: true, message: 'Vui lòng xác nhận mật khẩu mới.' },
+                ({ getFieldValue }) => ({
+                  validator(_, value) {
+                    if (!value || getFieldValue('newPassword') === value) {
+                      return Promise.resolve()
+                    }
+
+                    return Promise.reject(new Error('Mật khẩu xác nhận không khớp.'))
+                  },
+                }),
+              ]}
+            >
+              <Input.Password id="ho-so-confirm-password" autoComplete="new-password" className="truong-nhap" onChange={handlePasswordFieldChange('confirmPassword')} />
+            </Form.Item>
           </div>
 
           <div className="ho-so-profile-actions">
-            <button type="submit" className="btn nut-chinh ho-so-save-btn">
+            <Button htmlType="submit" className="btn nut-chinh ho-so-save-btn" loading={dangCapNhatMatKhau}>
               Cập nhật mật khẩu
-            </button>
-            <button type="button" className="btn ho-so-logout-btn ho-so-logout-btn--mobile" onClick={onLogout}>
+            </Button>
+            <Button htmlType="button" className="btn ho-so-logout-btn ho-so-logout-btn--mobile" onClick={onLogout}>
               Đăng xuất
-            </button>
+            </Button>
           </div>
-        </form>
+        </Form>
       </div>
     </article>
   )

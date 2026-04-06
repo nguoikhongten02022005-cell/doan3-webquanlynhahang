@@ -7,13 +7,13 @@ Mục tiêu:
 - xây dựng giao diện quản lý nhà hàng rõ ràng, dễ dùng
 - bám sát ngữ cảnh nhà hàng tại Việt Nam
 - giữ code dễ đọc, dễ bảo trì, phù hợp đồ án
-- tương thích với backend C# đang dùng thật trong `backend/apiquanlynhahang/apiquanlynhahang`
+- tương thích với backend NestJS đang dùng thật trong `backend/nest-api`
 
 ## 2. Hiện trạng repo
 Trong repo hiện tại:
 - frontend chạy ở thư mục gốc
 - mã nguồn giao diện chính nằm trong `src/`
-- backend đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/apiquanlynhahang/apiquanlynhahang`
+- backend đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/nest-api`
 
 Khi sửa frontend, cần ưu tiên hiểu đúng hiện trạng này trước khi thay đổi code.
 
@@ -88,8 +88,8 @@ Yêu cầu cơ bản khi sửa màn hình:
 
 Khi đối chiếu API đang chạy thật, ưu tiên đọc:
 - `README.md`
-- `backend/apiquanlynhahang/apiquanlynhahang/README.md`
-- mã nguồn trong `backend/apiquanlynhahang/apiquanlynhahang/`
+- `backend/nest-api/README.md`
+- mã nguồn trong `backend/nest-api/`
 
 ## 9. Quy tắc trải nghiệm người dùng
 Các màn hình chính hiện có cần được ưu tiên giữ ổn định, ví dụ:
@@ -134,5 +134,5 @@ Toàn bộ frontend hiện tại cần bám theo các nguyên tắc sau:
 - ưu tiên tiếng Việt không dấu khi đặt tên mới nếu phù hợp
 - giữ cấu trúc hiện có của repo
 - không tự ý đổi contract API
-- ưu tiên bám backend C# thật trong `backend/apiquanlynhahang/apiquanlynhahang`
+- ưu tiên bám backend NestJS that trong `backend/nest-api`
 - giao diện thực tế, rõ ràng, phù hợp ngữ cảnh Việt Nam

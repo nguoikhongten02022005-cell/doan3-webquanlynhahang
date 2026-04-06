@@ -188,7 +188,7 @@ const tinhTinhTrangKhungGio = ({ date, time, periodId }) => {
 }
 
 function DatBanPage() {
-  const { nguoiDungHienTai, daDangNhap } = useXacThuc()
+  const { nguoiDungHienTai } = useXacThuc()
   const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan } = useDatBan()
 
   const [tables, setTables] = useState([])

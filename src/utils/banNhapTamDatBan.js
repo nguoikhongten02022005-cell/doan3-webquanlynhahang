@@ -84,5 +84,3 @@ export const taoAnhChupBanNhapTamDatBan = (duLieuForm) => ({
   phone: duLieuForm?.phone,
   email: duLieuForm?.email,
 })
-
-export const THOI_GIAN_HET_HAN_BAN_NHAP_TAM_DAT_BAN = THOI_GIAN_HET_HAN_BAN_NHAP_TAM

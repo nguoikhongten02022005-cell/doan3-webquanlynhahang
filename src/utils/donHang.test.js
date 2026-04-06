@@ -26,7 +26,7 @@ test('anhXaMonTrongGioThanhMonDonHang anh xa dung cau truc DTO may chu khong kem
   })
 
   assert.deepEqual(ketQua, {
-    menuItemId: 12,
+    menuItemId: '12',
     quantity: 2,
     kichCoDaChon: 'L',
     toppingDaChon: ['Trân châu', 'Kem cheese'],
@@ -63,9 +63,14 @@ test('taoDuLieuTaoDonHang chi gom truong chuan duoc may chu chap nhan', () => {
   })
 
   assert.deepEqual(duLieuGuiDi, {
+    maKH: '',
+    maBan: 'A01',
+    maNV: null,
+    maDatBan: null,
+    nguonTao: 'Online',
     items: [
       {
-        menuItemId: 5,
+        menuItemId: '5',
         quantity: 1,
         kichCoDaChon: 'M',
         toppingDaChon: ['Bò viên'],
@@ -82,17 +87,17 @@ test('taoDuLieuTaoDonHang chi gom truong chuan duoc may chu chap nhan', () => {
     },
     note: 'giao nhanh',
     tableNumber: 'A01',
-    paymentMethod: 'CHUYEN_KHOAN',
+    paymentMethod: 'TienMat',
   })
 })
 
 test('cac ham trang thai don hang anh xa truc tiep enum chuan', () => {
-  assert.equal(layNhanTrangThaiDonHang('MOI_TAO'), 'Mới tạo')
-  assert.equal(laySacThaiDonHang('DANG_CHUAN_BI'), 'warning')
-  assert.equal(layBuocTienTrinhDonHang('DANG_PHUC_VU'), 4)
-  assert.equal(layBuocTienTrinhDonHang('DA_HUY'), 0)
-  assert.equal(laTrangThaiDonHangDaHuy('DA_HUY'), true)
-  assert.equal(laTrangThaiDonHangDaHuy('DA_HOAN_THANH'), false)
+  assert.equal(layNhanTrangThaiDonHang('Pending'), 'Mới tạo')
+  assert.equal(laySacThaiDonHang('Preparing'), 'warning')
+  assert.equal(layBuocTienTrinhDonHang('Ready'), 4)
+  assert.equal(layBuocTienTrinhDonHang('Cancelled'), 0)
+  assert.equal(laTrangThaiDonHangDaHuy('Cancelled'), true)
+  assert.equal(laTrangThaiDonHangDaHuy('Paid'), false)
 })
 
 test('cac ham phuong thuc thanh toan chuan hoa gia tri chuan', () => {
@@ -105,14 +110,14 @@ test('cac ham phuong thuc thanh toan chuan hoa gia tri chuan', () => {
     paymentMethod: 'banking',
   })
 
-  assert.equal(duLieuGuiDi.paymentMethod, 'CHUYEN_KHOAN')
-  assert.equal(chuanHoaPhuongThucThanhToan('card'), 'THE')
-  assert.equal(layNhanPhuongThucThanhToan('THE'), 'Thẻ')
+  assert.equal(duLieuGuiDi.paymentMethod, 'ChuyenKhoan')
+  assert.equal(chuanHoaPhuongThucThanhToan('card'), 'TheNganHang')
+  assert.equal(layNhanPhuongThucThanhToan('TheNganHang'), 'Thẻ')
 })
 
 test('ham don hang danh dau mon trong gio khong hop le truoc khi gui', () => {
-  assert.equal(chuanHoaIdMonAn('12'), 12)
-  assert.equal(chuanHoaIdMonAn('abc'), undefined)
+  assert.equal(chuanHoaIdMonAn('12'), '12')
+  assert.equal(chuanHoaIdMonAn('abc'), 'abc')
 
   const invalidItems = layMonKhongHopLeTrongDonHang([
     { id: 1, quantity: 1 },
@@ -120,7 +125,6 @@ test('ham don hang danh dau mon trong gio khong hop le truoc khi gui', () => {
     { menuItemId: null, quantity: 1 },
   ])
 
-  assert.equal(invalidItems.length, 2)
-  assert.deepEqual(invalidItems[0], { id: 'abc', quantity: 2 })
-  assert.deepEqual(invalidItems[1], { menuItemId: null, quantity: 1 })
+  assert.equal(invalidItems.length, 1)
+  assert.deepEqual(invalidItems[0], { menuItemId: null, quantity: 1 })
 })

@@ -319,6 +319,10 @@
   align-items: start;
 }
 
+.noi-bo-don-hang-list-col {
+  min-width: 0;
+}
+
 .noi-bo-don-hang-toolbar {
   overflow: hidden;
 }
@@ -715,6 +719,15 @@
 }
 
 @media (max-width: 640px) {
+  .noi-bo-don-hang-ticket__top {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .noi-bo-don-hang-ticket__meta {
+    grid-template-columns: 1fr;
+  }
+
   .noi-bo-layout-main {
     padding: 1rem;
   }

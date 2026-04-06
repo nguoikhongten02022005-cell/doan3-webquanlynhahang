@@ -78,8 +78,8 @@ Hệ thống cung cấp giao diện web thân thiện, dễ sử dụng cho từ
 
 ```text
 ┌─────────────────┐    ┌──────────────────────────────┐    ┌──────────────────────┐
-│   React App     │    │  ASP.NET Core Web API        │    │       MySQL          │
-│   (Frontend)    │◄──►│  JWT Authentication          │◄──►│      Database        │
+│   React App     │    │     NestJS API              │    │       MySQL          │
+│   (Frontend)    │◄──►│  JWT Authentication         │◄──►│      Database        │
 └─────────────────┘    └──────────────────────────────┘    └──────────────────────┘
 ```
 
@@ -87,12 +87,10 @@ Hệ thống cung cấp giao diện web thân thiện, dễ sử dụng cho từ
 
 ### Backend
 
-- C#
-- ASP.NET Core Web API
-- Entity Framework Core
+- TypeScript
+- NestJS
 - MySQL
 - JWT
-- Swagger
 
 ### Frontend
 
@@ -106,8 +104,7 @@ Hệ thống cung cấp giao diện web thân thiện, dễ sử dụng cho từ
 doan3-webquanlynhahang/
 ├── src/                                      # Frontend React + Vite
 ├── backend/
-│   └── apiquanlynhahang/
-│       └── apiquanlynhahang/                 # Backend C# chính dùng cho bài
+│   └── nest-api/                             # Backend NestJS chinh de chay tren Linux
 └── README.md
 ```
 
@@ -129,23 +126,22 @@ VITE_USE_BACKEND=true
 VITE_API_BASE_URL=http://localhost:5011/api
 ```
 
-### Chạy backend C#
+### Chạy backend NestJS
 
-Trong thư mục `backend/apiquanlynhahang/apiquanlynhahang/`:
+Tại thư mục gốc:
 
 ```bash
-dotnet restore
-dotnet build
-dotnet run
+npm run dev:backend
 ```
 
 Địa chỉ local thường dùng:
 
 - API HTTP: `http://localhost:5011`
-- Swagger: `http://localhost:5011/swagger`
+
+Can cau hinh DB trong `backend/nest-api/.env`.
 
 ## Ghi chú
 
-- Backend C# + MySQL là phần backend duy nhất dùng để phát triển và demo bài.
-- Nếu frontend gọi API local, cần đảm bảo backend C# đang chạy đúng cổng và CORS được cấu hình phù hợp.
-- Danh sách API nên xem trực tiếp trong `backend/apiquanlynhahang/apiquanlynhahang/README.md` hoặc qua Swagger tại `http://localhost:5011/swagger`.
+- Backend duy nhat trong repo hien tai la `backend/nest-api`.
+- Frontend van goi `http://localhost:5011/api` qua `VITE_API_BASE_URL`, nen khong can doi contract o frontend.
+- Neu chay lan dau, hay tao `backend/nest-api/.env` tu `.env.example` va dien dung thong tin MySQL local.

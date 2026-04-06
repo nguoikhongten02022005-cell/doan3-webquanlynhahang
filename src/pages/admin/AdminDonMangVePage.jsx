@@ -76,7 +76,14 @@ function AdminDonMangVePage() {
     { title: 'SĐT', dataIndex: 'soDienThoai', key: 'soDienThoai', render: (value) => value || '---' },
     { title: 'Địa chỉ', dataIndex: 'diaChiGiao', key: 'diaChiGiao', render: (value) => value || '---' },
     { title: 'Giờ nhận', key: 'gio', render: (_, row) => row.gioGiao || row.gioLayHang || '---' },
-    { title: 'Món', dataIndex: 'danhSachMon', key: 'danhSachMon', render: (value) => value.map((muc) => `${muc.tenMon} x${muc.soLuong}`).join(', ') },
+    {
+      title: 'Món',
+      dataIndex: 'danhSachMon',
+      key: 'danhSachMon',
+      render: (value) => Array.isArray(value) && value.length
+        ? value.map((muc) => `${muc.tenMon} x${muc.soLuong}`).join(', ')
+        : '---',
+    },
     { title: 'Tổng tiền', dataIndex: 'tongTien', key: 'tongTien', render: (value) => dinhDangTienTeVietNam(value) },
     { title: 'Trạng thái', dataIndex: 'trangThai', key: 'trangThai', render: (value) => <Tag color={NHAN[value]?.color || 'default'}>{NHAN[value]?.label || value}</Tag> },
     {
@@ -98,8 +105,8 @@ function AdminDonMangVePage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         <Col xs={24} md={8}><Card><Statistic title="Tổng đơn hôm nay" value={thongKe.tongDonHomNay} prefix={<ShoppingOutlined />} /></Card></Col>
-        <Col xs={24} md={8}><Card><Statistic title="Đang xử lý" value={thongKe.dangXuLy} valueStyle={{ color: '#d97706' }} prefix={<ClockCircleOutlined />} /></Card></Col>
-        <Col xs={24} md={8}><Card><Statistic title="Doanh thu hôm nay" value={thongKe.doanhThuHomNay} formatter={(value) => dinhDangTienTeVietNam(Number(value) || 0)} valueStyle={{ color: '#059669' }} prefix={<CheckCircleOutlined />} /></Card></Col>
+        <Col xs={24} md={8}><Card><Statistic title="Đang xử lý" value={thongKe.dangXuLy} styles={{ content: { color: '#d97706' } }} prefix={<ClockCircleOutlined />} /></Card></Col>
+        <Col xs={24} md={8}><Card><Statistic title="Doanh thu hôm nay" value={thongKe.doanhThuHomNay} formatter={(value) => dinhDangTienTeVietNam(Number(value) || 0)} styles={{ content: { color: '#059669' } }} prefix={<CheckCircleOutlined />} /></Card></Col>
       </Row>
 
       <Card title="Đơn mang về">

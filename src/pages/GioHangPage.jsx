@@ -17,7 +17,7 @@ import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
 
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 
-const tinhSoTienGiam = (voucher, tamTinh, phiDichVu) => {
+const tinhSoTienGiam = (voucher, tamTinh) => {
   if (!voucher) {
     return 0
   }
@@ -170,9 +170,13 @@ function GioHangPage() {
     }
 
     if (voucherDaApDung) {
+      const nhanGiamGia = voucherDaApDung.discountPercent > 0
+        ? `${voucherDaApDung.discountPercent}%`
+        : dinhDangTienTeVietNam(voucherDaApDung.amount || 0)
+
       return (
         <p className="voucher-message success">
-          ✅ Áp dụng thành công — Giảm {voucherDaApDung.discountPercent || 0}%
+          ✅ Áp dụng thành công — Giảm {nhanGiamGia}
         </p>
       )
     }

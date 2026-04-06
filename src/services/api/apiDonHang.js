@@ -26,6 +26,8 @@ const chuanHoaDanhSachChiTiet = (items) => Array.isArray(items) ? items.map((ite
 const chuanHoaDonHang = (order) => {
   if (!order || typeof order !== 'object') return null
 
+  const items = chuanHoaDanhSachChiTiet(order.chiTiet || order.ChiTiet || order.items || order.Items)
+
   return {
     ...order,
     id: layGiaTri(order, 'maDonHang', 'MaDonHang'),
@@ -47,7 +49,7 @@ const chuanHoaDonHang = (order) => {
       email: '',
       address: '',
     },
-    items: [],
+    items,
   }
 }
 

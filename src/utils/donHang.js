@@ -18,14 +18,6 @@ export const SAC_THAI_TRANG_THAI_DON_HANG = Object.freeze({
   Cancelled: 'danger',
 })
 
-export const CAC_BUOC_TIEN_TRINH_DON_HANG = Object.freeze([
-  'Mới tạo',
-  'Đã xác nhận',
-  'Đang chuẩn bị',
-  'Đang phục vụ',
-  'Hoàn thành',
-])
-
 const BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI = Object.freeze({
   Pending: 1,
   Confirmed: 2,
@@ -86,7 +78,7 @@ export const chuanHoaPhuongThucThanhToan = (giaTri) => {
     return giaTriDaChuanHoa
   }
 
-  return BI_DANH_PHUONG_THUC_THANH_TOAN[giaTriDaChuanHoa.toLowerCase()] || 'TIEN_MAT'
+  return BI_DANH_PHUONG_THUC_THANH_TOAN[giaTriDaChuanHoa.toLowerCase()] || 'TienMat'
 }
 
 export const chuanHoaIdMonAn = (giaTri) => String(giaTri ?? '').trim() || undefined

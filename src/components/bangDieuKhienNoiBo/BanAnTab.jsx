@@ -139,20 +139,33 @@ const formatBookingTime = (booking) => {
   return ''
 }
 
+const chuanHoaTrangThaiChoPos = (trangThai = '') => {
+  const giaTri = String(trangThai || '').trim().toUpperCase()
+
+  if (giaTri === 'AVAILABLE' || giaTri === 'TRONG') return 'AVAILABLE'
+  if (giaTri === 'HELD' || giaTri === 'RESERVED' || giaTri === 'GIU_CHO' || giaTri === 'CHO_THANH_TOAN') return 'HELD'
+  if (giaTri === 'OCCUPIED' || giaTri === 'CO_KHACH' || giaTri === 'DANG_SU_DUNG') return 'OCCUPIED'
+  if (giaTri === 'DIRTY' || giaTri === 'BAN' || giaTri === 'MAINTENANCE' || giaTri === 'CAN_DON') return 'DIRTY'
+
+  return giaTri || 'DIRTY'
+}
+
 const buildTableViewModel = (table, bookingById) => {
   const booking = table.activeBookingId ? bookingById.get(String(table.activeBookingId)) : null
-  const statusStyle = TABLE_STATUS_STYLES[table.status] || TABLE_STATUS_STYLES.DIRTY
+  const status = chuanHoaTrangThaiChoPos(table.status)
+  const statusStyle = TABLE_STATUS_STYLES[status] || TABLE_STATUS_STYLES.DIRTY
 
   return {
     ...table,
     booking,
+    status,
     displayName: table.name || table.code || 'Bàn',
     areaLabel: layNhanChoNgoi(table.areaId),
-    statusLabel: TABLE_STATUS_LABELS[table.status] || table.status,
-    statusTone: TABLE_STATUS_TONES[table.status] || 'neutral',
+    statusLabel: TABLE_STATUS_LABELS[status] || table.status,
+    statusTone: TABLE_STATUS_TONES[status] || 'neutral',
     statusStyle,
     bookingCode: booking?.bookingCode || table.activeBookingCode || '',
-    timeText: table.status === 'HELD' || table.status === 'OCCUPIED' ? formatBookingTime(booking) : '',
+    timeText: status === 'HELD' || status === 'OCCUPIED' ? formatBookingTime(booking) : '',
   }
 }
 

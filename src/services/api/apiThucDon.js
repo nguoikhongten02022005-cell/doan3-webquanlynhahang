@@ -30,5 +30,14 @@ export const taoMonApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.p
   thoiGianChuanBi: Number(payload.thoiGianChuanBi || payload.prepTime || 0),
 }))
 
-export const capNhatMonApi = async () => ({ duLieu: null, thongDiep: 'Backend chua ho tro cap nhat mon', meta: null })
-export const xoaMonApi = async () => ({ duLieu: null, thongDiep: 'Backend chua ho tro xoa mon', meta: null })
+export const capNhatMonApi = async (maMon, payload) => tachPhanHoiApi(await trinhKhachApi.put(`/thuc-don/${maMon}`, {
+  maDanhMuc: payload.maDanhMuc || payload.danhMuc || '',
+  tenMon: payload.tenMon || payload.name || '',
+  moTa: payload.moTa || payload.description || '',
+  gia: Number(payload.gia || payload.price || 0),
+  hinhAnh: payload.hinhAnh || payload.image || '',
+  thoiGianChuanBi: Number(payload.thoiGianChuanBi || payload.prepTime || 0),
+  trangThai: payload.trangThai || (payload.isVisible === false ? 'Unavailable' : 'Available'),
+}))
+
+export const xoaMonApi = async (maMon) => tachPhanHoiApi(await trinhKhachApi.delete(`/thuc-don/${maMon}`))

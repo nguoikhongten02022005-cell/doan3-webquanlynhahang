@@ -3,6 +3,7 @@ import { Card, Col, Row, Statistic } from 'antd'
 import { useOutletContext } from 'react-router-dom'
 import DatBanTab from '../../components/bangDieuKhienNoiBo/DatBanTab'
 import { layNhanPhamViTongQuan } from '../../features/bangDieuKhienNoiBo/boChon'
+import { laDatBanDaCheckIn } from '../../features/bangDieuKhienNoiBo/boChon'
 
 function AdminDatBanPage() {
   const {
@@ -54,6 +55,14 @@ function AdminDatBanPage() {
       description: 'Kiểm tra vị trí và ghi chú đặc biệt.',
       icon: <ClockCircleOutlined />,
       accent: 'from-emerald-500 to-teal-500',
+    },
+    {
+      key: 'checked-in',
+      label: 'Đã check-in',
+      value: hangDoiDatBan.filter((booking) => laDatBanDaCheckIn(booking)).length,
+      description: 'Đang phục vụ hoặc đã xếp bàn.',
+      icon: <TableOutlined />,
+      accent: 'from-blue-500 to-cyan-500',
     },
   ]
 

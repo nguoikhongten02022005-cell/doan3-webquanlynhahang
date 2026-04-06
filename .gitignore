@@ -15,6 +15,7 @@ dist-ssr
 
 # Editor directories and files
 .vs/
+backend/**/.vs/
 .vscode/*
 !.vscode/extensions.json
 .idea
@@ -25,36 +26,41 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+*.http
 
 # Build artifacts
 bin/
 obj/
+backend/**/bin/
+backend/**/obj/
 
 # Local scratch files
 .opencode/
-NUL
+[Nn][Uu][Ll]
 console-*.txt
 network-*.txt
 hero-*.png
 kiem-tra-*.png
+ban-*.png
+ho-so-*.png
 trang-chu-preview*.png
 trang-chu-mobile*.png
 
 # Playwright and manual test artifacts
+.tmp-testlogs/
 .playwright-mcp/
 reports/
-vite-dev.log
-admin-*-*.md
+reports/*.log
+reports/*.png
+vite.config.js.timestamp-*.mjs
 admin-*.md
+*-snapshot.md
 ban-*.md
-ban-*.log
 dang-nhap-*.md
 danh-gia-*.md
 delivery-tracking-*.md
 ho-so-*.md
 mang-ve-*.md
-dat-ban-snapshot.md
-booking-step2-snapshot.md
 trang-chu-desktop.png
 thuc-don-mobile.png
 thuc-don-current.png

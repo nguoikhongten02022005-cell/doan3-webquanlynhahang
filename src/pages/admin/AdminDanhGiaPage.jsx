@@ -51,10 +51,10 @@ function AdminDanhGiaPage() {
           <Card><Statistic title="Tổng đánh giá" value={danhSachSapXep.length} prefix={<CommentOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card><Statistic title="Chờ duyệt" value={danhSachDanhGiaChoDuyet.length} valueStyle={{ color: '#d97706' }} prefix={<LikeOutlined />} /></Card>
+          <Card><Statistic title="Chờ duyệt" value={danhSachDanhGiaChoDuyet.length} styles={{ content: { color: '#d97706' } }} prefix={<LikeOutlined />} /></Card>
         </Col>
         <Col xs={24} sm={8}>
-          <Card><Statistic title="Đã duyệt" value={tongDaDuyet} valueStyle={{ color: '#059669' }} prefix={<CheckCircleOutlined />} /></Card>
+          <Card><Statistic title="Đã duyệt" value={tongDaDuyet} styles={{ content: { color: '#059669' } }} prefix={<CheckCircleOutlined />} /></Card>
         </Col>
       </Row>
 

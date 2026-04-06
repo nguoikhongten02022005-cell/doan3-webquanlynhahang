@@ -55,10 +55,15 @@ function MangVeThanhToanPage() {
         })),
       })
 
+      const maDonHangMoi = ketQua?.duLieu?.maDonHang
+      if (!maDonHangMoi) {
+        throw new Error('Khong nhan duoc ma don hang sau khi tao don mang ve.')
+      }
+
       xoaToanBoGio()
       xoaMucLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_MANG_VE)
       hienThanhCong('Đã tạo đơn mang về. Vui lòng chuyển khoản theo QR để nhà hàng xác nhận.')
-      navigate(`/mang-ve/don-hang/${ketQua.duLieu.maDonHang}`)
+      navigate(`/mang-ve/don-hang/${maDonHangMoi}`)
     } catch (error) {
       hienLoi(error?.message || 'Không thể tạo đơn mang về.')
     }

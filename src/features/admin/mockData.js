@@ -22,45 +22,6 @@ export const ADMIN_REVENUE_SERIES = Object.freeze([
   { label: 'CN', revenue: 7600000 },
 ])
 
-export const ADMIN_RECENT_ACTIVITY = Object.freeze([
-  { id: 'act-1', title: 'Booking VIP vừa xác nhận', detail: 'Bàn phòng riêng cho 6 khách lúc 19:00.', tone: 'warning' },
-  { id: 'act-2', title: 'Bàn T7 cần dọn', detail: 'Ca tối còn 35 phút nữa đón lượt tiếp theo.', tone: 'neutral' },
-  { id: 'act-3', title: 'Combo Gia Đình bán tốt', detail: 'Tăng 18% so với tuần trước.', tone: 'success' },
-])
-
-export const ADMIN_SETTINGS_SECTIONS = Object.freeze([
-  {
-    id: 'hours',
-    title: 'Giờ phục vụ',
-    description: 'Thiết lập khung giờ nhận khách và ca vận hành.',
-    items: [
-      { label: 'Ca trưa', value: '11:00 - 14:00' },
-      { label: 'Ca tối', value: '17:00 - 22:00' },
-      { label: 'Giới hạn nhận booking', value: 'Trước 21:45' },
-    ],
-  },
-  {
-    id: 'notifications',
-    title: 'Thông báo nội bộ',
-    description: 'TODO: thay bằng API lưu thiết lập thông báo thực tế.',
-    items: [
-      { label: 'Chuông dashboard', value: 'Bật' },
-      { label: 'Cảnh báo khách sắp đến', value: '2 giờ trước giờ đặt' },
-      { label: 'Cảnh báo bàn cần dọn', value: 'Bật' },
-    ],
-  },
-  {
-    id: 'policies',
-    title: 'Quy định vận hành',
-    description: 'TODO: nối API cấu hình hệ thống khi backend sẵn sàng.',
-    items: [
-      { label: 'Tự động giữ bàn', value: '15 phút' },
-      { label: 'Xác nhận thủ công VIP', value: 'Bắt buộc' },
-      { label: 'Cho phép walk-in', value: 'Có' },
-    ],
-  },
-])
-
 const ADMIN_TABLE_LAYOUT = [
   { areaId: 'SANH_CHINH', total: 12, capacities: [2, 4, 4, 6, 2, 4, 4, 6, 2, 4, 6, 8] },
   { areaId: 'PHONG_VIP', total: 4, capacities: [6, 8, 10, 12] },
@@ -248,7 +209,7 @@ export const taoDuLieuNoiBoDuPhong = () => {
       total: 485000,
       subtotal: 485000,
       discountAmount: 0,
-      paymentMethod: 'TIEN_MAT',
+      paymentMethod: 'TienMat',
       note: 'Thêm ít đá cho đồ uống.',
       tableNumber: tableServing?.code || 'T5',
       customer: {
@@ -349,8 +310,9 @@ const laCungNgay = (left, right) => (
   && left.getDate() === right.getDate()
 )
 
-const isBookingCancelled = (booking) => booking?.status === 'DA_HUY'
-const isBookingCompleted = (booking) => booking?.status === 'DA_HOAN_THANH' || booking?.status === 'DA_CHECK_IN'
+const isBookingCancelled = (booking) => ['DA_HUY', 'Cancelled', 'KHONG_DEN', 'NoShow'].includes(booking?.status)
+const isBookingCompleted = (booking) => ['DA_HOAN_THANH', 'DA_CHECK_IN', 'Completed'].includes(booking?.status)
+const isOrderCompleted = (order) => order?.status === 'Paid' || order?.status === 'DA_HOAN_THANH'
 
 const filterOrdersByTimeRange = (orders, timeRange) => {
   const now = new Date()
@@ -508,7 +470,7 @@ export const taoDuLieuThongKeDoanhThu = ({ orders = [], bookings = [], timeRange
   const filteredOrders = filterOrdersByTimeRange(orders, timeRange)
   const filteredBookings = filterBookingsByTimeRange(bookings, timeRange)
   const tongDoanhThu = filteredOrders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0)
-  const soDonHoanThanh = filteredOrders.filter((order) => order?.status === 'DA_HOAN_THANH').length
+  const soDonHoanThanh = filteredOrders.filter((order) => isOrderCompleted(order)).length
   const giaTriTrungBinh = filteredOrders.length > 0 ? Math.round(tongDoanhThu / filteredOrders.length) : 0
   const revenueSeries = buildRevenueSeries(filteredOrders)
   const giaTriLonNhat = Math.max(...revenueSeries.map((item) => item.revenue), 1)

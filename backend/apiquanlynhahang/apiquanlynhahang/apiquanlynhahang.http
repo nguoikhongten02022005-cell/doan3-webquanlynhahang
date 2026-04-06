@@ -1,6 +1,0 @@
-@apiquanlynhahang_HostAddress = http://localhost:5011
-
-GET {{apiquanlynhahang_HostAddress}}/weatherforecast/
-Accept: application/json
-
-###

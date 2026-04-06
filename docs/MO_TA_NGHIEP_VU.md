@@ -15,11 +15,11 @@ Hiện trạng chính:
 - frontend chạy ở thư mục gốc của repo
 - mã nguồn giao diện chính nằm trong `src/`
 - frontend dùng React và Vite
-- backend chính đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/apiquanlynhahang/apiquanlynhahang`
+- backend chính đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/nest-api`
 
 Điều quan trọng:
-- khi cần hiểu contract API đang chạy thật, ưu tiên đọc và đối chiếu `backend/apiquanlynhahang/apiquanlynhahang`
-- xem backend C# là nguồn sự thật chính cho hệ thống hiện hành
+- khi cần hiểu contract API đang chạy thật, ưu tiên đọc và đối chiếu `backend/nest-api`
+- xem backend NestJS là nguồn sự thật chính cho hệ thống hiện hành
 
 ## 3. Tổng quan chức năng hệ thống
 
@@ -69,34 +69,32 @@ Các route chính được tổ chức trong frontend hiện tại, bao gồm:
 - `/noi-bo/bang-dieu-khien`
 
 ## 5. Backend chính đang dùng
-Backend chính của repo hiện tại nằm trong `backend/apiquanlynhahang/apiquanlynhahang/`.
+Backend chính của repo hiện tại nằm trong `backend/nest-api/`.
 
 Stack của backend này:
-- C#
-- ASP.NET Core Web API
-- Entity Framework Core
+- TypeScript
+- NestJS
 - MySQL
 - JWT
-- Swagger
 
 Các ghi chú quan trọng:
-- frontend hiện tại được đối chiếu và tích hợp theo contract từ backend C#
-- khi cần kiểm tra schema, route hoặc hành vi API, ưu tiên xem mã nguồn trong `backend/apiquanlynhahang/apiquanlynhahang/`
-- `backend/apiquanlynhahang/apiquanlynhahang/README.md` là tài liệu ngắn gọn phản ánh backend đang chạy thật
+- frontend hiện tại được đối chiếu và tích hợp theo contract từ backend NestJS
+- khi cần kiểm tra schema, route hoặc hành vi API, ưu tiên xem mã nguồn trong `backend/nest-api/`
+- `backend/nest-api/README.md` la tai lieu ngan gon phan anh backend dang chay that
 
 ## 6. Vai trò của `backend/`
 Thư mục `backend/` là backend chính đang chạy hằng ngày của repo hiện tại.
 
 Trong đó:
-- `backend/apiquanlynhahang/apiquanlynhahang` là khu vực backend C# chính
+- `backend/nest-api` là khu vực backend NestJS chinh
 - frontend hiện tại đang kết nối trực tiếp vào backend này
 
 ## 7. Ý nghĩa khi chỉnh sửa hệ thống
 Để sửa đúng theo hiện trạng repo:
-- sửa giao diện thì ưu tiên đọc `src/`, `README.md`, `backend/apiquanlynhahang/apiquanlynhahang/README.md`
-- sửa backend đang chạy thật thì ưu tiên làm trong `backend/apiquanlynhahang/apiquanlynhahang`
+- sửa giao diện thì ưu tiên đọc `src/`, `README.md`, `backend/nest-api/README.md`
+- sửa backend đang chạy thật thì ưu tiên làm trong `backend/nest-api`
 
-Nếu đổi contract API trong backend C#, cần kiểm tra ảnh hưởng tới:
+Nếu đổi contract API trong backend NestJS, cần kiểm tra ảnh hưởng tới:
 - thực đơn
 - giỏ hàng
 - thanh toán
@@ -120,8 +118,8 @@ Về mặt nghiệp vụ, hệ thống hiện không chỉ có giao diện publi
 ## 9. Kết luận
 Hiện trạng repo nên được hiểu theo thứ tự ưu tiên sau:
 - frontend chính: `src/` ở root, dùng React + Vite
-- backend chính đang chạy: `backend/apiquanlynhahang/apiquanlynhahang/`
+- backend chính đang chạy: `backend/nest-api/`
 
 Khi cần chỉnh sửa an toàn và đúng thực tế:
 - lấy `README.md` làm điểm bắt đầu
-- lấy `backend/apiquanlynhahang/apiquanlynhahang/` làm nguồn sự thật cho backend hiện hành
+- lấy `backend/nest-api/` làm nguồn sự thật cho backend hiện hành

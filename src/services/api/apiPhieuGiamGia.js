@@ -17,11 +17,6 @@ const chuanHoaPhieuGiamGia = (voucher) => {
   }
 }
 
-export const layPhieuGiamGiaTheoMaApi = async (code) => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/ma-giam-gia/${encodeURIComponent(code)}`))
-  return { ...phanHoi, duLieu: chuanHoaPhieuGiamGia(phanHoi.duLieu) }
-}
-
 export const kiemTraPhieuGiamGiaApi = async (code, orderAmount = 0) => {
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/ma-giam-gia/validate', { maCode: code, tongTien: orderAmount }))
   return { ...phanHoi, duLieu: chuanHoaPhieuGiamGia(phanHoi.duLieu) }

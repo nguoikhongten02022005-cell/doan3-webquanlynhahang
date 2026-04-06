@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Avatar, Button, Card, Col, Form, Input, InputNumber, Modal, Popconfirm, QRCode, Row, Segmented, Select, Space, Statistic, Table, Tag, Tooltip, Typography } from 'antd'
+import { Avatar, Button, Card, Col, Empty, Form, Input, InputNumber, Modal, Popconfirm, QRCode, Row, Segmented, Select, Space, Statistic, Table, Tag, Tooltip, Typography } from 'antd'
 import { DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlined, PrinterOutlined, QrcodeOutlined, TableOutlined } from '@ant-design/icons'
 import { capNhatBanApi, layDanhSachBanApi, layQrBanApi, taoBanApi, xoaBanApi } from '../../services/api/apiBanAn'
 import { layOrderDangMoTaiBanApi, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanTaiBan'
@@ -42,9 +42,14 @@ function AdminQuanLyBanPage() {
 
   useEffect(() => {
     taiLai()
+
+    if (dangMoForm || orderDangXem || qrDangXem) {
+      return undefined
+    }
+
     const intervalId = window.setInterval(() => taiLai(), 3000)
     return () => window.clearInterval(intervalId)
-  }, [])
+  }, [dangMoForm, orderDangXem, qrDangXem])
 
   const thongKe = useMemo(() => ({
     tong: danhSachBan.length,
@@ -108,7 +113,9 @@ function AdminQuanLyBanPage() {
 
   const moOrder = async (ban) => {
     const { duLieu } = await layOrderDangMoTaiBanApi(ban.code)
-    setOrderDangXem({ ban, duLieu })
+    const danhSachChiTiet = duLieu?.ChiTiet || duLieu?.chiTiet || []
+    const coOrderDangMo = Boolean(duLieu?.DonHang || duLieu?.donHang || (Array.isArray(danhSachChiTiet) && danhSachChiTiet.length))
+    setOrderDangXem({ ban, duLieu: coOrderDangMo ? duLieu : null, khongCoOrder: !coOrderDangMo })
   }
 
   const xoaBan = async (ban) => {
@@ -182,12 +189,12 @@ function AdminQuanLyBanPage() {
   ]
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} xl={6}><Card><Statistic title="Tổng bàn" value={thongKe.tong} /></Card></Col>
-        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Trống" value={thongKe.trong} valueStyle={{ color: '#059669' }} /></Card></Col>
-        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Có khách" value={thongKe.coKhach} valueStyle={{ color: '#d97706' }} /></Card></Col>
-        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Chờ thanh toán" value={thongKe.choThanhToan} valueStyle={{ color: '#dc2626' }} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Trống" value={thongKe.trong} styles={{ content: { color: '#059669' } }} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Có khách" value={thongKe.coKhach} styles={{ content: { color: '#d97706' } }} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Chờ thanh toán" value={thongKe.choThanhToan} styles={{ content: { color: '#dc2626' } }} /></Card></Col>
       </Row>
 
       <Card title="Quản lý bàn" extra={<Button type="primary" icon={<PlusOutlined />} onClick={moModalThem}>Thêm bàn</Button>}>
@@ -200,7 +207,7 @@ function AdminQuanLyBanPage() {
 
       <Modal open={Boolean(qrDangXem)} title={qrDangXem?.tenBan} footer={null} onCancel={() => setQrDangXem(null)}>
         {qrDangXem ? (
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={12} style={{ width: '100%' }}>
             <Typography.Text type="secondary">{qrDangXem.khuVuc}</Typography.Text>
             <div style={{ display: 'flex', justifyContent: 'center' }}><QRCode value={qrDangXem.url || ''} size={240} /></div>
             <Typography.Paragraph copyable={{ text: qrDangXem.url }} style={{ marginBottom: 0 }}>{qrDangXem.url}</Typography.Paragraph>
@@ -214,30 +221,36 @@ function AdminQuanLyBanPage() {
 
       <Modal open={Boolean(orderDangXem)} title={orderDangXem ? `Order của ${orderDangXem.ban.name}` : 'Order'} onCancel={() => setOrderDangXem(null)} footer={null} width={720}>
         {orderDangXem ? (
-          <Space direction="vertical" size={12} style={{ width: '100%' }}>
-            <Table
-              rowKey={(row, index) => `${row.MaMon || row.maMon}-${index}`}
-              pagination={false}
-              dataSource={orderDangXem.duLieu?.ChiTiet || orderDangXem.duLieu?.chiTiet || []}
-              columns={[
-                { title: 'Tên món', dataIndex: 'TenMon', key: 'TenMon', render: (_, row) => row.TenMon || row.tenMon },
-                { title: 'Số lượng', dataIndex: 'SoLuong', key: 'SoLuong', width: 100, render: (_, row) => `x${row.SoLuong || row.soLuong}` },
-                { title: 'Thành tiền', dataIndex: 'ThanhTien', key: 'ThanhTien', width: 140, render: (_, row) => dinhDangTienTeVietNam(row.ThanhTien || row.thanhTien) },
-              ]}
-            />
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-              <Typography.Text strong>Tổng cộng</Typography.Text>
-              <Typography.Text strong>{dinhDangTienTeVietNam(orderDangXem.duLieu?.DonHang?.TongTien || orderDangXem.duLieu?.donHang?.tongTien || 0)}</Typography.Text>
-            </div>
+          <Space orientation="vertical" size={12} style={{ width: '100%' }}>
+            {orderDangXem.khongCoOrder ? (
+              <Card variant="borderless"><Empty description="Bàn này hiện chưa có order đang mở." /></Card>
+            ) : (
+              <>
+                <Table
+                  rowKey={(row) => String(row.MaChiTiet || row.maChiTiet || `${row.MaMon || row.maMon || 'mon'}-${row.TenMon || row.tenMon || 'ten'}`)}
+                  pagination={false}
+                  dataSource={orderDangXem.duLieu?.ChiTiet || orderDangXem.duLieu?.chiTiet || []}
+                  columns={[
+                    { title: 'Tên món', dataIndex: 'TenMon', key: 'TenMon', render: (_, row) => row.TenMon || row.tenMon },
+                    { title: 'Số lượng', dataIndex: 'SoLuong', key: 'SoLuong', width: 100, render: (_, row) => `x${row.SoLuong || row.soLuong}` },
+                    { title: 'Thành tiền', dataIndex: 'ThanhTien', key: 'ThanhTien', width: 140, render: (_, row) => dinhDangTienTeVietNam(row.ThanhTien || row.thanhTien) },
+                  ]}
+                />
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                  <Typography.Text strong>Tổng cộng</Typography.Text>
+                  <Typography.Text strong>{dinhDangTienTeVietNam(orderDangXem.duLieu?.DonHang?.TongTien || orderDangXem.duLieu?.donHang?.tongTien || 0)}</Typography.Text>
+                </div>
+              </>
+            )}
             <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
               <Button onClick={() => setOrderDangXem(null)}>Đóng</Button>
-              {trangThaiNoiBo(orderDangXem.ban.status) === 'CHO_THANH_TOAN' ? <Button type="primary" onClick={() => xacNhanThanhToan(orderDangXem.ban)}>Xác nhận thanh toán</Button> : null}
+              {!orderDangXem.khongCoOrder && trangThaiNoiBo(orderDangXem.ban.status) === 'CHO_THANH_TOAN' ? <Button type="primary" onClick={() => xacNhanThanhToan(orderDangXem.ban)}>Xác nhận thanh toán</Button> : null}
             </Space>
           </Space>
         ) : null}
       </Modal>
 
-      <Modal open={dangMoForm} footer={null} onCancel={() => { setBanDangSua(null); setDangMoForm(false); form.resetFields(); }} title={banDangSua ? 'Sửa bàn' : 'Thêm bàn mới'} destroyOnClose>
+      <Modal open={dangMoForm} footer={null} onCancel={() => { setBanDangSua(null); setDangMoForm(false); form.resetFields(); }} title={banDangSua ? 'Sửa bàn' : 'Thêm bàn mới'} destroyOnHidden>
         <Form layout="vertical" form={form} onFinish={luuBan}>
           <Form.Item label="Mã bàn" name="maBan" rules={[{ required: true }]}><Input readOnly={Boolean(banDangSua)} /></Form.Item>
           <Form.Item label="Tên bàn" name="tenBan" rules={[{ required: true }]}><Input /></Form.Item>
