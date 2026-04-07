@@ -1,5 +1,14 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from 'react'
-import { layThongTinToiApi, dangNhapApi, dangKyApi, dangNhapNoiBoApi, dangXuatApi, capNhatHoSoApi, doiMatKhauApi } from '../services/api/apiXacThuc'
+import {
+  layThongTinToiApi,
+  dangNhapApi,
+  dangKyApi,
+  dangNhapNoiBoApi,
+  dangXuatApi,
+  capNhatHoSoApi,
+  doiMatKhauApi,
+  chuanHoaNguoiDungApi,
+} from '../services/api/apiXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 import {
   VAI_TRO_XAC_THUC,
@@ -270,9 +279,10 @@ function useXacThucState() {
       }
 
       const nguoiDungDangLuu = layNguoiDungHienTai()
+      const nguoiDungTuApi = chuanHoaNguoiDungApi(duLieu)
       luuNguoiDungHienTai({
         ...nguoiDungDangLuu,
-        ...duLieu,
+        ...nguoiDungTuApi,
       })
 
       const nguoiDungDaCapNhat = layNguoiDungHienTai()
