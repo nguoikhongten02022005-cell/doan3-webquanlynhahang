@@ -37,6 +37,7 @@ function MangVeThanhToanPage() {
     event.preventDefault()
     try {
       const ketQua = await taoDonMangVeApi({
+        maKH: nguoiDungHienTai?.maKH || null,
         hoTen: formData.hoTen,
         soDienThoai: formData.soDienThoai,
         loaiDon: formData.loaiNhanHang,

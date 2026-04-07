@@ -87,9 +87,12 @@ function MangVeGioHangPage() {
             <div className="gio-hang-item-list">
               {cartItems.map((item) => {
                 const itemKey = layKhoaMonTrongGio(item)
+                const coAnh = typeof item.image === 'string' && item.image.trim().length > 0
                 return (
                   <article key={itemKey} className="gio-hang-item">
-                    <div className="gio-hang-item-media"><img className="gio-hang-item-image" src={item.image} alt={item.name} /></div>
+                    <div className="gio-hang-item-media">
+                      {coAnh ? <img className="gio-hang-item-image" src={item.image} alt={item.name} /> : null}
+                    </div>
                     <div className="gio-hang-item-content">
                       <div className="gio-hang-item-top">
                         <div className="gio-hang-item-copy">
