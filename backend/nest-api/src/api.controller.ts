@@ -150,6 +150,11 @@ export class ApiController {
     return this.apiService.layDonHangCuaToi(authorization);
   }
 
+  @Get('don-hang/co-the-danh-gia')
+  layDonHangCoTheDanhGia(@Headers('authorization') authorization?: string) {
+    return this.apiService.layDonHangCoTheDanhGia(authorization);
+  }
+
   @Get('don-hang/:maDonHang')
   layChiTietDonHang(@Param('maDonHang') maDonHang: string) {
     return this.apiService.layChiTietDonHang(maDonHang);

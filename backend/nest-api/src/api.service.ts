@@ -608,6 +608,39 @@ export class ApiService {
     }, 'Lay chi tiet don hang thanh cong');
   }
 
+  private chuyenDuLieuHinhAnhDanhGia(giaTri: unknown) {
+    if (!giaTri) return [];
+    if (Array.isArray(giaTri)) return giaTri.filter(Boolean).map((item) => String(item));
+
+    const chuoi = String(giaTri).trim();
+    if (!chuoi) return [];
+
+    try {
+      const phanTich = JSON.parse(chuoi);
+      return Array.isArray(phanTich) ? phanTich.filter(Boolean).map((item) => String(item)) : [chuoi];
+    } catch {
+      return chuoi.includes('data:') || chuoi.includes('http') ? [chuoi] : [chuoi];
+    }
+  }
+
+  private chuyenHinhAnhDanhGia(giaTri: unknown) {
+    if (giaTri == null) return null;
+    if (Array.isArray(giaTri)) {
+      const hopLe = giaTri.map((item) => String(item).trim()).filter(Boolean);
+      return hopLe.length ? JSON.stringify(hopLe) : null;
+    }
+
+    const chuoi = String(giaTri).trim();
+    if (!chuoi) return null;
+
+    try {
+      const phanTich = JSON.parse(chuoi);
+      return Array.isArray(phanTich) ? JSON.stringify(phanTich.filter(Boolean).map((item) => String(item))) : chuoi;
+    } catch {
+      return chuoi;
+    }
+  }
+
   async layDonHangCuaToi(dauTrang?: string) {
     const thongTinToken = this.giaiMaNguoiDung(dauTrang);
     const khachHang = await this.layKhachHangTheoMaNd(String(thongTinToken.maND));
@@ -624,6 +657,35 @@ export class ApiService {
       chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
     })));
     return this.taoPhanHoi(ketQua, 'Lay don hang cua toi thanh cong');
+  }
+
+  async layDonHangCoTheDanhGia(dauTrang?: string) {
+    const thongTinToken = this.giaiMaNguoiDung(dauTrang);
+    const khachHang = await this.layKhachHangTheoMaNd(String(thongTinToken.maND));
+    if (!khachHang) {
+      return this.taoPhanHoi([], 'Khong co don hang co the danh gia');
+    }
+
+    const danhSach = await this.mysql.truyVan(
+      `SELECT d.*
+       FROM DonHang d
+       LEFT JOIN DanhGia dg ON dg.MaDonHang = d.MaDonHang AND dg.MaKH = d.MaKH
+       WHERE d.MaKH = ?
+         AND d.TrangThai IN ('Completed', 'Paid', 'Served')
+         AND dg.MaDanhGia IS NULL
+       ORDER BY d.NgayTao DESC`,
+      [khachHang.MaKH],
+    );
+
+    const ketQua = await Promise.all(danhSach.map(async (don) => ({
+      maDonHang: don.MaDonHang,
+      tongTien: Number(don.TongTien || 0),
+      trangThai: don.TrangThai,
+      ngayTao: don.NgayTao,
+      chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
+    })));
+
+    return this.taoPhanHoi(ketQua, 'Lay don hang co the danh gia thanh cong');
   }
 
   async capNhatTrangThaiDonHang(maDonHang: string, trangThai: string) {
@@ -737,6 +799,8 @@ export class ApiService {
       soSao: Number(danhGia.SoSao || 0),
       noiDung: danhGia.NoiDung || '',
       phanHoi: danhGia.PhanHoi || '',
+      hinhAnh: this.chuyenDuLieuHinhAnhDanhGia(danhGia.HinhAnh),
+      soLuotHuuIch: Number(danhGia.SoLuotHuuIch || 0),
       trangThai: danhGia.TrangThai,
       ngayDanhGia: danhGia.NgayDanhGia,
       tenKhachHang: danhGia.TenKH || '',
@@ -748,6 +812,7 @@ export class ApiService {
     const maDanhGia = String(payload.maDanhGia || this.taoMa('DG'));
     const maKH = String(payload.maKH || '').trim();
     const maDonHang = String(payload.maDonHang || '').trim();
+    const hinhAnh = this.chuyenHinhAnhDanhGia(payload.hinhAnh);
 
     if (!maKH || !maDonHang) {
       throw new BadRequestException('Thieu ma khach hang hoac ma don hang de tao danh gia.');
@@ -755,17 +820,33 @@ export class ApiService {
 
     try {
       await this.mysql.thucThi(
-        'INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [maDanhGia, maKH, maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, 'Pending'],
+        'INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [maDanhGia, maKH, maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, hinhAnh, 'Pending'],
       );
     } catch (loi) {
       if (loi instanceof ServiceUnavailableException && String(loi.message).includes('Duplicate entry')) {
         throw new ConflictException('Khach hang da danh gia don hang nay roi.');
       }
-      throw loi;
+
+      if (String(loi?.message || '').includes('HinhAnh') || String(loi?.code || '').includes('ER_BAD_FIELD_ERROR')) {
+        try {
+          await this.mysql.thucThi('ALTER TABLE DanhGia ADD COLUMN IF NOT EXISTS HinhAnh LONGTEXT NULL');
+          await this.mysql.thucThi(
+            'INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [maDanhGia, maKH, maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, hinhAnh, 'Pending'],
+          );
+        } catch {
+          await this.mysql.thucThi(
+            'INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?)',
+            [maDanhGia, maKH, maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, 'Pending'],
+          );
+        }
+      } else {
+        throw loi;
+      }
     }
 
-    return this.taoPhanHoi({ maDanhGia, ...payload, maKH, maDonHang, trangThai: 'Pending' }, 'Tao danh gia thanh cong');
+    return this.taoPhanHoi({ maDanhGia, ...payload, maKH, maDonHang, hinhAnh, trangThai: 'Pending' }, 'Tao danh gia thanh cong');
   }
 
   async duyetDanhGia(maDanhGia: string, payload: BanGhi) {

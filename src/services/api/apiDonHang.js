@@ -118,6 +118,8 @@ const tachVaChuanHoaHoSo = (phanHoi) => ({
 
 export const layDonHangCuaToiApi = async () => tachVaChuanHoaHoSo(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/me')))
 
+export const layDonHangCoTheDanhGiaApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/co-the-danh-gia')))
+
 export const layDanhSachDonHangHoSoApi = async () => layDonHangCuaToiApi()
 
 export const chuanHoaDonHangHoSoApi = chuanHoaDonHangHoSo

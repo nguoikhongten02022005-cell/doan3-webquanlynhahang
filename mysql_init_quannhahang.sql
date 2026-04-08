@@ -252,6 +252,7 @@ CREATE TABLE IF NOT EXISTS DanhGia (
     SoSao       TINYINT NOT NULL,
     NoiDung     VARCHAR(500),
     PhanHoi     VARCHAR(500),
+    HinhAnh     LONGTEXT,
     NgayDanhGia DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     TrangThai   ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
@@ -469,7 +470,7 @@ INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSu
 INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
 ('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW());
 
-INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, NgayDanhGia, NgayCapNhat, TrangThai) VALUES
+INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, NgayDanhGia, NgayCapNhat, TrangThai) VALUES
 ('DG001', 'KH001', 'DH001', 5, 'Mon ngon, phuc vu nhiet tinh, khong gian dep!', NULL, NOW(), NOW(), 'Pending');
 
 INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES

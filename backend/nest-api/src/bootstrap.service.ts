@@ -158,7 +158,7 @@ export class BootstrapService {
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
 
-    await this.mysql.thucThi(`
+      await this.mysql.thucThi(`
       CREATE TABLE IF NOT EXISTS DanhGia (
         MaDanhGia VARCHAR(50) PRIMARY KEY,
         MaKH VARCHAR(50) NOT NULL,
@@ -166,6 +166,7 @@ export class BootstrapService {
         SoSao TINYINT NOT NULL,
         NoiDung VARCHAR(500),
         PhanHoi VARCHAR(500),
+        HinhAnh LONGTEXT,
         NgayDanhGia DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
         TrangThai ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
@@ -173,6 +174,8 @@ export class BootstrapService {
         CONSTRAINT FK_DanhGia_DonHang FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE CASCADE
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+
+    await this.mysql.thucThi('ALTER TABLE DanhGia ADD COLUMN IF NOT EXISTS HinhAnh LONGTEXT NULL');
   }
 
   private async seedCoBan() {
