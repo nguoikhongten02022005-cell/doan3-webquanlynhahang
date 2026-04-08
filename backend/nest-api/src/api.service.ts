@@ -9,10 +9,25 @@ type BanGhi = Record<string, any>;
 export class ApiService {
   constructor(private readonly mysql: MySqlService) {}
 
-  private readonly jwtSecret = process.env.JWT_SECRET?.trim() || 'phat-trien-linux-nestjs-secret-toi-thieu-32-ky-tu';
-  private readonly jwtIssuer = process.env.JWT_ISSUER?.trim() || 'nest-api-quan-ly-nha-hang';
-  private readonly jwtAudience = process.env.JWT_AUDIENCE?.trim() || 'quan-ly-nha-hang-frontend';
-  private readonly urlFrontend = process.env.FRONTEND_ORIGIN?.trim() || 'http://localhost:5173';
+  private readonly jwtSecret = this.docBienMoiTruongBatBuoc('JWT_SECRET');
+  private readonly jwtIssuer = this.docBienMoiTruongBatBuoc('JWT_ISSUER');
+  private readonly jwtAudience = this.docBienMoiTruongBatBuoc('JWT_AUDIENCE');
+  private readonly jwtExpiresIn = this.docBienMoiTruongBatBuoc('JWT_EXPIRES_IN');
+  private readonly urlFrontend = this.docBienMoiTruongTuyChon('FRONTEND_ORIGIN');
+
+  private docBienMoiTruongBatBuoc(tenBien: string) {
+    const giaTri = process.env[tenBien]?.trim();
+
+    if (!giaTri) {
+      throw new Error(`Thiếu biến môi trường bắt buộc: ${tenBien}`);
+    }
+
+    return giaTri;
+  }
+
+  private docBienMoiTruongTuyChon(tenBien: string) {
+    return process.env[tenBien]?.trim() || '';
+  }
 
   taoPhanHoi(duLieu: unknown, thongDiep = 'Thanh cong', meta: unknown = null) {
     return { success: true, data: duLieu, message: thongDiep, meta };
@@ -52,7 +67,7 @@ export class ApiService {
       },
       this.jwtSecret,
       {
-        expiresIn: process.env.JWT_EXPIRES_IN || '12h',
+        expiresIn: this.jwtExpiresIn,
         issuer: this.jwtIssuer,
         audience: this.jwtAudience,
       } as any,

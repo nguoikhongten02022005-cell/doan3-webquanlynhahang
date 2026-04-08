@@ -2,8 +2,8 @@ import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { layMaXacThuc, xoaPhienXacThuc } from './dichVuXacThuc'
 import { datMucLuuTru, layMucLuuTru } from './dichVuLuuTru'
 
-const URL_GOC_API_PHAT_TRIEN_MAC_DINH = 'http://localhost:5011/api'
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
+
 const DANH_SACH_DUONG_DAN_CONG_KHAI = ['/auth/login', '/auth/internal-login', '/auth/register', '/thuc-don', '/ma-giam-gia/validate']
 
 const docCoSuDungMayChuTuEnv = () => {
@@ -19,17 +19,13 @@ const docCoSuDungMayChuTuEnv = () => {
 export const coSuDungMayChu = () => docCoSuDungMayChuTuEnv()
 
 export const layUrlGocApi = () => {
-  const urlGocDaCauHinh = String(import.meta.env.VITE_API_BASE_URL || '').trim()
+  const urlGocDaCauHinh = String(import.meta.env.VITE_API_BASE_URL ?? '').trim()
 
   if (urlGocDaCauHinh) {
     return urlGocDaCauHinh
   }
 
-  if (import.meta.env.DEV) {
-    return URL_GOC_API_PHAT_TRIEN_MAC_DINH
-  }
-
-  throw new Error('Thiếu VITE_API_BASE_URL cho frontend đang bật backend mode.')
+  throw new Error('Thiếu VITE_API_BASE_URL trong file .env khi frontend bật backend mode.')
 }
 
 const layDauTrangXacThuc = () => {

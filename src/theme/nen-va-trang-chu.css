@@ -801,120 +801,127 @@ button:focus-visible,
 
 /* FOOD CARD */
 .the-mon {
-  border-radius: var(--radius-lg); overflow: hidden;
-  border: 1px solid var(--line); background: #fff;
-  transition: transform 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease; position: relative;
+  overflow: hidden;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.the-mon.ant-card {
+  border-radius: 8px;
+  border: 1px solid #f0f0f0;
+  box-shadow: none;
+  border-bottom: none;
+}
+
 .the-mon.ant-card .ant-card-body {
-  padding: 0;
+  padding: 16px;
 }
+
 .the-mon:hover {
-  box-shadow: var(--shadow-md); transform: translateY(-3px);
-  border-color: var(--primary-light);
+  transform: translateY(-2px);
 }
-.the-mon.is-clickable { cursor: pointer; }
-.the-mon--menu { border-radius: var(--radius-md); }
-.the-mon-hinh {
-  position: relative; overflow: hidden; height: 180px;
-  background: var(--surface-warm); width: 100%; padding: 0; border: 0;
-  appearance: none; text-align: left; color: inherit;
+
+.the-mon.ant-card-hoverable:hover {
+  border-color: #d9d9d9;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
 }
-.the-mon-hinh:disabled { cursor: default; }
-.the-mon-hinh--menu { height: 160px; }
-.the-mon-hinh-image {
-  width: 100%; height: 100%; object-fit: cover;
-  transition: transform 0.5s ease;
+
+.the-mon--menu {
+  border-radius: 8px;
 }
-.the-mon:hover .the-mon-hinh-image { transform: scale(1.06); }
-.the-mon-hinh-head {
-  position: absolute; top: 0.6rem; left: 0.6rem; right: 0.6rem;
-  display: flex; justify-content: space-between; align-items: flex-start;
-  z-index: 2;
+
+.the-mon-cover {
+  position: relative;
+  height: 180px;
+  background: #fafafa;
+  overflow: hidden;
 }
-.nhan-mon {
-  padding: 0.2rem 0.55rem; border-radius: 99px;
-  font-size: 0.62rem; font-weight: 700; text-transform: uppercase;
-  letter-spacing: 0.06em;
-  background: rgba(255,255,255,0.9); backdrop-filter: blur(6px);
-  color: var(--primary);
+
+.the-mon-cover--menu {
+  height: 180px;
 }
-.the-mon-hinh-label {
-  padding: 0.2rem 0.55rem; border-radius: 99px;
-  font-size: 0.62rem; font-weight: 700;
-  background: var(--accent); color: #fff;
+
+.the-mon-cover-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
-.the-mon-hinh-art {
-  position: absolute; bottom: -1px; left: 0; width: 100%;
-  height: 3rem;
-  background: linear-gradient(transparent, #fff);
+
+.the-mon-cover-head {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: flex-start;
+  align-items: flex-start;
 }
-.than-mon { padding: 0.9rem 1rem 1rem; }
-.than-mon--menu { padding: 0.7rem 0.8rem 0.8rem; }
-.noi-dung-mon h3 {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.05rem; font-weight: 700; color: var(--dark);
-  line-height: 1.3; margin-bottom: 0.2rem;
+
+.the-mon-badge.ant-tag {
+  margin: 0;
+  border-radius: 6px;
+  padding-inline: 8px;
+  padding-block: 2px;
+  font-size: 12px;
+  font-weight: 500;
+  background: rgba(0, 0, 0, 0.45);
+  color: #fff;
 }
-.noi-dung-mon .ant-typography {
+
+.the-mon-cover--placeholder {
+  display: flex;
+  align-items: flex-end;
+  padding: 16px;
+}
+
+.the-mon-cover-placeholder-copy {
+  width: 100%;
+}
+
+.the-mon-cover-placeholder-copy .ant-typography {
   margin: 0;
 }
-.noi-dung-mon p {
-  font-size: 0.78rem; color: var(--text-muted);
-  line-height: 1.5; display: -webkit-box;
-  -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;
+
+.the-mon-meta .ant-card-meta {
+  margin: 0;
 }
+
+.the-mon-meta .ant-card-meta-title {
+  margin-bottom: 8px;
+  white-space: normal;
+}
+
+.the-mon-meta .ant-card-meta-description {
+  color: rgba(0, 0, 0, 0.65);
+}
+
+.the-mon-title {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.the-mon-description {
+  margin: 0;
+  color: rgba(0, 0, 0, 0.65);
+}
+
 .chan-mon {
-  display: flex; align-items: center; justify-content: space-between;
-  gap: 0.75rem;
-  margin-top: 0.7rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
 }
-.the-mon-price-block {
-  display: grid;
-  gap: 0.18rem;
-  min-width: 0;
-}
+
 .chan-mon .price,
 .gia-mon {
-  font-family: 'Cormorant Garamond', serif;
-  font-size: 1.12rem; font-weight: 700; color: var(--primary);
+  font-size: 18px;
+  font-weight: 600;
+  color: #ff4d4f;
 }
-.the-mon-price-note {
-  font-size: 0.72rem;
-  line-height: 1.5;
-  color: rgba(95, 75, 57, 0.78);
-}
-.nut-them-mon {
-  height: 2.2rem; padding: 0 1rem; border-radius: 2rem;
-  border: 1.5px solid var(--primary); background: transparent;
-  color: var(--primary); display: inline-flex; align-items: center; justify-content: center;
-  cursor: pointer; transition: background-color 0.25s ease, color 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease; font-size: 0.9rem; font-weight: 600; white-space: nowrap;
-}
-.nut-them-mon:hover { background: var(--primary); color: #fff; }
-.nut-them-mon--menu { height: 1.9rem; padding: 0 0.8rem; font-size: 0.85rem; }
 
-/* Food card placeholder */
-.the-mon.is-placeholder .the-mon-hinh {
-  background: var(--surface-soft); display: grid; place-items: center;
-  color: var(--text-muted); font-size: 2rem;
-}
 
 /* Tone variants */
-.the-mon.tone-amber { border-bottom: 3px solid var(--primary); }
-.the-mon.tone-amber .nhan-mon { color: var(--primary); }
-.the-mon.tone-green { border-bottom: 3px solid var(--primary); }
-.the-mon.tone-green .nhan-mon { color: var(--primary); }
-.the-mon.tone-red { border-bottom: 3px solid var(--primary); }
-.the-mon.tone-red .nhan-mon { color: var(--primary); }
-.the-mon.tone-gold { border-bottom: 3px solid var(--accent); }
-.the-mon.tone-gold .nhan-mon { color: var(--accent-strong); }
-.the-mon.tone-brown { border-bottom: 3px solid var(--primary); }
-.the-mon.tone-brown .nhan-mon { color: var(--primary); }
-.the-mon.tone-cool { border-bottom: 3px solid var(--primary); }
-.the-mon.tone-cool .nhan-mon { color: var(--primary); }
-.the-mon.tone-violet { border-bottom: 3px solid var(--primary); }
-.the-mon.tone-violet .nhan-mon { color: var(--primary); }
-.the-mon.tone-mint { border-bottom: 3px solid #e6785a; }
-.the-mon.tone-mint .nhan-mon { color: #e6785a; }
+
 
 /* BUTTONS */
 .btn {
@@ -1262,6 +1269,7 @@ body:has(.trang-chu-page) .main-nav button::after {
   color: var(--home-accent);
 }
 
+
 .trang-chu-page .showcase-am-thuc-link {
   display: inline-flex;
   align-items: center;
@@ -1338,28 +1346,6 @@ body:has(.trang-chu-page) .main-nav button::after {
   box-shadow: 0 12px 28px rgba(184, 139, 71, 0.22);
 }
 
-.trang-chu-page .the-mon.tone-amber,
-.trang-chu-page .the-mon.tone-green,
-.trang-chu-page .the-mon.tone-red,
-.trang-chu-page .the-mon.tone-gold,
-.trang-chu-page .the-mon.tone-brown,
-.trang-chu-page .the-mon.tone-cool,
-.trang-chu-page .the-mon.tone-violet,
-.trang-chu-page .the-mon.tone-mint {
-  border-bottom-color: var(--home-accent);
-}
-
-.trang-chu-page .the-mon.tone-amber .nhan-mon,
-.trang-chu-page .the-mon.tone-green .nhan-mon,
-.trang-chu-page .the-mon.tone-red .nhan-mon,
-.trang-chu-page .the-mon.tone-gold .nhan-mon,
-.trang-chu-page .the-mon.tone-brown .nhan-mon,
-.trang-chu-page .the-mon.tone-cool .nhan-mon,
-.trang-chu-page .the-mon.tone-violet .nhan-mon,
-.trang-chu-page .the-mon.tone-mint .nhan-mon {
-  color: var(--home-accent);
-}
-
 
 .trang-chu-page {
   background: #fbf6ef;
@@ -1382,7 +1368,6 @@ body:has(.trang-chu-page) .main-nav button::after {
 .trang-chu-page .mo-dau-card,
 .trang-chu-page .trai-nghiem-item,
 .trang-chu-page .danh-muc-item,
-.trang-chu-page .the-mon,
 .trang-chu-page .dat-ban-cta {
   background: #fffaf4;
 }
@@ -1392,12 +1377,11 @@ body:has(.trang-chu-page) .main-nav button::after {
   background: #f6ecdf;
 }
 
-.trang-chu-page .the-mon-hinh,
-.trang-chu-page .the-mon.is-placeholder .the-mon-hinh {
-  background: #f6ecdf;
+.trang-chu-page .noi-bat-section-action-wrap {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0.75rem;
 }
 
-.trang-chu-page .the-mon-hinh-art {
-  background: linear-gradient(transparent, #fffaf4);
-}
+
 

@@ -5,24 +5,36 @@ import { createPool, type Pool, type ResultSetHeader } from 'mysql2/promise';
 export class MySqlService {
   private ketNoi?: Pool;
 
+  private docBienMoiTruongBatBuoc(tenBien: string) {
+    const giaTri = process.env[tenBien]?.trim();
+
+    if (!giaTri) {
+      throw new ServiceUnavailableException(`Thiếu cấu hình bắt buộc: ${tenBien}`);
+    }
+
+    return giaTri;
+  }
+
   private layKetNoi(): Pool {
     if (this.ketNoi) {
       return this.ketNoi;
     }
 
-    const mayChu = process.env.DB_HOST?.trim();
-    const tenNguoiDung = process.env.DB_USER?.trim();
-    const tenCoSoDuLieu = process.env.DB_NAME?.trim();
+    const mayChu = this.docBienMoiTruongBatBuoc('DB_HOST');
+    const tenNguoiDung = this.docBienMoiTruongBatBuoc('DB_USER');
+    const tenCoSoDuLieu = this.docBienMoiTruongBatBuoc('DB_NAME');
+    const congDb = Number(this.docBienMoiTruongBatBuoc('DB_PORT'));
+    const matKhauDb = this.docBienMoiTruongBatBuoc('DB_PASSWORD');
 
-    if (!mayChu || !tenNguoiDung || !tenCoSoDuLieu) {
-      throw new ServiceUnavailableException('Thieu cau hinh DB_HOST, DB_USER hoac DB_NAME cho backend NestJS.');
+    if (!Number.isInteger(congDb) || congDb <= 0) {
+      throw new ServiceUnavailableException('DB_PORT không hợp lệ.');
     }
 
     this.ketNoi = createPool({
       host: mayChu,
-      port: Number(process.env.DB_PORT || 3306),
+      port: congDb,
       user: tenNguoiDung,
-      password: process.env.DB_PASSWORD || '',
+      password: matKhauDb,
       database: tenCoSoDuLieu,
       waitForConnections: true,
       connectionLimit: 10,

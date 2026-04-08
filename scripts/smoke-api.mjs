@@ -1,4 +1,14 @@
-const apiBaseUrl = process.env.SMOKE_API_BASE_URL || 'http://localhost:5011/api'
+function docBienMoiTruongBatBuoc(tenBien) {
+  const giaTri = process.env[tenBien]
+
+  if (typeof giaTri !== 'string' || !giaTri.trim()) {
+    throw new Error(`Thiếu ${tenBien} trong file .env để chạy smoke API.`)
+  }
+
+  return giaTri.trim()
+}
+
+const apiBaseUrl = docBienMoiTruongBatBuoc('SMOKE_API_BASE_URL')
 
 function taoMa(prefix) {
   return `${prefix}${Date.now()}${Math.floor(Math.random() * 1000)}`

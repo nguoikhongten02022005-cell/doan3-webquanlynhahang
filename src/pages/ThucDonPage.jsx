@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import TheMonAn from '../components/TheMonAn'
 import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
+import SectionDanhSachMonDongBo from '../components/thucDon/SectionDanhSachMonDongBo'
 import { useGioHang } from '../context/GioHangContext'
 import {
   GHI_CHU_DANH_MUC_THUC_DON,
@@ -218,32 +218,17 @@ function ThucDonPage() {
           {shouldShowMenu ? (
             <div className="thuc-don-sections" aria-label="Danh sách món ăn theo danh mục">
               {cacSectionDanhMuc.map((section) => (
-                <section
+                <SectionDanhSachMonDongBo
                   key={section.category}
-                  ref={(phanTu) => {
+                  tenMuc={section.label}
+                  nhanMuc="Danh mục"
+                  danhSachMon={section.dishes}
+                  xuLyMoChiTiet={moChiTietMon}
+                  thamChieuMuc={(phanTu) => {
                     danhMucRefs.current[section.category] = phanTu
                   }}
-                  className="thuc-don-category-section"
-                  data-category={section.category}
-                >
-                  <div className="thuc-don-results-head thuc-don-results-head--minimal thuc-don-results-head--section">
-                    <div>
-                      <p className="thuc-don-results-kicker">Danh mục</p>
-                      <h3>{section.label}</h3>
-                    </div>
-                  </div>
-
-                  <div className="thuc-don-grid thuc-don-grid--menu-showcase">
-                    {section.dishes.map((dish) => (
-                      <TheMonAn
-                        key={dish.id}
-                        dish={dish}
-                        variant="menu"
-                        onOpenDetail={moChiTietMon}
-                      />
-                    ))}
-                  </div>
-                </section>
+                  thuocTinhDuLieu={section.category}
+                />
               ))}
             </div>
           ) : null}

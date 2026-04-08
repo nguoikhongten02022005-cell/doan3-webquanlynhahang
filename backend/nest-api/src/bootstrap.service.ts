@@ -7,8 +7,18 @@ export class BootstrapService {
 
   constructor(private readonly mysql: MySqlService) {}
 
+  private docBienMoiTruongBatBuoc(tenBien: string) {
+    const giaTri = process.env[tenBien]?.trim();
+
+    if (!giaTri) {
+      throw new Error(`Thiếu biến môi trường bắt buộc: ${tenBien}`);
+    }
+
+    return giaTri;
+  }
+
   async khoiTaoNeuCan() {
-    if (String(process.env.DB_AUTO_INIT || 'false').toLowerCase() !== 'true') {
+    if (this.docBienMoiTruongBatBuoc('DB_AUTO_INIT').toLowerCase() !== 'true') {
       return;
     }
 

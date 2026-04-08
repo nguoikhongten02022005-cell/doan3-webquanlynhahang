@@ -481,14 +481,10 @@ INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiCh
 ('LS006', 'DH001', 'Served', 'Paid', NULL, 'NV003', NOW());
 
 -- Tai khoan khach test moi
-SELECT MaND, TenND, Email, VaiTro, TrangThai
-FROM NguoiDung
-WHERE MaND = 'ND_KH_TEST_01';
 
-SELECT MaKH, MaND, TenKH, SDT
-FROM KhachHang
-WHERE MaKH = 'KH_TEST_01';
 
-UPDATE NguoiDung
-SET MatKhau = '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K'
-WHERE MaND = 'ND_KH_TEST_01';
+
+UPDATE QuanNhaHang.NguoiDung
+SET MatKhau = '$2b$10$xSUYzc6LpQ0g/8eC1AZH3OpBGSWp4qZQNfJZfA.0e9WsHKQeBdcbi'
+WHERE LOWER(Email) = LOWER('khach1@gmail.com');
+

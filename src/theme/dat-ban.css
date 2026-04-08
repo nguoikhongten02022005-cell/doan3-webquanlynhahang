@@ -1,8 +1,8 @@
 .dat-ban-page-customer {
   background:
-    radial-gradient(circle at 12% 14%, rgba(230, 120, 90, 0.08), transparent 22%),
-    radial-gradient(circle at 88% 18%, rgba(214, 193, 165, 0.14), transparent 24%),
-    linear-gradient(180deg, #fbf8f2 0%, #f6efe7 100%);
+    radial-gradient(circle at 12% 14%, rgba(100, 200, 255, 0.08), transparent 22%),
+    radial-gradient(circle at 88% 18%, rgba(200, 230, 255, 0.14), transparent 24%),
+    linear-gradient(180deg, #f0f8ff 0%, #e6f7ff 100%);
 }
 
 .dat-ban-page-customer .ant-card,
@@ -28,14 +28,14 @@
 }
 
 .dat-ban-page-customer .ant-btn-primary {
-  background: #e8664a;
-  border-color: #e8664a;
+  background: #4CAF50;
+  border-color: #4CAF50;
 }
 
 .dat-ban-page-customer .ant-btn-primary:hover,
 .dat-ban-page-customer .ant-btn-primary:focus {
-  background: #d95b41 !important;
-  border-color: #d95b41 !important;
+  background: #45a049 !important;
+  border-color: #45a049 !important;
 }
 
 .dat-ban-page-customer .ant-btn-default:hover,
@@ -246,8 +246,8 @@
 }
 
 .dat-ban-guest-card.active {
-  border-color: #E8664A;
-  background: #E8664A;
+  border-color: #d97856;
+  background: #d97856;
   color: #fff;
 }
 
@@ -723,27 +723,27 @@
 
 .dat-ban-step-two-input:focus,
 .dat-ban-step-two-textarea:focus {
-  border-color: #E8664A;
-  box-shadow: 0 0 0 3px rgba(232, 102, 74, 0.14);
+  border-color: #4CAF50;
+  box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.14);
 }
 
 .dat-ban-step-two-primary-btn:hover:not(:disabled) {
-  background: #d85f44;
-  border-color: #d85f44;
-  box-shadow: 0 4px 14px rgba(232, 102, 74, 0.25);
+  background: #45a049;
+  border-color: #45a049;
+  box-shadow: 0 4px 14px rgba(76, 175, 80, 0.25);
 }
 
 .dat-ban-step-two-primary-btn:disabled {
-  background: rgba(232, 102, 74, 0.58);
-  border-color: rgba(232, 102, 74, 0.58);
+  background: rgba(76, 175, 80, 0.58);
+  border-color: rgba(76, 175, 80, 0.58);
   color: rgba(255, 255, 255, 0.92);
   cursor: not-allowed;
   box-shadow: none;
 }
 
 .dat-ban-step-two-secondary-btn:hover {
-  border-color: #E8664A;
-  color: #E8664A;
+  border-color: #4CAF50;
+  color: #4CAF50;
 }
 
 .dat-ban-review-grid {
@@ -948,8 +948,8 @@ main:has(.dat-ban-page-customer) + .site-footer .social-links a {
 .dat-ban-area-card.active,
 .dat-ban-customer-note-chip.active,
 .dat-ban-voucher-owned-item.active {
-  background: #e8664a !important;
-  border-color: #e8664a !important;
+  background: #d97856 !important;
+  border-color: #d97856 !important;
   color: #fff !important;
 }
 

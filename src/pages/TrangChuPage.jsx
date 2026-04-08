@@ -1,8 +1,8 @@
 import { useMemo } from 'react'
-import { Button, Col, ConfigProvider, Row, Space, Tag, Typography } from 'antd'
+import { Button, ConfigProvider, Space, Typography } from 'antd'
 import { Link } from 'react-router-dom'
-import TheMonAn from '../components/TheMonAn'
 import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
+import SectionDanhSachMonDongBo from '../components/thucDon/SectionDanhSachMonDongBo'
 import anhTimChungToi from '../assets/img/findus.585c393ccd3671513743.png'
 import knifeImage from '../assets/img/knife.1121c0a5afb62acb31cb.png'
 import { ANH_HERO_TRANG_CHU, layAnhMonTheoTen } from '../constants/anhMonAn'
@@ -12,14 +12,13 @@ import { useDanhSachMonAn } from '../hooks/useDanhSachMonAn'
 import { layDanhSachMonNoiBatTrangChu } from '../services/mappers/anhXaThucDon'
 
 function TrangChuPage() {
-  const { Title, Paragraph, Text } = Typography
+  const { Title, Paragraph } = Typography
   const { themVaoGio } = useGioHang()
   const { dishes } = useDanhSachMonAn()
   const {
     dongChiTietMon,
     giaChiTiet,
     xuLyThemMonDaTuyChon,
-    xuLyThemVaoGio,
     xuLyBatTatTopping,
     dangMoChiTiet,
     moChiTietMon,
@@ -40,7 +39,6 @@ function TrangChuPage() {
     [dishes],
   )
 
-
   return (
     <ConfigProvider
       theme={{
@@ -56,8 +54,8 @@ function TrangChuPage() {
         },
       }}
     >
-    <div className="trang-chu-page">
-      <section className="hero" id="home">
+      <div className="trang-chu-page">
+        <section className="hero" id="home">
         <div className="container mo-dau-grid">
           <div className="mo-dau-copy">
             <Space orientation="vertical" size={16} style={{ width: '100%', alignItems: 'flex-start' }}>
@@ -116,24 +114,18 @@ function TrangChuPage() {
 
       <section className="noi-bat-section">
         <div className="container">
-          <Row gutter={[16, 16]} align="middle" style={{ marginBottom: 24 }}>
-            <Col xs={24} lg={12}>
-              <Space orientation="vertical" size={8}>
-                <Text className="eyebrow">Món được chọn nhiều</Text>
-                <Title level={2} style={{ margin: 0 }}>Món Ngon Phải Thử</Title>
-              </Space>
-            </Col>
-            <Col xs={24} lg={12}>
-              <Space orientation="vertical" size={8} style={{ width: '100%', alignItems: 'flex-start' }}>
-                <Button type="link" href="/thuc-don" style={{ paddingInline: 0 }}>Xem toàn bộ thực đơn</Button>
-              </Space>
-            </Col>
-          </Row>
+          <SectionDanhSachMonDongBo
+            tenMuc="Món Ngon Phải Thử"
+            nhanMuc="Món được chọn nhiều"
+            danhSachMon={danhSachMonDacTrung}
+            xuLyMoChiTiet={moChiTietMon}
+            thuocTinhDuLieu="mon-noi-bat"
+          />
 
-          <div className="food-grid">
-            {danhSachMonDacTrung.map((dish) => (
-              <TheMonAn key={dish.id} dish={dish} xuLyThemVaoGio={xuLyThemVaoGio} onOpenDetail={moChiTietMon} variant="menu" />
-            ))}
+          <div className="noi-bat-section-action-wrap">
+            <Button type="link" href="/thuc-don" style={{ paddingInline: 0 }}>
+              Xem toàn bộ thực đơn
+            </Button>
           </div>
         </div>
       </section>

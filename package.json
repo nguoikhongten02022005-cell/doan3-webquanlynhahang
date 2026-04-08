@@ -5,13 +5,14 @@
   "description": "Frontend app with backend NestJS + MySQL",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "dev:frontend": "vite",
+    "dev": "vite --port 5173 --strictPort",
+    "dev:frontend": "vite --port 5173 --strictPort",
     "dev:backend": "npm --prefix backend/nest-api run start:dev",
     "build:backend": "npm --prefix backend/nest-api run build",
     "build": "vite build",
     "lint": "eslint .",
-    "smoke:api": "node scripts/smoke-api.mjs",
+    "smoke:api": "bash -lc 'set -a && source .env && set +a && node scripts/smoke-api.mjs'",
+
     "test": "node --test src/**/*.test.js",
     "preview": "vite preview"
   },
