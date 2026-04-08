@@ -1,4 +1,6 @@
 import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
+import { chuanHoaPricingSummary, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
 
 const chuanHoaChiTiet = (muc, index = 0) => ({
   id: muc?.MaChiTiet || muc?.maChiTiet || `CT-${index + 1}`,
@@ -12,13 +14,23 @@ const chuanHoaChiTiet = (muc, index = 0) => ({
 const chuanHoaDonMangVe = (duLieu) => {
   const don = duLieu?.DonHang || duLieu?.donHang || duLieu
   if (!don) return null
+
+  const pricingSummary = chuanHoaPricingSummary(don.pricingSummary || don.PricingSummary || don)
+  const voucher = chuanHoaKetQuaVoucher(don.voucher || don.Voucher || {})
+  const thongTinNhanHang = chuanHoaThongTinNhanHang(don.thongTinNhanHang || don.ThongTinNhanHang || don)
+
   return {
     maDonHang: don.MaDonHang || don.maDonHang || '',
     maKH: don.MaKH || don.maKH || '',
     loaiDon: don.LoaiDon || don.loaiDon || '',
-    diaChiGiao: don.DiaChiGiao || don.diaChiGiao || '',
-    phiShip: Number(don.PhiShip || don.phiShip || 0),
-    tongTien: Number(don.TongTien || don.tongTien || 0),
+    diaChiGiao: thongTinNhanHang.diaChiGiao,
+    gioLayHang: thongTinNhanHang.gioLayHang,
+    gioGiao: thongTinNhanHang.gioGiao,
+    phiShip: pricingSummary.phiShip,
+    tongTien: pricingSummary.tongTien,
+    pricingSummary,
+    voucher,
+    thongTinNhanHang,
     trangThai: don.TrangThai || don.trangThai || '',
     ghiChu: don.GhiChu || don.ghiChu || '',
     ngayTao: don.NgayTao || don.ngayTao || '',
@@ -27,7 +39,7 @@ const chuanHoaDonMangVe = (duLieu) => {
 }
 
 export const taoDonMangVeApi = async (payload) => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/mang-ve/don-hang', payload))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/mang-ve/don-hang', buildPayloadTaoDon(payload)))
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 

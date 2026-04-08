@@ -1,4 +1,6 @@
 import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
+import { chuanHoaPricingSummary, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
 
 const layGiaTri = (nguon, ...khoa) => {
   for (const key of khoa) {
@@ -28,15 +30,23 @@ const chuanHoaDonHang = (order) => {
 
   const items = chuanHoaDanhSachChiTiet(order.chiTiet || order.ChiTiet || order.items || order.Items)
 
+  const pricingSummary = chuanHoaPricingSummary(order.pricingSummary || order.PricingSummary || order)
+  const voucher = chuanHoaKetQuaVoucher(order.voucher || order.Voucher || {})
+  const thongTinNhanHang = chuanHoaThongTinNhanHang(order.thongTinNhanHang || order.ThongTinNhanHang || order)
+
   return {
     ...order,
     id: layGiaTri(order, 'maDonHang', 'MaDonHang'),
     orderCode: layGiaTri(order, 'maDonHang', 'MaDonHang') || '',
     orderDate: layGiaTri(order, 'ngayTao', 'NgayTao') || '',
-    total: Number(layGiaTri(order, 'tongTien', 'TongTien') || 0),
-    subtotal: Number(layGiaTri(order, 'tongTien', 'TongTien') || 0),
-    serviceFee: 0,
-    discountAmount: 0,
+    total: pricingSummary.tongTien,
+    subtotal: pricingSummary.tamTinh,
+    serviceFee: pricingSummary.phiDichVu,
+    shippingFee: pricingSummary.phiShip,
+    discountAmount: pricingSummary.giamGia,
+    pricingSummary,
+    voucher,
+    thongTinNhanHang,
     paymentMethod: '',
     paymentStatus: '',
     note: layGiaTri(order, 'ghiChu', 'GhiChu') || '',
@@ -60,26 +70,6 @@ const chuanHoaChiTietResponse = (payload) => {
   return { ...order, items: chuanHoaDanhSachChiTiet(payload.chiTiet || payload.items || []) }
 }
 
-const sinhMa = (prefix) => `${prefix}_${Date.now()}`
-
-const chuanHoaPayloadTaoDonHang = (payload = {}) => ({
-  maDonHang: payload.maDonHang || payload.orderCode || sinhMa('DH'),
-  maKH: payload.maKH || payload.customerCode || null,
-  maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
-  maNV: payload.maNV || payload.staffCode || null,
-  maDatBan: payload.maDatBan || payload.bookingCode || null,
-  nguonTao: payload.nguonTao || payload.source || 'Online',
-  ghiChu: payload.ghiChu || payload.note || '',
-  chiTiet: Array.isArray(payload.items)
-    ? payload.items.map((item, index) => ({
-        maChiTiet: item.maChiTiet || item.id || sinhMa(`CT${index + 1}`),
-        maMon: item.maMon || item.menuItemId,
-        soLuong: Number(item.soLuong || item.quantity || 0),
-        donGia: item.donGia ?? item.price ?? null,
-        ghiChu: item.ghiChu || item.note || '',
-      }))
-    : [],
-})
 
 const tachVaChuanHoa = (phanHoi) => ({
   ...phanHoi,
@@ -131,5 +121,5 @@ const tachVaChuanHoaChiTiet = (phanHoi) => ({
 
 export const layDanhSachDonHangApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang')))
 export const layChiTietDonHangApi = async (id) => tachVaChuanHoaChiTiet(tachPhanHoiApi(await trinhKhachApi.get(`/don-hang/${id}`)))
-export const taoDonHangApi = async (payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', chuanHoaPayloadTaoDonHang(payload))))
+export const taoDonHangApi = async (payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', buildPayloadTaoDon(payload))))
 export const capNhatTrangThaiDonHangApi = async (id, status) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/don-hang/${id}/status`, { trangThai: status })))

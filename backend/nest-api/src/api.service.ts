@@ -486,21 +486,130 @@ export class ApiService {
     }));
   }
 
+  private taoPricingSummary(tamTinh: number, phiShip = 0, giamGia = 0, phiDichVu = 0) {
+    return {
+      tamTinh: Number(tamTinh || 0),
+      giamGia: Number(giamGia || 0),
+      phiDichVu: Number(phiDichVu || 0),
+      phiShip: Number(phiShip || 0),
+      tongTien: Math.max(0, Number(tamTinh || 0) + Number(phiDichVu || 0) + Number(phiShip || 0) - Number(giamGia || 0)),
+    };
+  }
+
+  private tinhPhiDichVuTheoTamTinh(tamTinh: number) {
+    return tamTinh > 0 ? Math.round((Number(tamTinh || 0) * 0.05) / 1000) * 1000 : 0;
+  }
+
+  private tinhTongTamTinhTuChiTiet(chiTiet: BanGhi[]) {
+    return chiTiet.reduce((tong, muc) => tong + Number(muc.ThanhTien || muc.thanhTien || 0), 0);
+  }
+
+  private taoPricingSummaryTuDuLieuDonHang(donHang: BanGhi, chiTiet: BanGhi[]) {
+    const tamTinh = this.tinhTongTamTinhTuChiTiet(chiTiet);
+    const phiShip = Number(donHang.PhiShip || donHang.phiShip || 0);
+    const tongTienDaLuu = Number(donHang.TongTien || donHang.tongTien || 0);
+    const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
+    const tongTruocGiam = tamTinh + phiShip + phiDichVu;
+    const giamGia = Math.max(0, tongTruocGiam - tongTienDaLuu);
+    return this.taoPricingSummary(tamTinh, phiShip, giamGia, phiDichVu);
+  }
+
+  private async layThongTinVoucherApDung(maCodeDauVao: unknown, tongTien: number) {
+    const maCode = String(maCodeDauVao || '').trim();
+    if (!maCode) {
+      return this.taoVoucherResponse();
+    }
+
+    const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (!ma) {
+      throw new BadRequestException('Ma giam gia khong ton tai.');
+    }
+    if (String(ma.TrangThai || '') !== 'Active') {
+      throw new BadRequestException('Ma giam gia khong con hieu luc.');
+    }
+    if (tongTien < Number(ma.DonHangToiThieu || 0)) {
+      throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
+    }
+
+    const laPhanTram = String(ma.LoaiGiam || '').toLowerCase() === 'phantram';
+    const giaTriGiam = Number(ma.GiaTri || 0);
+    const giamToiDa = ma.GiaTriToiDa == null ? null : Number(ma.GiaTriToiDa);
+    const soTienGiamTamTinh = laPhanTram ? Math.round((tongTien * giaTriGiam) / 100) : giaTriGiam;
+    const soTienGiamThucTe = giamToiDa == null ? soTienGiamTamTinh : Math.min(soTienGiamTamTinh, giamToiDa);
+
+    return this.taoVoucherResponse({
+      maGiamGia: ma.MaCode,
+      tenGiamGia: ma.TenCode,
+      loaiGiam: ma.LoaiGiam,
+      giaTriGiam,
+      giamToiDa,
+      dieuKienToiThieu: Number(ma.DonHangToiThieu || 0),
+      thongDiep: '',
+    }, soTienGiamThucTe);
+  }
+
+  private async recalculateOrderPricing(payload: BanGhi, chiTietDauVao: BanGhi[]) {
+    const chiTietDaTinh: BanGhi[] = [];
+    let tamTinh = 0;
+
+    for (const muc of chiTietDauVao) {
+      const [mon] = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon]);
+      if (!mon) {
+        throw new BadRequestException(`Mon ${muc.maMon} khong ton tai.`);
+      }
+
+      const soLuong = Number(muc.soLuong || 0);
+      const donGia = Number(mon.Gia || 0);
+      const thanhTien = soLuong * donGia;
+      tamTinh += thanhTien;
+      chiTietDaTinh.push({
+        ...muc,
+        tenMon: String(mon.TenMon || ''),
+        donGia,
+        soLuong,
+        thanhTien,
+      });
+    }
+
+    const phiShip = Number(payload.phiShip || 0);
+    const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
+    const voucher = await this.layThongTinVoucherApDung(payload.maGiamGia, tamTinh + phiDichVu + phiShip);
+    const pricingSummary = this.taoPricingSummary(tamTinh, phiShip, voucher.soTienGiamThucTe, phiDichVu);
+
+    return { chiTietDaTinh, pricingSummary, voucher };
+  }
+
+  private taoVoucherResponse(payload: BanGhi = {}, soTienGiamThucTe = 0) {
+    return {
+      hopLe: Boolean(payload.maGiamGia || payload.maCode),
+      maGiamGia: String(payload.maGiamGia || payload.maCode || '').trim(),
+      tenGiamGia: String(payload.tenGiamGia || payload.tenCode || '').trim(),
+      loaiGiam: String(payload.loaiGiam || '').trim(),
+      giaTriGiam: Number(payload.giaTriGiam || payload.giaTri || 0),
+      giamToiDa: payload.giamToiDa == null && payload.giaTriToiDa == null ? null : Number(payload.giamToiDa ?? payload.giaTriToiDa),
+      dieuKienToiThieu: Number(payload.dieuKienToiThieu || payload.donHangToiThieu || 0),
+      soTienGiamThucTe: Number(soTienGiamThucTe || 0),
+      thongDiep: String(payload.thongDiep || payload.moTa || '').trim(),
+    };
+  }
+
+  private taoThongTinNhanHang(donHang: BanGhi) {
+    return {
+      loaiDon: String(donHang.loaiDon || donHang.LoaiDon || '').trim(),
+      diaChiGiao: String(donHang.diaChiGiao || donHang.DiaChiGiao || '').trim(),
+      gioLayHang: String(donHang.gioLayHang || donHang.GioLayHang || '').trim(),
+      gioGiao: String(donHang.gioGiao || donHang.GioGiao || '').trim(),
+    };
+  }
+
   async taoDonHang(payload: BanGhi, loaiDon?: string) {
     const maDonHang = String(payload.maDonHang || this.taoMa('DH'));
     const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
     const loaiDonHang = loaiDon || payload.loaiDon || 'TAI_QUAN';
-
-    let tongTien = 0;
-    for (const muc of chiTiet) {
-      const [mon] = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon]);
-      if (!mon) {
-        throw new BadRequestException(`Mon ${muc.maMon} khong ton tai.`);
-      }
-      tongTien += Number(mon.Gia || 0) * Number(muc.soLuong || 0);
-    }
+    const trangThai = payload.trangThai || 'Pending';
+    const { chiTietDaTinh, pricingSummary, voucher } = await this.recalculateOrderPricing(payload, chiTiet);
 
     await this.mysql.thucThi(
       `INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu)
@@ -514,29 +623,66 @@ export class ApiService {
         payload.maDatBan || null,
         loaiDonHang,
         payload.diaChiGiao || null,
-        Number(payload.phiShip || 0),
-        tongTien,
-        payload.trangThai || 'Pending',
+        pricingSummary.phiShip,
+        pricingSummary.tongTien,
+        trangThai,
         nguonTao,
         payload.ghiChu || null,
       ],
     );
 
-    for (const muc of chiTiet) {
-      const [mon] = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon]);
-      const donGia = muc.donGia == null ? Number(mon.Gia || 0) : Number(muc.donGia || 0);
-      const soLuong = Number(muc.soLuong || 0);
+    const chiTietPhanHoi: BanGhi[] = [];
+    for (const muc of chiTietDaTinh) {
+      const maChiTiet = muc.maChiTiet || this.taoMa('CT');
       await this.mysql.thucThi(
         'INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [muc.maChiTiet || this.taoMa('CT'), maDonHang, muc.maMon, soLuong, donGia, soLuong * donGia, muc.ghiChu || null, 'Pending'],
+        [maChiTiet, maDonHang, muc.maMon, muc.soLuong, muc.donGia, muc.thanhTien, muc.ghiChu || null, 'Pending'],
       );
+      chiTietPhanHoi.push({
+        MaChiTiet: maChiTiet,
+        MaMon: muc.maMon,
+        TenMon: muc.tenMon || '',
+        SoLuong: muc.soLuong,
+        DonGia: muc.donGia,
+        ThanhTien: muc.thanhTien,
+        GhiChu: muc.ghiChu || '',
+        TrangThai: 'Pending',
+      });
     }
 
     if (maBan) {
       await this.mysql.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Occupied', maBan]);
     }
 
-    return this.layChiTietDonHang(maDonHang);
+    return this.taoPhanHoi({
+      donHang: {
+        maDonHang,
+        maKH: payload.maKH || null,
+        maBan,
+        maNV: payload.maNV || null,
+        maDatBan: payload.maDatBan || null,
+        tongTien: pricingSummary.tongTien,
+        pricingSummary,
+        voucher,
+        trangThai,
+        ghiChu: payload.ghiChu || '',
+        ngayTao: new Date().toISOString(),
+        loaiDon: loaiDonHang,
+        thongTinNhanHang: this.taoThongTinNhanHang({
+          loaiDon: loaiDonHang,
+          diaChiGiao: payload.diaChiGiao || '',
+          gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
+          gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
+        }),
+        diaChiGiao: payload.diaChiGiao || '',
+        phiShip: pricingSummary.phiShip,
+        tenKhachHang: payload.hoTen || payload.tenKhachHang || '',
+        soDienThoai: payload.soDienThoai || '',
+        email: payload.email || '',
+        diaChiKhachHang: payload.diaChiGiao || '',
+      },
+      chiTiet: chiTietPhanHoi,
+    }, 'Tao don hang thanh cong');
   }
 
   async layDanhSachDonHang() {
@@ -547,25 +693,32 @@ export class ApiService {
        LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
        ORDER BY dh.NgayTao DESC`,
     );
-    const ketQua = await Promise.all(danhSach.map(async (don) => ({
-      maDonHang: don.MaDonHang,
-      maKH: don.MaKH,
-      maBan: don.MaBan || don.MaBanAn,
-      maNV: don.MaNV,
-      maDatBan: don.MaDatBan,
-      tongTien: Number(don.TongTien || 0),
-      trangThai: don.TrangThai,
-      ghiChu: don.GhiChu || '',
-      ngayTao: don.NgayTao,
-      loaiDon: don.LoaiDon,
-      diaChiGiao: don.DiaChiGiao || '',
-      phiShip: Number(don.PhiShip || 0),
-      tenKhachHang: don.TenKH || '',
-      soDienThoai: don.SDT || '',
-      email: don.Email || '',
-      diaChiKhachHang: don.DiaChi || '',
-      chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
-    })));
+    const ketQua = await Promise.all(danhSach.map(async (don) => {
+      const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
+      const pricingSummary = this.taoPricingSummaryTuDuLieuDonHang(don, chiTiet);
+      return {
+        maDonHang: don.MaDonHang,
+        maKH: don.MaKH,
+        maBan: don.MaBan || don.MaBanAn,
+        maNV: don.MaNV,
+        maDatBan: don.MaDatBan,
+        tongTien: Number(don.TongTien || 0),
+        pricingSummary,
+        voucher: this.taoVoucherResponse({}, pricingSummary.giamGia),
+        trangThai: don.TrangThai,
+        ghiChu: don.GhiChu || '',
+        ngayTao: don.NgayTao,
+        loaiDon: don.LoaiDon,
+        thongTinNhanHang: this.taoThongTinNhanHang({ loaiDon: don.LoaiDon, diaChiGiao: don.DiaChiGiao || '' }),
+        diaChiGiao: don.DiaChiGiao || '',
+        phiShip: Number(don.PhiShip || 0),
+        tenKhachHang: don.TenKH || '',
+        soDienThoai: don.SDT || '',
+        email: don.Email || '',
+        diaChiKhachHang: don.DiaChi || '',
+        chiTiet,
+      };
+    }));
 
     return this.taoPhanHoi(ketQua, 'Lay danh sach don hang thanh cong');
   }
@@ -585,6 +738,7 @@ export class ApiService {
     }
 
     const chiTiet = await this.layChiTietDonHangTheoMa(maDonHang);
+    const pricingSummary = this.taoPricingSummaryTuDuLieuDonHang(donHang, chiTiet);
     return this.taoPhanHoi({
       donHang: {
         maDonHang: donHang.MaDonHang,
@@ -593,10 +747,13 @@ export class ApiService {
         maNV: donHang.MaNV,
         maDatBan: donHang.MaDatBan,
         tongTien: Number(donHang.TongTien || 0),
+        pricingSummary,
+        voucher: this.taoVoucherResponse({}, pricingSummary.giamGia),
         trangThai: donHang.TrangThai,
         ghiChu: donHang.GhiChu || '',
         ngayTao: donHang.NgayTao,
         loaiDon: donHang.LoaiDon,
+        thongTinNhanHang: this.taoThongTinNhanHang({ loaiDon: donHang.LoaiDon, diaChiGiao: donHang.DiaChiGiao || '' }),
         diaChiGiao: donHang.DiaChiGiao || '',
         phiShip: Number(donHang.PhiShip || 0),
         tenKhachHang: donHang.TenKH || '',
@@ -773,12 +930,27 @@ export class ApiService {
     if (tongTien < Number(ma.DonHangToiThieu || 0)) {
       throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
     }
+
+    const laPhanTram = String(ma.LoaiGiam || '').toLowerCase() === 'phantram';
+    const giaTriGiam = Number(ma.GiaTri || 0);
+    const giamToiDa = ma.GiaTriToiDa == null ? null : Number(ma.GiaTriToiDa);
+    const soTienGiamTamTinh = laPhanTram ? Math.round((tongTien * giaTriGiam) / 100) : giaTriGiam;
+    const soTienGiamThucTe = giamToiDa == null ? soTienGiamTamTinh : Math.min(soTienGiamTamTinh, giamToiDa);
+
     return this.taoPhanHoi({
+      hopLe: true,
+      maGiamGia: ma.MaCode,
+      tenGiamGia: ma.TenCode,
+      loaiGiam: ma.LoaiGiam,
+      giaTriGiam,
+      giamToiDa,
+      dieuKienToiThieu: Number(ma.DonHangToiThieu || 0),
+      soTienGiamThucTe,
+      thongDiep: '',
       maCode: ma.MaCode,
       tenCode: ma.TenCode,
-      giaTri: Number(ma.GiaTri || 0),
-      loaiGiam: ma.LoaiGiam,
-      giaTriToiDa: ma.GiaTriToiDa == null ? null : Number(ma.GiaTriToiDa),
+      giaTri: giaTriGiam,
+      giaTriToiDa: giamToiDa,
       donHangToiThieu: Number(ma.DonHangToiThieu || 0),
       moTa: '',
     }, 'Kiem tra ma giam gia thanh cong');

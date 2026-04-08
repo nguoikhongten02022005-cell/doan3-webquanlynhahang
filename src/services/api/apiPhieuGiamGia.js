@@ -1,23 +1,27 @@
 import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { chuanHoaKetQuaVoucher } from '../../features/donHang/contracts'
 
 const chuanHoaPhieuGiamGia = (voucher) => {
-  if (!voucher || typeof voucher !== 'object') {
+  const ketQua = chuanHoaKetQuaVoucher(voucher)
+  if (!ketQua.maGiamGia) {
     return null
   }
 
   return {
     ...voucher,
-    code: voucher.maCode || voucher.MaCode,
-    name: voucher.tenCode || voucher.TenCode,
-    description: voucher.moTa || voucher.MoTa || '',
-    discountType: voucher.loaiGiam || voucher.LoaiGiam,
-    discountValue: Number(voucher.giaTri || voucher.GiaTri || 0),
-    minOrderAmount: Number(voucher.donHangToiThieu || voucher.DonHangToiThieu || 0),
-    maxDiscountAmount: voucher.giaTriToiDa == null && voucher.GiaTriToiDa == null ? null : Number(voucher.giaTriToiDa ?? voucher.GiaTriToiDa),
+    ...ketQua,
+    code: ketQua.maGiamGia,
+    name: ketQua.tenGiamGia,
+    description: ketQua.thongDiep,
+    discountType: ketQua.loaiGiam,
+    discountValue: ketQua.giaTriGiam,
+    minOrderAmount: ketQua.dieuKienToiThieu,
+    maxDiscountAmount: ketQua.giamToiDa,
+    discountAmount: ketQua.soTienGiamThucTe,
   }
 }
 
-export const kiemTraPhieuGiamGiaApi = async (code, orderAmount = 0) => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/ma-giam-gia/validate', { maCode: code, tongTien: orderAmount }))
+export const kiemTraPhieuGiamGiaApi = async (code, orderAmount = 0, loaiDon = '') => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/ma-giam-gia/validate', { maCode: code, tongTien: orderAmount, loaiDon }))
   return { ...phanHoi, duLieu: chuanHoaPhieuGiamGia(phanHoi.duLieu) }
 }
