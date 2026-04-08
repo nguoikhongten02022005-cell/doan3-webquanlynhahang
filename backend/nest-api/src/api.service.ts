@@ -746,11 +746,17 @@ export class ApiService {
 
   async taoDanhGia(payload: BanGhi) {
     const maDanhGia = String(payload.maDanhGia || this.taoMa('DG'));
+    const maKH = String(payload.maKH || '').trim();
+    const maDonHang = String(payload.maDonHang || '').trim();
+
+    if (!maKH || !maDonHang) {
+      throw new BadRequestException('Thieu ma khach hang hoac ma don hang de tao danh gia.');
+    }
 
     try {
       await this.mysql.thucThi(
         'INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?)',
-        [maDanhGia, payload.maKH, payload.maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, 'Pending'],
+        [maDanhGia, maKH, maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, 'Pending'],
       );
     } catch (loi) {
       if (loi instanceof ServiceUnavailableException && String(loi.message).includes('Duplicate entry')) {
@@ -759,7 +765,7 @@ export class ApiService {
       throw loi;
     }
 
-    return this.taoPhanHoi({ maDanhGia, ...payload, trangThai: 'Pending' }, 'Tao danh gia thanh cong');
+    return this.taoPhanHoi({ maDanhGia, ...payload, maKH, maDonHang, trangThai: 'Pending' }, 'Tao danh gia thanh cong');
   }
 
   async duyetDanhGia(maDanhGia: string, payload: BanGhi) {

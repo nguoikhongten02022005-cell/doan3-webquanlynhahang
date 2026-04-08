@@ -125,7 +125,20 @@
   text-align: center;
 }
 .xac-thuc-card-demo-only {
-  max-width: 32rem;
+  max-width: 26rem;
+  display: grid;
+  justify-items: center;
+  text-align: center;
+}
+
+.xac-thuc-card-demo-only .ho-so-profile-actions {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+}
+
+.xac-thuc-page-editorial .xac-thuc-card-demo-only {
+  margin-inline: auto;
 }
 
 /* CART PAGE */

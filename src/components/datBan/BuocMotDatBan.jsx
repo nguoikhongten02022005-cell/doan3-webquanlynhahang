@@ -10,7 +10,7 @@ const { Title, Paragraph, Text } = Typography
 
 const MAU_ANTD_DAT_BAN = {
   nutChon: { borderColor: '#ead7c5', background: '#fffaf4', color: '#2b1b14' },
-  nutDangChon: { borderColor: '#d97856', background: '#d97856', color: '#ffffff' },
+  nutDangChon: { borderColor: '#e8664a', background: '#e8664a', color: '#ffffff' },
   nutVoHieu: { borderColor: '#ede5db', background: '#f7f1ea', color: '#b2a79a' },
   canhBao: { borderColor: '#facc15', background: '#fffbeb' },
 }
