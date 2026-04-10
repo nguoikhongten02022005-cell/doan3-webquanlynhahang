@@ -3,7 +3,7 @@ import { DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, Pictur
 import { Alert, Badge, Button, Card, Col, Drawer, Empty, Form, Input, Row, Segmented, Select, Space, Switch, Tag, Typography, Upload } from 'antd'
 import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../constants/danhMucThucDon'
 import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, ANH_DU_PHONG_THUC_DON } from '../../constants/tuyChonThucDon'
-import { taoMonApi, xoaMonApi, capNhatMonApi } from '../../services/api/apiThucDon'
+import { taoMonApi, xoaMonApi, capNhatMonApi, uploadAnhMonApi } from '../../services/api/apiThucDon'
 import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../services/mappers/anhXaThucDon'
 import { phanTichGiaThanhSo } from '../../utils/giaTien'
 
@@ -42,15 +42,6 @@ function taoUploadFileList(imageUrl) {
   return [{ uid: 'dish-image', name: 'dish-image.png', status: 'done', url: imageUrl }]
 }
 
-function docTapTinThanhDataUrl(tapTin) {
-  return new Promise((resolve, reject) => {
-    const boDoc = new FileReader()
-    boDoc.onload = () => resolve(String(boDoc.result || ''))
-    boDoc.onerror = () => reject(new Error('Không thể đọc ảnh món.'))
-    boDoc.readAsDataURL(tapTin)
-  })
-}
-
 function taoTagsMacDinh(mon) {
   const badge = String(mon?.badge ?? '').trim()
   if (!badge || badge === NHAN_MAC_DINH_THUC_DON) return []
@@ -79,6 +70,7 @@ function MonAnTab({ dishes, reloadDishes }) {
   const [danhMucDangLoc, setDanhMucDangLoc] = useState('Tất cả')
   const [searchQuery, setSearchQuery] = useState('')
   const [uploadFileList, setUploadFileList] = useState([])
+  const [dangUploadAnh, setDangUploadAnh] = useState(false)
   const [dishMetaById, setDishMetaById] = useState({})
 
   const sortedDishes = useMemo(() => [...dishes].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0)), [dishes])
@@ -120,13 +112,23 @@ function MonAnTab({ dishes, reloadDishes }) {
 
     if (tapTinDauTien?.originFileObj) {
       try {
-        const duLieuAnhBase64 = await docTapTinThanhDataUrl(tapTinDauTien.originFileObj)
-        const latestFileList = [{ ...tapTinDauTien, url: duLieuAnhBase64, thumbUrl: duLieuAnhBase64, status: 'done' }]
+        setDangUploadAnh(true)
+        setLoiForm('')
+        const { duLieu } = await uploadAnhMonApi(tapTinDauTien.originFileObj)
+        const urlAnh = String(duLieu?.url || '').trim()
+
+        if (!urlAnh) {
+          throw new Error('Không nhận được URL ảnh từ máy chủ.')
+        }
+
+        const latestFileList = [{ ...tapTinDauTien, url: urlAnh, thumbUrl: urlAnh, status: 'done' }]
         setUploadFileList(latestFileList)
-        setFormValues((cur) => ({ ...cur, image: duLieuAnhBase64 }))
+        setFormValues((cur) => ({ ...cur, image: urlAnh }))
         return
       } catch (error) {
-        setLoiForm(error?.message || 'Không thể đọc ảnh món.')
+        setLoiForm(error?.message || 'Không thể tải ảnh món lên máy chủ.')
+      } finally {
+        setDangUploadAnh(false)
       }
     }
 
@@ -299,10 +301,10 @@ function MonAnTab({ dishes, reloadDishes }) {
         <Form id="mon-an-form" layout="vertical" onSubmitCapture={handleSubmit}>
           {loiForm ? <Alert type="error" showIcon title={loiForm} style={{ marginBottom: 16 }} /> : null}
           <Form.Item label="Ảnh món">
-            <Upload accept="image/*" listType="picture-card" maxCount={1} beforeUpload={() => false} fileList={uploadFileList} onChange={handleUploadChange} onRemove={handleRemoveUpload}>
-              {uploadFileList.length >= 1 ? null : <div><PictureOutlined /><div style={{ marginTop: 8 }}>Tải ảnh lên</div></div>}
+            <Upload accept="image/*" listType="picture-card" maxCount={1} beforeUpload={() => false} fileList={uploadFileList} onChange={handleUploadChange} onRemove={handleRemoveUpload} disabled={dangUploadAnh}>
+              {uploadFileList.length >= 1 ? null : <div><PictureOutlined /><div style={{ marginTop: 8 }}>{dangUploadAnh ? 'Đang tải...' : 'Tải ảnh lên'}</div></div>}
             </Upload>
-            <Typography.Text type="secondary">Ảnh được chuyển sang base64 và lưu trực tiếp qua API món ăn hiện tại.</Typography.Text>
+            <Typography.Text type="secondary">Ảnh được upload lên máy chủ và lưu URL ảnh qua API món ăn.</Typography.Text>
           </Form.Item>
           <Form.Item label="Tên món"><Input value={formValues.name} onChange={handleInputChange('name')} /></Form.Item>
           <Form.Item label="Mô tả"><TextArea rows={4} value={formValues.description} onChange={handleInputChange('description')} /></Form.Item>

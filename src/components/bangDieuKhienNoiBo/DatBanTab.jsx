@@ -186,7 +186,13 @@ function DatBanFormCard({
       <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>{subtitle}</Typography.Paragraph>
 
       <Form layout="vertical" onSubmitCapture={onSubmit}>
-        <Card size="small" title="Khách hàng & liên hệ" style={{ marginBottom: 16 }}>
+        <Card size="small" title="Thông tin backend đang hỗ trợ" style={{ marginBottom: 16 }}>
+          <Alert
+            type="info"
+            showIcon
+            message="Biểu mẫu này hiện đã hỗ trợ cả thông tin liên hệ khách, thời gian, số khách, khu vực ưu tiên và ghi chú nội bộ."
+            style={{ marginBottom: 16 }}
+          />
           <Row gutter={12}>
             <Col xs={24} md={12}>
               <Form.Item label="Tên khách">
@@ -203,22 +209,18 @@ function DatBanFormCard({
                 <Input size="middle" type="email" value={formValues.email} onChange={onFieldChange('email')} placeholder="khach@example.com" />
               </Form.Item>
             </Col>
-          </Row>
-        </Card>
-
-        <Card size="small" title="Thời gian & khu vực" style={{ marginBottom: 16 }}>
-          <Row gutter={12}>
             <Col xs={24} md={12}><Form.Item label="Ngày"><Input size="middle" type="date" value={formValues.date} onChange={onFieldChange('date')} /></Form.Item></Col>
             <Col xs={24} md={12}><Form.Item label="Giờ"><Input size="middle" type="time" value={formValues.time} onChange={onFieldChange('time')} /></Form.Item></Col>
             <Col xs={24} md={12}><Form.Item label="Số khách"><InputNumber size="middle" min={1} value={formValues.guests === '' ? null : Number(formValues.guests)} placeholder="Nhập số khách" onChange={(value) => onFieldChange('guests')({ target: { value: value == null ? '' : String(value) } })} className="!w-full" /></Form.Item></Col>
-            <Col xs={24} md={12}><Form.Item label="Khu vực"><Select size="middle" value={formValues.seatingArea} options={seatingAreaOptions} onChange={(value) => onFieldChange('seatingArea')({ target: { value } })} /></Form.Item></Col>
-            {formMode === 'create' ? <Col span={24}><Form.Item label="Trạng thái ban đầu"><Select size="middle" value={formValues.status} options={CREATE_STATUS_OPTIONS.map((status) => ({ value: status, label: HOST_NHAN_TRANG_THAI_DAT_BAN[status] }))} onChange={(value) => onFieldChange('status')({ target: { value } })} /></Form.Item></Col> : null}
+            <Col xs={24} md={12}><Form.Item label="Khu vực ưu tiên"><Select size="middle" value={formValues.seatingArea} options={seatingAreaOptions} onChange={(value) => onFieldChange('seatingArea')({ target: { value } })} /></Form.Item></Col>
+            {formMode === 'create' ? <Col xs={24} md={12}><Form.Item label="Trạng thái ban đầu"><Select size="middle" value={formValues.status} options={CREATE_STATUS_OPTIONS.map((status) => ({ value: status, label: HOST_NHAN_TRANG_THAI_DAT_BAN[status] }))} onChange={(value) => onFieldChange('status')({ target: { value } })} /></Form.Item></Col> : null}
+            <Col span={24}>
+              <Form.Item label="Ghi chú khách"><TextArea rows={3} value={formValues.notes} onChange={onFieldChange('notes')} placeholder="Yêu cầu bàn gần cửa sổ, có trẻ nhỏ..." /></Form.Item>
+            </Col>
+            <Col span={24}>
+              <Form.Item label="Ghi chú nội bộ"><TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." /></Form.Item>
+            </Col>
           </Row>
-        </Card>
-
-        <Card size="small" title="Thông tin bổ sung" style={{ marginBottom: 16 }}>
-          <Form.Item label="Ghi chú khách"><TextArea rows={3} value={formValues.notes} onChange={onFieldChange('notes')} placeholder="Yêu cầu bàn gần cửa sổ, có trẻ nhỏ..." /></Form.Item>
-          <Form.Item label="Ghi chú nội bộ"><TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." /></Form.Item>
         </Card>
 
         {formError ? <Alert type="error" showIcon title={formError} style={{ marginBottom: 16 }} /> : null}
@@ -576,7 +578,6 @@ function DatBanTab({
     }
 
     const duLieuGuiDi = {
-      ...formValues,
       name: formValues.name.trim(),
       phone: formValues.phone.trim(),
       email: formValues.email.trim(),
@@ -614,7 +615,7 @@ function DatBanTab({
       seatingArea: booking.seatingArea || 'KHONG_UU_TIEN',
       notes: booking.notes || '',
       internalNote: booking.internalNote || '',
-      status: 'DA_XAC_NHAN',
+      status: booking.status || 'DA_XAC_NHAN',
     })
     setFormError('')
   }

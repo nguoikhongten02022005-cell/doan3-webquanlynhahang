@@ -1,6 +1,5 @@
 import { useMemo } from 'react'
 import { useDuLieuBangDieuKhienNoiBo } from '../bangDieuKhienNoiBo/useDuLieuBangDieuKhienNoiBo'
-import { ADMIN_NOTIFICATION_COUNT } from './mockData'
 import { taoDuLieuThongKeDoanhThu } from './thongKeAdmin'
 import { useDashboardData } from './useDashboardData'
 
@@ -12,7 +11,7 @@ export const useAdminData = () => {
     bookings: duLieuNoiBo.danhSachDatBanChoXuLy.length,
     orders: duLieuNoiBo.danhSachDonHangDangMo.length,
     reviews: duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
-    notifications: ADMIN_NOTIFICATION_COUNT,
+    notifications: duLieuNoiBo.danhSachDatBanChoXuLy.length + duLieuNoiBo.danhSachDonHangDangMo.length + duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
   }), [duLieuNoiBo.danhSachDatBanChoXuLy.length, duLieuNoiBo.danhSachDonHangDangMo.length, duLieuNoiBo.danhSachDanhGiaChoDuyet.length])
 
   const revenueStats = useMemo(

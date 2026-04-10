@@ -81,11 +81,9 @@ function DangNhapNoiBoPage() {
       <Card className="xac-thuc-card xac-thuc-card-antd" variant="borderless">
             <Title level={1} className="xac-thuc-title">Đăng nhập</Title>
             <Paragraph className="xac-thuc-subtitle">
-              {backendMode
-                ? 'Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.'
-                : 'Ứng dụng đang ở chế độ demo. Hãy bật backend mode để dùng tài khoản nội bộ thật.'}
+              Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.
             </Paragraph>
-            {!backendMode ? <Alert type="info" showIcon title="Chế độ demo chỉ hỗ trợ tài khoản minh họa nội bộ được cấu hình sẵn." style={{ marginBottom: 16 }} /> : null}
+            {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa bật backend mode. Hãy cấu hình VITE_USE_BACKEND=true để đăng nhập nội bộ bằng API thật." style={{ marginBottom: 16 }} /> : null}
 
             {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." style={{ marginBottom: 16 }} /> : null}
             {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} style={{ marginBottom: 16 }} /> : null}

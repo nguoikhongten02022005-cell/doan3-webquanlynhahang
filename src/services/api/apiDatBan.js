@@ -35,6 +35,12 @@ const chuanHoaDatBan = (booking) => {
     time: booking.gioDat || booking.GioDat,
     endTime: booking.gioKetThuc || booking.GioKetThuc || '',
     note: booking.ghiChu || booking.GhiChu || '',
+    notes: booking.ghiChu || booking.GhiChu || '',
+    name: booking.tenKhachDatBan || booking.TenKhachDatBan || '',
+    phone: booking.sdtDatBan || booking.SDTDatBan || '',
+    email: booking.emailDatBan || booking.EmailDatBan || '',
+    seatingArea: booking.khuVucUuTien || booking.KhuVucUuTien || 'KHONG_UU_TIEN',
+    internalNote: booking.ghiChuNoiBo || booking.GhiChuNoiBo || '',
     status: booking.trangThai || booking.TrangThai || '',
     tableCode: booking.maBan || booking.MaBan || '',
     customerCode: booking.maKH || booking.MaKH || '',
@@ -56,11 +62,16 @@ const chuanHoaDatBanPayload = (payload = {}) => ({
   maKH: payload.maKH || payload.customerCode || 'KH001',
   maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
   maNV: payload.maNV || payload.staffCode || 'NV002',
+  tenKhachDatBan: payload.tenKhachDatBan || payload.name || '',
+  sdtDatBan: payload.sdtDatBan || payload.phone || '',
+  emailDatBan: payload.emailDatBan || payload.email || '',
   ngayDat: chuanHoaNgayDat(payload.ngayDat || payload.date || ''),
   gioDat: payload.gioDat || payload.time || '',
   gioKetThuc: payload.gioKetThuc || payload.endTime || null,
   soNguoi: Number(payload.soNguoi || payload.guests || 0),
   ghiChu: payload.ghiChu || payload.notes || '',
+  khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
+  ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
 })
 
 export const layDanhSachDatBanApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/dat-ban')))
@@ -77,7 +88,7 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
 }
 export const taoDatBanApi = async (payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/dat-ban', chuanHoaDatBanPayload(payload))))
 export const taoDatBanNoiBoApi = async (payload) => taoDatBanApi(payload)
-export const capNhatDatBanApi = async (id, payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: payload?.trangThai || payload?.status || 'Confirmed' })))
+export const capNhatDatBanApi = async (id, payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}`, chuanHoaDatBanPayload({ ...payload, maDatBan: id }))))
 export const capNhatTrangThaiDatBanApi = async (id, status) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: status })))
 export const ganBanChoDatBanApi = async (id, danhSachIdBan = []) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/assign-tables`, { danhSachMaBan: danhSachIdBan })))
 export const huyDatBanApi = async (id) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: 'Cancelled' })))

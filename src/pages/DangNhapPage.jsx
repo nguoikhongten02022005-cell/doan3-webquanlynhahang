@@ -65,12 +65,10 @@ function DangNhapPage() {
       <Card className="xac-thuc-card xac-thuc-card-antd" variant="borderless">
         <Title level={1} className="xac-thuc-title">Đăng nhập</Title>
         <Paragraph className="xac-thuc-subtitle">
-          {backendMode
-            ? 'Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.'
-            : 'Đăng nhập bằng tài khoản demo để trải nghiệm nhanh giao diện khách hàng.'}
+          Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.
         </Paragraph>
 
-        {!backendMode ? <Alert type="info" showIcon title="Ứng dụng đang ở chế độ demo. Vui lòng dùng tài khoản minh họa đã được cấu hình sẵn." style={{ marginBottom: 16 }} /> : null}
+        {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa bật backend mode. Hãy cấu hình VITE_USE_BACKEND=true để đăng nhập bằng API thật." style={{ marginBottom: 16 }} /> : null}
 
         <Form
           form={form}

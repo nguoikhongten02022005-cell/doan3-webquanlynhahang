@@ -1,5 +1,30 @@
 import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
 
+const chuanHoaUrlAnhMon = (duongDanAnh) => {
+  const urlAnh = String(duongDanAnh || '').trim()
+  if (!urlAnh) return ''
+  if (urlAnh.startsWith('http://') || urlAnh.startsWith('https://') || urlAnh.startsWith('data:')) return urlAnh
+
+  const apiBaseUrl = String(import.meta.env.VITE_API_BASE_URL || '').trim()
+  if (!apiBaseUrl) return urlAnh
+
+  const originApi = new URL(apiBaseUrl).origin
+  return urlAnh.startsWith('/') ? `${originApi}${urlAnh}` : `${originApi}/${urlAnh}`
+}
+
+export const uploadAnhMonApi = async (tapTin) => {
+  const formData = new FormData()
+  formData.append('file', tapTin)
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/upload/mon-an', formData))
+  return {
+    ...phanHoi,
+    duLieu: {
+      ...phanHoi.duLieu,
+      url: chuanHoaUrlAnhMon(phanHoi.duLieu?.url),
+    },
+  }
+}
+
 const chuanHoaMon = (mon) => {
   if (!mon || typeof mon !== 'object') return null
   return {
@@ -9,7 +34,7 @@ const chuanHoaMon = (mon) => {
     gia: Number(mon.gia ?? mon.Gia ?? 0),
     danhMuc: mon.maDanhMuc || mon.MaDanhMuc || mon.danhMuc || '',
     moTa: mon.moTa || mon.MoTa || '',
-    hinhAnh: mon.hinhAnh || mon.HinhAnh || '',
+    hinhAnh: chuanHoaUrlAnhMon(mon.hinhAnh || mon.HinhAnh || ''),
     thoiGianChuanBi: Number(mon.thoiGianChuanBi ?? mon.ThoiGianChuanBi ?? 0),
     trangThai: mon.trangThai || mon.TrangThai || '',
   }

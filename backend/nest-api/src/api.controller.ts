@@ -1,5 +1,23 @@
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put, Query } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put, Query, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { FileInterceptor } from '@nestjs/platform-express';
+import { diskStorage } from 'multer';
+import { extname } from 'path';
 import { ApiService } from './api.service';
+
+const taoTenTapTinAnhMon = (_req: unknown, tapTin: { originalname?: string }, callback: (error: Error | null, filename: string) => void) => {
+  const phanMoRong = extname(tapTin.originalname || '').toLowerCase() || '.png';
+  const tenTapTin = `mon-an-${Date.now()}-${Math.round(Math.random() * 1e9)}${phanMoRong}`;
+  callback(null, tenTapTin);
+};
+
+const boLocTapTinAnh = (_req: unknown, tapTin: { mimetype?: string }, callback: (error: Error | null, acceptFile: boolean) => void) => {
+  if (!tapTin.mimetype?.startsWith('image/')) {
+    callback(new Error('Chi ho tro upload tep hinh anh.'), false);
+    return;
+  }
+
+  callback(null, true);
+};
 
 @Controller('api')
 export class ApiController {
@@ -48,6 +66,24 @@ export class ApiController {
   @Get('thuc-don')
   layThucDon() {
     return this.apiService.layThucDon();
+  }
+
+  @Post('upload/mon-an')
+  @UseInterceptors(FileInterceptor('file', {
+    storage: diskStorage({
+      destination: 'uploads/mon-an',
+      filename: taoTenTapTinAnhMon,
+    }),
+    fileFilter: boLocTapTinAnh,
+    limits: {
+      fileSize: 5 * 1024 * 1024,
+    },
+  }))
+  uploadAnhMon(@UploadedFile() tapTin?: { filename?: string }) {
+    return this.apiService.taoPhanHoi({
+      url: tapTin?.filename ? `/uploads/mon-an/${tapTin.filename}` : '',
+      tenTep: tapTin?.filename || '',
+    }, 'Upload anh mon thanh cong');
   }
 
   @Post('thuc-don')
@@ -138,6 +174,11 @@ export class ApiController {
   @Get('dat-ban/availability')
   layKhaDungDatBan(@Query() query: Record<string, unknown>) {
     return this.apiService.layKhaDungDatBan(query);
+  }
+
+  @Patch('dat-ban/:maDatBan')
+  capNhatDatBan(@Param('maDatBan') maDatBan: string, @Body() body: Record<string, unknown>) {
+    return this.apiService.capNhatDatBan(maDatBan, body);
   }
 
   @Patch('dat-ban/:maDatBan/status')

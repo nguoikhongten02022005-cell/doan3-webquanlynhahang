@@ -138,6 +138,28 @@ export class ApiService {
     return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
   }
 
+  private chuyenDatBanSangResponse(datBan: BanGhi) {
+    return {
+      maDatBan: datBan.MaDatBan,
+      maKH: datBan.MaKH,
+      maBan: datBan.MaBan,
+      maNV: datBan.MaNV,
+      tenKhachDatBan: datBan.TenKhachDatBan || '',
+      sdtDatBan: datBan.SDTDatBan || '',
+      emailDatBan: datBan.EmailDatBan || '',
+      ngayDat: datBan.NgayDat,
+      gioDat: datBan.GioDat,
+      gioKetThuc: datBan.GioKetThuc,
+      soNguoi: Number(datBan.SoNguoi || 0),
+      ghiChu: datBan.GhiChu || '',
+      khuVucUuTien: datBan.KhuVucUuTien || 'KHONG_UU_TIEN',
+      ghiChuNoiBo: datBan.GhiChuNoiBo || '',
+      trangThai: datBan.TrangThai,
+      ngayTao: datBan.NgayTao,
+      ngayCapNhat: datBan.NgayCapNhat,
+    };
+  }
+
   private chuanHoaChuoiKhongDau(giaTri: string) {
     return String(giaTri || '')
       .normalize('NFD')
@@ -916,47 +938,38 @@ export class ApiService {
 
   async layDanhSachDatBan() {
     const danhSach = await this.mysql.truyVan('SELECT * FROM DatBan ORDER BY NgayTao DESC');
-    return this.taoPhanHoi(danhSach.map((datBan) => ({
-      maDatBan: datBan.MaDatBan,
-      maKH: datBan.MaKH,
-      maBan: datBan.MaBan,
-      maNV: datBan.MaNV,
-      ngayDat: datBan.NgayDat,
-      gioDat: datBan.GioDat,
-      gioKetThuc: datBan.GioKetThuc,
-      soNguoi: Number(datBan.SoNguoi || 0),
-      ghiChu: datBan.GhiChu || '',
-      trangThai: datBan.TrangThai,
-      ngayTao: datBan.NgayTao,
-      ngayCapNhat: datBan.NgayCapNhat,
-    })), 'Lay danh sach dat ban thanh cong');
+    return this.taoPhanHoi(danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)), 'Lay danh sach dat ban thanh cong');
   }
 
   async layLichSuDatBan(maKh: string) {
     const danhSach = await this.mysql.truyVan('SELECT * FROM DatBan WHERE MaKH = ? ORDER BY NgayTao DESC', [maKh]);
-    return this.taoPhanHoi(danhSach.map((datBan) => ({
-      maDatBan: datBan.MaDatBan,
-      maKH: datBan.MaKH,
-      maBan: datBan.MaBan,
-      maNV: datBan.MaNV,
-      ngayDat: datBan.NgayDat,
-      gioDat: datBan.GioDat,
-      gioKetThuc: datBan.GioKetThuc,
-      soNguoi: Number(datBan.SoNguoi || 0),
-      ghiChu: datBan.GhiChu || '',
-      trangThai: datBan.TrangThai,
-      ngayTao: datBan.NgayTao,
-      ngayCapNhat: datBan.NgayCapNhat,
-    })), 'Lay lich su dat ban thanh cong');
+    return this.taoPhanHoi(danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)), 'Lay lich su dat ban thanh cong');
   }
 
   async taoDatBan(payload: BanGhi) {
     await this.mysql.thucThi(
-      `INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-      [payload.maDatBan, payload.maKH || null, payload.maBan || null, payload.maNV || null, payload.ngayDat, payload.gioDat, payload.gioKetThuc || null, Number(payload.soNguoi || 0), payload.ghiChu || null, 'Pending'],
+      `INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo, TrangThai)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      [
+        payload.maDatBan,
+        payload.maKH || null,
+        payload.maBan || null,
+        payload.maNV || null,
+        payload.tenKhachDatBan || null,
+        payload.sdtDatBan || null,
+        payload.emailDatBan || null,
+        payload.ngayDat,
+        payload.gioDat,
+        payload.gioKetThuc || null,
+        Number(payload.soNguoi || 0),
+        payload.ghiChu || null,
+        payload.khuVucUuTien || null,
+        payload.ghiChuNoiBo || null,
+        'Pending',
+      ],
     );
-    return this.taoPhanHoi(payload, 'Tao dat ban thanh cong');
+    const [datBanDaTao] = await this.mysql.truyVan('SELECT * FROM DatBan WHERE MaDatBan = ? LIMIT 1', [payload.maDatBan]);
+    return this.taoPhanHoi(this.chuyenDatBanSangResponse(datBanDaTao || payload), 'Tao dat ban thanh cong');
   }
 
   async layKhaDungDatBan(query: BanGhi) {
@@ -1025,23 +1038,54 @@ export class ApiService {
     }, 'Lay kha dung dat ban thanh cong');
   }
 
+  async capNhatDatBan(maDatBan: string, payload: BanGhi) {
+    const [datBanHienTai] = await this.mysql.truyVan('SELECT * FROM DatBan WHERE MaDatBan = ? LIMIT 1', [maDatBan]);
+    if (!datBanHienTai) {
+      throw new NotFoundException('Khong tim thay dat ban.');
+    }
+
+    const maKH = payload.maKH === undefined ? datBanHienTai.MaKH : (payload.maKH || null);
+    const maBan = payload.maBan === undefined ? datBanHienTai.MaBan : (payload.maBan || null);
+    const maNV = payload.maNV === undefined ? datBanHienTai.MaNV : (payload.maNV || null);
+    const tenKhachDatBan = payload.tenKhachDatBan === undefined ? datBanHienTai.TenKhachDatBan : (payload.tenKhachDatBan ? String(payload.tenKhachDatBan).trim() : null);
+    const sdtDatBan = payload.sdtDatBan === undefined ? datBanHienTai.SDTDatBan : (payload.sdtDatBan ? String(payload.sdtDatBan).trim() : null);
+    const emailDatBan = payload.emailDatBan === undefined ? datBanHienTai.EmailDatBan : (payload.emailDatBan ? String(payload.emailDatBan).trim() : null);
+    const ngayDat = payload.ngayDat === undefined ? datBanHienTai.NgayDat : String(payload.ngayDat || '').trim();
+    const gioDat = payload.gioDat === undefined ? datBanHienTai.GioDat : String(payload.gioDat || '').trim();
+    const gioKetThuc = payload.gioKetThuc === undefined ? datBanHienTai.GioKetThuc : (payload.gioKetThuc ? String(payload.gioKetThuc).trim() : null);
+    const soNguoi = payload.soNguoi === undefined ? Number(datBanHienTai.SoNguoi || 0) : Number(payload.soNguoi || 0);
+    const ghiChu = payload.ghiChu === undefined ? datBanHienTai.GhiChu : (payload.ghiChu ? String(payload.ghiChu).trim() : null);
+    const khuVucUuTien = payload.khuVucUuTien === undefined ? datBanHienTai.KhuVucUuTien : (payload.khuVucUuTien ? String(payload.khuVucUuTien).trim() : null);
+    const ghiChuNoiBo = payload.ghiChuNoiBo === undefined ? datBanHienTai.GhiChuNoiBo : (payload.ghiChuNoiBo ? String(payload.ghiChuNoiBo).trim() : null);
+    const trangThai = payload.trangThai === undefined ? datBanHienTai.TrangThai : String(payload.trangThai || '').trim();
+
+    if (!ngayDat) {
+      throw new BadRequestException('Ngay dat la bat buoc.');
+    }
+
+    if (!gioDat) {
+      throw new BadRequestException('Gio dat la bat buoc.');
+    }
+
+    if (!Number.isFinite(soNguoi) || soNguoi <= 0) {
+      throw new BadRequestException('So nguoi phai lon hon 0.');
+    }
+
+    await this.mysql.thucThi(
+      `UPDATE DatBan
+       SET MaKH = ?, MaBan = ?, MaNV = ?, TenKhachDatBan = ?, SDTDatBan = ?, EmailDatBan = ?, NgayDat = ?, GioDat = ?, GioKetThuc = ?, SoNguoi = ?, GhiChu = ?, KhuVucUuTien = ?, GhiChuNoiBo = ?, TrangThai = ?
+       WHERE MaDatBan = ?`,
+      [maKH, maBan, maNV, tenKhachDatBan, sdtDatBan, emailDatBan, ngayDat, gioDat, gioKetThuc, soNguoi, ghiChu, khuVucUuTien, ghiChuNoiBo, trangThai || datBanHienTai.TrangThai, maDatBan],
+    );
+
+    const [datBanDaCapNhat] = await this.mysql.truyVan('SELECT * FROM DatBan WHERE MaDatBan = ? LIMIT 1', [maDatBan]);
+    return this.taoPhanHoi(this.chuyenDatBanSangResponse(datBanDaCapNhat), 'Cap nhat dat ban thanh cong');
+  }
+
   async capNhatTrangThaiDatBan(maDatBan: string, trangThai: string) {
     await this.mysql.thucThi('UPDATE DatBan SET TrangThai = ? WHERE MaDatBan = ?', [trangThai, maDatBan]);
     const [datBan] = await this.mysql.truyVan('SELECT * FROM DatBan WHERE MaDatBan = ? LIMIT 1', [maDatBan]);
-    return this.taoPhanHoi({
-      maDatBan: datBan.MaDatBan,
-      maKH: datBan.MaKH,
-      maBan: datBan.MaBan,
-      maNV: datBan.MaNV,
-      ngayDat: datBan.NgayDat,
-      gioDat: datBan.GioDat,
-      gioKetThuc: datBan.GioKetThuc,
-      soNguoi: Number(datBan.SoNguoi || 0),
-      ghiChu: datBan.GhiChu || '',
-      trangThai: datBan.TrangThai,
-      ngayTao: datBan.NgayTao,
-      ngayCapNhat: datBan.NgayCapNhat,
-    }, 'Cap nhat dat ban thanh cong');
+    return this.taoPhanHoi(this.chuyenDatBanSangResponse(datBan), 'Cap nhat dat ban thanh cong');
   }
 
   async ganBanChoDatBan(maDatBan: string, payload: BanGhi) {
@@ -1192,7 +1236,8 @@ export class ApiService {
         throw new ConflictException('Khach hang da danh gia don hang nay roi.');
       }
 
-      if (String(loi?.message || '').includes('HinhAnh') || String(loi?.code || '').includes('ER_BAD_FIELD_ERROR')) {
+      const loiDangBang = loi as { message?: string; code?: string };
+      if (String(loiDangBang.message || '').includes('HinhAnh') || String(loiDangBang.code || '').includes('ER_BAD_FIELD_ERROR')) {
         try {
           await this.mysql.thucThi('ALTER TABLE DanhGia ADD COLUMN IF NOT EXISTS HinhAnh LONGTEXT NULL');
           await this.mysql.thucThi(

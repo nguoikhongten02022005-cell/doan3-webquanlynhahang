@@ -75,11 +75,9 @@ function DangKyPage() {
       <div className="xac-thuc-card">
         <h1 className="xac-thuc-title">Đăng ký tài khoản</h1>
         <p className="xac-thuc-subtitle">
-          {backendMode
-            ? 'Tạo tài khoản khách hàng để đặt bàn, theo dõi đơn và lưu thông tin cá nhân.'
-            : 'Chế độ demo hiện không hỗ trợ đăng ký tài khoản khách hàng mới.'}
+          Tạo tài khoản khách hàng để đặt bàn, theo dõi đơn và lưu thông tin cá nhân.
         </p>
-        {!backendMode ? <Alert type="info" showIcon message="Ứng dụng đang ở chế độ demo. Hãy bật backend mode để dùng đăng ký thật." style={{ marginBottom: 16 }} /> : null}
+        {!backendMode ? <Alert type="warning" showIcon message="Ứng dụng chưa bật backend mode. Hãy cấu hình VITE_USE_BACKEND=true để đăng ký bằng API thật." style={{ marginBottom: 16 }} /> : null}
 
         <form onSubmit={handleSubmit} className="xac-thuc-form">
           <div className="nhom-truong">

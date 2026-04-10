@@ -1,5 +1,7 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { ServeStaticModule } from '@nestjs/serve-static';
+import { join } from 'path';
 import { ApiController } from './api.controller';
 import { ApiService } from './api.service';
 import { BootstrapService } from './bootstrap.service';
@@ -13,6 +15,10 @@ const tapTinMoiTruong = `.env.${moiTruong}`;
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: [tapTinMoiTruong, '.env'],
+    }),
+    ServeStaticModule.forRoot({
+      rootPath: join(process.cwd(), 'uploads'),
+      serveRoot: '/uploads',
     }),
   ],
   controllers: [ApiController],

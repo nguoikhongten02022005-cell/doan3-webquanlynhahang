@@ -106,11 +106,16 @@ export class BootstrapService {
         MaKH VARCHAR(50),
         MaBan VARCHAR(50),
         MaNV VARCHAR(50),
+        TenKhachDatBan VARCHAR(100),
+        SDTDatBan VARCHAR(20),
+        EmailDatBan VARCHAR(100),
         NgayDat DATE NOT NULL,
         GioDat TIME NOT NULL,
         GioKetThuc TIME,
         SoNguoi INT NOT NULL,
         GhiChu VARCHAR(500),
+        KhuVucUuTien VARCHAR(50),
+        GhiChuNoiBo VARCHAR(500),
         TrangThai ENUM('Pending','Confirmed','Cancelled','NoShow','Completed') NOT NULL DEFAULT 'Pending',
         NgayTao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
         NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
@@ -118,6 +123,11 @@ export class BootstrapService {
         CONSTRAINT FK_DatBan_Ban FOREIGN KEY (MaBan) REFERENCES Ban(MaBan) ON DELETE SET NULL
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
     `);
+    await this.mysql.thucThi('ALTER TABLE DatBan ADD COLUMN IF NOT EXISTS TenKhachDatBan VARCHAR(100) NULL');
+    await this.mysql.thucThi('ALTER TABLE DatBan ADD COLUMN IF NOT EXISTS SDTDatBan VARCHAR(20) NULL');
+    await this.mysql.thucThi('ALTER TABLE DatBan ADD COLUMN IF NOT EXISTS EmailDatBan VARCHAR(100) NULL');
+    await this.mysql.thucThi('ALTER TABLE DatBan ADD COLUMN IF NOT EXISTS KhuVucUuTien VARCHAR(50) NULL');
+    await this.mysql.thucThi('ALTER TABLE DatBan ADD COLUMN IF NOT EXISTS GhiChuNoiBo VARCHAR(500) NULL');
 
     await this.mysql.thucThi(`
       CREATE TABLE IF NOT EXISTS DonHang (

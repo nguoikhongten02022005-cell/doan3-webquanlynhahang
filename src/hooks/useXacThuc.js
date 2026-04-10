@@ -19,12 +19,6 @@ import {
   luuPhienXacThuc,
   luuNguoiDungHienTai,
 } from '../services/dichVuXacThuc'
-import {
-  TAI_KHOAN_KHACH_HANG_DEMO,
-  laMaXacThucDemo,
-  laThongTinDangNhapKhachDemo,
-  timTaiKhoanNoiBoDemo,
-} from '../constants/xacThucDemo'
 
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
@@ -65,12 +59,6 @@ function useXacThucState() {
 
       if (!maXacThuc) {
         setNguoiDungHienTai(null)
-        setIsAuthBootstrapping(false)
-        return
-      }
-
-      if (laMaXacThucDemo(maXacThuc)) {
-        dongBoNguoiDungHienTai()
         setIsAuthBootstrapping(false)
         return
       }
@@ -155,111 +143,60 @@ function useXacThucState() {
   }, [])
 
   const dangNhap = useCallback(async (identifier, password) => {
-    if (coSuDungMayChu()) {
-      return dangNhapBangApi(
-        dangNhapApi,
-          identifier,
-          password,
-        'Đăng nhập thất bại.',
-      )
-    }
-
-    if (laThongTinDangNhapKhachDemo(identifier, password)) {
-      luuPhienXacThuc({
-        user: TAI_KHOAN_KHACH_HANG_DEMO.user,
-        accessToken: TAI_KHOAN_KHACH_HANG_DEMO.accessToken,
-      })
-      setNguoiDungHienTai(TAI_KHOAN_KHACH_HANG_DEMO.user)
-
-      return {
-        success: true,
-        user: TAI_KHOAN_KHACH_HANG_DEMO.user,
-      }
-    }
-
-    return {
-      success: false,
-      error: 'Vui lòng dùng tài khoản demo để minh họa đăng nhập khách hàng.',
-    }
+    return dangNhapBangApi(
+      dangNhapApi,
+      identifier,
+      password,
+      'Đăng nhập thất bại.',
+    )
   }, [dangNhapBangApi])
 
   const dangNhapNoiBo = useCallback(async (identifier, password) => {
-    if (coSuDungMayChu()) {
-      return dangNhapBangApi(
-        dangNhapNoiBoApi,
-          identifier,
-          password,
-        'Đăng nhập nội bộ thất bại.',
-      )
-    }
-
-    const taiKhoanDemo = timTaiKhoanNoiBoDemo(identifier, password)
-
-    if (taiKhoanDemo) {
-      luuPhienXacThuc({
-        user: taiKhoanDemo.user,
-        accessToken: taiKhoanDemo.accessToken,
-      })
-      setNguoiDungHienTai(taiKhoanDemo.user)
-
-      return {
-        success: true,
-        user: taiKhoanDemo.user,
-      }
-    }
-
-    return {
-      success: false,
-      error: 'Sai tài khoản demo nội bộ. Hãy dùng tài khoản admin hoặc nhân viên được hiển thị trên form đăng nhập.',
-    }
+    return dangNhapBangApi(
+      dangNhapNoiBoApi,
+      identifier,
+      password,
+      'Đăng nhập nội bộ thất bại.',
+    )
   }, [dangNhapBangApi])
 
   const dangKy = useCallback(async (payload) => {
-    if (coSuDungMayChu()) {
-      try {
-        const { duLieu } = await dangKyApi(payload)
-        const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
-        const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
+    try {
+      const { duLieu } = await dangKyApi(payload)
+      const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
+      const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
 
-        if (!nguoiDung || !accessToken) {
-          xoaPhienXacThuc()
-          return {
-            success: false,
-            error: 'Đăng ký thất bại.',
-          }
-        }
-
-        luuPhienXacThuc({
-          user: nguoiDung,
-          accessToken,
-        })
-
-        const nguoiDungDaLuu = layNguoiDungHienTai()
-        setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
-
-        return {
-          success: true,
-          user: nguoiDungDaLuu || nguoiDung,
-        }
-      } catch (error) {
+      if (!nguoiDung || !accessToken) {
         xoaPhienXacThuc()
         return {
           success: false,
-          error: error?.message || 'Đăng ký thất bại.',
+          error: 'Đăng ký thất bại.',
         }
       }
-    }
 
-    return {
-      success: false,
-      error: 'Đăng ký khách hàng đã được tắt trong chế độ demo.',
+      luuPhienXacThuc({
+        user: nguoiDung,
+        accessToken,
+      })
+
+      const nguoiDungDaLuu = layNguoiDungHienTai()
+      setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
+
+      return {
+        success: true,
+        user: nguoiDungDaLuu || nguoiDung,
+      }
+    } catch (error) {
+      xoaPhienXacThuc()
+      return {
+        success: false,
+        error: error?.message || 'Đăng ký thất bại.',
+      }
     }
   }, [])
 
   const dangXuat = useCallback(async () => {
-    const maXacThuc = layMaXacThuc()
-
-    if (coSuDungMayChu() && !laMaXacThucDemo(maXacThuc)) {
+    if (coSuDungMayChu()) {
       try {
         await dangXuatApi()
       } catch {

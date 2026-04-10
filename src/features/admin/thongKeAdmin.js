@@ -1,6 +1,5 @@
 import { DANH_SACH_MON } from '../../data/duLieuThucDon'
 import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../../constants/danhMucThucDon'
-import { ADMIN_REVENUE_SERIES } from './mockData'
 
 const pad = (value) => String(value).padStart(2, '0')
 
@@ -95,7 +94,6 @@ const filterBookingsByTimeRange = (bookings, timeRange) => {
 
 const buildRevenueSeries = (orders = []) => {
   const today = taoMocBatDauNgay(new Date())
-  const fallbackSeries = ADMIN_REVENUE_SERIES.map((item) => item.revenue)
 
   return Array.from({ length: 7 }, (_, index) => {
     const day = new Date(today)
@@ -109,7 +107,7 @@ const buildRevenueSeries = (orders = []) => {
 
     return {
       label: `${pad(day.getDate())}/${pad(day.getMonth() + 1)}`,
-      revenue: revenueFromOrders > 0 ? revenueFromOrders : fallbackSeries[index],
+      revenue: revenueFromOrders,
     }
   })
 }
@@ -182,6 +180,13 @@ const buildCategoryShares = (orders = []) => {
     percent: totalRevenue > 0 ? Math.round(((categoryRevenueMap.get(category) || 0) / totalRevenue) * 100) : 0,
   }))
 }
+
+export const ADMIN_THONG_KE_TIME_RANGE_OPTIONS = Object.freeze([
+  { key: 'today', label: 'Hôm nay' },
+  { key: 'last7Days', label: '7 ngày' },
+  { key: 'last30Days', label: '30 ngày' },
+  { key: 'thisMonth', label: 'Tháng này' },
+])
 
 export const taoDuLieuThongKeDoanhThu = ({ orders = [], bookings = [], timeRange = 'today' } = {}) => {
   const filteredOrders = filterOrdersByTimeRange(orders, timeRange)
