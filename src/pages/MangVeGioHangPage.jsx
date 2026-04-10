@@ -4,19 +4,14 @@ import { useGioHangMangVe } from '../context/GioHangMangVeContext'
 import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { layJsonLuuTru, datJsonLuuTru } from '../services/dichVuLuuTru'
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { xoaPhieuGiamGiaDaApDung as clearStoredVoucher, layPhieuGiamGiaDaApDung as getStoredVoucher, luuPhieuGiamGiaDaApDung as saveVoucher } from '../services/dichVuPhieuGiamGia'
+import { xoaPhieuGiamGiaDaApDung as clearStoredVoucher, layPhieuGiamGiaDaApDung as getStoredVoucher, luuPhieuGiamGiaDaApDung as saveVoucher, tinhSoTienGiamTheoVoucher } from '../services/dichVuPhieuGiamGia'
+import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
+import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../constants/phieuGiamGia'
 
-const VOUCHER_MOCK_DATA = Object.freeze({ SUMMER30: 30, WELCOME10: 10, FREESHIP: 20 })
 const DANH_SACH_GIO_LAY = ['10:30', '11:00', '11:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00']
 const DANH_SACH_GIO_GIAO = ['10:00', '10:30', '11:00', '11:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30']
-const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.ceil((tamTinh * 0.05) / 1000) * 1000 : 0)
+const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 const PHI_SHIP_CO_DINH = 30000
-const tinhSoTienGiam = (voucher, tamTinh) => {
-  if (!voucher) return 0
-  const phanTramGiam = Number(voucher.discountPercent || 0)
-  const soTienGiamTamTinh = phanTramGiam > 0 ? Math.round((tamTinh * phanTramGiam) / 100) : Number(voucher.amount || 0)
-  return Math.min(Math.max(0, soTienGiamTamTinh), tamTinh)
-}
 
 function MangVeGioHangPage() {
   const navigate = useNavigate()
@@ -29,12 +24,14 @@ function MangVeGioHangPage() {
   const [maVoucherNhap, setMaVoucherNhap] = useState('')
   const [voucherDaApDung, setVoucherDaApDung] = useState(null)
   const [loiVoucher, setLoiVoucher] = useState('')
+  const [dangApVoucher, setDangApVoucher] = useState(false)
 
   const tamTinh = useMemo(() => cartItems.reduce((tong, item) => tong + item.price * item.quantity, 0), [cartItems])
   const phiDichVu = tinhPhiDichVu(tamTinh)
-  const soTienGiam = tinhSoTienGiam(voucherDaApDung, tamTinh)
   const phiShip = loaiNhanHang === 'MANG_VE_GIAO_HANG' ? PHI_SHIP_CO_DINH : 0
-  const tongTien = Math.max(0, tamTinh + phiDichVu + phiShip - soTienGiam)
+  const tongTienXetVoucher = tamTinh + phiDichVu + phiShip
+  const soTienGiam = tinhSoTienGiamTheoVoucher(voucherDaApDung, tongTienXetVoucher)
+  const tongTien = Math.max(0, tongTienXetVoucher - soTienGiam)
 
   useEffect(() => {
     const draft = layJsonLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_MANG_VE, null)
@@ -52,18 +49,40 @@ function MangVeGioHangPage() {
     }
   }, [])
 
-  const handleApplyVoucher = () => {
+  const handleApplyVoucher = async () => {
     const maVoucher = maVoucherNhap.trim().toUpperCase()
-    const phanTramGiam = VOUCHER_MOCK_DATA[maVoucher]
-    if (!maVoucher || !phanTramGiam) {
+
+    if (!maVoucher || tamTinh <= 0) {
       setVoucherDaApDung(null)
-      setLoiVoucher('Mã không hợp lệ hoặc đã hết hạn.')
+      setLoiVoucher('Mã không hợp lệ hoặc chưa đủ điều kiện áp dụng.')
       clearStoredVoucher()
       return
     }
-    const voucher = saveVoucher({ code: maVoucher, discountPercent: phanTramGiam, amount: Math.round((tamTinh * phanTramGiam) / 100) })
-    setVoucherDaApDung(voucher)
-    setLoiVoucher('')
+
+    setDangApVoucher(true)
+
+    try {
+      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tongTienXetVoucher, loaiNhanHang)
+
+      if (!duLieu?.code) {
+        setVoucherDaApDung(null)
+        setLoiVoucher('Mã không hợp lệ hoặc đã hết hạn.')
+        clearStoredVoucher()
+        return
+      }
+
+      const voucher = saveVoucher(duLieu)
+
+      setVoucherDaApDung(voucher)
+      setMaVoucherNhap(voucher.code)
+      setLoiVoucher('')
+    } catch (error) {
+      setVoucherDaApDung(null)
+      setLoiVoucher(error?.message || 'Mã không hợp lệ hoặc đã hết hạn.')
+      clearStoredVoucher()
+    } finally {
+      setDangApVoucher(false)
+    }
   }
 
   const diTiep = () => {
@@ -148,12 +167,39 @@ function MangVeGioHangPage() {
                 </>
               ) : null}
               <div className="voucher-block">
-                <div className="voucher-header"><h3>Mã giảm giá</h3></div>
+                <div className="voucher-header">
+                  <h3>Mã giảm giá</h3>
+                  <p>{DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.length} mã đang khả dụng theo cấu hình hiện tại.</p>
+                </div>
+                <div className="thanh-toan-voucher-xem-list" style={{ marginBottom: '0.75rem' }}>
+                  {DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.map((phieuGiamGia) => {
+                    const dangDuocApDung = voucherDaApDung?.code === phieuGiamGia.code
+
+                    return (
+                      <button
+                        key={phieuGiamGia.code}
+                        type="button"
+                        className={`thanh-toan-voucher-xem-item ${dangDuocApDung ? 'active' : ''}`}
+                        onClick={() => {
+                          setMaVoucherNhap(phieuGiamGia.code)
+                          if (loiVoucher) setLoiVoucher('')
+                        }}
+                      >
+                        <div>
+                          <strong>{phieuGiamGia.code}</strong>
+                          <p>{phieuGiamGia.moTa}</p>
+                        </div>
+                        <span>{dangDuocApDung ? 'Đang áp dụng' : phieuGiamGia.giaTri}</span>
+                      </button>
+                    )
+                  })}
+                </div>
                 <div className="voucher-controls">
                   <input className="truong-nhap voucher-input" placeholder="Nhập mã giảm giá" value={maVoucherNhap} onChange={(e) => setMaVoucherNhap(e.target.value)} />
-                  <button type="button" className="btn nut-chinh voucher-apply-btn" onClick={handleApplyVoucher}>Áp dụng</button>
+                  <button type="button" className="btn nut-chinh voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>{dangApVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}</button>
                 </div>
                 {loiVoucher ? <p className="voucher-message error">{loiVoucher}</p> : null}
+                {!loiVoucher && voucherDaApDung ? <p className="voucher-message success">Đã áp dụng mã {voucherDaApDung.code}.</p> : null}
               </div>
               <div className="nhom-truong">
                 <label className="nhan-truong" htmlFor="ghi-chu-mang-ve">Ghi chú</label>

@@ -12,27 +12,12 @@ import {
   xoaPhieuGiamGiaDaApDung as clearStoredVoucher,
   layPhieuGiamGiaDaApDung as getStoredVoucher,
   luuPhieuGiamGiaDaApDung as saveVoucher,
+  tinhSoTienGiamTheoVoucher,
 } from '../services/dichVuPhieuGiamGia'
 import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
+import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../constants/phieuGiamGia'
 
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
-
-const tinhSoTienGiam = (voucher, tamTinh) => {
-  if (!voucher) {
-    return 0
-  }
-
-  const phanTramGiam = Number(voucher.discountPercent || 0)
-  const soTienGiamTamTinh = phanTramGiam > 0
-    ? Math.round((tamTinh * phanTramGiam) / 100)
-    : Number(voucher.amount || 0)
-
-  if (!Number.isFinite(soTienGiamTamTinh) || soTienGiamTamTinh <= 0) {
-    return 0
-  }
-
-  return Math.min(soTienGiamTamTinh, tamTinh)
-}
 
 function GioHangPage() {
   const navigate = useNavigate()
@@ -48,8 +33,9 @@ function GioHangPage() {
   const tongSoLuongMon = cartItems.reduce((tong, item) => tong + item.quantity, 0)
   const tamTinh = cartItems.reduce((tong, item) => tong + item.price * item.quantity, 0)
   const phiDichVu = tinhPhiDichVu(tamTinh)
-  const soTienGiam = tinhSoTienGiam(voucherDaApDung, tamTinh, phiDichVu)
-  const tongTien = Math.max(0, tamTinh + phiDichVu - soTienGiam)
+  const tongTienXetVoucher = tamTinh + phiDichVu
+  const soTienGiam = tinhSoTienGiamTheoVoucher(voucherDaApDung, tongTienXetVoucher)
+  const tongTien = Math.max(0, tongTienXetVoucher - soTienGiam)
 
   useEffect(() => {
     const voucher = getStoredVoucher()
@@ -114,7 +100,7 @@ function GioHangPage() {
     setDangApVoucher(true)
 
     try {
-      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tamTinh)
+      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tongTienXetVoucher)
       if (!duLieu) {
         setVoucherDaApDung(null)
         setLoiVoucher('❌ Mã không hợp lệ hoặc đã hết hạn')
@@ -122,21 +108,7 @@ function GioHangPage() {
         return
       }
 
-      const laGiamPhanTram = String(duLieu.discountType || '').toLowerCase() === 'phantram'
-      const phanTramGiam = laGiamPhanTram ? Number(duLieu.discountValue || 0) : 0
-      const soTienGiamCoDinh = laGiamPhanTram ? 0 : Number(duLieu.discountValue || 0)
-      const soTienGiamTamTinh = laGiamPhanTram
-        ? Math.round((tamTinh * phanTramGiam) / 100)
-        : soTienGiamCoDinh
-      const soTienGiamToiDa = duLieu.maxDiscountAmount == null
-        ? soTienGiamTamTinh
-        : Math.min(soTienGiamTamTinh, Number(duLieu.maxDiscountAmount || 0))
-
-      const voucherHopLe = saveVoucher({
-        code: duLieu.code || maVoucher,
-        discountPercent: phanTramGiam,
-        amount: soTienGiamToiDa,
-      })
+      const voucherHopLe = saveVoucher(duLieu)
 
       if (!voucherHopLe) {
         setVoucherDaApDung(null)
@@ -284,6 +256,30 @@ function GioHangPage() {
               <div className="voucher-block">
                 <div className="voucher-header">
                   <h3>Mã giảm giá</h3>
+                  <p>{DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.length} mã đang khả dụng theo cấu hình hiện tại.</p>
+                </div>
+                <div className="thanh-toan-voucher-xem-list" style={{ marginBottom: '0.75rem' }}>
+                  {DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.map((phieuGiamGia) => {
+                    const dangDuocApDung = voucherDaApDung?.code === phieuGiamGia.code
+
+                    return (
+                      <button
+                        key={phieuGiamGia.code}
+                        type="button"
+                        className={`thanh-toan-voucher-xem-item ${dangDuocApDung ? 'active' : ''}`}
+                        onClick={() => {
+                          setMaVoucherNhap(phieuGiamGia.code)
+                          if (loiVoucher) setLoiVoucher('')
+                        }}
+                      >
+                        <div>
+                          <strong>{phieuGiamGia.code}</strong>
+                          <p>{phieuGiamGia.moTa}</p>
+                        </div>
+                        <span>{dangDuocApDung ? 'Đang áp dụng' : phieuGiamGia.giaTri}</span>
+                      </button>
+                    )
+                  })}
                 </div>
                 <div className="voucher-controls">
                   <input

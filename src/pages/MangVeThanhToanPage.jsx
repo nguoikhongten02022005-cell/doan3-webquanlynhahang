@@ -8,7 +8,7 @@ import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { taoDonMangVeApi } from '../services/api/apiMangVe'
 
-const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.ceil((tamTinh * 0.05) / 1000) * 1000 : 0)
+const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 const PHI_SHIP_CO_DINH = 30000
 
 function MangVeThanhToanPage() {

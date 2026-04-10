@@ -6,32 +6,11 @@ import { useThongBao } from '../context/ThongBaoContext'
 import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
 import { taoDonHangApi } from '../services/api/apiDonHang'
-import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung } from '../services/dichVuPhieuGiamGia'
+import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung, tinhSoTienGiamTheoVoucher } from '../services/dichVuPhieuGiamGia'
+import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../constants/phieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
-const DANH_SACH_MA_GIAM_GIA_CO_SAN = Object.freeze([
-  { code: 'WELCOME10', moTa: 'Giảm 10% cho đơn đầu tiên', giaTri: '10%' },
-  { code: 'SUMMER30', moTa: 'Giảm tối đa 100.000đ cho đơn hè', giaTri: 'Tối đa 100.000đ' },
-])
-
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
-
-const tinhSoTienGiam = (voucher, tamTinh, phiDichVu) => {
-  if (!voucher) {
-    return 0
-  }
-
-  const phanTramGiam = Number(voucher.discountPercent || 0)
-  const soTienGiamTamTinh = phanTramGiam > 0
-    ? Math.round((tamTinh * phanTramGiam) / 100)
-    : Number(voucher.amount || 0)
-
-  if (!Number.isFinite(soTienGiamTamTinh) || soTienGiamTamTinh <= 0) {
-    return 0
-  }
-
-  return Math.min(soTienGiamTamTinh, tamTinh + phiDichVu)
-}
 
 function ThanhToanPage() {
   const navigate = useNavigate()
@@ -74,8 +53,9 @@ function ThanhToanPage() {
   )
 
   const serviceFee = tinhPhiDichVu(subtotal)
-  const discountAmount = tinhSoTienGiam(appliedVoucher, subtotal, serviceFee)
-  const tongCong = Math.max(0, subtotal + serviceFee - discountAmount)
+  const tongTienXetVoucher = subtotal + serviceFee
+  const discountAmount = tinhSoTienGiamTheoVoucher(appliedVoucher, tongTienXetVoucher)
+  const tongCong = Math.max(0, tongTienXetVoucher - discountAmount)
 
   const handleChange = (event) => {
     const { name, value } = event.target
@@ -291,10 +271,10 @@ function ThanhToanPage() {
                 <div className="thanh-toan-voucher-xem">
                   <div className="thanh-toan-voucher-xem-head">
                     <strong>Mã giảm giá khả dụng</strong>
-                    <span>{DANH_SACH_MA_GIAM_GIA_CO_SAN.length} mã</span>
+                    <span>{DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.length} mã</span>
                   </div>
                   <div className="thanh-toan-voucher-xem-list">
-                    {DANH_SACH_MA_GIAM_GIA_CO_SAN.map((maGiamGia) => {
+                    {DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.map((maGiamGia) => {
                       const dangDuocApDung = appliedVoucher?.code === maGiamGia.code
 
                       return (

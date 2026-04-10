@@ -142,7 +142,9 @@ async function main() {
     },
   })
   assert(donMangVe.data?.donHang?.maDonHang === maDonMangVe, 'Don mang ve sai maDonHang')
-  assert(donMangVe.data?.donHang?.tongTien === 95000, 'TongTien don mang ve sai')
+  assert(donMangVe.data?.donHang?.tongTien === 100000, 'TongTien don mang ve sai')
+  assert(donMangVe.data?.donHang?.pricingSummary?.tamTinh === 95000, 'Tam tinh don mang ve sai')
+  assert(donMangVe.data?.donHang?.pricingSummary?.phiDichVu === 5000, 'Phi dich vu don mang ve sai')
   assert(Array.isArray(donMangVe.data?.chiTiet) && donMangVe.data.chiTiet.length === 2, 'Chi tiet don mang ve sai')
 
   console.log('6. Don tai ban')
@@ -159,7 +161,9 @@ async function main() {
     },
   })
   assert(donTaiBan.data?.donHang?.maDonHang === maDonTaiBan, 'Don tai ban sai maDonHang')
-  assert(donTaiBan.data?.donHang?.tongTien === 125000, 'TongTien don tai ban sai')
+  assert(donTaiBan.data?.donHang?.tongTien === 131000, 'TongTien don tai ban sai')
+  assert(donTaiBan.data?.donHang?.pricingSummary?.tamTinh === 125000, 'Tam tinh don tai ban sai')
+  assert(donTaiBan.data?.donHang?.pricingSummary?.phiDichVu === 6000, 'Phi dich vu don tai ban sai')
   assert(Array.isArray(donTaiBan.data?.chiTiet) && donTaiBan.data.chiTiet.length === 2, 'Chi tiet don tai ban sai')
 
   console.log('7. Admin flow cap nhat')
