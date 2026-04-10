@@ -1,12 +1,9 @@
 import { useCallback, useEffect, useState } from 'react'
-import { DANH_SACH_MON as DANH_SACH_MON_MO_PHONG } from '../data/duLieuThucDon'
 import { layDanhSachMonApi } from '../services/api/apiThucDon'
 import { chuanHoaDanhSachMonThucDon } from '../services/mappers/anhXaThucDon'
 
-const DANH_SACH_MON_DU_PHONG = chuanHoaDanhSachMonThucDon(DANH_SACH_MON_MO_PHONG)
-
 export const useDanhSachMonAn = () => {
-  const [danhSachMon, setDanhSachMon] = useState(DANH_SACH_MON_DU_PHONG)
+  const [danhSachMon, setDanhSachMon] = useState([])
   const [daTaiLanDau, setDaTaiLanDau] = useState(false)
   const [loiTaiMon, setLoiTaiMon] = useState('')
 
@@ -18,10 +15,9 @@ export const useDanhSachMonAn = () => {
       setLoiTaiMon('')
       return monAn
     } catch (error) {
-      const danhSachMonDuPhong = [...DANH_SACH_MON_DU_PHONG]
-      setDanhSachMon(danhSachMonDuPhong)
+      setDanhSachMon([])
       setLoiTaiMon(error?.message || 'Không thể tải danh sách món ăn từ máy chủ.')
-      return danhSachMonDuPhong
+      return []
     } finally {
       setDaTaiLanDau(true)
     }

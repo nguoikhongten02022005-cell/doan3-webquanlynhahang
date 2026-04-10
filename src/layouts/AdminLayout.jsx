@@ -1,4 +1,4 @@
-import { Avatar, Badge, Button, Drawer, Grid, Layout, Menu, Space, Typography } from 'antd'
+import { Alert, Avatar, Badge, Button, Drawer, Grid, Layout, Menu, Space, Typography } from 'antd'
 import {
   AppstoreOutlined,
   AuditOutlined,
@@ -9,6 +9,7 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   OrderedListOutlined,
+  ReloadOutlined,
   ShopOutlined,
   TableOutlined,
   UserOutlined,
@@ -44,7 +45,7 @@ function AdminLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { nguoiDungHienTai, laAdmin, dangXuat } = useXacThuc()
   const adminData = useAdminData()
-  const { badges } = adminData
+  const { badges, dangTaiDuLieu, loiTaiDuLieu, taiLaiDuLieu } = adminData
   const laMobile = manHinh.xs && !manHinh.md
   const laTabletTroLen = !!manHinh.md
 
@@ -143,11 +144,13 @@ function AdminLayout() {
             </div>
           </Space>
           <Space>
+            <Button icon={<ReloadOutlined />} loading={dangTaiDuLieu} onClick={() => taiLaiDuLieu?.()}>Tải lại</Button>
             <Avatar style={{ background: '#f07d5c' }}>{String(nguoiDungHienTai?.fullName || 'A').charAt(0).toUpperCase()}</Avatar>
           </Space>
         </Header>
 
         <Content style={{ padding: laMobile ? 14 : 20 }}>
+          {loiTaiDuLieu ? <Alert type="error" showIcon message={loiTaiDuLieu} style={{ marginBottom: 16 }} action={<Button size="small" onClick={() => taiLaiDuLieu?.()}>Thử lại</Button>} /> : null}
           <Outlet context={adminData} />
         </Content>
       </Layout>

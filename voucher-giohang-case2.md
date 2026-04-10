@@ -1,0 +1,104 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - navigation "Điều hướng chính" [ref=e9]:
+        - link "Trang chủ" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: Trang chủ
+        - link "Thực đơn" [ref=e12] [cursor=pointer]:
+          - /url: /thuc-don
+          - generic [ref=e13]: Thực đơn
+        - link "Đặt bàn" [ref=e14] [cursor=pointer]:
+          - /url: /dat-ban
+          - generic [ref=e15]: Đặt bàn
+        - link "Về chúng tôi" [ref=e16] [cursor=pointer]:
+          - /url: /gioi-thieu
+          - generic [ref=e17]: Về chúng tôi
+        - link "Đánh giá" [ref=e18] [cursor=pointer]:
+          - /url: /danh-gia
+          - generic [ref=e19]: Đánh giá
+      - generic [ref=e20]:
+        - link "Đặt bàn" [ref=e21] [cursor=pointer]:
+          - /url: /dat-ban
+        - link "Đăng nhập" [ref=e23] [cursor=pointer]:
+          - /url: /dang-nhap
+  - main [ref=e24]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]:
+          - heading "Giỏ hàng của bạn" [level=2] [ref=e30]
+          - generic [ref=e31]: 3 món
+        - article [ref=e33]:
+          - img "Goi Cuon Tom Thit" [ref=e35]
+          - generic [ref=e36]:
+            - generic [ref=e37]:
+              - generic [ref=e38]:
+                - heading "Goi Cuon Tom Thit" [level=3] [ref=e39]
+                - paragraph [ref=e40]: Size M
+              - button "Xóa nhanh Goi Cuon Tom Thit" [ref=e41] [cursor=pointer]:
+                - img [ref=e42]
+            - generic [ref=e44]:
+              - generic "Số lượng món Goi Cuon Tom Thit" [ref=e45]:
+                - button "Giảm số lượng" [ref=e46] [cursor=pointer]: "-"
+                - generic [ref=e47]: "3"
+                - button "Tăng số lượng" [active] [ref=e48] [cursor=pointer]: +
+              - strong [ref=e49]: 105.000đ
+      - generic [ref=e51]:
+        - heading "Tổng kết đơn" [level=2] [ref=e52]
+        - generic [ref=e53]:
+          - heading "Mã giảm giá" [level=3] [ref=e55]
+          - generic [ref=e56]:
+            - textbox "Nhập mã giảm giá" [ref=e57]
+            - button "Áp dụng" [ref=e58] [cursor=pointer]
+        - generic [ref=e59]:
+          - generic [ref=e60]: Tạm tính
+          - generic [ref=e61]: 105.000đ
+        - generic [ref=e62]:
+          - generic [ref=e63]: Phí dịch vụ (5%)
+          - generic [ref=e64]: 5.000đ
+        - generic [ref=e66]:
+          - generic [ref=e67]: Tổng cộng
+          - strong [ref=e68]: 110.000đ
+        - generic [ref=e70]:
+          - generic [ref=e71]: Ghi chú cho quán
+          - textbox "Ghi chú cho quán" [ref=e72]:
+            - /placeholder: Dị ứng thực phẩm, yêu cầu đặc biệt về món ăn, hoặc ghi chú khác cho bếp...
+          - generic [ref=e73]: 0/300
+        - button "Thanh toán" [ref=e74] [cursor=pointer]
+  - contentinfo [ref=e75]:
+    - generic [ref=e76]:
+      - generic [ref=e77]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e78] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e79]: NH
+          - generic [ref=e80]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e81]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic "Mạng xã hội" [ref=e82]:
+          - link "Facebook" [ref=e83] [cursor=pointer]:
+            - /url: "#"
+          - link "Instagram" [ref=e84] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e85]:
+        - heading "Liên hệ" [level=3] [ref=e86]
+        - list [ref=e87]:
+          - listitem [ref=e88]: 28 Nguyễn Huệ, Q.1, TP. HCM
+          - listitem [ref=e89]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e90] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e91]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e92] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e93]:
+        - heading "Giờ mở cửa" [level=3] [ref=e94]
+        - list [ref=e95]:
+          - listitem [ref=e96]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e97]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e98]: Nhận đơn online đến 21:45

@@ -19,8 +19,6 @@ import {
   sapXepDonHangChoVanHanh,
 } from './boChon'
 import { laySacThaiDonHang } from './dinhDang'
-import { coSuDungMayChu } from '../../services/trinhKhachApi'
-import { taoDuLieuNoiBoDuPhong } from '../admin/mockData'
 import { chuanHoaBanChoNoiBo } from '../../services/dichVuBanAn.js'
 import { chuanHoaNguoiDungApi } from '../../services/api/apiXacThuc'
 
@@ -52,23 +50,14 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   const [danhSachTaiKhoan, setDanhSachTaiKhoan] = useState([])
   const [danhSachBan, setDanhSachBan] = useState([])
   const [danhSachDanhGia, setDanhSachDanhGia] = useState([])
+  const [dangTaiDuLieu, setDangTaiDuLieu] = useState(false)
+  const [loiTaiDuLieu, setLoiTaiDuLieu] = useState('')
 
   const taiLaiDuLieu = useCallback(async () => {
-      const apDungDuLieuDuPhong = () => {
-        const duLieuDuPhong = taoDuLieuNoiBoDuPhong()
-        setDanhSachDatBan(duLieuDuPhong.bookings)
-        setDanhSachDonHang(duLieuDuPhong.orders)
-        setDanhSachTaiKhoan(duLieuDuPhong.accounts)
-        setDanhSachBan(duLieuDuPhong.tables)
-        setDanhSachDanhGia([])
-      }
-
-    if (!coSuDungMayChu()) {
-      apDungDuLieuDuPhong()
-      return
-    }
-
     try {
+      setDangTaiDuLieu(true)
+      setLoiTaiDuLieu('')
+
       const [nextBookings, nextOrdersResponse, nextAccountsResponse, nextTablesResponse, nextReviewsResponse] = await Promise.all([
         layDanhSachDatBanHost(),
         layDanhSachDonHangApi(),
@@ -82,8 +71,11 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
       setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu.map(chuanHoaNguoiDungApi).filter(Boolean) : [])
       setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu.map(chuanHoaBanChoNoiBo).filter(Boolean) : [])
       setDanhSachDanhGia(Array.isArray(nextReviewsResponse?.duLieu) ? nextReviewsResponse.duLieu : [])
-    } catch {
-      apDungDuLieuDuPhong()
+    } catch (error) {
+      setLoiTaiDuLieu(error?.message || 'Không thể tải dữ liệu nội bộ từ máy chủ.')
+      throw error
+    } finally {
+      setDangTaiDuLieu(false)
     }
   }, [layDanhSachDatBanHost])
 
@@ -179,62 +171,21 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
   }, [danhDauKhongDen, taiLaiDuLieu])
 
   const xuLyDanhDauBanBan = useCallback(async (tableId) => {
-    if (!coSuDungMayChu()) {
-      setDanhSachBan((currentTables) => currentTables.map((table) => (
-        table.id === tableId
-          ? { ...table, status: TRANG_THAI_BAN.BAN }
-          : table
-      )))
-      return
-    }
-
     await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.BAN)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
   const xuLyDanhDauBanSanSang = useCallback(async (tableId) => {
-    if (!coSuDungMayChu()) {
-      setDanhSachBan((currentTables) => currentTables.map((table) => (
-        table.id === tableId
-          ? { ...table, status: TRANG_THAI_BAN.TRONG }
-          : table
-      )))
-      return
-    }
-
     await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.TRONG)
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
   const layChiTietDonHang = useCallback(async (orderId) => {
-    if (!coSuDungMayChu()) {
-      return danhSachDonHang.find((order) => String(order.id) === String(orderId)) || null
-    }
-
     const ketQua = await layChiTietDonHangApi(orderId)
     return ketQua?.duLieu || null
-  }, [danhSachDonHang])
+  }, [])
 
   const xuLyCapNhatTrangThaiDonHang = useCallback(async (orderId, status) => {
-    if (!coSuDungMayChu()) {
-      let duLieuCapNhat = null
-
-      setDanhSachDonHang((currentOrders) => currentOrders.map((order) => {
-        if (String(order.id) !== String(orderId)) {
-          return order
-        }
-
-        duLieuCapNhat = { ...order, status }
-        return duLieuCapNhat
-      }))
-
-      return {
-        duLieu: duLieuCapNhat,
-        thongDiep: 'Cập nhật trạng thái đơn hàng thành công',
-        meta: null,
-      }
-    }
-
     const ketQua = await capNhatTrangThaiDonHangApi(orderId, status)
     if (ketQua?.duLieu) {
       await taiLaiDuLieu()
@@ -263,6 +214,8 @@ export const useDuLieuBangDieuKhienNoiBo = () => {
     danhSachDonHang,
     danhSachMon,
     danhSachTaiKhoan,
+    dangTaiDuLieu,
+    loiTaiDuLieu,
     xuLyGanBan,
     xuLyCheckIn,
     xuLyHoanThanh,

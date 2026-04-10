@@ -3,8 +3,6 @@ import { Col, ConfigProvider, Row } from 'antd'
 import '../theme/dat-ban.css'
 import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
-  DU_LIEU_GIA_BAN_THEO_KHU_VUC_DAT_BAN,
-  DU_LIEU_GIA_TINH_TRANG_KHUNG_GIO_DAT_BAN,
   GIO_GIOI_HAN_NHAN_DAT_BAN,
   KHU_VUC_DAT_BAN_CONG_KHAI,
   NHAN_GOI_Y_KHU_VUC_DAT_BAN,
@@ -19,6 +17,7 @@ import { dinhDangNgayGio, layNhanChoNgoi } from '../features/bangDieuKhienNoiBo/
 import { useDatBan } from '../hooks/useDatBan'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { layDanhSachBanApi } from '../services/api/apiBanAn'
+import { layKhaDungDatBanApi } from '../services/api/apiDatBan'
 import { taoAnhChupBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 import BuocMotDatBan from '../components/datBan/BuocMotDatBan'
@@ -152,7 +151,7 @@ const tinhTinhTrangKhuVuc = (count) => {
   return { count, label: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.AVAILABLE, tone: 'available' }
 }
 
-const tinhTinhTrangKhungGio = ({ date, time, periodId }) => {
+const tinhTinhTrangKhungGio = ({ date, time, tables = [], bookings = [] }) => {
   const selectedDate = taoNgayKhongGio(date)
   const isToday = laNgayHomNay(date)
   const isClosedDay = THU_DONG_CUA_DAT_BAN.includes(selectedDate.getDay())
@@ -173,26 +172,42 @@ const tinhTinhTrangKhungGio = ({ date, time, periodId }) => {
     }
   }
 
-  const previewSlot = DU_LIEU_GIA_TINH_TRANG_KHUNG_GIO_DAT_BAN[periodId]?.[time]
+  const tongBanSanSang = Array.isArray(tables)
+    ? tables.filter((table) => table?.status !== 'CO_KHACH' && table?.status !== 'Occupied').length
+    : 0
 
-  if (!previewSlot) {
+  const soDatBanCungKhungGio = Array.isArray(bookings)
+    ? bookings.filter((booking) => booking?.date === date && booking?.time === time && booking?.status !== 'Cancelled' && booking?.status !== 'DA_HUY' && booking?.status !== 'KHONG_DEN' && booking?.status !== 'NoShow').length
+    : 0
+
+  const soBanConLai = Math.max(0, tongBanSanSang - soDatBanCungKhungGio)
+
+  if (soBanConLai <= 0) {
     return { count: 0, availability: 'FULL', availabilityLabel: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.FULL, isDisabled: true }
   }
 
+  if (soBanConLai <= 2) {
+    return { count: soBanConLai, availability: 'LIMITED', availabilityLabel: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.LIMITED, isDisabled: false }
+  }
+
   return {
-    count: previewSlot.count,
-    availability: previewSlot.availability,
-    availabilityLabel: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN[previewSlot.availability] || NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.FULL,
-    isDisabled: previewSlot.availability === 'FULL',
+    count: soBanConLai,
+    availability: 'AVAILABLE',
+    availabilityLabel: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.AVAILABLE,
+    isDisabled: false,
   }
 }
 
 function DatBanPage() {
   const { nguoiDungHienTai } = useXacThuc()
-  const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan } = useDatBan()
+  const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan, layDanhSachDatBanHost } = useDatBan()
 
   const [tables, setTables] = useState([])
-  const [, setIsLoadingTables] = useState(true)
+  const [danhSachDatBanHienTai, setDanhSachDatBanHienTai] = useState([])
+  const [duLieuKhaDungDatBan, setDuLieuKhaDungDatBan] = useState(null)
+  const [isLoadingTables, setIsLoadingTables] = useState(true)
+  const [dangTaiKhaDung, setDangTaiKhaDung] = useState(false)
+  const [loiTaiBan, setLoiTaiBan] = useState('')
   const [didBootstrapDraft, setDidBootstrapDraft] = useState(false)
   const [currentStep, setCurrentStep] = useState(1)
   const [stepErrors, setStepErrors] = useState({})
@@ -213,14 +228,23 @@ function DatBanPage() {
 
     const loadTables = async () => {
       setIsLoadingTables(true)
+      setLoiTaiBan('')
 
       try {
-        const { duLieu } = await layDanhSachBanApi()
+        const [{ duLieu: duLieuBan }, danhSachDatBan] = await Promise.all([
+          layDanhSachBanApi(),
+          layDanhSachDatBanHost(),
+        ])
+
         if (!active) return
-        setTables(Array.isArray(duLieu) ? duLieu : [])
-      } catch {
+
+        setTables(Array.isArray(duLieuBan) ? duLieuBan : [])
+        setDanhSachDatBanHienTai(Array.isArray(danhSachDatBan) ? danhSachDatBan : [])
+      } catch (error) {
         if (!active) return
-        setTables(DU_LIEU_GIA_BAN_THEO_KHU_VUC_DAT_BAN)
+        setTables([])
+        setDanhSachDatBanHienTai([])
+        setLoiTaiBan(error?.message || 'Không thể tải dữ liệu bàn khả dụng từ máy chủ.')
       } finally {
         if (active) {
           setIsLoadingTables(false)
@@ -232,7 +256,7 @@ function DatBanPage() {
     return () => {
       active = false
     }
-  }, [])
+  }, [layDanhSachDatBanHost])
 
   useEffect(() => {
     if (!didBootstrapDraft || submitSuccess) {
@@ -241,6 +265,43 @@ function DatBanPage() {
 
     luuBanNhapTam(taoAnhChupBanNhapTamDatBan(formData))
   }, [didBootstrapDraft, formData, luuBanNhapTam, submitSuccess])
+
+  useEffect(() => {
+    let active = true
+
+    const taiKhaDungDatBan = async () => {
+      if (!formData.date || !formData.time) {
+        setDuLieuKhaDungDatBan(null)
+        return
+      }
+
+      try {
+        setDangTaiKhaDung(true)
+        const phanHoi = await layKhaDungDatBanApi({
+          ngayDat: formData.date,
+          gioDat: formData.time,
+          soNguoi: Number(formData.guests) || 0,
+          khuVuc: formData.seatingArea,
+        })
+
+        if (!active) return
+        setDuLieuKhaDungDatBan(phanHoi?.duLieu || null)
+      } catch {
+        if (!active) return
+        setDuLieuKhaDungDatBan(null)
+      } finally {
+        if (active) {
+          setDangTaiKhaDung(false)
+        }
+      }
+    }
+
+    taiKhaDungDatBan()
+
+    return () => {
+      active = false
+    }
+  }, [formData.date, formData.guests, formData.seatingArea, formData.time])
 
   const dateOptions = useMemo(() => taoDanhSachNgayNhanh(), [])
   const dateOptionMap = useMemo(() => new Map(dateOptions.map((item) => [item.value, item])), [dateOptions])
@@ -300,16 +361,34 @@ function DatBanPage() {
       return []
     }
 
-    return CAC_CA_KHUNG_GIO_DAT_BAN.flatMap((period) => period.slots.map((time) => ({
-      time,
-      periodId: period.id,
-      ...tinhTinhTrangKhungGio({
-        date: formData.date,
+    return CAC_CA_KHUNG_GIO_DAT_BAN.flatMap((period) => period.slots.map((time) => {
+      const duLieuApi = formData.date === duLieuKhaDungDatBan?.ngayDat && time === duLieuKhaDungDatBan?.gioDat
+        ? duLieuKhaDungDatBan
+        : null
+
+      if (duLieuApi) {
+        return {
+          time,
+          periodId: period.id,
+          count: Number(duLieuApi.tongBanPhuHop || 0),
+          availability: duLieuApi.mucKhaDung || 'FULL',
+          availabilityLabel: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN[duLieuApi.mucKhaDung] || NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.FULL,
+          isDisabled: Number(duLieuApi.tongBanPhuHop || 0) <= 0,
+        }
+      }
+
+      return {
         time,
         periodId: period.id,
-      }),
-    })))
-  }, [formData.date])
+        ...tinhTinhTrangKhungGio({
+          date: formData.date,
+          time,
+          tables,
+          bookings: danhSachDatBanHienTai,
+        }),
+      }
+    }))
+  }, [danhSachDatBanHienTai, duLieuKhaDungDatBan, formData.date, tables])
 
   const summaryAreaLabel = layNhanChoNgoi(formData.seatingArea)
   const todayIso = new Date().toISOString().slice(0, 10)
@@ -324,6 +403,7 @@ function DatBanPage() {
     ? 'Khu vực này đã hết chỗ, vui lòng chọn khu vực khác hoặc bỏ chọn khu vực'
     : ''
   const largePartyNotice = Number(formData.guests) >= 10 ? `Hotline ${SITE_CONTACT.phoneDisplay}` : ''
+  const thongBaoTaiBan = loiTaiBan || (isLoadingTables ? 'Đang tải dữ liệu bàn khả dụng từ máy chủ...' : '') || (dangTaiKhaDung ? 'Đang cập nhật khả dụng đặt bàn...' : '')
 
   const summary = useMemo(() => ({
     guests: Number(formData.guests) > 0 ? `${Number(formData.guests)} người` : 'Chưa chọn',
@@ -543,12 +623,18 @@ function DatBanPage() {
         bookingId: undefined,
       }
 
+      const maBanDuocChon = candidateTables?.[0]?.code || candidateTables?.[0]?.id || null
+
+      if (!maBanDuocChon) {
+        throw new Error('Hiện không tìm thấy bàn phù hợp để giữ chỗ cho lựa chọn này. Vui lòng đổi giờ hoặc khu vực.')
+      }
+
       const createdBooking = await taoDatBan({
         booking: {
           ...formData,
           maDatBan: confirmationPayload.bookingCode,
           maKH: nguoiDungHienTai?.maKH || 'KH001',
-          maBan: candidateTables?.[0]?.code || 'B001',
+          maBan: maBanDuocChon,
           maNV: 'NV002',
           ngayDat: formData.date,
           gioDat: formData.time,
@@ -638,6 +724,7 @@ function DatBanPage() {
                   timeSlotOptions={timeSlotOptions}
                   selectedAreaUnavailableMessage={selectedAreaUnavailableMessage}
                   largePartyNotice={largePartyNotice}
+                  thongBaoTaiBan={thongBaoTaiBan}
                   onGuestSelect={handleGuestSelect}
                   onDateSelect={handleDateSelect}
                   onDateInputChange={handleDateInputChange}

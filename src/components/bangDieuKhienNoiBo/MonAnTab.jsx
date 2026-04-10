@@ -42,6 +42,15 @@ function taoUploadFileList(imageUrl) {
   return [{ uid: 'dish-image', name: 'dish-image.png', status: 'done', url: imageUrl }]
 }
 
+function docTapTinThanhDataUrl(tapTin) {
+  return new Promise((resolve, reject) => {
+    const boDoc = new FileReader()
+    boDoc.onload = () => resolve(String(boDoc.result || ''))
+    boDoc.onerror = () => reject(new Error('Không thể đọc ảnh món.'))
+    boDoc.readAsDataURL(tapTin)
+  })
+}
+
 function taoTagsMacDinh(mon) {
   const badge = String(mon?.badge ?? '').trim()
   if (!badge || badge === NHAN_MAC_DINH_THUC_DON) return []
@@ -105,8 +114,23 @@ function MonAnTab({ dishes, reloadDishes }) {
   const handleSelectChange = (field) => (value) => setFormValues((cur) => ({ ...cur, [field]: value }))
   const handleSwitchChange = (checked) => setFormValues((cur) => ({ ...cur, isVisible: checked }))
 
-  const handleUploadChange = ({ fileList }) => {
-    const latestFileList = fileList.slice(-1).map((file) => file.originFileObj ? { ...file, url: URL.createObjectURL(file.originFileObj) } : file)
+  const handleUploadChange = async ({ fileList }) => {
+    const tapTinMoiNhat = fileList.slice(-1)
+    const tapTinDauTien = tapTinMoiNhat[0]
+
+    if (tapTinDauTien?.originFileObj) {
+      try {
+        const duLieuAnhBase64 = await docTapTinThanhDataUrl(tapTinDauTien.originFileObj)
+        const latestFileList = [{ ...tapTinDauTien, url: duLieuAnhBase64, thumbUrl: duLieuAnhBase64, status: 'done' }]
+        setUploadFileList(latestFileList)
+        setFormValues((cur) => ({ ...cur, image: duLieuAnhBase64 }))
+        return
+      } catch (error) {
+        setLoiForm(error?.message || 'Không thể đọc ảnh món.')
+      }
+    }
+
+    const latestFileList = tapTinMoiNhat
     setUploadFileList(latestFileList)
     setFormValues((cur) => ({ ...cur, image: latestFileList[0]?.url || latestFileList[0]?.thumbUrl || '' }))
   }
@@ -278,7 +302,7 @@ function MonAnTab({ dishes, reloadDishes }) {
             <Upload accept="image/*" listType="picture-card" maxCount={1} beforeUpload={() => false} fileList={uploadFileList} onChange={handleUploadChange} onRemove={handleRemoveUpload}>
               {uploadFileList.length >= 1 ? null : <div><PictureOutlined /><div style={{ marginTop: 8 }}>Tải ảnh lên</div></div>}
             </Upload>
-            <Typography.Text type="secondary">UI upload demo sẵn sàng, chưa kết nối API upload thật.</Typography.Text>
+            <Typography.Text type="secondary">Ảnh được chuyển sang base64 và lưu trực tiếp qua API món ăn hiện tại.</Typography.Text>
           </Form.Item>
           <Form.Item label="Tên món"><Input value={formValues.name} onChange={handleInputChange('name')} /></Form.Item>
           <Form.Item label="Mô tả"><TextArea rows={4} value={formValues.description} onChange={handleInputChange('description')} /></Form.Item>

@@ -176,6 +176,22 @@ export class BootstrapService {
     `);
 
     await this.mysql.thucThi('ALTER TABLE DanhGia ADD COLUMN IF NOT EXISTS HinhAnh LONGTEXT NULL');
+
+    await this.mysql.thucThi(`
+      CREATE TABLE IF NOT EXISTS LichSuDiemTichLuy (
+        MaGiaoDichDiem VARCHAR(50) PRIMARY KEY,
+        MaKH VARCHAR(50) NOT NULL,
+        MaDonHang VARCHAR(50),
+        LoaiBienDong ENUM('CONG','TRU','DIEU_CHINH') NOT NULL DEFAULT 'CONG',
+        SoDiem INT NOT NULL,
+        SoDiemTruoc INT NOT NULL DEFAULT 0,
+        SoDiemSau INT NOT NULL DEFAULT 0,
+        MoTa VARCHAR(255),
+        NgayTao DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        CONSTRAINT FK_LichSuDiemTichLuy_KhachHang FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE CASCADE,
+        CONSTRAINT FK_LichSuDiemTichLuy_DonHang FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE SET NULL
+      ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+    `);
   }
 
   private async seedCoBan() {

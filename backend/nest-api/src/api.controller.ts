@@ -1,4 +1,4 @@
-import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put, Query } from '@nestjs/common';
 import { ApiService } from './api.service';
 
 @Controller('api')
@@ -135,9 +135,19 @@ export class ApiController {
     return this.apiService.taoDatBan(body);
   }
 
+  @Get('dat-ban/availability')
+  layKhaDungDatBan(@Query() query: Record<string, unknown>) {
+    return this.apiService.layKhaDungDatBan(query);
+  }
+
   @Patch('dat-ban/:maDatBan/status')
   capNhatTrangThaiDatBan(@Param('maDatBan') maDatBan: string, @Body() body: Record<string, unknown>) {
     return this.apiService.capNhatTrangThaiDatBan(maDatBan, String(body.trangThai || ''));
+  }
+
+  @Patch('dat-ban/:maDatBan/assign-tables')
+  ganBanChoDatBan(@Param('maDatBan') maDatBan: string, @Body() body: Record<string, unknown>) {
+    return this.apiService.ganBanChoDatBan(maDatBan, body);
   }
 
   @Get('don-hang')
@@ -218,5 +228,15 @@ export class ApiController {
   @Patch('mang-ve/don-hang/:maDonHang/huy')
   huyDonMangVe(@Param('maDonHang') maDonHang: string) {
     return this.apiService.huyDonMangVe(maDonHang);
+  }
+
+  @Get('loyalty/me')
+  layTongQuanDiemTichLuy(@Headers('authorization') authorization?: string) {
+    return this.apiService.layTongQuanDiemTichLuy(authorization);
+  }
+
+  @Get('loyalty/me/history')
+  layLichSuDiemTichLuy(@Headers('authorization') authorization?: string) {
+    return this.apiService.layLichSuDiemTichLuy(authorization);
   }
 }

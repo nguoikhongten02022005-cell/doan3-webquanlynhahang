@@ -27,6 +27,7 @@ function BuocMotDatBan({
   timeSlotOptions,
   selectedAreaUnavailableMessage,
   largePartyNotice,
+  thongBaoTaiBan,
   onGuestSelect,
   onDateSelect,
   onDateInputChange,
@@ -103,6 +104,8 @@ function BuocMotDatBan({
       <Card title="Chọn khung giờ" extra={hasSelectedDate ? <Text type="secondary">{selectedDateLabel} {selectedDayLabel ? `· ${selectedDayLabel}` : ''}</Text> : null}>
         <div className="dat-ban-flow-section-head">
         </div>
+
+        {thongBaoTaiBan ? <Alert type={thongBaoTaiBan.includes('Đang tải') ? 'info' : 'warning'} showIcon title={thongBaoTaiBan} style={{ marginBottom: 16 }} /> : null}
 
         {!hasSelectedDate ? (
           <Alert type="info" showIcon title="Chọn ngày trước để xem khung giờ." description="Ngay khi có ngày dùng bữa, chúng tôi sẽ gợi ý các khung giờ còn phù hợp với lựa chọn của bạn." />
