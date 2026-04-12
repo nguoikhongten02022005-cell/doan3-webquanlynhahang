@@ -1,5 +1,5 @@
 import { useCallback } from 'react'
-import { STORAGE_KEYS } from '../../constants/khoaLuuTru'
+import { STORAGE_KEYS } from '../../../constants/khoaLuuTru'
 import { CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST } from '../mocks/duLieuDatBan'
 import {
   huyDatBanApi,
@@ -10,15 +10,15 @@ import {
   capNhatDatBanApi,
   capNhatTrangThaiDatBanApi,
   ganBanChoDatBanApi,
-} from '../../services/api/apiDatBan'
-import { datJsonLuuTru } from '../../services/dichVuLuuTru'
+} from '../../../services/api/apiDatBan'
+import { datJsonLuuTru } from '../../../services/dichVuLuuTru'
 import { xoaBanNhapTamDatBan, layBanNhapTamDatBanHopLe, luuBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
-import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
+import { TRANG_THAI_BAN } from '../../../services/dichVuBanAn.js'
 import {
   anhXaMucDatBan,
   chuanHoaDatBan,
 } from '../utils/anhXaDatBan'
-import { useXacThuc } from '../../hooks/useXacThuc'
+import { useXacThuc } from '../../../hooks/useXacThuc'
 
 export const SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN = 'booking:data-changed'
 
@@ -217,9 +217,17 @@ export const useDatBan = () => {
   }, [layLichSuDatBan])
 
   const layDanhSachDatBanHost = useCallback(async () => {
-    const { duLieu } = await layDanhSachDatBanApi()
-    const danhSachDatBan = Array.isArray(duLieu) ? duLieu : []
-    return danhSachDatBan.map(chuanHoaDatBan).filter(Boolean)
+    try {
+      const { duLieu } = await layDanhSachDatBanApi()
+      const danhSachDatBan = Array.isArray(duLieu) ? duLieu : []
+      return danhSachDatBan.map(chuanHoaDatBan).filter(Boolean)
+    } catch (error) {
+      if (error?.status === 401 || error?.status === 403) {
+        return []
+      }
+
+      throw error
+    }
   }, [])
 
   const layBanPhuHopChoDatBan = useCallback((booking, danhSachBanGhiDe = []) => locBanPhuHopChoDatBan(booking, danhSachBanGhiDe), [])

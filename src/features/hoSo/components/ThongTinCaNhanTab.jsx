@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Button, Form, Input, Upload } from 'antd'
-import { useThongBao } from '../../context/ThongBaoContext'
+import { useThongBao } from '../../../context/ThongBaoContext'
 
 const UserAvatarIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

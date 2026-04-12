@@ -9,9 +9,9 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import { Alert, Badge, Button, Card, Descriptions, Empty, Grid, Input, List, Segmented, Select, Space, Spin, Table, Tag, Typography } from 'antd'
-import { dinhDangTienTe } from '../../utils/tienTe'
+import { dinhDangTienTe } from '../../../utils/tienTe'
 import { dinhDangNgay } from '../dinhDang'
-import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../utils/donHang'
+import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../../utils/donHang'
 
 const { TextArea } = Input
 const { useBreakpoint } = Grid

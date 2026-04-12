@@ -83,7 +83,7 @@ function DangNhapNoiBoPage() {
             <Paragraph className="xac-thuc-subtitle">
               Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.
             </Paragraph>
-            {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa bật backend mode. Hãy cấu hình VITE_USE_BACKEND=true để đăng nhập nội bộ bằng API thật." style={{ marginBottom: 16 }} /> : null}
+            {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa kết nối máy chủ. Vui lòng kiểm tra cấu hình hệ thống trước khi đăng nhập nội bộ." style={{ marginBottom: 16 }} /> : null}
 
             {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." style={{ marginBottom: 16 }} /> : null}
             {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} style={{ marginBottom: 16 }} /> : null}
@@ -138,11 +138,6 @@ function DangNhapNoiBoPage() {
                 </Button>
               </Form.Item>
             </Form>
-
-            <p className="xac-thuc-switch-text">
-              <Text type="secondary">Muốn chuyển sang khu vực khách hàng? </Text>
-              <Link to="/dang-nhap">Mở đăng nhập khách hàng</Link>
-            </p>
       </Card>
     </section>
   )

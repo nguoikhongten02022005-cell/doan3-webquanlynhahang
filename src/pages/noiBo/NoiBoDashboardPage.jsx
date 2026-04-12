@@ -16,7 +16,6 @@ function NoiBoDashboardPage() {
   return (
     <Flex vertical gap={laMobile ? 14 : 20} style={{ width: '100%' }}>
       <Space orientation="vertical" size={4} style={{ width: '100%' }}>
-        <Typography.Text className="noi-bo-dashboard-kicker">Toàn cảnh vận hành</Typography.Text>
         <Typography.Title level={laMobile ? 4 : 3} style={{ margin: 0 }}>
           Bảng điều khiển nhà hàng hôm nay
         </Typography.Title>

@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react'
-import { layDanhSachMonApi } from '../../services/api/apiThucDon'
-import { chuanHoaDanhSachMonThucDon } from '../../services/mappers/anhXaThucDon'
+import { layDanhSachMonApi } from '../../../services/api/apiThucDon'
+import { chuanHoaDanhSachMonThucDon } from '../../../services/mappers/anhXaThucDon'
 
 export const useDanhSachMonAn = () => {
   const [danhSachMon, setDanhSachMon] = useState([])

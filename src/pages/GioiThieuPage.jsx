@@ -8,7 +8,7 @@ function GioiThieuPage() {
         <div className="container">
             <div className="about-editorial">
               <div className="about-editorial-media">
-                <img className="about-editorial-image" src={chefPortrait} alt="Đầu bếp của nhà hàng" />
+                <img className="about-editorial-image" src={chefPortrait} alt="Bếp trưởng của nhà hàng" />
               </div>
 
             <div className="about-editorial-copy">
@@ -39,7 +39,7 @@ function GioiThieuPage() {
                   Ẩm thực không chỉ là món ăn, mà là nghệ thuật kết nối con người với nhau
                 </p>
                 <div className="about-editorial-author">
-                  <p className="about-editorial-name">Chef Nguyễn Minh Tuấn</p>
+                  <p className="about-editorial-name">Nguyễn Minh Tuấn</p>
                   <p className="about-editorial-role">Bếp trưởng</p>
                 </div>
                 <p className="about-editorial-signature" aria-hidden="true">Nguyễn Minh Tuấn</p>
@@ -83,7 +83,7 @@ function GioiThieuPage() {
                 <article className="about-award-item">
                   <span className="about-award-index">01</span>
                   <div>
-                    <h3>Không gian chuẩn fine dining</h3>
+                    <h3>Không gian ẩm thực cao cấp</h3>
                     <p>Thiết kế sang trọng, ấm cúng và chỉn chu trong từng trải nghiệm tại bàn.</p>
                   </div>
                 </article>
@@ -131,7 +131,7 @@ function GioiThieuPage() {
           <div className="team-grid">
             <div className="team-member">
               <div className="team-member-photo team-photo-1"></div>
-              <h3 className="team-member-name">Chef Nguyễn Minh Tuấn</h3>
+              <h3 className="team-member-name">Nguyễn Minh Tuấn</h3>
               <p className="team-member-role">Bếp trưởng</p>
               <p className="team-member-bio">15 năm kinh nghiệm, từng làm việc tại các nhà hàng 5 sao</p>
             </div>
@@ -146,14 +146,14 @@ function GioiThieuPage() {
             <div className="team-member">
               <div className="team-member-photo team-photo-3"></div>
               <h3 className="team-member-name">Lê Văn Đức</h3>
-              <p className="team-member-role">Sous Chef</p>
+              <p className="team-member-role">Bếp phó</p>
               <p className="team-member-bio">Chuyên môn về ẩm thực Âu và món fusion sáng tạo</p>
             </div>
 
             <div className="team-member">
               <div className="team-member-photo team-photo-4"></div>
               <h3 className="team-member-name">Phạm Thu Hà</h3>
-              <p className="team-member-role">Pastry Chef</p>
+              <p className="team-member-role">Bếp bánh</p>
               <p className="team-member-bio">Nghệ nhân bánh ngọt với đam mê tạo nên những tác phẩm nghệ thuật</p>
             </div>
           </div>

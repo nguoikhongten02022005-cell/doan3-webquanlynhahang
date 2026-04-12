@@ -81,18 +81,39 @@ function MangVeThanhToanPage() {
           <section className="thanh-toan-form-panel">
             <h2>Thông tin nhận đơn</h2>
             <div className="thanh-toan-form-grid">
-              <div className="nhom-truong full"><label className="nhan-truong">Họ tên</label><input className="truong-nhap" value={formData.hoTen} onChange={(e) => setFormData((c) => ({ ...c, hoTen: e.target.value }))} required /></div>
-              <div className="nhom-truong full"><label className="nhan-truong">Số điện thoại</label><input className="truong-nhap" value={formData.soDienThoai} onChange={(e) => setFormData((c) => ({ ...c, soDienThoai: e.target.value }))} required /></div>
-              <div className="nhom-truong full"><label className="nhan-truong">Hình thức</label><input className="truong-nhap" value={formData.loaiNhanHang === 'MANG_VE_GIAO_HANG' ? 'Giao hàng' : 'Tự đến lấy'} readOnly /></div>
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="mang-ve-ho-ten">Họ tên</label>
+                <input id="mang-ve-ho-ten" name="hoTen" className="truong-nhap" value={formData.hoTen} onChange={(e) => setFormData((c) => ({ ...c, hoTen: e.target.value }))} required />
+              </div>
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="mang-ve-so-dien-thoai">Số điện thoại</label>
+                <input id="mang-ve-so-dien-thoai" name="soDienThoai" className="truong-nhap" inputMode="tel" autoComplete="tel" value={formData.soDienThoai} onChange={(e) => setFormData((c) => ({ ...c, soDienThoai: e.target.value }))} required />
+              </div>
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="mang-ve-hinh-thuc">Hình thức</label>
+                <input id="mang-ve-hinh-thuc" className="truong-nhap" value={formData.loaiNhanHang === 'MANG_VE_GIAO_HANG' ? 'Giao hàng' : 'Tự đến lấy'} readOnly />
+              </div>
               {formData.loaiNhanHang === 'MANG_VE_GIAO_HANG' ? (
                 <>
-                  <div className="nhom-truong full"><label className="nhan-truong">Địa chỉ giao</label><input className="truong-nhap" value={formData.diaChiGiao} onChange={(e) => setFormData((c) => ({ ...c, diaChiGiao: e.target.value }))} required /></div>
-                  <div className="nhom-truong full"><label className="nhan-truong">Giờ giao</label><input className="truong-nhap" value={formData.gioGiao} onChange={(e) => setFormData((c) => ({ ...c, gioGiao: e.target.value }))} required /></div>
+                  <div className="nhom-truong full">
+                    <label className="nhan-truong" htmlFor="mang-ve-dia-chi-giao">Địa chỉ giao</label>
+                    <input id="mang-ve-dia-chi-giao" name="diaChiGiao" className="truong-nhap" autoComplete="street-address" value={formData.diaChiGiao} onChange={(e) => setFormData((c) => ({ ...c, diaChiGiao: e.target.value }))} required />
+                  </div>
+                  <div className="nhom-truong full">
+                    <label className="nhan-truong" htmlFor="mang-ve-gio-giao">Giờ giao</label>
+                    <input id="mang-ve-gio-giao" name="gioGiao" className="truong-nhap" inputMode="numeric" value={formData.gioGiao} onChange={(e) => setFormData((c) => ({ ...c, gioGiao: e.target.value }))} required />
+                  </div>
                 </>
               ) : (
-                <div className="nhom-truong full"><label className="nhan-truong">Giờ đến lấy</label><input className="truong-nhap" value={formData.gioLayHang} onChange={(e) => setFormData((c) => ({ ...c, gioLayHang: e.target.value }))} required /></div>
+                <div className="nhom-truong full">
+                  <label className="nhan-truong" htmlFor="mang-ve-gio-lay">Giờ đến lấy</label>
+                  <input id="mang-ve-gio-lay" name="gioLayHang" className="truong-nhap" inputMode="numeric" value={formData.gioLayHang} onChange={(e) => setFormData((c) => ({ ...c, gioLayHang: e.target.value }))} required />
+                </div>
               )}
-              <div className="nhom-truong full"><label className="nhan-truong">Ghi chú</label><textarea className="truong-van-ban" rows="4" value={formData.ghiChu} onChange={(e) => setFormData((c) => ({ ...c, ghiChu: e.target.value.slice(0, 300) }))} /></div>
+              <div className="nhom-truong full">
+                <label className="nhan-truong" htmlFor="mang-ve-ghi-chu">Ghi chú</label>
+                <textarea id="mang-ve-ghi-chu" name="ghiChu" className="truong-van-ban" rows="4" value={formData.ghiChu} onChange={(e) => setFormData((c) => ({ ...c, ghiChu: e.target.value.slice(0, 300) }))} />
+              </div>
             </div>
           </section>
 

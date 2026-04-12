@@ -12,8 +12,8 @@ function ChanTrang() {
           </Link>
           <p>Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.</p>
           <div className="social-links" aria-label="Mạng xã hội">
-            <a href="#">Facebook</a>
-            <a href="#">Instagram</a>
+            <a href="#">Theo dõi trên Facebook</a>
+            <a href="#">Theo dõi trên Instagram</a>
           </div>
         </section>
 

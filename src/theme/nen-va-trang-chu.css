@@ -125,9 +125,9 @@ button:focus-visible,
 .main-nav button.active, .main-nav button:hover { color: #302219; }
 .main-nav a.active::after, .main-nav a:hover::after,
 .main-nav button.active::after, .main-nav button:hover::after { transform: translateX(-50%) scaleX(1); }
-.header-actions { display: flex; align-items: center; gap: 0.5rem; }
+.header-actions { display: flex; align-items: center; gap: 0.65rem; }
 .icon-btn {
-  width: 2.45rem; height: 2.45rem; border: 1px solid rgba(216, 204, 190, 0.95);
+  width: 2.75rem; height: 2.75rem; border: 1px solid rgba(216, 204, 190, 0.95);
   background: rgba(255, 252, 248, 0.92); border-radius: 50%;
   display: grid; place-items: center; cursor: pointer;
   color: #34261d; transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease;
@@ -140,13 +140,13 @@ button:focus-visible,
 .header-dat-ban-btn {
   min-width: 5.9rem;
   padding-inline: 1.05rem;
-  min-height: 2.45rem;
+  min-height: 2.75rem;
   border-radius: 0.9rem;
   box-shadow: none;
   font-size: 0.82rem;
 }
 .header-login-btn {
-  min-height: 2.45rem;
+  min-height: 2.75rem;
   padding-inline: 1rem;
   border-radius: 0.9rem;
   border: 1px solid rgba(216, 204, 190, 0.95);

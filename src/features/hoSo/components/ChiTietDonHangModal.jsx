@@ -1,6 +1,6 @@
 import { Button, Card, Divider, List, Modal, Space, Tag, Typography } from 'antd'
-import { dinhDangNgay } from '../../features/noiBo/dinhDang'
-import { dinhDangTienTeVietNam } from '../../utils/tienTe'
+import { dinhDangNgay } from '../../noiBo/dinhDang'
+import { dinhDangTienTeVietNam } from '../../../utils/tienTe'
 
 const { Paragraph, Text, Title } = Typography
 

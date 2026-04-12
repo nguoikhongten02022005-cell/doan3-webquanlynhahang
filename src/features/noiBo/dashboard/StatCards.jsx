@@ -22,7 +22,7 @@ function StatCards({ stats }) {
     },
     {
       key: 'open-bookings',
-      title: 'Booking đang mở',
+      title: 'Đơn đặt bàn đang mở',
       value: stats?.openBookings || 0,
     },
     {

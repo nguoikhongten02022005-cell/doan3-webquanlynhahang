@@ -126,7 +126,9 @@ function DauTrang() {
           <button
             type="button"
             className="icon-btn mobile-toggle"
-            aria-label="Mở menu"
+            aria-label={mobileMenuOpen ? 'Đóng menu' : 'Mở menu'}
+            aria-expanded={mobileMenuOpen}
+            aria-controls="mobile-menu-chinh"
             onClick={handleToggleMobileMenu}
           >
             <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
@@ -137,7 +139,7 @@ function DauTrang() {
       </div>
 
       {mobileMenuOpen && (
-        <div className="mobile-menu open container">
+        <div id="mobile-menu-chinh" className="mobile-menu open container" role="dialog" aria-label="Menu điều hướng trên điện thoại">
           {navItems.map((item) => (
             <Link
               key={item.label}

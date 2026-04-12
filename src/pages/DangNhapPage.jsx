@@ -68,7 +68,7 @@ function DangNhapPage() {
           Đăng nhập để tiếp tục sử dụng tài khoản khách hàng của bạn.
         </Paragraph>
 
-        {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa bật backend mode. Hãy cấu hình VITE_USE_BACKEND=true để đăng nhập bằng API thật." style={{ marginBottom: 16 }} /> : null}
+        {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa kết nối máy chủ. Vui lòng kiểm tra cấu hình hệ thống trước khi đăng nhập." style={{ marginBottom: 16 }} /> : null}
 
         <Form
           form={form}

@@ -28,14 +28,14 @@ export const useNoiBoData = () => {
         key: 'pending-bookings',
         title: 'Chờ xác nhận',
         value: duLieuNoiBo.danhSachDatBanChoXuLy.length,
-        detail: duLieuNoiBo.danhSachDatBanChoXuLy.length > 0 ? 'Ưu tiên gọi lại và chốt bàn.' : 'Không có booking chờ xử lý.',
+        detail: duLieuNoiBo.danhSachDatBanChoXuLy.length > 0 ? 'Ưu tiên gọi lại và chốt bàn.' : 'Không có đơn đặt bàn chờ xử lý.',
         tone: duLieuNoiBo.danhSachDatBanChoXuLy.length > 0 ? 'warning' : 'neutral',
       },
       {
         key: 'unassigned-bookings',
         title: 'Chưa gán bàn',
         value: duLieuNoiBo.danhSachDatBanChuaGanBan.length,
-        detail: duLieuNoiBo.danhSachDatBanChuaGanBan.length > 0 ? 'Cần phân bàn trước giờ khách đến.' : 'Các booking đang có bàn phù hợp.',
+        detail: duLieuNoiBo.danhSachDatBanChuaGanBan.length > 0 ? 'Cần phân bàn trước giờ khách đến.' : 'Các đơn đặt bàn đang có bàn phù hợp.',
         tone: duLieuNoiBo.danhSachDatBanChuaGanBan.length > 0 ? 'danger' : 'neutral',
       },
       {

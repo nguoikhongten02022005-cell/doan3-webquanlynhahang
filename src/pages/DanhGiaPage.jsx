@@ -280,7 +280,7 @@ function DanhGiaPage() {
             <p className="eyebrow">Phản hồi từ khách hàng</p>
             <h1>Đánh giá trải nghiệm thật, minh bạch và hiện đại</h1>
             <p>
-              Tổng hợp nhận xét đã xác thực từ khách hàng, hiển thị theo chuẩn UX/UI hiện đại như Google Maps, Shopee và GrabFood.
+              Tổng hợp nhận xét đã xác thực từ khách hàng, trình bày rõ ràng, hiện đại và dễ theo dõi.
             </p>
             <div className="danh-gia-modern-hero__badges">
               <span className="danh-gia-modern-badge danh-gia-modern-badge--primary">Đã xác thực</span>

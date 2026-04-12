@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { dinhDangNgay } from '../../features/noiBo/dinhDang'
+import { dinhDangNgay } from '../../noiBo/dinhDang'
 
 const BookingCalendarIcon = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">

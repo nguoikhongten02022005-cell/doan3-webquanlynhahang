@@ -65,6 +65,7 @@ function App() {
           </Route>
         </Route>
 
+        <Route path="/dang-nhap-noi-bo" element={<Navigate to="/noi-bo/dang-nhap" replace />} />
         <Route path="/noi-bo/dang-nhap" element={<DangNhapNoiBoPage />} />
         <Route
           path="/noi-bo"

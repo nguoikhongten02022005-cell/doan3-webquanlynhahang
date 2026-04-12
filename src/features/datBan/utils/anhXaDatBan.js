@@ -1,4 +1,4 @@
-import { NHAN_KHU_VUC_DAT_BAN } from '../../features/datBan/mocks/duLieuDatBan.js'
+import { NHAN_KHU_VUC_DAT_BAN } from '../mocks/duLieuDatBan.js'
 
 export const dinhDangNgay = (value) => {
   if (!value) return '--'

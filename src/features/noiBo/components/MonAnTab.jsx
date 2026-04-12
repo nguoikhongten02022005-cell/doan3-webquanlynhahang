@@ -1,11 +1,11 @@
 import { useMemo, useState } from 'react'
 import { DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, PictureOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
 import { Alert, Badge, Button, Card, Col, Drawer, Empty, Form, Input, Row, Segmented, Select, Space, Switch, Tag, Typography, Upload } from 'antd'
-import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../features/thucDon/constants/danhMucThucDon'
-import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, ANH_DU_PHONG_THUC_DON } from '../../features/thucDon/constants/tuyChonThucDon'
-import { taoMonApi, xoaMonApi, capNhatMonApi, uploadAnhMonApi } from '../../services/api/apiThucDon'
-import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../services/mappers/anhXaThucDon'
-import { phanTichGiaThanhSo } from '../../utils/giaTien'
+import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../thucDon/constants/danhMucThucDon'
+import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, ANH_DU_PHONG_THUC_DON } from '../../thucDon/constants/tuyChonThucDon'
+import { taoMonApi, xoaMonApi, capNhatMonApi, uploadAnhMonApi } from '../../../services/api/apiThucDon'
+import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../../services/mappers/anhXaThucDon'
+import { phanTichGiaThanhSo } from '../../../utils/giaTien'
 
 const { Search, TextArea } = Input
 const { Title, Paragraph, Text } = Typography
@@ -246,9 +246,8 @@ function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
       <Card>
         <Row gutter={[16, 16]} align="middle">
           <Col xs={24} xl={8}>
-            <Typography.Text type="secondary" style={{ textTransform: 'uppercase', letterSpacing: '0.16em' }}>POS Menu Studio</Typography.Text>
-            <Title level={3} style={{ margin: '8px 0 0' }}>Danh sách món ăn</Title>
-            <Paragraph type="secondary" style={{ marginBottom: 0 }}>Tìm nhanh, lọc theo danh mục và điều khiển trạng thái hiển thị món theo chuẩn POS hiện đại.</Paragraph>
+            <Title level={3} style={{ margin: 0 }}>Danh sách món ăn</Title>
+            <Paragraph type="secondary" style={{ margin: '8px 0 0' }}>Tìm nhanh, lọc theo danh mục và điều khiển trạng thái hiển thị món theo chuẩn POS hiện đại.</Paragraph>
           </Col>
           <Col xs={24} xl={16}>
             <Space orientation="vertical" size={12} style={{ width: '100%' }}>

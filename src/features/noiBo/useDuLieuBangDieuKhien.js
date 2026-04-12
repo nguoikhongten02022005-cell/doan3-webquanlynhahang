@@ -1,8 +1,8 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { useDanhSachMonAn } from '../../features/thucDon/hooks/useDanhSachMonAn'
-import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../../features/datBan/hooks/useDatBan'
+import { useDanhSachMonAn } from '../thucDon/hooks/useDanhSachMonAn'
+import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../datBan/hooks/useDatBan'
 import { useXacThuc } from '../../hooks/useXacThuc'
-import { layDanhSachNguoiDungApi } from '../../services/api/apiXacThuc'
+import { layDanhSachNguoiDungApi, taoNguoiDungNoiBoApi, capNhatNguoiDungNoiBoApi, xoaNguoiDungNoiBoApi } from '../../services/api/apiXacThuc'
 import { layDanhSachDanhGiaApi, duyetDanhGiaApi } from '../../services/api/apiDanhGia'
 import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
@@ -232,6 +232,28 @@ export const useDuLieuBangDieuKhien = () => {
     return ketQua
   }, [taiLaiDuLieu])
 
+  const xuLyTaoNguoiDungNoiBo = useCallback(async (duLieuGuiDi) => {
+    const ketQua = await taoNguoiDungNoiBoApi(duLieuGuiDi)
+    if (ketQua?.duLieu) {
+      await taiLaiDuLieu()
+    }
+    return ketQua
+  }, [taiLaiDuLieu])
+
+  const xuLyCapNhatNguoiDungNoiBo = useCallback(async (maND, duLieuGuiDi) => {
+    const ketQua = await capNhatNguoiDungNoiBoApi(maND, duLieuGuiDi)
+    if (ketQua?.duLieu) {
+      await taiLaiDuLieu()
+    }
+    return ketQua
+  }, [taiLaiDuLieu])
+
+  const xuLyXoaNguoiDungNoiBo = useCallback(async (maND) => {
+    const ketQua = await xoaNguoiDungNoiBoApi(maND)
+    await taiLaiDuLieu()
+    return ketQua
+  }, [taiLaiDuLieu])
+
   return {
     tomTatTaiKhoan,
     danhSachDatBanDangHoatDong,
@@ -260,6 +282,9 @@ export const useDuLieuBangDieuKhien = () => {
     layChiTietDonHang,
     xuLyCapNhatTrangThaiDonHang,
     xuLyDuyetDanhGia,
+    xuLyTaoNguoiDungNoiBo,
+    xuLyCapNhatNguoiDungNoiBo,
+    xuLyXoaNguoiDungNoiBo,
     danhSachDonHangDangMo,
     tomTatDonHang,
     danhSachDatBanChoXuLy,

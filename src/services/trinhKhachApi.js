@@ -76,7 +76,7 @@ const phanTichDuLieuPhanHoi = async (phanHoi) => {
 }
 
 const taoLoiTuPhanHoiApi = (phanHoi, duLieu) => {
-  const loi = new Error(duLieu?.message || 'API request failed')
+  const loi = new Error(duLieu?.message || 'Yêu cầu tới máy chủ không thành công.')
   loi.status = phanHoi.status
   loi.details = duLieu?.details
   return loi

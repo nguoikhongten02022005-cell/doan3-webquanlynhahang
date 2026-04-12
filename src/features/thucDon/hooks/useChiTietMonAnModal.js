@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { CAC_LUA_CHON_KICH_CO_THUC_DON } from '../constants/tuyChonThucDon'
 import { BI_DANH_DANH_MUC_THUC_DON } from '../constants/danhMucThucDon'
-import { phanTichGiaThanhSo } from '../../utils/giaTien'
+import { phanTichGiaThanhSo } from '../../../utils/giaTien'
 
 export const useChiTietMonAnModal = ({ sizeOptions = CAC_LUA_CHON_KICH_CO_THUC_DON, themVaoGio = null }) => {
   const kichCoMacDinh = sizeOptions[0]?.value || 'M'

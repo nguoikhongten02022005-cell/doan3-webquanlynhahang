@@ -15,7 +15,7 @@ import {
   UserOutlined,
 } from '@ant-design/icons'
 import { Alert, Badge, Button, Card, Col, Descriptions, Divider, Drawer, Empty, Form, Input, InputNumber, Modal, Row, Select, Segmented, Space, Tag, Typography } from 'antd'
-import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../features/datBan/mocks/duLieuDatBan'
+import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../datBan/mocks/duLieuDatBan'
 import {
   dinhDangNgayGio,
   dinhDangSoKhach,
@@ -181,12 +181,12 @@ function DatBanFormCard({
   return (
     <Card
       title={<Typography.Title level={4} style={{ margin: 0 }}>{title}</Typography.Title>}
-      extra={<Tag color="orange">{formMode === 'edit' ? 'EDIT' : 'CREATE'}</Tag>}
+      extra={<Tag color="orange">{formMode === 'edit' ? 'Đang chỉnh sửa' : 'Tạo mới'}</Tag>}
     >
       <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>{subtitle}</Typography.Paragraph>
 
       <Form layout="vertical" onSubmitCapture={onSubmit}>
-        <Card size="small" title="Thông tin backend đang hỗ trợ" style={{ marginBottom: 16 }}>
+        <Card size="small" title="Thông tin biểu mẫu" style={{ marginBottom: 16 }}>
           <Alert
             type="info"
             showIcon
@@ -227,7 +227,7 @@ function DatBanFormCard({
 
         <Divider style={{ marginTop: 0 }} />
         <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-          <Button size="middle" onClick={onReset}>{formMode === 'edit' ? 'Hủy' : 'Reset'}</Button>
+          <Button size="middle" onClick={onReset}>{formMode === 'edit' ? 'Hủy' : 'Làm lại'}</Button>
           <Button type="primary" size="middle" htmlType="submit" icon={<CheckCircleOutlined />}>{formMode === 'edit' ? 'Cập nhật' : 'Thêm mới'}</Button>
         </Space>
       </Form>

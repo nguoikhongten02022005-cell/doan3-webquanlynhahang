@@ -37,7 +37,7 @@ function TheMonAn({
     <div className={`the-mon-cover ${isMenuVariant ? 'the-mon-cover--menu' : ''}`}>
       <img className="the-mon-cover-image" src={safeDish.image} alt={dishName} loading="lazy" />
       <div className="the-mon-cover-head">
-        <Tag bordered={false} color="default" className="the-mon-badge">
+        <Tag variant="filled" color="default" className="the-mon-badge">
           {dishBadge}
         </Tag>
       </div>
@@ -45,7 +45,7 @@ function TheMonAn({
   ) : (
     <div className={`the-mon-cover the-mon-cover--placeholder ${isMenuVariant ? 'the-mon-cover--menu' : ''}`}>
       <div className="the-mon-cover-head">
-        <Tag bordered={false} color="default" className="the-mon-badge">
+        <Tag variant="filled" color="default" className="the-mon-badge">
           {dishBadge}
         </Tag>
       </div>

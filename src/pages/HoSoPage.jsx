@@ -82,12 +82,12 @@ function HoSoPage() {
     [],
   )
 
-  const handleCancelBooking = async (bookingCode) => {
-    const xacNhan = window.confirm(`Bạn có chắc muốn hủy booking ${bookingCode}?`)
+  const handleCancelBooking = async (maDatBan) => {
+    const xacNhan = window.confirm(`Bạn có chắc muốn hủy đặt bàn ${maDatBan}?`)
     if (!xacNhan) return
 
     try {
-      const ketQua = await huyDatBan(bookingCode, bookingCode)
+      const ketQua = await huyDatBan(maDatBan, maDatBan)
       if (!ketQua.success) {
         hienThongBao({
           message: ketQua.error || 'Không thể hủy đặt bàn lúc này.',
@@ -100,7 +100,7 @@ function HoSoPage() {
 
       setLichSuDatBan(Array.isArray(ketQua.lichSuDatBan) ? ketQua.lichSuDatBan : [])
       hienThongBao({
-        message: ketQua.message || `Đã hủy booking ${bookingCode}.`,
+        message: ketQua.message || `Đã hủy đặt bàn ${maDatBan}.`,
         tone: 'success',
         duration: 3000,
         title: '',

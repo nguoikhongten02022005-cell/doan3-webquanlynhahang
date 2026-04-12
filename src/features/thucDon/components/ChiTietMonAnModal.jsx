@@ -1,6 +1,6 @@
 import { CAC_LUA_CHON_KICH_CO_THUC_DON, CAC_LUA_CHON_TOPPING_THUC_DON } from '../constants/tuyChonThucDon'
-import { dinhDangTienTe } from '../../utils/tienTe'
-import { phanTichGiaThanhSo } from '../../utils/giaTien'
+import { dinhDangTienTe } from '../../../utils/tienTe'
+import { phanTichGiaThanhSo } from '../../../utils/giaTien'
 
 function ChiTietMonAnModal({
   giaChiTiet,

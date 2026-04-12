@@ -134,9 +134,9 @@ function TrangChuPage() {
         <div className="container tim-chung-toi-grid">
           <div className="tim-chung-toi-noi-dung">
             <p className="tim-chung-toi-kicker">Liên hệ</p>
-            <h2 id="tim-chung-toi-title">Tìm Chúng Tôi</h2>
+            <h2 id="tim-chung-toi-title">Tìm chúng tôi</h2>
             <p className="tim-chung-toi-dia-chi">
-              Lane Ends Bungalow, Whatcroft Hall Lane, Rudheath, CW9 75G
+              28 Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh
             </p>
 
             <div className="tim-chung-toi-thong-tin">

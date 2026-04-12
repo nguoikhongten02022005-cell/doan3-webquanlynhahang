@@ -8,8 +8,8 @@ export const CAC_LUA_CHON_SAP_XEP_THUC_DON = Object.freeze([
 export const CAC_LUA_CHON_TOPPING_THUC_DON = Object.freeze(['Thêm phô mai', 'Thêm trứng', 'Sốt đặc biệt'])
 
 export const CAC_LUA_CHON_KICH_CO_THUC_DON = Object.freeze([
-  { value: 'M', label: 'Size M', surcharge: 0 },
-  { value: 'L', label: 'Size L', surcharge: 30000 },
+  { value: 'M', label: 'Cỡ M', surcharge: 0 },
+  { value: 'L', label: 'Cỡ L', surcharge: 30000 },
 ])
 
 export const CAC_LUA_CHON_SAC_DO_THUC_DON = Object.freeze([

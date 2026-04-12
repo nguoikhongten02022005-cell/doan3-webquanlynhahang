@@ -1,7 +1,7 @@
 import { Link } from 'react-router-dom'
 import { Button, Empty, Segmented } from 'antd'
-import { dinhDangNgay } from '../../features/noiBo/dinhDang'
-import { dinhDangTienTeVietNam } from '../../utils/tienTe'
+import { dinhDangNgay } from '../../noiBo/dinhDang'
+import { dinhDangTienTeVietNam } from '../../../utils/tienTe'
 
 const BO_LOC = [
   { key: 'ALL', label: 'Tất cả' },

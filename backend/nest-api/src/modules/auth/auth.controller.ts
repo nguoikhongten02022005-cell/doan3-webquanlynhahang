@@ -30,6 +30,11 @@ export class AuthController {
     return this.authService.layThongTinToi(authorization);
   }
 
+  @Get('nguoi-dung')
+  layDanhSachNguoiDung(@Headers('authorization') authorization?: string) {
+    return this.authService.layDanhSachNguoiDung(authorization);
+  }
+
   @Put('profile')
   capNhatHoSo(@Headers('authorization') authorization: string | undefined, @Body() body: Record<string, unknown>) {
     return this.authService.capNhatHoSo(authorization, body);

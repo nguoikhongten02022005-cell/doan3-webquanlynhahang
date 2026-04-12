@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { SITE_CONTACT } from '../../constants/lienHeTrang'
+import { SITE_CONTACT } from '../../../constants/lienHeTrang'
 
 function DatBanThanhCong({ confirmation }) {
   return (

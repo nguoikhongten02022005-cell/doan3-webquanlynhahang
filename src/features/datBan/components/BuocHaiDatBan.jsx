@@ -1,5 +1,5 @@
 import { Alert, Button, Card, Col, Form, Input, Row, Select, Space, Tag, Typography } from 'antd'
-import { CAC_GOI_Y_GHI_CHU_DAT_BAN, CAC_DIP_DAT_BAN } from '../../features/datBan/mocks/duLieuDatBan'
+import { CAC_GOI_Y_GHI_CHU_DAT_BAN, CAC_DIP_DAT_BAN } from '../mocks/duLieuDatBan'
 
 const { TextArea } = Input
 

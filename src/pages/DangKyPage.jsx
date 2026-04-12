@@ -77,7 +77,7 @@ function DangKyPage() {
         <p className="xac-thuc-subtitle">
           Tạo tài khoản khách hàng để đặt bàn, theo dõi đơn và lưu thông tin cá nhân.
         </p>
-        {!backendMode ? <Alert type="warning" showIcon message="Ứng dụng chưa bật backend mode. Hãy cấu hình VITE_USE_BACKEND=true để đăng ký bằng API thật." style={{ marginBottom: 16 }} /> : null}
+        {!backendMode ? <Alert type="warning" showIcon message="Ứng dụng chưa kết nối máy chủ. Vui lòng kiểm tra cấu hình hệ thống trước khi đăng ký." style={{ marginBottom: 16 }} /> : null}
 
         <form onSubmit={handleSubmit} className="xac-thuc-form">
           <div className="nhom-truong">

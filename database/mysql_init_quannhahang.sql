@@ -503,16 +503,6 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT003', 'DH001', 'M008', 2, 25000, 50000, NULL, 'Done', NOW()),
 ('CT004', 'DH001', 'M006', 1, 30000, 30000, NULL, 'Done', NOW());
 
-INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
-('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW()),
-('HD002', 'DH002', 'KH002', NULL, 140000, 0, 10, 14000, 154000, 'Khach den lay tai quay', NOW()),
-('HD003', 'DH003', 'KH_TEST_01', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Don giao hang khu vuc trung tam', NOW());
-
-INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
-('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW()),
-('TT002', 'HD002', 'TienMat', 154000, NULL, 'Pending', NOW()),
-('TT003', 'HD003', 'MoMo', 143000, 'MOMO_DH003_001', 'Pending', NOW());
-
 INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
 ('DH002', 'KH002', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '18:30:00', NULL, 0, 140000, 'Ready', 'Online', 'Khach se den lay sau gio tan lam', NOW(), NOW()),
 ('DH003', 'KH_TEST_01', NULL, NULL, 'NV002', NULL, 'MANG_VE_GIAO_HANG', '123 Nguyen Hue, Q1, TP.HCM', NULL, '19:15:00', 15000, 180000, 'Confirmed', 'Online', 'Giao tan noi, goi truoc khi giao', NOW(), NOW());
@@ -524,6 +514,16 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT008', 'DH003', 'M004', 1, 75000, 75000, 'Them tieu', 'Preparing', NOW()),
 ('CT009', 'DH003', 'M008', 2, 25000, 50000, 'Bot duong', 'Preparing', NOW()),
 ('CT010', 'DH003', 'M010', 1, 30000, 30000, NULL, 'Pending', NOW());
+
+INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
+('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW()),
+('HD002', 'DH002', 'KH002', NULL, 140000, 0, 10, 14000, 154000, 'Khach den lay tai quay', NOW()),
+('HD003', 'DH003', 'KH_TEST_01', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Don giao hang khu vuc trung tam', NOW());
+
+INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
+('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW()),
+('TT002', 'HD002', 'TienMat', 154000, NULL, 'Pending', NOW()),
+('TT003', 'HD003', 'MoMo', 143000, 'MOMO_DH003_001', 'Pending', NOW());
 
 INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES
 ('LS007', 'DH002', NULL, 'Pending', 'Tao don mang ve pickup', 'System', NOW()),

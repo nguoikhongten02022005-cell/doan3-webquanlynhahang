@@ -50,3 +50,27 @@ export const layDanhSachNguoiDungApi = async () => {
     duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaNguoiDung).filter(Boolean) : [],
   }
 }
+
+export const taoNguoiDungNoiBoApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.post('/nguoi-dung', {
+  hoTen: payload.hoTen || payload.fullName || '',
+  email: payload.email || '',
+  soDienThoai: payload.soDienThoai || payload.phone || '',
+  vaiTro: payload.vaiTro || 'NhanVien',
+  trangThai: payload.trangThai || 'Active',
+  chucVu: payload.chucVu || '',
+  matKhau: payload.matKhau || '',
+  xacNhanMatKhau: payload.xacNhanMatKhau || '',
+}))
+
+export const capNhatNguoiDungNoiBoApi = async (maND, payload) => tachPhanHoiApi(await trinhKhachApi.put(`/nguoi-dung/${maND}`, {
+  hoTen: payload.hoTen || payload.fullName || '',
+  email: payload.email || '',
+  soDienThoai: payload.soDienThoai || payload.phone || '',
+  vaiTro: payload.vaiTro || 'NhanVien',
+  trangThai: payload.trangThai || 'Active',
+  chucVu: payload.chucVu || '',
+  matKhau: payload.matKhau || '',
+  xacNhanMatKhau: payload.xacNhanMatKhau || '',
+}))
+
+export const xoaNguoiDungNoiBoApi = async (maND) => tachPhanHoiApi(await trinhKhachApi.delete(`/nguoi-dung/${maND}`))

@@ -1,4 +1,4 @@
-import { layJsonLuuTru, xoaMucLuuTru, datJsonLuuTru } from '../../services/dichVuLuuTru'
+import { layJsonLuuTru, xoaMucLuuTru, datJsonLuuTru } from '../../../services/dichVuLuuTru'
 
 const THOI_GIAN_HET_HAN_BAN_NHAP_TAM = 1000 * 60 * 60 * 12
 const CAC_TRUONG_BAN_NHAP_TAM_DAT_BAN = [

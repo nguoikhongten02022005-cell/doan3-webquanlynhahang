@@ -2,7 +2,7 @@ import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
   CAC_SO_KHACH_DAT_BAN,
   NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN,
-} from '../../features/datBan/mocks/duLieuDatBan'
+} from '../mocks/duLieuDatBan'
 import { Alert, Button, Card, Col, DatePicker, Row, Space, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 

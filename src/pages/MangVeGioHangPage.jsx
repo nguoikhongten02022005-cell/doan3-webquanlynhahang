@@ -138,14 +138,14 @@ function MangVeGioHangPage() {
             <div className="tom-tat-card gio-hang-tom-tat-card">
               <h2>Đơn mang về</h2>
               <div className="nhom-truong">
-                <label className="nhan-truong">Hình thức nhận hàng</label>
-                <div className="thanh-toan-voucher-xem-list">
+                <label className="nhan-truong" id="mang-ve-loai-nhan-hang-label">Hình thức nhận hàng</label>
+                <div className="thanh-toan-voucher-xem-list" role="radiogroup" aria-labelledby="mang-ve-loai-nhan-hang-label">
                   <label className={`chi-tiet-mon-option ${loaiNhanHang === 'MANG_VE_PICKUP' ? 'selected' : ''}`}>
-                    <input type="radio" checked={loaiNhanHang === 'MANG_VE_PICKUP'} onChange={() => setLoaiNhanHang('MANG_VE_PICKUP')} />
+                    <input type="radio" name="loaiNhanHang" checked={loaiNhanHang === 'MANG_VE_PICKUP'} onChange={() => setLoaiNhanHang('MANG_VE_PICKUP')} />
                     <span className="chi-tiet-mon-option-label">Tự đến lấy</span>
                   </label>
                   <label className={`chi-tiet-mon-option ${loaiNhanHang === 'MANG_VE_GIAO_HANG' ? 'selected' : ''}`}>
-                    <input type="radio" checked={loaiNhanHang === 'MANG_VE_GIAO_HANG'} onChange={() => setLoaiNhanHang('MANG_VE_GIAO_HANG')} />
+                    <input type="radio" name="loaiNhanHang" checked={loaiNhanHang === 'MANG_VE_GIAO_HANG'} onChange={() => setLoaiNhanHang('MANG_VE_GIAO_HANG')} />
                     <span className="chi-tiet-mon-option-label">Giao hàng</span>
                   </label>
                 </div>
@@ -161,7 +161,7 @@ function MangVeGioHangPage() {
                 <>
                   <div className="nhom-truong">
                     <label className="nhan-truong" htmlFor="dia-chi-giao">Địa chỉ giao</label>
-                    <input id="dia-chi-giao" className="truong-nhap" placeholder="Nhập địa chỉ đầy đủ..." value={diaChiGiao} onChange={(e) => setDiaChiGiao(e.target.value)} />
+                    <input id="dia-chi-giao" className="truong-nhap" autoComplete="street-address" placeholder="Nhập địa chỉ đầy đủ..." value={diaChiGiao} onChange={(e) => setDiaChiGiao(e.target.value)} />
                   </div>
                   <p className="thanh-toan-tom-tat-note">Chỉ giao trong nội thành TP.HCM.</p>
                 </>
@@ -195,7 +195,7 @@ function MangVeGioHangPage() {
                   })}
                 </div>
                 <div className="voucher-controls">
-                  <input className="truong-nhap voucher-input" placeholder="Nhập mã giảm giá" value={maVoucherNhap} onChange={(e) => setMaVoucherNhap(e.target.value)} />
+                  <input className="truong-nhap voucher-input" aria-label="Nhập mã giảm giá" placeholder="Nhập mã giảm giá" value={maVoucherNhap} onChange={(e) => setMaVoucherNhap(e.target.value)} />
                   <button type="button" className="btn nut-chinh voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>{dangApVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}</button>
                 </div>
                 {loiVoucher ? <p className="voucher-message error">{loiVoucher}</p> : null}

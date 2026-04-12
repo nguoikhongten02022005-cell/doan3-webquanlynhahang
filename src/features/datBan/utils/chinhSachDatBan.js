@@ -1,4 +1,4 @@
-import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
+import { TRANG_THAI_BAN } from '../../../services/dichVuBanAn.js'
 import { chuanHoaDanhSachIdBanDaGan } from './anhXaDatBan.js'
 
 export const CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG = new Set([

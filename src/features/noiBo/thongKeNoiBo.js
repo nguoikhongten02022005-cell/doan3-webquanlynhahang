@@ -1,5 +1,5 @@
-import { DANH_SACH_MON } from '../../features/thucDon/mocks/duLieuThucDon'
-import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../../features/thucDon/constants/danhMucThucDon'
+import { DANH_SACH_MON } from '../thucDon/mocks/duLieuThucDon'
+import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../thucDon/constants/danhMucThucDon'
 
 const pad = (value) => String(value).padStart(2, '0')
 

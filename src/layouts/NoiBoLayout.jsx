@@ -139,7 +139,6 @@ function NoiBoLayout() {
           <Space align="center" size={12}>
             {laMobile ? <Button type="text" icon={drawerOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />} onClick={() => setDrawerOpen(true)} className="noi-bo-mobile-toggle" /> : null}
             <div>
-              <Text type="secondary" style={{ display: 'block', fontSize: 12, textTransform: 'uppercase', letterSpacing: '0.12em' }}>Khu vực nội bộ</Text>
               <Title level={4} style={{ margin: 0 }}>{metaTrang.label}</Title>
             </div>
           </Space>

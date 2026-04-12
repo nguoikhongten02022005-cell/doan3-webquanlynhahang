@@ -24,6 +24,14 @@ select {
   font: inherit;
 }
 
+button,
+a,
+input,
+textarea,
+select {
+  -webkit-tap-highlight-color: rgba(232, 102, 74, 0.18);
+}
+
 .notification-stack {
   position: fixed;
   left: 50%;

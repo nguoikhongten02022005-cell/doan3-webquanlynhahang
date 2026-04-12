@@ -1,5 +1,5 @@
-import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../features/datBan/mocks/duLieuDatBan'
-import { dinhDangTienTe } from '../../utils/tienTe'
+import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../datBan/mocks/duLieuDatBan'
+import { dinhDangTienTe } from '../../../utils/tienTe'
 import {
   dinhDangNgay,
   dinhDangNgayGio,
@@ -8,7 +8,7 @@ import {
   laySacThaiDonHang,
   layNhanChoNgoi,
 } from '../dinhDang'
-import { layNhanTrangThaiDonHang } from '../../utils/donHang'
+import { layNhanTrangThaiDonHang } from '../../../utils/donHang'
 import { layGhiChuUuTienDatBan } from '../boChon'
 
 function TongQuanTab({
