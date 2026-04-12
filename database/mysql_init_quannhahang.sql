@@ -136,18 +136,23 @@ CREATE TABLE IF NOT EXISTS MaGiamGia (
 -- 9. DAT BAN
 -- ============================================================
 CREATE TABLE IF NOT EXISTS DatBan (
-    MaDatBan    VARCHAR(50) PRIMARY KEY,
-    MaKH        VARCHAR(50),
-    MaBan       VARCHAR(50),
-    MaNV        VARCHAR(50),
-    NgayDat     DATE NOT NULL,
-    GioDat      TIME NOT NULL,
-    GioKetThuc  TIME,
-    SoNguoi     INT NOT NULL,
-    GhiChu      VARCHAR(500),
-    TrangThai   ENUM('Pending','Confirmed','Cancelled','NoShow','Completed') NOT NULL DEFAULT 'Pending',
-    NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    MaDatBan       VARCHAR(50) PRIMARY KEY,
+    MaKH           VARCHAR(50),
+    MaBan          VARCHAR(50),
+    MaNV           VARCHAR(50),
+    TenKhachDatBan VARCHAR(100),
+    SDTDatBan      VARCHAR(20),
+    EmailDatBan    VARCHAR(100),
+    NgayDat        DATE NOT NULL,
+    GioDat         TIME NOT NULL,
+    GioKetThuc     TIME,
+    SoNguoi        INT NOT NULL,
+    GhiChu         VARCHAR(500),
+    KhuVucUuTien   VARCHAR(50),
+    GhiChuNoiBo    VARCHAR(500),
+    TrangThai      ENUM('Pending','Confirmed','Cancelled','NoShow','Completed','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
+    NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT FK_DatBan_KhachHang
         FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
     CONSTRAINT FK_DatBan_Ban
@@ -168,6 +173,8 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaDatBan    VARCHAR(50),
     LoaiDon     ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG','TAI_BAN') NOT NULL DEFAULT 'TAI_QUAN',
     DiaChiGiao  VARCHAR(255),
+    GioLayHang  TIME,
+    GioGiao     TIME,
     PhiShip     DECIMAL(10,2) NOT NULL DEFAULT 0,
     TongTien    DECIMAL(15,2) NOT NULL DEFAULT 0,
     TrangThai   ENUM('Pending','Confirmed','Preparing','Ready','Served','Paid','Cancelled') NOT NULL DEFAULT 'Pending',
@@ -246,16 +253,17 @@ CREATE TABLE IF NOT EXISTS ThanhToan (
 -- 14. DANH GIA
 -- ============================================================
 CREATE TABLE IF NOT EXISTS DanhGia (
-    MaDanhGia   VARCHAR(50) PRIMARY KEY,
-    MaKH        VARCHAR(50) NOT NULL,
-    MaDonHang   VARCHAR(50) NOT NULL,
-    SoSao       TINYINT NOT NULL,
-    NoiDung     VARCHAR(500),
-    PhanHoi     VARCHAR(500),
-    HinhAnh     LONGTEXT,
-    NgayDanhGia DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    TrangThai   ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
+    MaDanhGia    VARCHAR(50) PRIMARY KEY,
+    MaKH         VARCHAR(50) NOT NULL,
+    MaDonHang    VARCHAR(50) NOT NULL,
+    SoSao        TINYINT NOT NULL,
+    NoiDung      VARCHAR(500),
+    PhanHoi      VARCHAR(500),
+    HinhAnh      LONGTEXT,
+    SoLuotHuuIch INT NOT NULL DEFAULT 0,
+    NgayDanhGia  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    NgayCapNhat  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    TrangThai    ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
     CONSTRAINT FK_DanhGia_KhachHang
         FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE CASCADE,
     CONSTRAINT FK_DanhGia_DonHang
@@ -279,7 +287,26 @@ CREATE TABLE IF NOT EXISTS LichSuDonHang (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 16. THONG BAO
+-- 16. LICH SU DIEM TICH LUY
+-- ============================================================
+CREATE TABLE IF NOT EXISTS LichSuDiemTichLuy (
+    MaGiaoDichDiem VARCHAR(50) PRIMARY KEY,
+    MaKH           VARCHAR(50) NOT NULL,
+    MaDonHang      VARCHAR(50),
+    LoaiBienDong   ENUM('CONG','TRU','DIEU_CHINH') NOT NULL DEFAULT 'CONG',
+    SoDiem         INT NOT NULL,
+    SoDiemTruoc    INT NOT NULL DEFAULT 0,
+    SoDiemSau      INT NOT NULL DEFAULT 0,
+    MoTa           VARCHAR(255),
+    NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    CONSTRAINT FK_LichSuDiemTichLuy_KhachHang
+        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE CASCADE,
+    CONSTRAINT FK_LichSuDiemTichLuy_DonHang
+        FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- ============================================================
+-- 17. THONG BAO
 -- ============================================================
 CREATE TABLE IF NOT EXISTS ThongBao (
     MaThongBao   VARCHAR(50) PRIMARY KEY,
@@ -314,6 +341,8 @@ CREATE INDEX IDX_ThanhToan_HoaDon ON ThanhToan(MaHoaDon);
 CREATE INDEX IDX_ThanhToan_TrangThai ON ThanhToan(TrangThai);
 CREATE INDEX IDX_DanhGia_TrangThai ON DanhGia(TrangThai);
 CREATE INDEX IDX_LichSu_DonHang ON LichSuDonHang(MaDonHang);
+CREATE INDEX IDX_LichSuDiemTichLuy_MaKH ON LichSuDiemTichLuy(MaKH);
+CREATE INDEX IDX_LichSuDiemTichLuy_NgayTao ON LichSuDiemTichLuy(NgayTao);
 CREATE INDEX IDX_ThongBao_MaND ON ThongBao(MaND);
 CREATE INDEX IDX_ThongBao_DaDoc ON ThongBao(DaDoc);
 
@@ -458,11 +487,15 @@ INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangTo
 ('SUMMER20', 'Khuyen mai He', 20, 'PhanTram', 100000, 200000, '2026-06-01', '2026-08-31', NULL, 0, 'Active'),
 ('GIAM50K', 'Giam thang 50k', 50000, 'SoTien', NULL, 300000, '2026-01-01', '2026-12-31', 500, 0, 'Active');
 
-INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
-('DB001', 'KH001', 'B004', 'NV002', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhat, can banh kem', 'Confirmed', NOW(), NOW());
+INSERT INTO DatBan (
+    MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
+    NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
+    TrangThai, NgayTao, NgayCapNhat
+) VALUES
+('DB001', 'KH001', 'B004', 'NV002', 'Tran Van Khach', '0912345678', 'khach1@gmail.com', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhat, can banh kem', 'PHONG_VIP', 'Can sap xep ban dep va uu tien check-in dung gio', 'Confirmed', NOW(), NOW());
 
-INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
-('DH001', 'KH001', 'B004', NULL, 'NV002', 'DB001', 'TAI_QUAN', NULL, 0, 215000, 'Paid', 'DatBan', NULL, NOW(), NOW());
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH001', 'KH001', 'B004', NULL, 'NV002', 'DB001', 'TAI_QUAN', NULL, NULL, NULL, 0, 215000, 'Paid', 'DatBan', NULL, NOW(), NOW());
 
 INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
 ('CT001', 'DH001', 'M001', 2, 35000, 70000, NULL, 'Done', NOW()),
@@ -471,27 +504,38 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT004', 'DH001', 'M006', 1, 30000, 30000, NULL, 'Done', NOW());
 
 INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
-('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW());
+('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW()),
+('HD002', 'DH002', 'KH002', NULL, 140000, 0, 10, 14000, 154000, 'Khach den lay tai quay', NOW()),
+('HD003', 'DH003', 'KH_TEST_01', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Don giao hang khu vuc trung tam', NOW());
 
 INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
-('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW());
+('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW()),
+('TT002', 'HD002', 'TienMat', 154000, NULL, 'Pending', NOW()),
+('TT003', 'HD003', 'MoMo', 143000, 'MOMO_DH003_001', 'Pending', NOW());
 
-INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, NgayDanhGia, NgayCapNhat, TrangThai) VALUES
-('DG001', 'KH001', 'DH001', 5, 'Mon ngon, phuc vu nhiet tinh, khong gian dep!', NULL, NULL, NOW(), NOW(), 'Pending');
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH002', 'KH002', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '18:30:00', NULL, 0, 140000, 'Ready', 'Online', 'Khach se den lay sau gio tan lam', NOW(), NOW()),
+('DH003', 'KH_TEST_01', NULL, NULL, 'NV002', NULL, 'MANG_VE_GIAO_HANG', '123 Nguyen Hue, Q1, TP.HCM', NULL, '19:15:00', 15000, 180000, 'Confirmed', 'Online', 'Giao tan noi, goi truoc khi giao', NOW(), NOW());
+
+INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
+('CT005', 'DH002', 'M003', 1, 55000, 55000, 'Khong hanh', 'Done', NOW()),
+('CT006', 'DH002', 'M009', 1, 35000, 35000, 'It da', 'Done', NOW()),
+('CT007', 'DH002', 'M007', 2, 25000, 50000, NULL, 'Done', NOW()),
+('CT008', 'DH003', 'M004', 1, 75000, 75000, 'Them tieu', 'Preparing', NOW()),
+('CT009', 'DH003', 'M008', 2, 25000, 50000, 'Bot duong', 'Preparing', NOW()),
+('CT010', 'DH003', 'M010', 1, 30000, 30000, NULL, 'Pending', NOW());
 
 INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES
-('LS001', 'DH001', NULL, 'Pending', NULL, 'System', NOW()),
-('LS002', 'DH001', 'Pending', 'Confirmed', NULL, 'NV002', NOW()),
-('LS003', 'DH001', 'Confirmed', 'Preparing', NULL, 'NV002', NOW()),
-('LS004', 'DH001', 'Preparing', 'Ready', NULL, 'System', NOW()),
-('LS005', 'DH001', 'Ready', 'Served', NULL, 'NV002', NOW()),
-('LS006', 'DH001', 'Served', 'Paid', NULL, 'NV003', NOW());
+('LS007', 'DH002', NULL, 'Pending', 'Tao don mang ve pickup', 'System', NOW()),
+('LS008', 'DH002', 'Pending', 'Confirmed', 'Da goi xac nhan khach den lay', 'NV003', NOW()),
+('LS009', 'DH002', 'Confirmed', 'Preparing', 'Bep tiep nhan don', 'NV003', NOW()),
+('LS010', 'DH002', 'Preparing', 'Ready', 'San sang tra khach tai quay', 'NV003', NOW()),
+('LS011', 'DH003', NULL, 'Pending', 'Tao don giao hang', 'System', NOW()),
+('LS012', 'DH003', 'Pending', 'Confirmed', 'Xac nhan dia chi giao hang', 'NV002', NOW());
 
-
-
-SELECT * FROM DanhGia WHERE MaDanhGia = 'DG001';
-SELECT MaChiTiet, MaMon, DonGia, ThanhTien FROM ChiTietDonHang WHERE MaChiTiet = 'CT004';
-SELECT * FROM V_TinhTrangBan;
+INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, SoDiem, SoDiemTruoc, SoDiemSau, MoTa, NgayTao) VALUES
+('LSD002', 'KH002', 'DH002', 'CONG', 15, 65, 80, 'Cong diem tu don hang pickup DH002', NOW()),
+('LSD003', 'KH_TEST_01', 'DH003', 'CONG', 14, 0, 14, 'Tam cong diem cho don giao hang DH003', NOW());
 
 -- Tai khoan khach test moi
 UPDATE NguoiDung
