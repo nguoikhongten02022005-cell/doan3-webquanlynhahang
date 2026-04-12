@@ -2,6 +2,8 @@ import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UploadedFile,
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { CapNhatMonDto } from './dto/cap-nhat-mon.dto';
+import { TaoMonDto } from './dto/tao-mon.dto';
 import { ThucDonService } from './thuc-don.service';
 
 const taoTenTapTinAnhMon = (_req: unknown, tapTin: { originalname?: string }, callback: (error: Error | null, filename: string) => void) => {
@@ -29,12 +31,12 @@ export class ThucDonController {
   }
 
   @Post()
-  taoMon(@Headers('authorization') authorization: string | undefined, @Body() body: Record<string, unknown>) {
+  taoMon(@Headers('authorization') authorization: string | undefined, @Body() body: TaoMonDto) {
     return this.thucDonService.taoMon(authorization, body);
   }
 
   @Put(':maMon')
-  capNhatMon(@Headers('authorization') authorization: string | undefined, @Param('maMon') maMon: string, @Body() body: Record<string, unknown>) {
+  capNhatMon(@Headers('authorization') authorization: string | undefined, @Param('maMon') maMon: string, @Body() body: CapNhatMonDto) {
     return this.thucDonService.capNhatMon(authorization, maMon, body);
   }
 

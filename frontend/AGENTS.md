@@ -3,13 +3,15 @@
 ## Phạm vi
 File này là bộ quy tắc dành cho phần frontend hiện tại của repo.
 
-Frontend hiện tại không nằm trong một thư mục `frontend/` riêng để chạy chính, mà nằm ở thư mục gốc với mã nguồn giao diện chủ yếu trong `src/`.
+Frontend hiện tại chạy chính trong thư mục `frontend/` với mã nguồn giao diện chủ yếu trong `frontend/src/`.
 
 Vì vậy, khi làm việc với frontend hiện tại, hãy áp dụng các quy tắc trong file này cho:
-- `src/`
-- `public/`
-- `index.html`
-- các file cấu hình frontend ở root như `vite.config.js`, `eslint.config.js`, `package.json` nếu thay đổi thật sự liên quan đến giao diện
+- `frontend/src/`
+- `frontend/public/`
+- `frontend/index.html`
+- các file cấu hình frontend trong `frontend/` như `frontend/vite.config.js`, `frontend/eslint.config.js`, `frontend/tailwind.config.js`, `frontend/postcss.config.js`
+- `frontend/package.json`
+- `package.json` ở root nếu thay đổi script điều phối frontend/backend
 
 Ngoài các quy tắc trong file này, cần tiếp tục tôn trọng tinh thần từ `AGENTS.md` ở root: ưu tiên đặt tên mới rõ nghĩa theo nghiệp vụ, ưu tiên tiếng Việt không dấu khi phù hợp, và giữ tính nhất quán với convention đang có trong từng file.
 
@@ -24,8 +26,8 @@ Khi chỉnh sửa frontend:
 
 ## Vị trí của frontend trong repo hiện tại
 Hiện trạng repo:
-- frontend chạy ở thư mục gốc
-- mã nguồn giao diện chính nằm trong `src/`
+- frontend chạy trong thư mục `frontend/`
+- mã nguồn giao diện chính nằm trong `frontend/src/`
 - backend đang dùng thật cho phát triển và kiểm thử nằm trong `backend/nest-api`
 
 Khi cần đối chiếu API đang chạy thật, ưu tiên đọc `README.md`, `backend/nest-api/README.md` và mã nguồn trong `backend/nest-api/`.
@@ -38,17 +40,17 @@ Khi cần đối chiếu API đang chạy thật, ưu tiên đọc `README.md`, 
 
 ## Cấu trúc cần tôn trọng
 Ưu tiên giữ cấu trúc frontend hiện có, ví dụ:
-- `src/components/`
-- `src/pages/`
-- `src/layouts/`
-- `src/features/`
-- `src/context/`
-- `src/hooks/`
-- `src/services/`
-- `src/utils/`
-- `src/constants/`
-- `src/data/`
-- `src/assets/`
+- `frontend/src/components/`
+- `frontend/src/pages/`
+- `frontend/src/layouts/`
+- `frontend/src/features/`
+- `frontend/src/context/`
+- `frontend/src/hooks/`
+- `frontend/src/services/`
+- `frontend/src/utils/`
+- `frontend/src/constants/`
+- `frontend/src/data/`
+- `frontend/src/assets/`
 
 Không tự ý đổi tên hoặc di chuyển file hàng loạt nếu không có yêu cầu rõ ràng.
 

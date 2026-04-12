@@ -407,18 +407,18 @@ LEFT JOIN DonHang dh
 
 -- ============================================================
 -- DU LIEU MAU
--- Password mac dinh:
--- admin@nhahang.com / 123
--- an.nv@nhahang.com / 123
--- bich.lt@nhahang.com / 123
+-- Password mac dinh da doi chieu voi DB dang chay:
+-- admin@nhahang.com / Admin@123
+-- an.nv@nhahang.com / Staff@123
+-- bich.lt@nhahang.com / Staff@123
 -- khach1@gmail.com / 123
 -- mai.pt@gmail.com / 123
--- khachtest01@gmail.com / 12345678
+-- khachtest01@gmail.com / chua xac minh tu DB dang chay (giu nguyen hash hien tai)
 -- ============================================================
 INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro, TrangThai) VALUES
-('ND001', 'Admin System', 'admin@nhahang.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'Admin', 'Active'),
-('ND002', 'Nguyen Van An', 'an.nv@nhahang.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'NhanVien', 'Active'),
-('ND003', 'Le Thi Bich', 'bich.lt@nhahang.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'NhanVien', 'Active'),
+('ND001', 'Admin System', 'admin@nhahang.com', '$2b$10$QQjUYOP2RIOusra.a.Sig.dnEWuKOnYCqQoMEqhJPX/T/XJ.dMEiW', 'Admin', 'Active'),
+('ND002', 'Nguyen Van An', 'an.nv@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
+('ND003', 'Le Thi Bich', 'bich.lt@nhahang.com', '$2b$10$cU0ttRiu8gphooM1j9SuVuJ8l7M0GLj8G/ZzReu9xFxDyY/5YFi4W', 'NhanVien', 'Active'),
 ('ND004', 'Tran Van Khach', 'khach1@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
 ('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
 ('ND_KH_TEST_01', 'Nguyen Van Test', 'khachtest01@gmail.com', '$2a$11$dtmZV4AJS/fB16ymIqO4AuCZuj21tj08dUYpY3uons9iJor0n1omW', 'KhachHang', 'Active');

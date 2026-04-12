@@ -71,7 +71,12 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
-  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: false }));
+  app.useGlobalPipes(new ValidationPipe({
+    transform: true,
+    whitelist: true,
+    forbidNonWhitelisted: true,
+    transformOptions: { enableImplicitConversion: true },
+  }));
   app.setGlobalPrefix('');
   await app.get(BootstrapService).khoiTaoNeuCan();
   await app.listen(congBackend);

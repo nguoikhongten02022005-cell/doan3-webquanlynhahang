@@ -5,7 +5,7 @@
 Thu muc `backend/` chua backend NestJS + MySQL chinh cua du an quan ly nha hang.
 
 Hien trang repo:
-- frontend chay o thu muc goc voi ma nguon chinh trong `src/`
+- frontend chay trong thu muc `frontend/` voi ma nguon chinh trong `frontend/src/` va `frontend/package.json` rieng
 - backend chinh dung cho phat trien va demo nam trong `backend/nest-api`
 
 ## Cong nghe cua ma trong `backend/`

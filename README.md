@@ -102,7 +102,9 @@ Hệ thống cung cấp giao diện web thân thiện, dễ sử dụng cho từ
 
 ```text
 doan3-webquanlynhahang/
-├── src/                                      # Frontend React + Vite
+├── frontend/                                 # Frontend React + Vite
+│   ├── src/
+│   └── public/
 ├── backend/
 │   └── nest-api/                             # Backend NestJS chinh de chay tren Linux
 └── README.md
@@ -112,14 +114,27 @@ doan3-webquanlynhahang/
 
 ### Chạy frontend
 
-Tại thư mục gốc:
+Cài phụ thuộc frontend một lần:
 
 ```bash
+cd frontend
 npm install
+```
+
+Chạy frontend từ thư mục gốc:
+
+```bash
 npm run dev
 ```
 
-Cấu hình tối thiểu trong `.env`:
+Hoặc chạy trực tiếp trong `frontend/`:
+
+```bash
+cd frontend
+npm run dev
+```
+
+Cấu hình tối thiểu trong `.env` ở thư mục gốc:
 
 ```env
 VITE_USE_BACKEND=true
@@ -143,5 +158,7 @@ Can cau hinh DB trong `backend/nest-api/.env`.
 ## Ghi chú
 
 - Backend duy nhat trong repo hien tai la `backend/nest-api`.
+- Frontend da co `frontend/package.json` rieng de tach vong doi frontend khoi backend.
+- `package.json` o root dong vai tro dieu phoi lenh giua `frontend/` va `backend/nest-api`.
 - Frontend van goi `http://localhost:5011/api` qua `VITE_API_BASE_URL`, nen khong can doi contract o frontend.
 - Neu chay lan dau, hay tao `backend/nest-api/.env` tu `.env.example` va dien dung thong tin MySQL local.
