@@ -2,12 +2,12 @@ import {
   CAC_DANH_MUC_CHUAN_THUC_DON,
   BI_DANH_DANH_MUC_THUC_DON,
   DANH_MUC_MAC_DINH_THUC_DON,
-} from '../../constants/danhMucThucDon'
+} from '../../features/thucDon/constants/danhMucThucDon'
 import {
   NHAN_MAC_DINH_THUC_DON,
   SAC_DO_MAC_DINH_THUC_DON,
   ANH_DU_PHONG_THUC_DON,
-} from '../../constants/tuyChonThucDon'
+} from '../../features/thucDon/constants/tuyChonThucDon'
 import { phanTichGiaThanhSo } from '../../utils/giaTien'
 import { dinhDangTienTe } from '../../utils/tienTe'
 

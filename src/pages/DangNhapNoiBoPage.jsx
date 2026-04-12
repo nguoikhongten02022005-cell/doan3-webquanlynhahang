@@ -23,7 +23,7 @@ function DangNhapNoiBoPage() {
   const location = useLocation()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
   const backendMode = coSuDungMayChu()
-  const duongDanChuyenHuongSauDangNhap = location.state?.from || '/admin/dashboard'
+  const duongDanChuyenHuongSauDangNhap = location.state?.from || '/noi-bo/dashboard'
 
   useEffect(() => {
     if (layMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)) {
@@ -140,8 +140,8 @@ function DangNhapNoiBoPage() {
             </Form>
 
             <p className="xac-thuc-switch-text">
-              <Text type="secondary">Bạn là khách hàng? </Text>
-              <Link to="/dang-nhap">Đăng nhập tại đây</Link>
+              <Text type="secondary">Muốn chuyển sang khu vực khách hàng? </Text>
+              <Link to="/dang-nhap">Mở đăng nhập khách hàng</Link>
             </p>
       </Card>
     </section>

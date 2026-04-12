@@ -1,14 +1,14 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import ChiTietMonAnModal from '../components/thucDon/ChiTietMonAnModal'
-import SectionDanhSachMonDongBo from '../components/thucDon/SectionDanhSachMonDongBo'
+import ChiTietMonAnModal from '../features/thucDon/components/ChiTietMonAnModal'
+import SectionDanhSachMonDongBo from '../features/thucDon/components/SectionDanhSachMonDongBo'
 import { useGioHang } from '../context/GioHangContext'
 import {
   GHI_CHU_DANH_MUC_THUC_DON,
   HOME_CAC_DANH_MUC_THUC_DON,
-} from '../constants/danhMucThucDon'
-import { layAnhMonTheoTen } from '../constants/anhMonAn'
-import { useChiTietMonAnModal } from '../hooks/useChiTietMonAnModal'
-import { useDanhSachMonAn } from '../hooks/useDanhSachMonAn'
+} from '../features/thucDon/constants/danhMucThucDon'
+import { layAnhMonTheoTen } from '../features/thucDon/constants/anhMonAn'
+import { useChiTietMonAnModal } from '../features/thucDon/hooks/useChiTietMonAnModal'
+import { useDanhSachMonAn } from '../features/thucDon/hooks/useDanhSachMonAn'
 
 const MENU_CATEGORY_META = Object.freeze(
   HOME_CAC_DANH_MUC_THUC_DON.reduce(

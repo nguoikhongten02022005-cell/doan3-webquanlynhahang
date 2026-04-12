@@ -15,7 +15,7 @@ import {
   tinhSoTienGiamTheoVoucher,
 } from '../services/dichVuPhieuGiamGia'
 import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
-import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../constants/phieuGiamGia'
+import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 

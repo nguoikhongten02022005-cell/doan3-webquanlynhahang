@@ -39,8 +39,8 @@ function DauTrang() {
     setUserMenuOpen(false)
   }
 
-  const handleLogout = () => {
-    dangXuat()
+  const handleLogout = async () => {
+    await dangXuat()
     closeMenus()
     navigate('/')
   }
@@ -98,7 +98,7 @@ function DauTrang() {
                       Xin chào, <strong>{displayName}</strong>
                     </div>
                     {coTheVaoNoiBo && (
-                      <Link to="/noi-bo/bang-dieu-khien" role="menuitem" onClick={handleNavLinkClick}>
+                      <Link to="/noi-bo/dashboard" role="menuitem" onClick={handleNavLinkClick}>
                         Bảng điều khiển nội bộ
                       </Link>
                     )}
@@ -154,7 +154,7 @@ function DauTrang() {
                 Xin chào, <strong>{displayName}</strong>
               </div>
               {coTheVaoNoiBo && (
-                <Link to="/noi-bo/bang-dieu-khien" onClick={handleNavLinkClick}>
+                <Link to="/noi-bo/dashboard" onClick={handleNavLinkClick}>
                   Bảng điều khiển nội bộ
                 </Link>
               )}

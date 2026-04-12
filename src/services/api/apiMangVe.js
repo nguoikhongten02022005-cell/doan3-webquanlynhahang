@@ -48,16 +48,16 @@ export const layDonMangVeApi = async (maDonHang) => {
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
-export const layDanhSachDonMangVeChoAdminApi = async () => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/mang-ve/admin/don-hang'))
+export const layDanhSachDonMangVeChoNoiBoApi = async () => {
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/mang-ve/noi-bo/don-hang'))
   return {
     ...phanHoi,
-    duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonMangVeChoAdmin).filter(Boolean) : [],
+    duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonMangVeChoNoiBo).filter(Boolean) : [],
   }
 }
 
 export const capNhatTrangThaiDonMangVeApi = async (maDonHang, trangThai) => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/mang-ve/admin/don-hang/${maDonHang}/trang-thai`, { trangThai }))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/mang-ve/noi-bo/don-hang/${maDonHang}/trang-thai`, { trangThai }))
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
@@ -74,7 +74,7 @@ export const huyDonMangVeApi = async (maDonHang) => {
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
-function chuanHoaDonMangVeChoAdmin(duLieu) {
+function chuanHoaDonMangVeChoNoiBo(duLieu) {
   if (!duLieu || typeof duLieu !== 'object') return null
   return {
     maDonHang: duLieu.MaDonHang || duLieu.maDonHang || '',

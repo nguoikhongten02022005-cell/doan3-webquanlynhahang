@@ -6,7 +6,7 @@ import { layJsonLuuTru, datJsonLuuTru } from '../services/dichVuLuuTru'
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { xoaPhieuGiamGiaDaApDung as clearStoredVoucher, layPhieuGiamGiaDaApDung as getStoredVoucher, luuPhieuGiamGiaDaApDung as saveVoucher, tinhSoTienGiamTheoVoucher } from '../services/dichVuPhieuGiamGia'
 import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
-import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../constants/phieuGiamGia'
+import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 
 const DANH_SACH_GIO_LAY = ['10:30', '11:00', '11:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00']
 const DANH_SACH_GIO_GIAO = ['10:00', '10:30', '11:00', '11:30', '17:00', '17:30', '18:00', '18:30', '19:00', '19:30', '20:00', '20:30', '21:00', '21:30']

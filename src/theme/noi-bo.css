@@ -263,25 +263,25 @@
 /* DatBanTab extras */
 .noi-bo-list-top-gap { margin-top: 0.8rem; }
 
-.booking-admin-search {
+.booking-noi-bo-search {
   min-width: min(100%, 320px);
 }
 
-.booking-admin-search .ant-input-affix-wrapper,
-.booking-admin-search.ant-input-affix-wrapper {
+.booking-noi-bo-search .ant-input-affix-wrapper,
+.booking-noi-bo-search.ant-input-affix-wrapper {
   border-radius: 999px;
   border-color: #E5E7EB;
   background: #fff;
   box-shadow: 0 8px 16px rgba(15, 23, 42, 0.035);
 }
 
-.booking-admin-search .ant-input-affix-wrapper:focus,
-.booking-admin-search.ant-input-affix-wrapper-focused {
+.booking-noi-bo-search .ant-input-affix-wrapper:focus,
+.booking-noi-bo-search.ant-input-affix-wrapper-focused {
   border-color: #F97316;
   box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.12);
 }
 
-.booking-admin-filter-chip {
+.booking-noi-bo-filter-chip {
   margin-inline-end: 0 !important;
   border-radius: 999px;
   border: 1px solid #E5E7EB;
@@ -293,7 +293,7 @@
   transition: all 0.2s ease;
 }
 
-.booking-admin-filter-chip.ant-tag-checkable-checked {
+.booking-noi-bo-filter-chip.ant-tag-checkable-checked {
   border-color: #FDBA74;
   background: #FFF7ED;
   color: #C2410C;

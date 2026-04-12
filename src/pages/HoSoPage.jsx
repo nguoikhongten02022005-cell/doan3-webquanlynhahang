@@ -1,16 +1,17 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Tabs } from 'antd'
 import { Navigate, useNavigate } from 'react-router-dom'
-import ChiTietDonHangModal from '../components/hoSo/ChiTietDonHangModal'
-import DonHangMangVeTab from '../components/hoSo/DonHangMangVeTab'
-import LichSuDatBanTab from '../components/hoSo/LichSuDatBanTab'
-import ThongTinCaNhanTab from '../components/hoSo/ThongTinCaNhanTab'
-import { PROFILE_TABS } from '../data/duLieuHoSo'
+import ChiTietDonHangModal from '../features/hoSo/components/ChiTietDonHangModal'
+import DonHangMangVeTab from '../features/hoSo/components/DonHangMangVeTab'
+import LichSuDatBanTab from '../features/hoSo/components/LichSuDatBanTab'
+import ThongTinCaNhanTab from '../features/hoSo/components/ThongTinCaNhanTab'
+import { PROFILE_TABS } from '../features/hoSo/mocks/duLieuHoSo'
 import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { useDatBan } from '../hooks/useDatBan'
+import { useDatBan } from '../features/datBan/hooks/useDatBan'
 import { huyDonMangVeApi } from '../services/api/apiMangVe'
 import { layDanhSachDonHangHoSoApi } from '../services/api/apiDonHang'
+import { layLichSuDiemTichLuyApi, layTongQuanDiemTichLuyApi } from '../services/api/apiLoyalty'
 
 function HoSoPage() {
   const navigate = useNavigate()
@@ -20,6 +21,8 @@ function HoSoPage() {
   const [tabDangMo, setTabDangMo] = useState('personal')
   const [lichSuDatBan, setLichSuDatBan] = useState([])
   const [lichSuDonHang, setLichSuDonHang] = useState([])
+  const [tongQuanDiemTichLuy, setTongQuanDiemTichLuy] = useState(null)
+  const [lichSuDiemTichLuy, setLichSuDiemTichLuy] = useState([])
   const [maDonDangXem, setMaDonDangXem] = useState('')
   const [boLocDonHang, setBoLocDonHang] = useState('ALL')
 
@@ -35,6 +38,8 @@ function HoSoPage() {
     if (!nguoiDungHienTai) {
       setLichSuDatBan([])
       setLichSuDonHang([])
+      setTongQuanDiemTichLuy(null)
+      setLichSuDiemTichLuy([])
       setMaDonDangXem('')
       return
     }
@@ -49,11 +54,20 @@ function HoSoPage() {
           setLichSuDatBan([])
         }
 
-        const { duLieu } = await layDanhSachDonHangHoSoApi()
-        setLichSuDonHang(Array.isArray(duLieu) ? duLieu : [])
+        const [phanHoiDonHang, phanHoiTongQuanDiem, phanHoiLichSuDiem] = await Promise.all([
+          layDanhSachDonHangHoSoApi(),
+          layTongQuanDiemTichLuyApi(),
+          layLichSuDiemTichLuyApi(),
+        ])
+
+        setLichSuDonHang(Array.isArray(phanHoiDonHang?.duLieu) ? phanHoiDonHang.duLieu : [])
+        setTongQuanDiemTichLuy(phanHoiTongQuanDiem?.duLieu || null)
+        setLichSuDiemTichLuy(Array.isArray(phanHoiLichSuDiem?.duLieu) ? phanHoiLichSuDiem.duLieu : [])
       } catch {
         setLichSuDatBan([])
         setLichSuDonHang([])
+        setTongQuanDiemTichLuy(null)
+        setLichSuDiemTichLuy([])
       }
     })()
   }, [layLichSuDatBan, nguoiDungHienTai])
@@ -153,6 +167,8 @@ function HoSoPage() {
             {tabDangMo === 'personal' && (
               <ThongTinCaNhanTab
                 nguoiDung={nguoiDungHienTai}
+                tongQuanDiemTichLuy={tongQuanDiemTichLuy}
+                lichSuDiemTichLuy={lichSuDiemTichLuy}
                 onLogout={handleLogout}
                 onCapNhatHoSo={capNhatHoSo}
                 onDoiMatKhau={capNhatMatKhau}

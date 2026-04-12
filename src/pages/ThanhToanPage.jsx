@@ -7,7 +7,7 @@ import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
 import { taoDonHangApi } from '../services/api/apiDonHang'
 import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung, tinhSoTienGiamTheoVoucher } from '../services/dichVuPhieuGiamGia'
-import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../constants/phieuGiamGia'
+import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)

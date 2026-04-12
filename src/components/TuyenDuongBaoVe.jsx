@@ -6,12 +6,12 @@ function TuyenDuongBaoVe({
   children,
   loginPath = '/noi-bo/dang-nhap',
   redirectUnauthorizedTo = '/',
-  yeuCauAdmin = false,
+  yeuCauQuanLy = false,
   chiCanDangNhap = false,
 }) {
   const location = useLocation()
   const outletContext = useOutletContext()
-  const { daDangNhap, coTheVaoNoiBo, dangKhoiTaoXacThuc, laAdmin } = useXacThuc()
+  const { daDangNhap, coTheVaoNoiBo, dangKhoiTaoXacThuc, laQuanLy } = useXacThuc()
 
   if (dangKhoiTaoXacThuc) {
     return (
@@ -41,7 +41,7 @@ function TuyenDuongBaoVe({
     return <Navigate to={redirectUnauthorizedTo} replace />
   }
 
-  if (yeuCauAdmin && !laAdmin) {
+  if (yeuCauQuanLy && !laQuanLy) {
     return <Navigate to={redirectUnauthorizedTo} replace />
   }
 

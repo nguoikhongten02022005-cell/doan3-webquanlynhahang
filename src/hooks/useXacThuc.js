@@ -241,14 +241,14 @@ function useXacThucState() {
   }, [])
 
   const vaiTro = nguoiDungHienTai?.role ?? VAI_TRO_XAC_THUC.KHACH_HANG
-  const laAdmin = vaiTro === VAI_TRO_XAC_THUC.QUAN_TRI
+  const laQuanLy = vaiTro === VAI_TRO_XAC_THUC.QUAN_TRI
   const laNhanVien = vaiTro === VAI_TRO_XAC_THUC.NHAN_VIEN
-  const coTheVaoNoiBo = laAdmin || laNhanVien
+  const coTheVaoNoiBo = laQuanLy || laNhanVien
 
   return useMemo(() => ({
     nguoiDungHienTai,
     vaiTro,
-    laAdmin,
+    laQuanLy,
     laNhanVien,
     coTheVaoNoiBo,
     daDangNhap: Boolean(nguoiDungHienTai),
@@ -262,7 +262,7 @@ function useXacThucState() {
   }), [
     nguoiDungHienTai,
     vaiTro,
-    laAdmin,
+    laQuanLy,
     laNhanVien,
     coTheVaoNoiBo,
     dangKhoiTaoXacThuc,

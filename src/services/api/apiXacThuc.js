@@ -30,7 +30,7 @@ export const dangKyApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.p
   diaChi: payload.diaChi || payload.address || '',
 }))
 export const layThongTinToiApi = async () => tachPhanHoiApi(await trinhKhachApi.get('/auth/me'))
-export const dangXuatApi = async () => ({ duLieu: null, thongDiep: 'Dang xuat thanh cong', meta: null })
+export const dangXuatApi = async () => tachPhanHoiApi(await trinhKhachApi.post('/auth/logout', {}))
 export const capNhatHoSoApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.put('/auth/profile', {
   hoTen: payload.hoTen || payload.fullName || '',
   email: payload.email || '',

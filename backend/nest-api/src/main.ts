@@ -2,7 +2,7 @@ import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
-import { BootstrapService } from './bootstrap.service';
+import { BootstrapService } from './config/bootstrap.service';
 
 function docBienMoiTruongBatBuoc(tenBien: string) {
   const giaTri = process.env[tenBien]?.trim();

@@ -12,19 +12,19 @@ import {
   SO_NGAY_TOI_DA_NHAN_DAT_BAN,
   SO_PHUT_TOI_THIEU_TRUOC_GIO_DAT_BAN,
   THU_DONG_CUA_DAT_BAN,
-} from '../data/duLieuDatBan'
-import { dinhDangNgayGio, layNhanChoNgoi } from '../features/bangDieuKhienNoiBo/dinhDang'
-import { useDatBan } from '../hooks/useDatBan'
+} from '../features/datBan/mocks/duLieuDatBan'
+import { dinhDangNgayGio, layNhanChoNgoi } from '../features/noiBo/dinhDang'
+import { useDatBan } from '../features/datBan/hooks/useDatBan'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { layDanhSachBanApi } from '../services/api/apiBanAn'
 import { layKhaDungDatBanApi } from '../services/api/apiDatBan'
-import { taoAnhChupBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
+import { taoAnhChupBanNhapTamDatBan } from '../features/datBan/utils/banNhapTamDatBan'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
-import BuocMotDatBan from '../components/datBan/BuocMotDatBan'
-import BuocHaiDatBan from '../components/datBan/BuocHaiDatBan'
-import BuocBaDatBan from '../components/datBan/BuocBaDatBan'
-import ThanhBenDatBan from '../components/datBan/ThanhBenDatBan'
-import DatBanThanhCong from '../components/datBan/DatBanThanhCong'
+import BuocMotDatBan from '../features/datBan/components/BuocMotDatBan'
+import BuocHaiDatBan from '../features/datBan/components/BuocHaiDatBan'
+import BuocBaDatBan from '../features/datBan/components/BuocBaDatBan'
+import ThanhBenDatBan from '../features/datBan/components/ThanhBenDatBan'
+import DatBanThanhCong from '../features/datBan/components/DatBanThanhCong'
 
 const STEPS = [
   { id: 1, label: 'Chọn thông tin', description: 'Số khách, ngày, giờ và khu vực ưu tiên.' },
