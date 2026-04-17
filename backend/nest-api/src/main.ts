@@ -1,5 +1,6 @@
 import { ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
+import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { BootstrapService } from './config/bootstrap.service';
@@ -71,17 +72,31 @@ async function bootstrap() {
     methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
+
   app.useGlobalPipes(new ValidationPipe({
     transform: true,
     whitelist: true,
     forbidNonWhitelisted: true,
     transformOptions: { enableImplicitConversion: true },
   }));
+
   app.setGlobalPrefix('');
+
+  const cauHinhSwagger = new DocumentBuilder()
+    .setTitle('API Quan Ly Nha Hang')
+    .setDescription('Tai lieu API cho he thong quan ly nha hang')
+    .setVersion('1.0.0')
+    .build();
+
+  const taiLieuSwagger = SwaggerModule.createDocument(app, cauHinhSwagger);
+  SwaggerModule.setup('swagger', app, taiLieuSwagger);
+
   await app.get(BootstrapService).khoiTaoNeuCan();
   await app.listen(congBackend);
 
   console.log(`Backend đang chạy ở môi trường: ${moiTruong}`);
   console.log('Danh sách origin CORS:', danhSachOriginDuocPhep);
+  console.log(`Swagger UI: http://localhost:${congBackend}/swagger`);
 }
+
 bootstrap();
