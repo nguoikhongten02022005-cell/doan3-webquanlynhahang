@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link, useLocation, Navigate } from 'react-router-dom'
 import { Alert, Button, Card, Checkbox, Form, Input, Typography } from 'antd'
-import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
@@ -18,7 +17,6 @@ function DangNhapNoiBoPage() {
   const [nhoDangNhap, setNhoDangNhap] = useState(false)
   const [loiDangNhap, setLoiDangNhap] = useState('')
   const [dangGui, setDangGui] = useState(false)
-  const [canhBaoPhienHetHan, setCanhBaoPhienHetHan] = useState(false)
   const [form] = Form.useForm()
   const location = useLocation()
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
@@ -26,10 +24,6 @@ function DangNhapNoiBoPage() {
   const duongDanChuyenHuongSauDangNhap = location.state?.from || '/noi-bo/dashboard'
 
   useEffect(() => {
-    if (layMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)) {
-      setCanhBaoPhienHetHan(true)
-      xoaMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN)
-    }
     const coNhoDangNhap = layMucLuuTru(KHOA_NHO_NOI_BO) === '1'
     const emailDaNho = layMucLuuTru(KHOA_EMAIL_NOI_BO) || ''
 
@@ -84,8 +78,6 @@ function DangNhapNoiBoPage() {
               Đăng nhập để tiếp tục sử dụng tài khoản nội bộ của bạn.
             </Paragraph>
             {!backendMode ? <Alert type="warning" showIcon title="Ứng dụng chưa kết nối máy chủ. Vui lòng kiểm tra cấu hình hệ thống trước khi đăng nhập nội bộ." style={{ marginBottom: 16 }} /> : null}
-
-            {canhBaoPhienHetHan ? <Alert type="warning" showIcon title="Phiên đăng nhập đã hết hạn. Vui lòng đăng nhập lại để tiếp tục vào khu vực quản trị." style={{ marginBottom: 16 }} /> : null}
             {loiDangNhap ? <Alert type="error" showIcon title={loiDangNhap} style={{ marginBottom: 16 }} /> : null}
 
             <Form

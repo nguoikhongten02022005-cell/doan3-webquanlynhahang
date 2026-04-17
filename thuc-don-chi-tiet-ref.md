@@ -1,0 +1,229 @@
+- generic [ref=e15]:
+  - complementary [ref=e16]:
+    - generic [ref=e18]:
+      - generic [ref=e20]:
+        - generic [ref=e23]: NH
+        - generic [ref=e25]:
+          - heading "Nguyên Vị Nội bộ" [level=5] [ref=e26]
+          - text: Trung tâm vận hành
+      - menu [ref=e27]:
+        - menuitem "dashboard Bảng điều khiển" [ref=e28] [cursor=pointer]:
+          - img "dashboard" [ref=e29]:
+            - img [ref=e30]
+          - generic [ref=e34]: Bảng điều khiển
+        - menuitem "calendar Đặt bàn" [ref=e35] [cursor=pointer]:
+          - img "calendar" [ref=e36]:
+            - img [ref=e37]
+          - generic [ref=e41]: Đặt bàn
+        - menuitem "table Sơ đồ bàn" [ref=e42] [cursor=pointer]:
+          - img "table" [ref=e43]:
+            - img [ref=e44]
+          - generic [ref=e48]: Sơ đồ bàn
+        - menuitem "shop Quản lý bàn" [ref=e49] [cursor=pointer]:
+          - img "shop" [ref=e50]:
+            - img [ref=e51]
+          - generic [ref=e55]: Quản lý bàn
+        - menuitem "appstore Thực đơn" [ref=e56] [cursor=pointer]:
+          - img "appstore" [ref=e57]:
+            - img [ref=e58]
+          - generic [ref=e62]: Thực đơn
+        - menuitem "ordered-list Đơn hàng 1" [ref=e63] [cursor=pointer]:
+          - img "ordered-list" [ref=e64]:
+            - img [ref=e65]
+          - generic [ref=e68]:
+            - generic [ref=e69]: Đơn hàng
+            - superscript [ref=e72]:
+              - generic [ref=e74]: "1"
+        - menuitem "ordered-list Đơn mang về" [ref=e75] [cursor=pointer]:
+          - img "ordered-list" [ref=e76]:
+            - img [ref=e77]
+          - generic [ref=e81]: Đơn mang về
+        - menuitem "audit Đánh giá" [ref=e82] [cursor=pointer]:
+          - img "audit" [ref=e83]:
+            - img [ref=e84]
+          - generic [ref=e88]: Đánh giá
+        - menuitem "dollar Thống kê doanh thu" [ref=e89] [cursor=pointer]:
+          - img "dollar" [ref=e90]:
+            - img [ref=e91]
+          - generic [ref=e95]: Thống kê doanh thu
+        - menuitem "user Nhân viên" [ref=e96] [cursor=pointer]:
+          - img "user" [ref=e97]:
+            - img [ref=e98]
+          - generic [ref=e102]: Nhân viên
+      - generic [ref=e104]:
+        - generic [ref=e106]:
+          - generic [ref=e109]: A
+          - generic [ref=e111]:
+            - strong [ref=e113]: Admin System
+            - text: Quản lý
+        - button "logout Đăng xuất" [ref=e115] [cursor=pointer]:
+          - img "logout" [ref=e117]:
+            - img [ref=e118]
+          - generic [ref=e120]: Đăng xuất
+  - generic [ref=e121]:
+    - banner [ref=e122]:
+      - heading "Thực đơn" [level=4] [ref=e126]
+      - generic [ref=e127]:
+        - button "reload Tải lại" [ref=e129] [cursor=pointer]:
+          - img "reload" [ref=e131]:
+            - img [ref=e132]
+          - generic [ref=e134]: Tải lại
+        - generic [ref=e137]: A
+    - main [ref=e138]:
+      - generic [ref=e141]:
+        - generic [ref=e145]:
+          - generic [ref=e146]:
+            - heading "Danh sách món ăn" [level=3] [ref=e147]
+            - generic [ref=e148]: Tìm nhanh, lọc theo danh mục và điều khiển trạng thái hiển thị món theo chuẩn POS hiện đại.
+          - generic [ref=e150]:
+            - generic [ref=e152]:
+              - generic [ref=e154]:
+                - searchbox "Tìm tên món..." [ref=e156]
+                - button "search" [ref=e158] [cursor=pointer]
+              - button "plus Thêm món mới" [ref=e163] [cursor=pointer]:
+                - img "plus" [ref=e165]
+                - generic [ref=e169]: Thêm món mới
+            - radiogroup "segmented control" [ref=e171]:
+              - generic [ref=e172]:
+                - generic [ref=e173] [cursor=pointer]
+                - generic [ref=e175] [cursor=pointer]
+                - generic [ref=e177] [cursor=pointer]
+                - generic [ref=e179] [cursor=pointer]
+                - generic [ref=e181] [cursor=pointer]
+                - generic [ref=e183] [cursor=pointer]
+        - generic [ref=e186]:
+          - generic [ref=e190]:
+            - text: Hiển thị
+            - strong [ref=e191]: "13"
+            - text: / 13 món
+          - generic [ref=e193]:
+            - generic [ref=e194] [cursor=pointer]:
+              - img "Combo Cá Nhân" [ref=e196]
+              - generic [ref=e198]:
+                - generic [ref=e200]
+                - generic [ref=e205]: Combo
+                - heading "Combo Cá Nhân" [level=5] [ref=e207]
+                - generic [ref=e209]
+              - list [ref=e216]:
+                - listitem [ref=e217]
+                - listitem [ref=e225]
+            - generic [ref=e234] [cursor=pointer]:
+              - img "Combo Cặp Đôi" [ref=e236]
+              - generic [ref=e238]:
+                - generic [ref=e240]
+                - generic [ref=e245]: Combo
+                - heading "Combo Cặp Đôi" [level=5] [ref=e247]
+                - generic [ref=e249]
+              - list [ref=e256]:
+                - listitem [ref=e257]
+                - listitem [ref=e265]
+            - generic [ref=e274] [cursor=pointer]:
+              - img "Gỏi Cuốn Tôm Thịt" [ref=e276]
+              - generic [ref=e278]:
+                - generic [ref=e280]
+                - generic [ref=e285]: Khai Vị
+                - heading "Gỏi Cuốn Tôm Thịt" [level=5] [ref=e287]
+                - generic [ref=e289]
+              - list [ref=e296]:
+                - listitem [ref=e297]
+                - listitem [ref=e305]
+            - generic [ref=e314] [cursor=pointer]:
+              - img "Chả Giò Hải Sản" [ref=e316]
+              - generic [ref=e318]:
+                - generic [ref=e320]
+                - generic [ref=e325]: Khai Vị
+                - heading "Chả Giò Hải Sản" [level=5] [ref=e327]
+                - generic [ref=e329]
+              - list [ref=e336]:
+                - listitem [ref=e337]
+                - listitem [ref=e345]
+            - generic [ref=e354] [cursor=pointer]:
+              - img "Cơm Rang Dương Châu" [ref=e356]
+              - generic [ref=e358]:
+                - generic [ref=e360]
+                - generic [ref=e365]: Món Chính
+                - heading "Cơm Rang Dương Châu" [level=5] [ref=e367]
+                - generic [ref=e369]
+              - list [ref=e376]:
+                - listitem [ref=e377]
+                - listitem [ref=e385]
+            - generic [ref=e394] [cursor=pointer]:
+              - img "Phở Bò Đặc Biệt" [ref=e396]
+              - generic [ref=e398]:
+                - generic [ref=e400]
+                - generic [ref=e405]: Món Chính
+                - heading "Phở Bò Đặc Biệt" [level=5] [ref=e407]
+                - generic [ref=e409]
+              - list [ref=e416]:
+                - listitem [ref=e417]
+                - listitem [ref=e425]
+            - generic [ref=e434] [cursor=pointer]:
+              - img "Bún Bò Huế" [ref=e436]
+              - generic [ref=e438]:
+                - generic [ref=e440]
+                - generic [ref=e445]: Món Chính
+                - heading "Bún Bò Huế" [level=5] [ref=e447]
+                - generic [ref=e449]
+              - list [ref=e456]:
+                - listitem [ref=e457]
+                - listitem [ref=e465]
+            - generic [ref=e474] [cursor=pointer]:
+              - img "Kem Dâu Tây" [ref=e476]
+              - generic [ref=e478]:
+                - generic [ref=e480]
+                - generic [ref=e485]: Tráng Miệng
+                - heading "Kem Dâu Tây" [level=5] [ref=e487]
+                - generic [ref=e489]
+              - list [ref=e496]:
+                - listitem [ref=e497]
+                - listitem [ref=e505]
+            - generic [ref=e514] [cursor=pointer]:
+              - img "Bánh Flan Caramel" [ref=e516]
+              - generic [ref=e518]:
+                - generic [ref=e520]
+                - generic [ref=e525]: Tráng Miệng
+                - heading "Bánh Flan Caramel" [level=5] [ref=e527]
+                - generic [ref=e529]
+              - list [ref=e536]:
+                - listitem [ref=e537]
+                - listitem [ref=e545]
+            - generic [ref=e554] [cursor=pointer]:
+              - img "Cà Phê Sữa Đá" [ref=e556]
+              - generic [ref=e558]:
+                - generic [ref=e560]
+                - generic [ref=e565]: Đồ Uống
+                - heading "Cà Phê Sữa Đá" [level=5] [ref=e567]
+                - generic [ref=e569]
+              - list [ref=e576]:
+                - listitem [ref=e577]
+                - listitem [ref=e585]
+            - generic [ref=e594] [cursor=pointer]:
+              - img "Trà Đào Cam Sả" [ref=e596]
+              - generic [ref=e598]:
+                - generic [ref=e600]
+                - generic [ref=e605]: Đồ Uống
+                - heading "Trà Đào Cam Sả" [level=5] [ref=e607]
+                - generic [ref=e609]
+              - list [ref=e616]:
+                - listitem [ref=e617]
+                - listitem [ref=e625]
+            - generic [ref=e634] [cursor=pointer]:
+              - img "Nước Ép Cam" [ref=e636]
+              - generic [ref=e638]:
+                - generic [ref=e640]
+                - generic [ref=e645]: Đồ Uống
+                - heading "Nước Ép Cam" [level=5] [ref=e647]
+                - generic [ref=e649]
+              - list [ref=e656]:
+                - listitem [ref=e657]
+                - listitem [ref=e665]
+            - generic [ref=e674] [cursor=pointer]:
+              - img "Combo Gia Đình" [ref=e676]
+              - generic [ref=e678]:
+                - generic [ref=e680]
+                - generic [ref=e685]: Combo
+                - heading "Combo Gia Đình" [level=5] [ref=e687]
+                - generic [ref=e689]
+              - list [ref=e696]:
+                - listitem [ref=e697]
+                - listitem [ref=e705]

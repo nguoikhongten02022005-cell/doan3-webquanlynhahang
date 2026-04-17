@@ -1,4 +1,5 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put, UploadedFile, UseInterceptors } from '@nestjs/common';
+import { ApiBearerAuth, ApiBody, ApiConsumes, ApiOperation, ApiTags } from '@nestjs/swagger';
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
@@ -21,30 +22,50 @@ const boLocTapTinAnh = (_req: unknown, tapTin: { mimetype?: string }, callback: 
   callback(null, true);
 };
 
+@ApiTags('thuc-don')
 @Controller('api/thuc-don')
 export class ThucDonController {
   constructor(private readonly thucDonService: ThucDonService) {}
 
+  @ApiOperation({ summary: 'Lay danh sach mon an cong khai' })
   @Get()
   layThucDon() {
     return this.thucDonService.layThucDon();
   }
 
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Tao mon an moi (Admin)' })
   @Post()
   taoMon(@Headers('authorization') authorization: string | undefined, @Body() body: TaoMonDto) {
     return this.thucDonService.taoMon(authorization, body);
   }
 
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Cap nhat mon an (Admin)' })
   @Put(':maMon')
   capNhatMon(@Headers('authorization') authorization: string | undefined, @Param('maMon') maMon: string, @Body() body: CapNhatMonDto) {
     return this.thucDonService.capNhatMon(authorization, maMon, body);
   }
 
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Xoa mon an (Admin)' })
   @Delete(':maMon')
   xoaMon(@Headers('authorization') authorization: string | undefined, @Param('maMon') maMon: string) {
     return this.thucDonService.xoaMon(authorization, maMon);
   }
 
+  @ApiBearerAuth('access-token')
+  @ApiOperation({ summary: 'Upload anh mon an (Admin)' })
+  @ApiConsumes('multipart/form-data')
+  @ApiBody({
+    schema: {
+      type: 'object',
+      properties: {
+        file: { type: 'string', format: 'binary' },
+      },
+      required: ['file'],
+    },
+  })
   @Post('/upload/anh')
   @UseInterceptors(FileInterceptor('file', {
     storage: diskStorage({

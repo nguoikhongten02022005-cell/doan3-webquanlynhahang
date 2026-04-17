@@ -18,5 +18,9 @@
     "test:backend": "npm --prefix backend/nest-api run test",
     "preview": "npm --prefix frontend run preview",
     "smoke:api": "bash -lc 'set -a && source .env && set +a && node scripts/smoke-api.mjs'"
+  },
+  "dependencies": {
+    "@nestjs/swagger": "^11.3.0",
+    "swagger-ui-express": "^5.0.1"
   }
 }

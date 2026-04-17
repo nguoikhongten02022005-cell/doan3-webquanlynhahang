@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Headers, Param, Patch, Post, Query } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { DatBanService } from './dat-ban.service';
 
+@ApiTags('dat-ban')
 @Controller('api/dat-ban')
 export class DatBanController {
   constructor(private readonly datBanService: DatBanService) {}

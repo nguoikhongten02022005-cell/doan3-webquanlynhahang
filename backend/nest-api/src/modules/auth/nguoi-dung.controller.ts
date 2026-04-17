@@ -1,6 +1,9 @@
 import { Body, Controller, Delete, Get, Headers, Param, Post, Put } from '@nestjs/common';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
 
+@ApiTags('nguoi-dung')
+@ApiBearerAuth('access-token')
 @Controller('api/nguoi-dung')
 export class NguoiDungController {
   constructor(private readonly authService: AuthService) {}

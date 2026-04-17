@@ -8,9 +8,6 @@ USE QuanNhaHang;
 
 SET FOREIGN_KEY_CHECKS = 0;
 
--- ============================================================
--- 1. NGUOI DUNG
--- ============================================================
 CREATE TABLE IF NOT EXISTS NguoiDung (
     MaND        VARCHAR(50) PRIMARY KEY,
     TenND       VARCHAR(100) NOT NULL,
@@ -22,9 +19,7 @@ CREATE TABLE IF NOT EXISTS NguoiDung (
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================
--- 2. NHAN VIEN
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS NhanVien (
     MaNV        VARCHAR(50) PRIMARY KEY,
     MaND        VARCHAR(50) NOT NULL UNIQUE,
@@ -41,9 +36,7 @@ CREATE TABLE IF NOT EXISTS NhanVien (
         FOREIGN KEY (MaND) REFERENCES NguoiDung(MaND) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================
--- 3. KHACH HANG
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS KhachHang (
     MaKH        VARCHAR(50) PRIMARY KEY,
     MaND        VARCHAR(50) UNIQUE,
@@ -56,9 +49,7 @@ CREATE TABLE IF NOT EXISTS KhachHang (
         FOREIGN KEY (MaND) REFERENCES NguoiDung(MaND) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================
--- 4. BAN
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS Ban (
     MaBan       VARCHAR(50) PRIMARY KEY,
     TenBan      VARCHAR(50),
@@ -72,9 +63,7 @@ CREATE TABLE IF NOT EXISTS Ban (
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================
--- 5. QR CODE
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS QRCode (
     MaQR        VARCHAR(50) PRIMARY KEY,
     MaBan       VARCHAR(50) NOT NULL UNIQUE,
@@ -86,9 +75,7 @@ CREATE TABLE IF NOT EXISTS QRCode (
         FOREIGN KEY (MaBan) REFERENCES Ban(MaBan) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================
--- 6. DANH MUC
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS DanhMuc (
     MaDanhMuc   VARCHAR(50) PRIMARY KEY,
     TenDanhMuc  VARCHAR(100) NOT NULL,
@@ -97,9 +84,7 @@ CREATE TABLE IF NOT EXISTS DanhMuc (
     TrangThai   ENUM('Active','Inactive') NOT NULL DEFAULT 'Active'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
--- ============================================================
--- 7. THUC DON
--- ============================================================
+
 CREATE TABLE IF NOT EXISTS ThucDon (
     MaMon           VARCHAR(50) PRIMARY KEY,
     MaDanhMuc       VARCHAR(50),

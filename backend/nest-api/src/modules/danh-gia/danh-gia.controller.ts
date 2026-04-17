@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Headers, Param, Patch, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { DanhGiaService } from './danh-gia.service';
 
 type BanGhi = Record<string, any>;
 
+@ApiTags('danh-gia')
 @Controller('api/danh-gia')
 export class DanhGiaController {
   constructor(private readonly danhGiaService: DanhGiaService) {}

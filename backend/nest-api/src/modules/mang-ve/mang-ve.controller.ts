@@ -1,8 +1,10 @@
 import { Body, Controller, Get, Headers, Param, Patch, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { MangVeService } from './mang-ve.service';
 
 type BanGhi = Record<string, any>;
 
+@ApiTags('mang-ve')
 @Controller('api/mang-ve')
 export class MangVeController {
   constructor(private readonly mangVeService: MangVeService) {}

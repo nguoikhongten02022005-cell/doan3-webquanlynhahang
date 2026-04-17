@@ -1,6 +1,8 @@
-import { Body, Controller, Get, Headers, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Headers, Param, Patch, Post } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { DonHangService } from './don-hang.service';
 
+@ApiTags('don-hang')
 @Controller('api/don-hang')
 export class DonHangController {
   constructor(private readonly donHangService: DonHangService) {}
@@ -28,5 +30,18 @@ export class DonHangController {
   @Post()
   taoDonHang(@Body() body: Record<string, unknown>) {
     return this.donHangService.taoDonHang(body);
+  }
+
+  @Patch(':maDonHang/status')
+  capNhatTrangThaiDonHang(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maDonHang') maDonHang: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.donHangService.capNhatTrangThaiDonHang(
+      authorization,
+      maDonHang,
+      String(body.trangThai || ''),
+    );
   }
 }

@@ -108,41 +108,43 @@ function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
   const handleSelectChange = (field) => (value) => setFormValues((cur) => ({ ...cur, [field]: value }))
   const handleSwitchChange = (checked) => setFormValues((cur) => ({ ...cur, isVisible: checked }))
 
-  const handleUploadChange = async ({ fileList }) => {
-    const tapTinMoiNhat = fileList.slice(-1)
-    const tapTinDauTien = tapTinMoiNhat[0]
+  const xuLyTaiAnhMon = async (tapTin) => {
+    if (!tapTin) return false
 
-    if (tapTinDauTien?.originFileObj) {
-      try {
-        setDangUploadAnh(true)
-        setLoiForm('')
-        const { duLieu } = await uploadAnhMonApi(tapTinDauTien.originFileObj)
-        const urlAnh = String(duLieu?.url || '').trim()
+    try {
+      setDangUploadAnh(true)
+      setLoiForm('')
+      const { duLieu } = await uploadAnhMonApi(tapTin)
+      const urlAnh = String(duLieu?.url || '').trim()
 
-        if (!urlAnh) {
-          throw new Error('Không nhận được URL ảnh từ máy chủ.')
-        }
-
-        const latestFileList = [{ ...tapTinDauTien, url: urlAnh, thumbUrl: urlAnh, status: 'done' }]
-        setUploadFileList(latestFileList)
-        setFormValues((cur) => ({ ...cur, image: urlAnh }))
-        return
-      } catch (error) {
-        setLoiForm(error?.message || 'Không thể tải ảnh món lên máy chủ.')
-      } finally {
-        setDangUploadAnh(false)
+      if (!urlAnh) {
+        throw new Error('Không nhận được URL ảnh từ máy chủ.')
       }
+
+      const danhSachTapTinMoi = [{ uid: `dish-image-${Date.now()}`, name: tapTin.name || 'dish-image.png', status: 'done', url: urlAnh, thumbUrl: urlAnh }]
+      setUploadFileList(danhSachTapTinMoi)
+      setFormValues((cur) => ({ ...cur, image: urlAnh }))
+    } catch (error) {
+      setLoiForm(error?.message || 'Không thể tải ảnh món lên máy chủ.')
+    } finally {
+      setDangUploadAnh(false)
     }
 
-    const latestFileList = tapTinMoiNhat
-    setUploadFileList(latestFileList)
-    setFormValues((cur) => ({ ...cur, image: latestFileList[0]?.url || latestFileList[0]?.thumbUrl || '' }))
+    return false
   }
 
   const handleRemoveUpload = () => {
     setUploadFileList([])
     setFormValues((cur) => ({ ...cur, image: '' }))
   }
+
+  const customUploadTrigger = uploadFileList.length >= 1
+    ? <Button type="default" loading={dangUploadAnh}>Đổi ảnh</Button>
+    : <div><PictureOutlined /><div style={{ marginTop: 8 }}>{dangUploadAnh ? 'Đang tải...' : 'Tải ảnh lên'}</div></div>
+
+  const customUploadHint = uploadFileList.length >= 1
+    ? 'Bấm "Đổi ảnh" để chọn ảnh mới cho món này.'
+    : 'Ảnh được upload lên máy chủ và lưu URL ảnh qua API món ăn.'
 
   const validateForm = () => {
     if (!formValues.name.trim()) return 'Vui lòng nhập tên món.'
@@ -312,10 +314,18 @@ function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
         <Form id="mon-an-form" layout="vertical" onSubmitCapture={handleSubmit}>
           {loiForm ? <Alert type="error" showIcon title={loiForm} style={{ marginBottom: 16 }} /> : null}
           <Form.Item label="Ảnh món">
-            <Upload accept="image/*" listType="picture-card" maxCount={1} beforeUpload={() => false} fileList={uploadFileList} onChange={handleUploadChange} onRemove={handleRemoveUpload} disabled={dangUploadAnh}>
-              {uploadFileList.length >= 1 ? null : <div><PictureOutlined /><div style={{ marginTop: 8 }}>{dangUploadAnh ? 'Đang tải...' : 'Tải ảnh lên'}</div></div>}
+            <Upload
+              accept="image/*"
+              listType="picture-card"
+              maxCount={1}
+              beforeUpload={xuLyTaiAnhMon}
+              fileList={uploadFileList}
+              onRemove={handleRemoveUpload}
+              disabled={dangUploadAnh}
+            >
+              {customUploadTrigger}
             </Upload>
-            <Typography.Text type="secondary">Ảnh được upload lên máy chủ và lưu URL ảnh qua API món ăn.</Typography.Text>
+            <Typography.Text type="secondary">{customUploadHint}</Typography.Text>
           </Form.Item>
           <Form.Item label="Tên món"><Input value={formValues.name} onChange={handleInputChange('name')} /></Form.Item>
           <Form.Item label="Mô tả"><TextArea rows={4} value={formValues.description} onChange={handleInputChange('description')} /></Form.Item>

@@ -1,61 +1,74 @@
-# HIỆN TRẠNG HỆ THỐNG
+# Mô tả nghiệp vụ hiện tại của hệ thống
 
-## 1. Mục đích file
-File này mô tả hiện trạng thực tế của hệ thống dựa trên mã nguồn và cấu trúc repo hiện tại.
+## 1. Mục đích tài liệu
 
-Mục tiêu:
-- giúp hiểu dự án hiện đang có gì
-- xác định frontend đang chạy ở đâu
-- xác định backend nào là backend chính của repo hiện tại
-- tóm tắt các nhóm chức năng nghiệp vụ đã có
-- làm cơ sở để chỉnh sửa an toàn mà không hiểu sai kiến trúc hiện hành
+File này mô tả **hiện trạng triển khai thực tế** của repo tại thời điểm hiện tại, dùng để:
+
+- hiểu đúng cấu trúc frontend / backend đang chạy
+- nắm các nghiệp vụ lõi đã có trong mã nguồn
+- tránh mô tả quá tay những phần mới chỉ ở mức nền tảng hoặc định hướng mở rộng
 
 ## 2. Kiến trúc hiện tại của repo
-Hiện trạng chính:
-- frontend chạy ở thư mục gốc của repo
-- mã nguồn giao diện chính nằm trong `src/`
-- frontend dùng React và Vite
-- backend chính đang dùng cho phát triển và kiểm thử hiện tại nằm trong `backend/nest-api`
+
+Hiện trạng đúng của repo:
+
+- frontend chính nằm trong `frontend/`
+- mã nguồn giao diện chính nằm trong `frontend/src/`
+- frontend dùng React + Vite
+- backend chính nằm trong `backend/nest-api/`
+- backend dùng NestJS + TypeScript + MySQL
+- frontend gọi backend qua base URL có dạng `/api`
 
 Điều quan trọng:
-- khi cần hiểu contract API đang chạy thật, ưu tiên đọc và đối chiếu `backend/nest-api`
-- xem backend NestJS là nguồn sự thật chính cho hệ thống hiện hành
 
-## 3. Tổng quan chức năng hệ thống
+- khi cần kiểm tra API đang chạy thật, ưu tiên đọc `backend/nest-api/src/modules/**`
+- khi cần kiểm tra route giao diện, ưu tiên đọc `frontend/src/App.jsx`
 
-### 3.1 Khu vực khách hàng
-Hệ thống hiện có các nhóm chức năng giao diện chính:
-- trang chủ
-- xem thực đơn
+## 3. Nhóm nghiệp vụ đã có trong mã nguồn
+
+### 3.1 Khách hàng
+
+Hệ thống hiện có các luồng chính cho khách hàng:
+
+- xem trang chủ và giới thiệu nhà hàng
+- xem thực đơn công khai
+- đăng ký, đăng nhập
 - đặt bàn
-- giỏ hàng
+- thêm món vào giỏ hàng
 - thanh toán
-- giới thiệu nhà hàng
-
-### 3.2 Tài khoản khách hàng
-Hệ thống hiện có:
-- đăng ký
-- đăng nhập
 - xem hồ sơ cá nhân
 - xem lịch sử đơn hàng
 - xem lịch sử đặt bàn
-- hủy booking nếu trạng thái còn cho phép
+- gửi đánh giá cho đơn hàng đủ điều kiện
+- đặt món mang về và theo dõi đơn mang về
+- gọi món tại bàn qua mã QR theo `maBan`
 
-### 3.3 Khu vực nội bộ
-Hệ thống hiện có:
+### 3.2 Nhân viên / nội bộ
+
+Khu vực nội bộ hiện có:
+
 - đăng nhập nội bộ
 - dashboard vận hành
-- quản lý booking
+- quản lý danh sách booking
+- theo dõi sơ đồ bàn
 - quản lý bàn
-- theo dõi đơn đang mở
+- theo dõi và cập nhật trạng thái đơn hàng
+- theo dõi đơn mang về
+- xem và xử lý đánh giá
 
-### 3.4 Khu vực quản trị
-Ngoài dashboard chung, admin hiện có thêm:
+### 3.3 Quản trị
+
+Tài khoản quản trị hiện có thêm các nhóm chức năng:
+
 - quản lý món ăn
-- xem danh sách tài khoản nội bộ
+- quản lý tài khoản nội bộ
+- quản lý bàn nâng cao
+- xem thống kê doanh thu mức cơ bản trên dashboard / trang nội bộ
 
 ## 4. Các route giao diện chính
-Các route chính được tổ chức trong frontend hiện tại, bao gồm:
+
+### Public / khách hàng
+
 - `/`
 - `/thuc-don`
 - `/dat-ban`
@@ -63,63 +76,103 @@ Các route chính được tổ chức trong frontend hiện tại, bao gồm:
 - `/thanh-toan`
 - `/gioi-thieu`
 - `/ho-so`
+- `/danh-gia`
 - `/dang-nhap`
 - `/dang-ky`
+- `/mang-ve`
+- `/mang-ve/thuc-don`
+- `/mang-ve/gio-hang`
+- `/mang-ve/thanh-toan`
+- `/mang-ve/don-hang/:id`
+- `/ban/:maBan`
+- `/ban/:maBan/goi-mon`
+
+### Nội bộ
+
 - `/noi-bo/dang-nhap`
-- `/noi-bo/bang-dieu-khien`
+- `/noi-bo/dashboard`
+- `/noi-bo/dat-ban`
+- `/noi-bo/so-do-ban`
+- `/noi-bo/quan-ly-ban`
+- `/noi-bo/thuc-don`
+- `/noi-bo/don-hang`
+- `/noi-bo/don-mang-ve`
+- `/noi-bo/danh-gia`
+- `/noi-bo/thong-ke`
+- `/noi-bo/nhan-vien`
+
+Một số route cũ như `/admin/*`, `/dang-nhap-noi-bo`, `/bang-dieu-khien-host` hiện được giữ để chuyển hướng tương thích sang khu vực nội bộ mới.
 
 ## 5. Backend chính đang dùng
-Backend chính của repo hiện tại nằm trong `backend/nest-api/`.
 
-Stack của backend này:
-- TypeScript
+Backend chính của repo là `backend/nest-api/`.
+
+Stack backend:
+
 - NestJS
+- TypeScript
 - MySQL
 - JWT
+- Swagger
 
-Các ghi chú quan trọng:
-- frontend hiện tại được đối chiếu và tích hợp theo contract từ backend NestJS
-- khi cần kiểm tra schema, route hoặc hành vi API, ưu tiên xem mã nguồn trong `backend/nest-api/`
-- `backend/nest-api/README.md` la tai lieu ngan gon phan anh backend dang chay that
+Các nhóm controller chính:
 
-## 6. Vai trò của `backend/`
-Thư mục `backend/` là backend chính đang chạy hằng ngày của repo hiện tại.
+- `auth`
+- `nguoi-dung`
+- `thuc-don`
+- `ban`
+- `dat-ban`
+- `don-hang`
+- `voucher`
+- `danh-gia`
+- `mang-ve`
+- `loyalty`
 
-Trong đó:
-- `backend/nest-api` là khu vực backend NestJS chinh
-- frontend hiện tại đang kết nối trực tiếp vào backend này
+## 6. Các điểm nghiệp vụ đã nối frontend - backend
 
-## 7. Ý nghĩa khi chỉnh sửa hệ thống
-Để sửa đúng theo hiện trạng repo:
-- sửa giao diện thì ưu tiên đọc `src/`, `README.md`, `backend/nest-api/README.md`
-- sửa backend đang chạy thật thì ưu tiên làm trong `backend/nest-api`
+Hiện frontend và backend đã nối thật ở các mảng:
 
-Nếu đổi contract API trong backend NestJS, cần kiểm tra ảnh hưởng tới:
+- xác thực khách hàng và nội bộ
 - thực đơn
-- giỏ hàng
-- thanh toán
-- hồ sơ người dùng
-- lịch sử đơn hàng
-- lịch sử đặt bàn
-- dashboard nội bộ
-
-## 8. Ghi chú nghiệp vụ
-Về mặt nghiệp vụ, hệ thống hiện không chỉ có giao diện public mà còn bao gồm:
-- xác thực người dùng
-- đơn hàng
-- đặt bàn
 - bàn ăn
-- dashboard nội bộ
-- món ăn
-- tài khoản và vai trò người dùng
+- đặt bàn
+- đơn hàng
+- đơn mang về
+- đánh giá
+- tài khoản nội bộ
 
-Điều này có nghĩa là mọi thay đổi backend hoặc frontend nên bám sát nghiệp vụ nhà hàng hiện có, tránh hiểu quá đơn giản rằng dự án chỉ gồm menu và giỏ hàng.
+Đây là các mảng cần ưu tiên giữ ổn định contract khi chỉnh sửa.
+
+## 7. Các điểm không nên mô tả là đã hoàn thiện toàn bộ
+
+Để tài liệu trung thực với hiện trạng mã nguồn, không nên khẳng định quá mức rằng hệ thống đã hoàn chỉnh toàn diện ở các mảng sau nếu chưa phát triển thêm:
+
+- quản lý kho / nguyên liệu
+- báo cáo tổng hợp nhiều chiều, BI hoặc dashboard phân tích sâu
+- vận hành chuỗi chi nhánh hoặc đa cơ sở
+- các quy trình ERP mở rộng ngoài phạm vi đồ án hiện tại
+
+Nếu cần mô tả trong báo cáo, nên dùng cách diễn đạt như:
+
+- “đã có nền tảng để mở rộng tiếp”
+- “đã có module / màn hình cơ bản”
+- “đang tập trung hoàn thiện nghiệp vụ lõi trước”
+
+## 8. Ý nghĩa khi chỉnh sửa repo
+
+Khi sửa repo này để ổn định và sẵn sàng nộp:
+
+- ưu tiên giữ nguyên kiến trúc hiện tại
+- ưu tiên sửa mismatch giữa frontend và backend
+- ưu tiên sửa route thiếu, test mẫu sai, tài liệu lệch
+- không nên thêm hệ thống lớn mới nếu chưa có nền sẵn trong mã nguồn
 
 ## 9. Kết luận
-Hiện trạng repo nên được hiểu theo thứ tự ưu tiên sau:
-- frontend chính: `src/` ở root, dùng React + Vite
-- backend chính đang chạy: `backend/nest-api/`
 
-Khi cần chỉnh sửa an toàn và đúng thực tế:
-- lấy `README.md` làm điểm bắt đầu
-- lấy `backend/nest-api/` làm nguồn sự thật cho backend hiện hành
+Cách hiểu đúng repo hiện tại:
+
+- frontend chính: `frontend/`
+- backend chính: `backend/nest-api/`
+- contract API nguồn sự thật: controller và service trong `backend/nest-api/src/modules/**`
+- trọng tâm đã làm tốt: auth, menu, table, booking, order, voucher, review, mang về, dashboard nội bộ
+- trọng tâm cần mô tả trung thực: báo cáo nâng cao và các mảng mở rộng chưa phải phần hoàn thiện end-to-end

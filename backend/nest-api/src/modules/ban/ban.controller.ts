@@ -1,6 +1,8 @@
 import { Body, Controller, Delete, Get, Headers, Param, Patch, Post, Put } from '@nestjs/common';
+import { ApiTags } from '@nestjs/swagger';
 import { BanService } from './ban.service';
 
+@ApiTags('ban')
 @Controller('api/ban')
 export class BanController {
   constructor(private readonly banService: BanService) {}

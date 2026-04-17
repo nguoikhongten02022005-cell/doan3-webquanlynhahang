@@ -1,0 +1,43 @@
+name: Bug report
+description: Bao loi de doi du an tai hien va sua loi nhanh hon
+title: "[Bug]: "
+labels:
+  - bug
+body:
+  - type: textarea
+    id: mo_ta
+    attributes:
+      label: Mo ta loi
+      description: Loi xay ra la gi?
+    validations:
+      required: true
+
+  - type: textarea
+    id: tai_hien
+    attributes:
+      label: Cach tai hien
+      description: Liet ke cac buoc tai hien loi
+      placeholder: |
+        1. Vao trang ...
+        2. Click ...
+        3. Thay loi ...
+    validations:
+      required: true
+
+  - type: textarea
+    id: mong_doi
+    attributes:
+      label: Ket qua mong doi
+    validations:
+      required: true
+
+  - type: textarea
+    id: moi_truong
+    attributes:
+      label: Moi truong
+      description: Trinh duyet / OS / branch / file lien quan
+
+  - type: textarea
+    id: bang_chung
+    attributes:
+      label: Log / screenshot / bang chung

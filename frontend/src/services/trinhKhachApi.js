@@ -133,7 +133,6 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
   }
 
   if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon) && layMaXacThuc()) {
-    datMucLuuTru(STORAGE_KEYS.PHIEN_HET_HAN, '1')
     xoaPhienXacThuc()
   }
 

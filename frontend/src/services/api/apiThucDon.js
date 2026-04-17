@@ -15,7 +15,7 @@ const chuanHoaUrlAnhMon = (duongDanAnh) => {
 export const uploadAnhMonApi = async (tapTin) => {
   const formData = new FormData()
   formData.append('file', tapTin)
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/upload/mon-an', formData))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/thuc-don/upload/anh', formData))
   return {
     ...phanHoi,
     duLieu: {

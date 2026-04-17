@@ -8,6 +8,7 @@ import {
   SAC_DO_MAC_DINH_THUC_DON,
   ANH_DU_PHONG_THUC_DON,
 } from '../../features/thucDon/constants/tuyChonThucDon'
+import { layAnhMonTheoTen } from '../../features/thucDon/constants/anhMonAn'
 import { phanTichGiaThanhSo } from '../../utils/giaTien'
 import { dinhDangTienTe } from '../../utils/tienTe'
 
@@ -34,7 +35,7 @@ const chuanHoaGiaTriGia = (giaGoc) => phanTichGiaThanhSo(giaGoc)
 
 const chuanHoaNhan = (giaTri) => chuanHoaVanBan(giaTri) || NHAN_MAC_DINH_THUC_DON
 const chuanHoaSacDo = (giaTri) => chuanHoaVanBan(giaTri) || SAC_DO_MAC_DINH_THUC_DON
-const chuanHoaAnh = (giaTri) => chuanHoaVanBan(giaTri) || ANH_DU_PHONG_THUC_DON
+const chuanHoaAnh = (giaTri, tenMon = '', danhMuc = '') => chuanHoaVanBan(giaTri) || layAnhMonTheoTen(tenMon, danhMuc) || ANH_DU_PHONG_THUC_DON
 
 export const chuanHoaDanhMucThucDon = (danhMucGoc) => {
   const danhMucDaChuanHoa = chuanHoaVanBan(danhMucGoc)
@@ -63,20 +64,21 @@ export const chuanHoaMonThucDon = (monGoc, chiSoDuPhong = 0) => {
 
   const giaTriGia = chuanHoaGiaTriGia(monGoc.price ?? monGoc.gia ?? monGoc.Gia)
   const danhMucDaChuanHoa = chuanHoaDanhMucThucDon(monGoc.category ?? monGoc.danhMuc ?? monGoc.maDanhMuc ?? monGoc.MaDanhMuc)
+  const tenMonDaChuanHoa = chuanHoaVanBan(monGoc.name ?? monGoc.tenMon ?? monGoc.TenMon) || TEN_MON_DU_PHONG
   const idDaChuanHoa = monGoc.id ?? monGoc.maMon ?? monGoc.MaMon ?? monGoc._id ?? monGoc.slug ?? `fallback-${chiSoDuPhong}`
 
   return {
     ...monGoc,
     id: idDaChuanHoa,
     maMon: chuanHoaVanBan(monGoc.maMon ?? monGoc.MaMon ?? idDaChuanHoa),
-    name: chuanHoaVanBan(monGoc.name ?? monGoc.tenMon ?? monGoc.TenMon) || TEN_MON_DU_PHONG,
+    name: tenMonDaChuanHoa,
     description: chuanHoaVanBan(monGoc.description ?? monGoc.moTa ?? monGoc.MoTa) || MO_TA_MON_DU_PHONG,
     price: dinhDangTienTe(giaTriGia),
     priceValue: giaTriGia,
     category: damBaoDanhMucHopLe(danhMucDaChuanHoa),
     badge: chuanHoaNhan(monGoc.badge ?? monGoc.nhanMon),
     tone: chuanHoaSacDo(monGoc.tone ?? monGoc.toneMau),
-    image: chuanHoaAnh(monGoc.image ?? monGoc.hinhAnh),
+    image: chuanHoaAnh(monGoc.image ?? monGoc.hinhAnh, tenMonDaChuanHoa, danhMucDaChuanHoa),
   }
 }
 
