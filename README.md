@@ -46,7 +46,7 @@ Có thể xem đây là **hướng mở rộng tiếp theo** của đồ án, kh
 ## Kiến trúc repo
 
 ```text
-/media/nha/New Volume/doan3-webquanlynhahang
+doan3-webquanlynhahang/
 ├── frontend/                    # Frontend React + Vite
 │   ├── src/
 │   ├── public/
@@ -59,7 +59,7 @@ Có thể xem đây là **hướng mở rộng tiếp theo** của đồ án, kh
 │       ├── .env.example
 │       └── package.json
 ├── database/                    # SQL schema / seed phục vụ local
-├── docs/                        # Mô tả nghiệp vụ, snapshot, ghi chú phân tích
+├── docs/                        # Mô tả nghiệp vụ, ghi chú phân tích
 ├── scripts/                     # Script smoke test và tiện ích
 ├── package.json                 # Script điều phối ở root
 └── README.md
