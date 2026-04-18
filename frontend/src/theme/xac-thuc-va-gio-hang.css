@@ -360,48 +360,48 @@
   font-size: 1.45rem;
   color: var(--dark);
 }
-.gio-hang-page .voucher-block {
+.gio-hang-page .phieu-giam-gia-block {
   margin-bottom: 1rem;
   padding-bottom: 1rem;
   border-bottom: 1px solid #E5E0DB;
 }
-.gio-hang-page .voucher-header h3 {
+.gio-hang-page .phieu-giam-gia-header h3 {
   margin: 0 0 0.25rem;
   font-family: 'Cormorant Garamond', serif;
   font-size: 1rem;
   font-weight: 700;
   color: var(--dark);
 }
-.gio-hang-page .voucher-header p {
+.gio-hang-page .phieu-giam-gia-header p {
   margin: 0 0 0.75rem;
   font-size: 0.8rem;
   line-height: 1.55;
   color: var(--text-muted);
 }
-.gio-hang-page .voucher-controls {
+.gio-hang-page .phieu-giam-gia-controls {
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
 }
-.gio-hang-page .voucher-input {
+.gio-hang-page .phieu-giam-gia-input {
   flex: 1;
   min-width: 12rem;
 }
-.gio-hang-page .voucher-apply-btn {
+.gio-hang-page .phieu-giam-gia-apply-btn {
   min-width: 7rem;
 }
-.gio-hang-page .voucher-clear-btn {
+.gio-hang-page .phieu-giam-gia-clear-btn {
   font-size: 0.78rem;
   padding: 0.55rem 0.9rem;
 }
-.gio-hang-page .voucher-message {
+.gio-hang-page .phieu-giam-gia-message {
   margin: 0.65rem 0 0;
   font-size: 0.82rem;
   line-height: 1.5;
 }
-.gio-hang-page .voucher-message.success { color: #1f7a47; }
-.gio-hang-page .voucher-message.error { color: #d24b31; }
-.gio-hang-page .voucher-apply-btn:disabled {
+.gio-hang-page .phieu-giam-gia-message.success { color: #1f7a47; }
+.gio-hang-page .phieu-giam-gia-message.error { color: #d24b31; }
+.gio-hang-page .phieu-giam-gia-apply-btn:disabled {
   opacity: 0.7;
   cursor: wait;
 }
@@ -638,13 +638,13 @@
     -webkit-box-orient: vertical;
   }
 
-  .gio-hang-page .voucher-controls {
+  .gio-hang-page .phieu-giam-gia-controls {
     flex-direction: column;
   }
 
-  .gio-hang-page .voucher-input,
-  .gio-hang-page .voucher-apply-btn,
-  .gio-hang-page .voucher-clear-btn {
+  .gio-hang-page .phieu-giam-gia-input,
+  .gio-hang-page .phieu-giam-gia-apply-btn,
+  .gio-hang-page .phieu-giam-gia-clear-btn {
     width: 100%;
   }
 

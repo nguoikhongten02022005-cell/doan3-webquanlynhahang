@@ -45,8 +45,8 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
         </div>
       ) : (
         <div className="ho-so-history-grid">
-          {bookings.map((booking) => (
-            <div key={booking.bookingCode} className="ho-so-history-card">
+          {bookings.map((booking, index) => (
+            <div key={booking.bookingCode || booking.id || booking.bookingId || `${booking.date || 'booking'}-${booking.time || index}` } className="ho-so-history-card">
               <div className="ho-so-history-header">
                 <strong>{booking.bookingCode}</strong>
                 <span className={`nhan-trang-thai tone-${booking.statusTone || 'warning'}`}>{booking.statusLabel || booking.status || 'Chờ xác nhận'}</span>

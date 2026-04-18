@@ -3,7 +3,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { AuthService } from '../auth/auth.service';
 
 @Injectable()
-export class LoyaltyService {
+export class DiemTichLuyService {
   constructor(
     private readonly mysql: MySqlService,
     private readonly authService: AuthService,

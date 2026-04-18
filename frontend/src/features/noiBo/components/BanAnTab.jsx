@@ -11,21 +11,21 @@ import { Badge, Button, Drawer, Empty, Tabs, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { layNhanChoNgoi } from '../dinhDang'
 
-const TABLE_STATUS_LABELS = {
+const NHAN_TRANG_THAI_BAN = {
   AVAILABLE: 'Sẵn sàng',
   HELD: 'Đã đặt',
   OCCUPIED: 'Đang phục vụ',
   DIRTY: 'Chờ dọn',
 }
 
-const TABLE_STATUS_TONES = {
+const SAC_THAI_TRANG_THAI_BAN = {
   AVAILABLE: 'success',
   HELD: 'warning',
   OCCUPIED: 'danger',
   DIRTY: 'neutral',
 }
 
-const TABLE_STATUS_STYLES = {
+const KIEU_TRANG_THAI_BAN = {
   AVAILABLE: {
     card: 'border-emerald-100 bg-white text-slate-900',
     dot: 'bg-emerald-500',
@@ -64,7 +64,7 @@ const TABLE_STATUS_STYLES = {
   },
 }
 
-const drawerButtonStyles = {
+const kieuNutDrawer = {
   primary: {
     background: 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)',
     borderColor: '#f97316',
@@ -82,23 +82,23 @@ const drawerButtonStyles = {
   },
 }
 
-const getTargetRows = (tableCount) => {
-  if (tableCount >= 10) return 3
-  if (tableCount >= 5) return 2
+const laySoHangMucTieu = (soLuongBan) => {
+  if (soLuongBan >= 10) return 3
+  if (soLuongBan >= 5) return 2
   return 1
 }
 
-const getAreaGridColumns = (tableCount) => {
-  if (tableCount <= 0) return 1
+const laySoCotKhuVuc = (soLuongBan) => {
+  if (soLuongBan <= 0) return 1
 
-  const targetRows = getTargetRows(tableCount)
-  return Math.max(1, Math.ceil(tableCount / targetRows))
+  const soHangMucTieu = laySoHangMucTieu(soLuongBan)
+  return Math.max(1, Math.ceil(soLuongBan / soHangMucTieu))
 }
 
-const getAreaDotClass = (occupancyRate) => (occupancyRate >= 1 ? 'bg-orange-500' : 'bg-slate-300')
+const layLopChamKhuVuc = (tyLeLapDay) => (tyLeLapDay >= 1 ? 'bg-orange-500' : 'bg-slate-300')
 
-const getTableShapeClasses = (capacity) => {
-  if (capacity <= 2) {
+const layLopHinhDangBan = (sucChua) => {
+  if (sucChua <= 2) {
     return {
       khung: 'rounded-[999px] min-h-[138px]',
       matBan: 'rounded-[999px] px-5 py-4',
@@ -106,7 +106,7 @@ const getTableShapeClasses = (capacity) => {
     }
   }
 
-  if (capacity <= 4) {
+  if (sucChua <= 4) {
     return {
       khung: 'rounded-[34px] min-h-[148px]',
       matBan: 'rounded-[30px] px-5 py-4',
@@ -114,7 +114,7 @@ const getTableShapeClasses = (capacity) => {
     }
   }
 
-  if (capacity <= 6) {
+  if (sucChua <= 6) {
     return {
       khung: 'rounded-[999px] min-h-[150px]',
       matBan: 'rounded-[999px] px-6 py-4',
@@ -129,10 +129,10 @@ const getTableShapeClasses = (capacity) => {
   }
 }
 
-const formatBookingTime = (booking) => {
-  if (!booking?.time) return ''
+const dinhDangGioDatBan = (datBan) => {
+  if (!datBan?.time) return ''
 
-  const normalized = String(booking.time).trim()
+  const normalized = String(datBan.time).trim()
   if (/^\d{2}:\d{2}$/.test(normalized)) return normalized
   if (/^\d{2}:\d{2}:\d{2}$/.test(normalized)) return normalized.slice(0, 5)
 
@@ -150,26 +150,26 @@ const chuanHoaTrangThaiChoPos = (trangThai = '') => {
   return giaTri || 'DIRTY'
 }
 
-const buildTableViewModel = (table, bookingById) => {
-  const booking = table.activeBookingId ? bookingById.get(String(table.activeBookingId)) : null
+const taoMoHinhHienThiBan = (table, datBanTheoId) => {
+  const datBan = table.activeBookingId ? datBanTheoId.get(String(table.activeBookingId)) : null
   const status = chuanHoaTrangThaiChoPos(table.status)
-  const statusStyle = TABLE_STATUS_STYLES[status] || TABLE_STATUS_STYLES.DIRTY
+  const kieuTrangThai = KIEU_TRANG_THAI_BAN[status] || KIEU_TRANG_THAI_BAN.DIRTY
 
   return {
     ...table,
-    booking,
+    datBan,
     status,
     displayName: table.name || table.code || 'Bàn',
     areaLabel: layNhanChoNgoi(table.areaId),
-    statusLabel: TABLE_STATUS_LABELS[status] || table.status,
-    statusTone: TABLE_STATUS_TONES[status] || 'neutral',
-    statusStyle,
-    bookingCode: booking?.bookingCode || table.activeBookingCode || '',
-    timeText: status === 'HELD' || status === 'OCCUPIED' ? formatBookingTime(booking) : '',
+    statusLabel: NHAN_TRANG_THAI_BAN[status] || table.status,
+    statusTone: SAC_THAI_TRANG_THAI_BAN[status] || 'neutral',
+    kieuTrangThai,
+    bookingCode: datBan?.bookingCode || table.activeBookingCode || '',
+    timeText: status === 'HELD' || status === 'OCCUPIED' ? dinhDangGioDatBan(datBan) : '',
   }
 }
 
-function LegacyBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, xuLyDanhDauBanSanSang, xuLyDanhDauBanBan }) {
+function BanAnTabCoDien({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, xuLyDanhDauBanSanSang, xuLyDanhDauBanBan }) {
   return (
     <article className="ho-so-card">
       <div className="van-hanh-board-head">
@@ -217,14 +217,14 @@ function LegacyBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, xuLyD
           <div key={table.id} className="ho-so-list-item">
             <div className="ho-so-list-top">
               <strong>{table.code}</strong>
-              <span className={`nhan-trang-thai tone-${TABLE_STATUS_TONES[table.status] || 'neutral'}`}>
-                {TABLE_STATUS_LABELS[table.status] || table.status}
+              <span className={`nhan-trang-thai tone-${SAC_THAI_TRANG_THAI_BAN[table.status] || 'neutral'}`}>
+                {NHAN_TRANG_THAI_BAN[table.status] || table.status}
               </span>
             </div>
 
             <div className="ho-so-list-meta noi-bo-don-hang-meta">
               <p><span>Khu vực</span><strong>{layNhanChoNgoi(table.areaId)}</strong></p>
-              <p><span>Sức chứa</span><strong>{table.capacity} khách</strong></p>
+              <p><span>Sức chứa</span><strong>{table.sucChua} khách</strong></p>
               <p><span>Booking hiện tại</span><strong>{table.activeBookingCode || 'Trống'}</strong></p>
               <p><span>Ghi chú</span><strong>{table.note || '--'}</strong></p>
             </div>
@@ -247,7 +247,7 @@ function LegacyBanAnTab({ phamViLabel, tomTatBan, tables, tomTatTonKhoBan, xuLyD
   )
 }
 
-function PosBanAnTab({
+function BanAnTabPos({
   phamViLabel,
   tomTatBan,
   tables,
@@ -259,87 +259,87 @@ function PosBanAnTab({
 }) {
   const navigate = useNavigate()
   const [messageApi, contextHolder] = message.useMessage()
-  const [selectedTableId, setSelectedTableId] = useState(null)
-  const [isSubmittingAction, setIsSubmittingAction] = useState(false)
+  const [idBanDangChon, setIdBanDangChon] = useState(null)
+  const [dangGuiHanhDong, setDangGuiHanhDong] = useState(false)
 
-  const bookingById = useMemo(
-    () => new Map((bookings || []).map((booking) => [String(booking.id), booking])),
+  const datBanTheoId = useMemo(
+    () => new Map((bookings || []).map((datBan) => [String(datBan.id), datBan])),
     [bookings],
   )
 
-  const ordersByTableCode = useMemo(
-    () => new Map((orders || []).map((order) => [String(order.tableNumber || '').trim().toUpperCase(), order]).filter(([tableCode]) => tableCode)),
+  const donHangTheoMaBan = useMemo(
+    () => new Map((orders || []).map((order) => [String(order.tableNumber || '').trim().toUpperCase(), order]).filter(([maBan]) => maBan)),
     [orders],
   )
 
-  const tableViewModels = useMemo(
-    () => tables.map((table) => buildTableViewModel(table, bookingById)),
-    [bookingById, tables],
+  const moHinhHienThiBan = useMemo(
+    () => tables.map((table) => taoMoHinhHienThiBan(table, datBanTheoId)),
+    [datBanTheoId, tables],
   )
 
-  const tomTatBanPos = useMemo(() => ({
-    total: tableViewModels.length,
-    available: tableViewModels.filter((table) => table.status === 'AVAILABLE').length,
-    held: tableViewModels.filter((table) => table.status === 'HELD').length,
-    occupied: tableViewModels.filter((table) => table.status === 'OCCUPIED').length,
-    dirty: tableViewModels.filter((table) => table.status === 'DIRTY').length,
-  }), [tableViewModels])
+  const tomTatBanDangPos = useMemo(() => ({
+    total: moHinhHienThiBan.length,
+    available: moHinhHienThiBan.filter((table) => table.status === 'AVAILABLE').length,
+    held: moHinhHienThiBan.filter((table) => table.status === 'HELD').length,
+    occupied: moHinhHienThiBan.filter((table) => table.status === 'OCCUPIED').length,
+    dirty: moHinhHienThiBan.filter((table) => table.status === 'DIRTY').length,
+  }), [moHinhHienThiBan])
 
-  const selectedTable = useMemo(
-    () => tableViewModels.find((table) => table.id === selectedTableId) || null,
-    [selectedTableId, tableViewModels],
+  const banDangChon = useMemo(
+    () => moHinhHienThiBan.find((table) => table.id === idBanDangChon) || null,
+    [idBanDangChon, moHinhHienThiBan],
   )
 
-  const selectedOrder = useMemo(() => {
-    if (!selectedTable) return null
-    return ordersByTableCode.get(String(selectedTable.code || selectedTable.displayName || '').trim().toUpperCase()) || null
-  }, [ordersByTableCode, selectedTable])
+  const donHangDangChon = useMemo(() => {
+    if (!banDangChon) return null
+    return donHangTheoMaBan.get(String(banDangChon.code || banDangChon.displayName || '').trim().toUpperCase()) || null
+  }, [donHangTheoMaBan, banDangChon])
 
-  const summaryItems = [
-    { key: 'total', label: 'Tổng bàn', value: tomTatBanPos.total, dot: 'bg-slate-400' },
-    { key: 'available', label: 'Trống', value: tomTatBanPos.available, dot: TABLE_STATUS_STYLES.AVAILABLE.dot },
-    { key: 'occupied', label: 'Đang phục vụ', value: tomTatBanPos.occupied, dot: TABLE_STATUS_STYLES.OCCUPIED.dot },
-    { key: 'held', label: 'Đã đặt', value: tomTatBanPos.held, dot: TABLE_STATUS_STYLES.HELD.dot },
-    { key: 'dirty', label: 'Chờ dọn', value: tomTatBanPos.dirty, dot: TABLE_STATUS_STYLES.DIRTY.dot },
+  const danhSachTomTat = [
+    { key: 'total', label: 'Tổng bàn', value: tomTatBanDangPos.total, dot: 'bg-slate-400' },
+    { key: 'available', label: 'Trống', value: tomTatBanDangPos.available, dot: KIEU_TRANG_THAI_BAN.AVAILABLE.dot },
+    { key: 'occupied', label: 'Đang phục vụ', value: tomTatBanDangPos.occupied, dot: KIEU_TRANG_THAI_BAN.OCCUPIED.dot },
+    { key: 'held', label: 'Đã đặt', value: tomTatBanDangPos.held, dot: KIEU_TRANG_THAI_BAN.HELD.dot },
+    { key: 'dirty', label: 'Chờ dọn', value: tomTatBanDangPos.dirty, dot: KIEU_TRANG_THAI_BAN.DIRTY.dot },
   ]
 
-  const handleOpenDrawer = (tableId) => setSelectedTableId(tableId)
-  const handleCloseDrawer = () => setSelectedTableId(null)
+  const xuLyMoDrawer = (idBan) => setIdBanDangChon(idBan)
+  const xuLyDongDrawer = () => setIdBanDangChon(null)
 
-  const handleMarkReady = async (event, tableId) => {
+  const xuLyDanhDauSanSang = async (event, idBan) => {
     event.stopPropagation()
-    await xuLyDanhDauBanSanSang?.(tableId)
+    await xuLyDanhDauBanSanSang?.(idBan)
   }
 
-  const runTableAction = async (action) => {
-    if (!selectedTable || isSubmittingAction || !action) return
+  const thucThiHanhDongBan = async (hanhDong) => {
+    if (!banDangChon || dangGuiHanhDong || !hanhDong) return
 
-    if (action.type === 'navigate-orders') {
+    if (hanhDong.type === 'navigate-orders') {
       navigate('/noi-bo/don-hang')
-      handleCloseDrawer()
+      xuLyDongDrawer()
       return
     }
 
-    if (action.type === 'walk-in') {
+    if (hanhDong.type === 'walk-in') {
       messageApi.info('Dùng tab Đặt bàn để tạo booking walk-in cho bàn này.')
-      handleCloseDrawer()
+      xuLyDongDrawer()
       navigate('/noi-bo/dat-ban')
       return
     }
 
-    setIsSubmittingAction(true)
+    setDangGuiHanhDong(true)
 
     try {
-      if (action.type === 'check-in') {
-        if (!selectedTable.booking?.id) {
+      if (hanhDong.type === 'check-in') {
+        if (!banDangChon.datBan?.id) {
           messageApi.warning('Bàn này chưa có booking để check-in.')
           return
         }
 
-        const ketQua = await xuLyCheckIn?.(selectedTable.booking.id)
+        const ketQua = await xuLyCheckIn?.(banDangChon.datBan.id)
         if (ketQua?.success) {
           messageApi.success('Đã check-in booking cho bàn này.')
-          handleCloseDrawer()
+          xuLyDongDrawer()
           return
         }
 
@@ -347,16 +347,16 @@ function PosBanAnTab({
         return
       }
 
-      if (action.type === 'complete-booking') {
-        if (!selectedTable.booking?.id) {
+      if (hanhDong.type === 'complete-booking') {
+        if (!banDangChon.datBan?.id) {
           messageApi.warning('Bàn này chưa có booking đang phục vụ để giải phóng.')
           return
         }
 
-        const ketQua = await xuLyHoanThanh?.(selectedTable.booking.id)
+        const ketQua = await xuLyHoanThanh?.(banDangChon.datBan.id)
         if (ketQua?.success) {
           messageApi.success('Đã giải phóng bàn thành công.')
-          handleCloseDrawer()
+          xuLyDongDrawer()
           return
         }
 
@@ -364,52 +364,52 @@ function PosBanAnTab({
         return
       }
 
-      if (action.type === 'mark-ready') {
-        await xuLyDanhDauBanSanSang?.(selectedTable.id)
+      if (hanhDong.type === 'mark-ready') {
+        await xuLyDanhDauBanSanSang?.(banDangChon.id)
         messageApi.success('Đã đánh dấu bàn sẵn sàng.')
-        handleCloseDrawer()
+        xuLyDongDrawer()
       }
     } finally {
-      setIsSubmittingAction(false)
+      setDangGuiHanhDong(false)
     }
   }
 
-  const selectedTableActions = useMemo(() => {
-    if (!selectedTable) return []
+  const danhSachHanhDongBanDangChon = useMemo(() => {
+    if (!banDangChon) return []
 
-    if (selectedTable.status === 'AVAILABLE') {
+    if (banDangChon.status === 'AVAILABLE') {
       return [
         {
           key: 'walk-in',
           type: 'walk-in',
           label: 'Nhận walk-in',
           icon: <ShoppingCartOutlined />,
-          style: drawerButtonStyles.primary,
+          style: kieuNutDrawer.primary,
           typeButton: 'primary',
         },
       ]
     }
 
-    if (selectedTable.status === 'HELD') {
+    if (banDangChon.status === 'HELD') {
       return [
         {
           key: 'check-in',
           type: 'check-in',
           label: 'Check-in',
           icon: <CheckOutlined />,
-          style: drawerButtonStyles.success,
+          style: kieuNutDrawer.success,
           typeButton: 'primary',
-          disabled: !selectedTable.booking?.id,
+          disabled: !banDangChon.datBan?.id,
         },
       ]
     }
 
-    if (selectedTable.status === 'OCCUPIED') {
+    if (banDangChon.status === 'OCCUPIED') {
       return [
         {
           key: 'view-order',
           type: 'navigate-orders',
-          label: selectedOrder ? `Xem đơn #${selectedOrder.orderCode || selectedOrder.code || selectedOrder.id}` : 'Xem đơn',
+          label: donHangDangChon ? `Xem đơn #${donHangDangChon.orderCode || donHangDangChon.code || donHangDangChon.id}` : 'Xem đơn',
           icon: <EyeOutlined />,
           typeButton: 'default',
         },
@@ -418,62 +418,62 @@ function PosBanAnTab({
           type: 'complete-booking',
           label: 'Giải phóng bàn',
           icon: <CreditCardOutlined />,
-          style: drawerButtonStyles.danger,
+          style: kieuNutDrawer.danger,
           typeButton: 'primary',
-          disabled: !selectedTable.booking?.id,
+          disabled: !banDangChon.datBan?.id,
         },
       ]
     }
 
-    if (selectedTable.status === 'DIRTY') {
+    if (banDangChon.status === 'DIRTY') {
       return [
         {
           key: 'mark-ready',
           type: 'mark-ready',
           label: 'Đánh dấu đã dọn',
           icon: <CheckOutlined />,
-          style: drawerButtonStyles.success,
+          style: kieuNutDrawer.success,
           typeButton: 'primary',
         },
       ]
     }
 
     return []
-  }, [selectedOrder, selectedTable])
+  }, [donHangDangChon, banDangChon])
 
-  const tabItems = tomTatBan.map((area) => {
-    const areaTables = tableViewModels.filter((table) => table.areaId === area.id)
-    const areaGridColumns = getAreaGridColumns(areaTables.length)
+  const danhSachTab = tomTatBan.map((area) => {
+    const danhSachBanTheoKhuVuc = moHinhHienThiBan.filter((table) => table.areaId === area.id)
+    const soCotKhuVuc = laySoCotKhuVuc(danhSachBanTheoKhuVuc.length)
 
     return {
       key: area.id,
       label: (
         <div className="flex items-center gap-2">
-          <span className={`inline-flex h-2.5 w-2.5 rounded-full ${getAreaDotClass(area.occupancyRate)}`} />
+          <span className={`inline-flex h-2.5 w-2.5 rounded-full ${layLopChamKhuVuc(area.tyLeLapDay)}`} />
           <span className="font-semibold text-slate-800">{area.name}</span>
           <span className="rounded-full bg-slate-100 px-2 py-0.5 text-[11px] font-medium text-slate-500">
             {area.available}/{area.total}
           </span>
         </div>
       ),
-      children: areaTables.length ? (
-        <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${areaGridColumns}, minmax(126px, 1fr))` }}>
-          {areaTables.map((table) => (
+      children: danhSachBanTheoKhuVuc.length ? (
+        <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${soCotKhuVuc}, minmax(126px, 1fr))` }}>
+          {danhSachBanTheoKhuVuc.map((table) => (
             (() => {
-              const shapeClasses = getTableShapeClasses(table.capacity)
+              const lopHinhDangBan = layLopHinhDangBan(table.sucChua)
 
               return (
                 <button
                   key={table.id}
                   type="button"
-                  onClick={() => handleOpenDrawer(table.id)}
-                  className={`group relative flex flex-col justify-center overflow-hidden border border-white/70 bg-gradient-to-br from-white via-white to-slate-50/90 p-3 text-left shadow-[0_18px_32px_rgba(148,163,184,0.14)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_22px_38px_rgba(249,115,22,0.18)] focus:outline-none focus:ring-2 focus:ring-orange-300 ${shapeClasses.khung} ${table.statusStyle.card}`}
+                  onClick={() => xuLyMoDrawer(table.id)}
+                  className={`group relative flex flex-col justify-center overflow-hidden border border-white/70 bg-gradient-to-br from-white via-white to-slate-50/90 p-3 text-left shadow-[0_18px_32px_rgba(148,163,184,0.14)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_22px_38px_rgba(249,115,22,0.18)] focus:outline-none focus:ring-2 focus:ring-orange-300 ${lopHinhDangBan.khung} ${table.kieuTrangThai.card}`}
                 >
-                  <span className={`pointer-events-none absolute inset-[9px] border border-white/80 opacity-80 ${shapeClasses.vienTrangTri}`} />
+                  <span className={`pointer-events-none absolute inset-[9px] border border-white/80 opacity-80 ${lopHinhDangBan.vienTrangTri}`} />
 
-                  <div className={`relative flex h-full flex-col justify-between border border-black/5 bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-sm ${shapeClasses.matBan}`}>
+                  <div className={`relative flex h-full flex-col justify-between border border-black/5 bg-white/72 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] backdrop-blur-sm ${lopHinhDangBan.matBan}`}>
                     <div className="flex items-start justify-between gap-2">
-                      <span className={`mt-1 inline-flex h-2.5 w-2.5 rounded-full ${table.statusStyle.dot}`} />
+                      <span className={`mt-1 inline-flex h-2.5 w-2.5 rounded-full ${table.kieuTrangThai.dot}`} />
 
                       <div className="flex items-center gap-2">
                         {table.status === 'DIRTY' && (
@@ -482,15 +482,15 @@ function PosBanAnTab({
                             shape="circle"
                             type="text"
                             icon={<CheckOutlined />}
-                            onClick={(event) => handleMarkReady(event, table.id)}
+                            onClick={(event) => xuLyDanhDauSanSang(event, table.id)}
                             aria-label={`Đánh dấu ${table.displayName} sẵn sàng lại`}
                             className="!h-7 !w-7 !border !border-emerald-200 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100"
                           />
                         )}
 
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold shadow-sm ${table.statusStyle.surface}`}>
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold shadow-sm ${table.kieuTrangThai.surface}`}>
                           <UserOutlined className="text-[10px]" />
-                          {table.capacity}
+                          {table.sucChua}
                         </span>
                       </div>
                     </div>
@@ -500,16 +500,16 @@ function PosBanAnTab({
                         {table.displayName}
                       </div>
                       {table.bookingCode ? (
-                        <div className={`mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] ${table.statusStyle.subtle}`}>
+                        <div className={`mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] ${table.kieuTrangThai.subtle}`}>
                           {table.bookingCode}
                         </div>
                       ) : null}
                     </div>
 
                     <div className="flex items-end justify-between gap-2 text-[11px]">
-                      <span className={`font-semibold ${table.statusStyle.accent}`}>{table.statusLabel}</span>
+                      <span className={`font-semibold ${table.kieuTrangThai.accent}`}>{table.statusLabel}</span>
                       {table.timeText ? (
-                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold shadow-sm ${table.statusStyle.surface}`}>
+                        <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 font-semibold shadow-sm ${table.kieuTrangThai.surface}`}>
                           <ClockCircleOutlined className="text-[10px]" />
                           {table.timeText}
                         </span>
@@ -542,22 +542,22 @@ function PosBanAnTab({
             </div>
             <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-500">
               <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
-                <span className={`h-2 w-2 rounded-full ${TABLE_STATUS_STYLES.AVAILABLE.dot}`} /> Trống
+                <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.AVAILABLE.dot}`} /> Trống
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
-                <span className={`h-2 w-2 rounded-full ${TABLE_STATUS_STYLES.HELD.dot}`} /> Đã đặt
+                <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.HELD.dot}`} /> Đã đặt
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
-                <span className={`h-2 w-2 rounded-full ${TABLE_STATUS_STYLES.OCCUPIED.dot}`} /> Đang phục vụ
+                <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.OCCUPIED.dot}`} /> Đang phục vụ
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
-                <span className={`h-2 w-2 rounded-full ${TABLE_STATUS_STYLES.DIRTY.dot}`} /> Chờ dọn
+                <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.DIRTY.dot}`} /> Chờ dọn
               </span>
             </div>
           </div>
 
           <div className="flex flex-wrap gap-2">
-            {summaryItems.map((item) => (
+            {danhSachTomTat.map((item) => (
               <div key={item.key} className="inline-flex min-w-[116px] items-center gap-3 rounded-[18px] border border-slate-200 bg-slate-50 px-3.5 py-2.5 shadow-sm">
                 <span className={`h-2.5 w-2.5 rounded-full ${item.dot}`} />
                 <div>
@@ -569,52 +569,52 @@ function PosBanAnTab({
           </div>
 
           <div className="rounded-[24px] border border-slate-200 bg-[#FCFCFD] px-2 py-3 md:px-3">
-            <Tabs items={tabItems} animated size="middle" className="noi-bo-pos-table-tabs" />
+            <Tabs items={danhSachTab} animated size="middle" className="noi-bo-pos-table-tabs" />
           </div>
         </div>
       </article>
 
       <Drawer
-        open={Boolean(selectedTable)}
-        onClose={handleCloseDrawer}
+        open={Boolean(banDangChon)}
+        onClose={xuLyDongDrawer}
         size={420}
         destroyOnClose
-        title={selectedTable ? (
+        title={banDangChon ? (
           <div className="flex items-center justify-between gap-3 pr-6">
             <div>
               <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Chi tiết bàn</div>
-              <div className="mt-1 text-xl font-semibold tracking-tight text-slate-900">{selectedTable.displayName}</div>
+              <div className="mt-1 text-xl font-semibold tracking-tight text-slate-900">{banDangChon.displayName}</div>
             </div>
             <Badge
-              color={selectedTable.statusStyle.badgeColor}
-              text={<span className="text-sm font-semibold text-slate-600">{selectedTable.statusLabel}</span>}
+              color={banDangChon.kieuTrangThai.badgeColor}
+              text={<span className="text-sm font-semibold text-slate-600">{banDangChon.statusLabel}</span>}
             />
           </div>
         ) : null}
       >
-        {selectedTable ? (
+        {banDangChon ? (
           <div className="flex flex-col gap-4">
-            <div className={`rounded-[22px] border p-4 shadow-sm ${selectedTable.statusStyle.drawerSurface}`}>
+            <div className={`rounded-[22px] border p-4 shadow-sm ${banDangChon.kieuTrangThai.drawerSurface}`}>
               <div className="flex items-start justify-between gap-3">
                 <div>
                   <div className="text-[11px] font-semibold uppercase tracking-[0.18em] text-slate-400">Khu vực</div>
-                  <div className="mt-1 text-lg font-semibold text-slate-900">{selectedTable.areaLabel}</div>
+                  <div className="mt-1 text-lg font-semibold text-slate-900">{banDangChon.areaLabel}</div>
                 </div>
-                <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${selectedTable.statusStyle.surface}`}>
+                <span className={`inline-flex items-center gap-1 rounded-full border px-2.5 py-1 text-xs font-semibold ${banDangChon.kieuTrangThai.surface}`}>
                   <UserOutlined />
-                  {selectedTable.capacity} ghế
+                  {banDangChon.sucChua} ghế
                 </span>
               </div>
 
-              {selectedTable.bookingCode || selectedTable.timeText ? (
+              {banDangChon.bookingCode || banDangChon.timeText ? (
                 <div className="mt-4 grid grid-cols-2 gap-3">
                   <div className="rounded-2xl bg-white/80 px-3 py-2 shadow-sm">
                     <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">Booking</div>
-                    <div className="mt-1 text-sm font-semibold text-slate-700">{selectedTable.bookingCode || '—'}</div>
+                    <div className="mt-1 text-sm font-semibold text-slate-700">{banDangChon.bookingCode || '—'}</div>
                   </div>
                   <div className="rounded-2xl bg-white/80 px-3 py-2 shadow-sm">
                     <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">Giờ vào</div>
-                    <div className="mt-1 text-sm font-semibold text-slate-700">{selectedTable.timeText || '—'}</div>
+                    <div className="mt-1 text-sm font-semibold text-slate-700">{banDangChon.timeText || '—'}</div>
                   </div>
                 </div>
               ) : null}
@@ -623,36 +623,36 @@ function PosBanAnTab({
             <div className="grid grid-cols-2 gap-3">
               <div className="rounded-[18px] border border-slate-200 bg-slate-50 px-3.5 py-3">
                 <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">Sức chứa</div>
-                <div className="mt-2 text-base font-semibold text-slate-900">{selectedTable.capacity} khách</div>
+                <div className="mt-2 text-base font-semibold text-slate-900">{banDangChon.sucChua} khách</div>
               </div>
               <div className="rounded-[18px] border border-slate-200 bg-slate-50 px-3.5 py-3">
                 <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">Giờ vào</div>
-                <div className="mt-2 text-base font-semibold text-slate-900">{selectedTable.timeText || 'Chưa có'}</div>
+                <div className="mt-2 text-base font-semibold text-slate-900">{banDangChon.timeText || 'Chưa có'}</div>
               </div>
             </div>
 
             <div className="rounded-[22px] border border-slate-200 bg-white p-4 shadow-sm">
-              <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Khối action</div>
+              <div className="text-[11px] font-semibold uppercase tracking-[0.22em] text-slate-400">Khối hành động</div>
               <div className="mt-1 text-sm text-slate-500">
-                {selectedTable.status === 'AVAILABLE' ? 'Nhận khách walk-in nhanh cho bàn đang trống.' : null}
-                {selectedTable.status === 'HELD' ? 'Check-in booking đã gán cho bàn này.' : null}
-                {selectedTable.status === 'OCCUPIED' ? 'Mở luồng đơn hàng hiện tại hoặc giải phóng bàn sau khi phục vụ xong.' : null}
-                {selectedTable.status === 'DIRTY' ? 'Xác nhận bàn đã dọn xong để sẵn sàng nhận khách mới.' : null}
+                {banDangChon.status === 'AVAILABLE' ? 'Nhận khách walk-in nhanh cho bàn đang trống.' : null}
+                {banDangChon.status === 'HELD' ? 'Check-in booking đã gán cho bàn này.' : null}
+                {banDangChon.status === 'OCCUPIED' ? 'Mở luồng đơn hàng hiện tại hoặc giải phóng bàn sau khi phục vụ xong.' : null}
+                {banDangChon.status === 'DIRTY' ? 'Xác nhận bàn đã dọn xong để sẵn sàng nhận khách mới.' : null}
               </div>
               <div className="mt-4 flex flex-col gap-3">
-                {selectedTableActions.map((action) => (
+                {danhSachHanhDongBanDangChon.map((hanhDong) => (
                   <Button
-                    key={action.key}
-                    type={action.typeButton || 'default'}
+                    key={hanhDong.key}
+                    type={hanhDong.typeButton || 'default'}
                     size="large"
                     block
-                    icon={action.icon}
-                    style={action.style}
-                    disabled={action.disabled || isSubmittingAction}
-                    loading={isSubmittingAction && action.type !== 'navigate-orders' && action.type !== 'walk-in'}
-                    onClick={() => runTableAction(action)}
+                    icon={hanhDong.icon}
+                    style={hanhDong.style}
+                    disabled={hanhDong.disabled || dangGuiHanhDong}
+                    loading={dangGuiHanhDong && hanhDong.type !== 'navigate-orders' && hanhDong.type !== 'walk-in'}
+                    onClick={() => thucThiHanhDongBan(hanhDong)}
                   >
-                    {action.label}
+                    {hanhDong.label}
                   </Button>
                 ))}
               </div>
@@ -668,10 +668,10 @@ function BanAnTab(props) {
   const { variant = 'legacy' } = props
 
   if (variant === 'pos') {
-    return <PosBanAnTab {...props} />
+    return <BanAnTabPos {...props} />
   }
 
-  return <LegacyBanAnTab {...props} />
+  return <BanAnTabCoDien {...props} />
 }
 
 export default BanAnTab

@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Card, Col, Row, Segmented, Space, Statistic, Table, Typography } from 'antd'
-import RevenueChart from '../../features/noiBo/dashboard/RevenueChart'
+import BieuDoDoanhThu from '../../features/noiBo/dashboard/BieuDoDoanhThu'
 import { NOI_BO_THONG_KE_KHOANG_THOI_GIAN, taoDuLieuThongKeDoanhThu } from '../../features/noiBo/thongKeNoiBo'
 import { dinhDangTienTe } from '../../utils/tienTe'
 import { useOutletContext } from 'react-router-dom'
@@ -47,7 +47,7 @@ function NoiBoThongKePage() {
         <Col xs={24} md={12} xl={6}><Card><Statistic title="Tỉ lệ hủy" value={revenueStats.bookingStats.cancellationRate} suffix="%" /></Card></Col>
       </Row>
 
-      <RevenueChart title="Doanh thu 7 ngày gần nhất" revenue={{ summary: revenueStats.overview, series: revenueStats.revenueSeries }} />
+      <BieuDoDoanhThu title="Doanh thu 7 ngày gần nhất" revenue={{ summary: revenueStats.overview, series: revenueStats.revenueSeries }} />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={14}>

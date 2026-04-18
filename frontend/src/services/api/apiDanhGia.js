@@ -1,4 +1,10 @@
-import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import {
+  taoPhanHoiOffline,
+  layDanhSachDanhGiaOffline,
+  taoHoacCapNhatDanhGiaOffline,
+  timDanhGiaOfflineTheoMa,
+} from '../offline/dichVuOfflineStore'
 
 const chuanHoaDanhGia = (review) => {
   if (!review || typeof review !== 'object') return null
@@ -34,6 +40,14 @@ const chuanHoaDanhGia = (review) => {
 }
 
 export const layDanhSachDanhGiaApi = async () => {
+  if (!coSuDungMayChu()) {
+    const duLieu = layDanhSachDanhGiaOffline().map(chuanHoaDanhGia).filter(Boolean)
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay danh sach danh gia thanh cong')),
+      duLieu,
+    }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/danh-gia'))
   return {
     ...phanHoi,
@@ -41,9 +55,28 @@ export const layDanhSachDanhGiaApi = async () => {
   }
 }
 
-export const taoDanhGiaApi = async (payload) => tachPhanHoiApi(await trinhKhachApi.post('/danh-gia', payload))
+export const taoDanhGiaApi = async (payload) => {
+  if (!coSuDungMayChu()) {
+    return tachPhanHoiApi(taoPhanHoiOffline(taoHoacCapNhatDanhGiaOffline(payload), 'Tao danh gia thanh cong'))
+  }
+
+  return tachPhanHoiApi(await trinhKhachApi.post('/danh-gia', payload))
+}
 
 export const duyetDanhGiaApi = async (maDanhGia, payload) => {
+  if (!coSuDungMayChu()) {
+    const duLieu = taoHoacCapNhatDanhGiaOffline({
+      ...(timDanhGiaOfflineTheoMa(maDanhGia) || {}),
+      trangThai: payload.trangThai,
+      phanHoi: payload.phanHoi || '',
+    }, { maDanhGia })
+
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Duyet danh gia thanh cong')),
+      duLieu: chuanHoaDanhGia(duLieu),
+    }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/danh-gia/${maDanhGia}/duyet`, payload))
   return {
     ...phanHoi,

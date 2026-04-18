@@ -6,17 +6,17 @@ const layMauTheoTai = (percent) => {
   return '#52c41a'
 }
 
-function TablePressure({ tablePressure }) {
+function ApLucBanAn({ tablePressure }) {
   return (
     <Card className="noi-bo-dashboard-card" title="Áp lực bàn ăn" styles={{ body: { padding: '10px 14px' } }}>
       <Space size={10} style={{ width: '100%', flexDirection: 'column', alignItems: 'stretch' }}>
-        {(tablePressure || []).map((area) => (
-          <div key={area.id}>
+        {(tablePressure || []).map((khuVuc) => (
+          <div key={khuVuc.id}>
             <div className="noi-bo-dashboard-pressure__head">
-              <Typography.Text strong>{area.name}</Typography.Text>
+              <Typography.Text strong>{khuVuc.name}</Typography.Text>
             </div>
-            <Tooltip title={`${area.busyTables}/${area.total} bàn bận · ${area.available} trống · ${area.held} giữ chỗ · ${area.dirty} cần dọn`}>
-              <Progress percent={area.percent} strokeColor={layMauTheoTai(area.percent)} size={{ height: 10 }} showInfo={false} />
+            <Tooltip title={`${khuVuc.busyTables}/${khuVuc.total} bàn bận · ${khuVuc.available} trống · ${khuVuc.held} giữ chỗ · ${khuVuc.dirty} cần dọn`}>
+              <Progress percent={khuVuc.percent} strokeColor={layMauTheoTai(khuVuc.percent)} size={{ height: 10 }} showInfo={false} />
             </Tooltip>
           </div>
         ))}
@@ -25,4 +25,4 @@ function TablePressure({ tablePressure }) {
   )
 }
 
-export default TablePressure
+export default ApLucBanAn

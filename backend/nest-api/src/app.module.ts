@@ -10,8 +10,8 @@ import { DatBanModule } from './modules/dat-ban/dat-ban.module';
 import { DonHangModule } from './modules/don-hang/don-hang.module';
 import { DanhGiaModule } from './modules/danh-gia/danh-gia.module';
 import { MangVeModule } from './modules/mang-ve/mang-ve.module';
-import { LoyaltyModule } from './modules/loyalty/loyalty.module';
-import { VoucherModule } from './modules/voucher/voucher.module';
+import { DiemTichLuyModule } from './modules/diem-tich-luy/diem-tich-luy.module';
+import { MaGiamGiaModule } from './modules/ma-giam-gia/ma-giam-gia.module';
 
 const moiTruong = process.env.NODE_ENV?.trim() || 'development';
 const tapTinMoiTruong = `.env.${moiTruong}`;
@@ -34,8 +34,8 @@ const tapTinMoiTruong = `.env.${moiTruong}`;
     DonHangModule,
     DanhGiaModule,
     MangVeModule,
-    LoyaltyModule,
-    VoucherModule,
+    DiemTichLuyModule,
+    MaGiamGiaModule,
   ],
 })
 export class AppModule {}

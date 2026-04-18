@@ -1,4 +1,11 @@
-import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import {
+  taoPhanHoiOffline,
+  layDanhSachDonMangVeChoNoiBoOffline,
+  timDonHangOfflineTheoMa,
+  taoHoacCapNhatDonHangOffline,
+  capNhatTrangThaiDonHangOffline,
+} from '../offline/dichVuOfflineStore'
 import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
 import { chuanHoaPricingSummary, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
 
@@ -39,16 +46,34 @@ const chuanHoaDonMangVe = (duLieu) => {
 }
 
 export const taoDonMangVeApi = async (payload) => {
+  if (!coSuDungMayChu()) {
+    const duLieu = taoHoacCapNhatDonHangOffline(buildPayloadTaoDon(payload))
+    const phanHoi = tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Tao don mang ve thanh cong'))
+    return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.post('/mang-ve/don-hang', buildPayloadTaoDon(payload)))
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
 export const layDonMangVeApi = async (maDonHang) => {
+  if (!coSuDungMayChu()) {
+    return { ...tachPhanHoiApi(taoPhanHoiOffline(timDonHangOfflineTheoMa(maDonHang), 'Lay don mang ve thanh cong')), duLieu: chuanHoaDonMangVe(timDonHangOfflineTheoMa(maDonHang)) }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/mang-ve/don-hang/${maDonHang}`))
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
 export const layDanhSachDonMangVeChoNoiBoApi = async () => {
+  if (!coSuDungMayChu()) {
+    const duLieu = layDanhSachDonMangVeChoNoiBoOffline().map(chuanHoaDonMangVeChoNoiBo).filter(Boolean)
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay danh sach don mang ve thanh cong')),
+      duLieu,
+    }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/mang-ve/noi-bo/don-hang'))
   return {
     ...phanHoi,
@@ -57,11 +82,24 @@ export const layDanhSachDonMangVeChoNoiBoApi = async () => {
 }
 
 export const capNhatTrangThaiDonMangVeApi = async (maDonHang, trangThai) => {
+  if (!coSuDungMayChu()) {
+    const phanHoi = tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDonHangOffline(maDonHang, trangThai), 'Cap nhat trang thai don mang ve thanh cong'))
+    return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/mang-ve/noi-bo/don-hang/${maDonHang}/trang-thai`, { trangThai }))
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }
 
 export const layLichSuDonMangVeApi = async () => {
+  if (!coSuDungMayChu()) {
+    const duLieu = layDanhSachDonMangVeChoNoiBoOffline().map(chuanHoaDonMangVeLichSu).filter(Boolean)
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay lich su don mang ve thanh cong')),
+      duLieu,
+    }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/mang-ve/lich-su'))
   return {
     ...phanHoi,
@@ -70,6 +108,11 @@ export const layLichSuDonMangVeApi = async () => {
 }
 
 export const huyDonMangVeApi = async (maDonHang) => {
+  if (!coSuDungMayChu()) {
+    const phanHoi = tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDonHangOffline(maDonHang, 'Cancelled'), 'Huy don mang ve thanh cong'))
+    return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.patch(`/mang-ve/don-hang/${maDonHang}/huy`, {}))
   return { ...phanHoi, duLieu: chuanHoaDonMangVe(phanHoi.duLieu) }
 }

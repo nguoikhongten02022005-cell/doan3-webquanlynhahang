@@ -1,20 +1,20 @@
 import { Controller, Get, Headers } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-import { LoyaltyService } from './loyalty.service';
+import { DiemTichLuyService } from './diem-tich-luy.service';
 
 @ApiTags('diem-tich-luy')
 @ApiBearerAuth('access-token')
 @Controller('api/diem-tich-luy')
-export class LoyaltyController {
-  constructor(private readonly loyaltyService: LoyaltyService) {}
+export class DiemTichLuyController {
+  constructor(private readonly diemTichLuyService: DiemTichLuyService) {}
 
   @Get('me')
   layTongQuanDiemTichLuy(@Headers('authorization') authorization?: string) {
-    return this.loyaltyService.layTongQuanDiemTichLuy(authorization);
+    return this.diemTichLuyService.layTongQuanDiemTichLuy(authorization);
   }
 
   @Get('me/history')
   layLichSuDiemTichLuy(@Headers('authorization') authorization?: string) {
-    return this.loyaltyService.layLichSuDiemTichLuy(authorization);
+    return this.diemTichLuyService.layLichSuDiemTichLuy(authorization);
   }
 }

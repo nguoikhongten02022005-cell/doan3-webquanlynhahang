@@ -2,11 +2,11 @@ import { Card } from 'antd'
 import { Column } from '@ant-design/plots'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 
-function RevenueChart({ revenue, title = 'Doanh thu 7 ngày gần nhất' }) {
-  const data = revenue?.series || []
+function BieuDoDoanhThu({ revenue, title = 'Doanh thu 7 ngày gần nhất' }) {
+  const duLieuCot = revenue?.series || []
 
-  const config = {
-    data,
+  const cauHinhBieuDo = {
+    data: duLieuCot,
     xField: 'label',
     yField: 'revenue',
     color: '#E8664A',
@@ -37,9 +37,9 @@ function RevenueChart({ revenue, title = 'Doanh thu 7 ngày gần nhất' }) {
 
   return (
     <Card className="noi-bo-dashboard-card" title={title} extra={dinhDangTienTe(revenue?.summary?.revenue || 0)} styles={{ body: { padding: '10px 14px' } }}>
-      <Column {...config} height={232} />
+      <Column {...cauHinhBieuDo} height={232} />
     </Card>
   )
 }
 
-export default RevenueChart
+export default BieuDoDoanhThu

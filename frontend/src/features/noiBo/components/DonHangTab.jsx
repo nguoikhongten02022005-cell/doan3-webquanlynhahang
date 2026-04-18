@@ -16,7 +16,7 @@ import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../../ut
 const { TextArea } = Input
 const { useBreakpoint } = Grid
 
-const ORDER_FILTERS = [
+const BO_LOC_DON_HANG = [
   { key: 'all', label: 'Tất cả' },
   { key: 'pending', label: 'Chờ xử lý', statuses: ['Pending', 'Confirmed'] },
   { key: 'preparing', label: 'Đang chuẩn bị', statuses: ['Preparing'] },
@@ -25,7 +25,7 @@ const ORDER_FILTERS = [
   { key: 'cancelled', label: 'Đã hủy', statuses: ['Cancelled'] },
 ]
 
-const STATUS_OPTIONS = [
+const TUY_CHON_TRANG_THAI = [
   { value: 'Pending', label: 'Mới tạo' },
   { value: 'Confirmed', label: 'Đã xác nhận' },
   { value: 'Preparing', label: 'Đang chuẩn bị' },
@@ -35,7 +35,7 @@ const STATUS_OPTIONS = [
   { value: 'Cancelled', label: 'Đã hủy' },
 ]
 
-const STATUS_TICKET_STYLES = {
+const KIEU_THE_TRANG_THAI = {
   Pending: {
     tone: 'pending',
     badge: 'badge-pending',
@@ -75,14 +75,14 @@ const STATUS_TICKET_STYLES = {
 
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 
-const escapePrintHtml = (value) => String(value ?? '')
+const maHoaHtmlIn = (value) => String(value ?? '')
   .replaceAll('&', '&amp;')
   .replaceAll('<', '&lt;')
   .replaceAll('>', '&gt;')
   .replaceAll('"', '&quot;')
   .replaceAll("'", '&#39;')
 
-const buildFilterCounts = (orders) => ORDER_FILTERS.reduce((acc, filter) => {
+const tinhSoLuongTheoBoLoc = (orders) => BO_LOC_DON_HANG.reduce((acc, filter) => {
   if (filter.key === 'all') {
     acc[filter.key] = orders.length
     return acc
@@ -92,25 +92,25 @@ const buildFilterCounts = (orders) => ORDER_FILTERS.reduce((acc, filter) => {
   return acc
 }, {})
 
-const matchOrderFilter = (order, filterKey) => {
+const khopBoLocDonHang = (order, filterKey) => {
   if (filterKey === 'all') {
     return true
   }
 
-  const filter = ORDER_FILTERS.find((item) => item.key === filterKey)
+  const filter = BO_LOC_DON_HANG.find((item) => item.key === filterKey)
   return filter ? filter.statuses.includes(order.status) : true
 }
 
-const formatTableLabel = (tableNumber) => {
+const dinhDangNhanBan = (tableNumber) => {
   const normalized = String(tableNumber || '').trim()
   return normalized ? `BÀN ${normalized.toUpperCase()}` : 'BÀN WALK-IN'
 }
 
-const formatOrderCode = (order) => order.orderCode || order.code || `DH-${order.id}`
+const dinhDangMaDonHang = (order) => order.orderCode || order.code || `DH-${order.id}`
 
-const getTicketStyle = (status) => STATUS_TICKET_STYLES[status] || STATUS_TICKET_STYLES.Pending
+const layKieuTheTrangThai = (status) => KIEU_THE_TRANG_THAI[status] || KIEU_THE_TRANG_THAI.Pending
 
-const buildOrderFinancialSummary = (order) => {
+const taoTongKetTienDonHang = (order) => {
   const items = Array.isArray(order?.items) ? order.items : []
   const subtotalFromItems = items.reduce(
     (tong, item) => tong + (Number(item.price) || 0) * (Number(item.quantity) || 0),
@@ -135,24 +135,24 @@ const buildOrderFinancialSummary = (order) => {
 
 const taoNoiDungInHoaDon = (order) => {
   const items = Array.isArray(order?.items) ? order.items : []
-  const moneySummary = buildOrderFinancialSummary(order)
+  const tongKetTien = taoTongKetTienDonHang(order)
   const itemRows = items.length
     ? items.map((item, index) => {
         const soLuong = Number(item.quantity) || 0
         const donGia = Number(item.price) || 0
         const thanhTien = soLuong * donGia
-        const ghiChu = item.note ? `<div class="invoice-note">${escapePrintHtml(item.note)}</div>` : ''
-        const size = item.size ? ` <span class="invoice-size">(Size ${escapePrintHtml(item.size)})</span>` : ''
+        const ghiChu = item.note ? `<div class="invoice-note">${maHoaHtmlIn(item.note)}</div>` : ''
+        const size = item.size ? ` <span class="invoice-size">(Size ${maHoaHtmlIn(item.size)})</span>` : ''
 
         return `
           <tr>
             <td>
-              <div class="invoice-item-name">${index + 1}. ${escapePrintHtml(item.name || `Món ${index + 1}`)}${size}</div>
+              <div class="invoice-item-name">${index + 1}. ${maHoaHtmlIn(item.name || `Món ${index + 1}`)}${size}</div>
               ${ghiChu}
             </td>
             <td>${soLuong}</td>
-            <td>${escapePrintHtml(dinhDangTienTe(donGia))}</td>
-            <td>${escapePrintHtml(dinhDangTienTe(thanhTien))}</td>
+            <td>${maHoaHtmlIn(dinhDangTienTe(donGia))}</td>
+            <td>${maHoaHtmlIn(dinhDangTienTe(thanhTien))}</td>
           </tr>
         `
       }).join('')
@@ -163,7 +163,7 @@ const taoNoiDungInHoaDon = (order) => {
     <html lang="vi">
       <head>
         <meta charset="utf-8" />
-        <title>Hóa đơn #${escapePrintHtml(formatOrderCode(order))}</title>
+        <title>Hóa đơn #${maHoaHtmlIn(dinhDangMaDonHang(order))}</title>
         <style>
           * { box-sizing: border-box; }
           body {
@@ -302,25 +302,25 @@ const taoNoiDungInHoaDon = (order) => {
           <header class="invoice-header">
             <div>
               <p class="invoice-kicker">Hóa đơn thanh toán</p>
-              <h1 class="invoice-title">${escapePrintHtml(formatTableLabel(order.tableNumber))}</h1>
-              <p class="invoice-subtitle">Mã đơn #${escapePrintHtml(formatOrderCode(order))}</p>
+              <h1 class="invoice-title">${maHoaHtmlIn(dinhDangNhanBan(order.tableNumber))}</h1>
+              <p class="invoice-subtitle">Mã đơn #${maHoaHtmlIn(dinhDangMaDonHang(order))}</p>
             </div>
             <div class="invoice-meta">
-              <p><strong>Thời gian:</strong> ${escapePrintHtml(dinhDangNgay(order.orderDate))}</p>
-              <p><strong>Trạng thái:</strong> ${escapePrintHtml(layNhanTrangThaiDonHang(order.status))}</p>
-              <p><strong>Thanh toán:</strong> ${escapePrintHtml(layNhanPhuongThucThanhToan(order.paymentMethod))}</p>
+              <p><strong>Thời gian:</strong> ${maHoaHtmlIn(dinhDangNgay(order.orderDate))}</p>
+              <p><strong>Trạng thái:</strong> ${maHoaHtmlIn(layNhanTrangThaiDonHang(order.status))}</p>
+              <p><strong>Thanh toán:</strong> ${maHoaHtmlIn(layNhanPhuongThucThanhToan(order.paymentMethod))}</p>
             </div>
           </header>
 
           <section class="invoice-grid">
             <div class="invoice-panel">
               <h2>Khách hàng</h2>
-              <p>${escapePrintHtml(order.customer?.fullName || 'Khách lẻ')}</p>
-              <p>${escapePrintHtml(order.customer?.phone || 'Không có số điện thoại')}</p>
+              <p>${maHoaHtmlIn(order.customer?.fullName || 'Khách lẻ')}</p>
+              <p>${maHoaHtmlIn(order.customer?.phone || 'Không có số điện thoại')}</p>
             </div>
             <div class="invoice-panel">
               <h2>Ghi chú</h2>
-              <p>${escapePrintHtml(order.note || 'Không có ghi chú cho đơn này.')}</p>
+              <p>${maHoaHtmlIn(order.note || 'Không có ghi chú cho đơn này.')}</p>
             </div>
           </section>
 
@@ -341,19 +341,19 @@ const taoNoiDungInHoaDon = (order) => {
           <section class="invoice-summary">
             <div class="invoice-summary-row">
               <span>Tạm tính</span>
-              <span>${escapePrintHtml(dinhDangTienTe(moneySummary.subtotal))}</span>
+              <span>${maHoaHtmlIn(dinhDangTienTe(tongKetTien.subtotal))}</span>
             </div>
             <div class="invoice-summary-row">
               <span>Phí dịch vụ</span>
-              <span>${escapePrintHtml(dinhDangTienTe(moneySummary.serviceFee))}</span>
+              <span>${maHoaHtmlIn(dinhDangTienTe(tongKetTien.serviceFee))}</span>
             </div>
             <div class="invoice-summary-row">
               <span>Voucher</span>
-              <span>-${escapePrintHtml(dinhDangTienTe(moneySummary.discountAmount))}</span>
+              <span>-${maHoaHtmlIn(dinhDangTienTe(tongKetTien.discountAmount))}</span>
             </div>
             <div class="invoice-summary-row total">
               <span>Tổng cộng</span>
-              <span>${escapePrintHtml(dinhDangTienTe(moneySummary.total))}</span>
+              <span>${maHoaHtmlIn(dinhDangTienTe(tongKetTien.total))}</span>
             </div>
           </section>
 
@@ -370,7 +370,7 @@ const taoNoiDungInHoaDon = (order) => {
   `
 }
 
-const buildItemsTableColumns = () => [
+const taoCotBangMon = () => [
   {
     title: 'Món',
     dataIndex: 'name',
@@ -410,7 +410,7 @@ const buildItemsTableColumns = () => [
   },
 ]
 
-function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, totalCount, donChoXuLy }) {
+function ThanhBoLocDonHang({ boLocDangChon, onFilterChange, counts, visibleCount, totalCount, donChoXuLy }) {
   const manHinh = useBreakpoint()
   const laMobile = manHinh.xs && !manHinh.md
 
@@ -423,11 +423,11 @@ function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, to
         </div>
         <Segmented
           block={laMobile}
-          options={ORDER_FILTERS.map((filter) => ({
+          options={BO_LOC_DON_HANG.map((filter) => ({
             label: <Space size={6}><span>{filter.label}</span><Badge count={counts[filter.key] || 0} size="small" /></Space>,
             value: filter.key,
           }))}
-          value={activeFilter}
+          value={boLocDangChon}
           onChange={onFilterChange}
         />
       </Space>
@@ -435,7 +435,7 @@ function OrderFilterBar({ activeFilter, onFilterChange, counts, visibleCount, to
   )
 }
 
-function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
+function DanhSachTheDonHang({ orders, idDonHangDangChon, onSelectOrder }) {
   if (!orders.length) {
     return (
       <Card>
@@ -448,18 +448,18 @@ function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
     <Card title="Danh sách order">
       <div className="grid gap-2.5">
         {orders.map((order) => {
-        const ticketStyle = getTicketStyle(order.status)
-        const isSelected = String(selectedOrderId) === String(order.id)
+        const kieuThe = layKieuTheTrangThai(order.status)
+        const isSelected = String(idDonHangDangChon) === String(order.id)
 
         return (
           <div key={order.id} onClick={() => onSelectOrder(order.id)} style={{ cursor: 'pointer', borderRadius: 16, padding: 14, marginBottom: 10, border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb', background: isSelected ? '#fff7ed' : '#fff' }}>
             <Space orientation="vertical" size={10} style={{ width: '100%' }}>
               <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                 <div>
-                  <Typography.Text type="secondary">#{formatOrderCode(order)}</Typography.Text>
-                  <div><Typography.Text strong>{formatTableLabel(order.tableNumber)}</Typography.Text></div>
+                  <Typography.Text type="secondary">#{dinhDangMaDonHang(order)}</Typography.Text>
+                  <div><Typography.Text strong>{dinhDangNhanBan(order.tableNumber)}</Typography.Text></div>
                 </div>
-                <Tag color={ticketStyle.tone === 'cancelled' ? 'red' : ticketStyle.tone === 'paid' ? 'green' : ticketStyle.tone === 'preparing' ? 'orange' : 'blue'}>{layNhanTrangThaiDonHang(order.status)}</Tag>
+                <Tag color={kieuThe.tone === 'cancelled' ? 'red' : kieuThe.tone === 'paid' ? 'green' : kieuThe.tone === 'preparing' ? 'orange' : 'blue'}>{layNhanTrangThaiDonHang(order.status)}</Tag>
               </Space>
               <Descriptions size="small" column={2} bordered>
                 <Descriptions.Item label="Khách">{order.customer?.fullName || 'Khách lẻ'}</Descriptions.Item>
@@ -467,7 +467,7 @@ function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
                 <Descriptions.Item label="Tổng tiền">{dinhDangTienTe(order.total)}</Descriptions.Item>
                 <Descriptions.Item label="Thanh toán">{layNhanPhuongThucThanhToan(order.paymentMethod)}</Descriptions.Item>
               </Descriptions>
-              <Typography.Text type="secondary">{ticketStyle.hint}</Typography.Text>
+              <Typography.Text type="secondary">{kieuThe.hint}</Typography.Text>
               {order.note ? <Typography.Text>{order.note}</Typography.Text> : null}
             </Space>
           </div>
@@ -478,18 +478,18 @@ function OrderTicketList({ orders, selectedOrderId, onSelectOrder }) {
   )
 }
 
-function OrderDetailPanel({
+function BangChiTietDonHang({
   order,
-  detailOrder,
-  loadingDetail,
-  detailError,
-  formStatus,
+  chiTietDonHang,
+  dangTaiChiTiet,
+  loiChiTiet,
+  trangThaiDangSua,
   onStatusChange,
   onReloadDetail,
   onSubmit,
   onQuickPay,
   onPrint,
-  savingStatus,
+  dangLuuTrangThai,
 }) {
   const manHinh = useBreakpoint()
   const laMobile = manHinh.xs && !manHinh.md
@@ -502,25 +502,25 @@ function OrderDetailPanel({
     )
   }
 
-  const sourceOrder = detailOrder || order
-  const items = Array.isArray(sourceOrder.items) ? sourceOrder.items : []
-  const ticketStyle = getTicketStyle(order.status)
-  const hasStatusChanged = formStatus !== order.status
-  const moneySummary = buildOrderFinancialSummary(sourceOrder)
-  const canPrint = !loadingDetail && items.length > 0
+  const donHangNguon = chiTietDonHang || order
+  const items = Array.isArray(donHangNguon.items) ? donHangNguon.items : []
+  const kieuThe = layKieuTheTrangThai(order.status)
+  const daDoiTrangThai = trangThaiDangSua !== order.status
+  const tongKetTien = taoTongKetTienDonHang(donHangNguon)
+  const coTheIn = !dangTaiChiTiet && items.length > 0
 
   return (
     <article className="noi-bo-don-hang-form-shell rounded-[22px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-4.5 xl:sticky xl:top-4 xl:self-start">
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Order detail</p>
-          <h2 className="m-0 text-[1.2rem] font-semibold tracking-[-0.04em] text-slate-900">{formatTableLabel(order.tableNumber)}</h2>
-          <p className="mt-1.5 mb-0 text-xs leading-5 text-slate-500">#{formatOrderCode(order)} · {ticketStyle.hint}</p>
+          <h2 className="m-0 text-[1.2rem] font-semibold tracking-[-0.04em] text-slate-900">{dinhDangNhanBan(order.tableNumber)}</h2>
+          <p className="mt-1.5 mb-0 text-xs leading-5 text-slate-500">#{dinhDangMaDonHang(order)} · {kieuThe.hint}</p>
         </div>
 
         <div className="noi-bo-don-hang-status-control">
           <span className="noi-bo-don-hang-status-control__label">Trạng thái đơn</span>
-          <Select size="middle" value={formStatus} options={STATUS_OPTIONS} onChange={onStatusChange} />
+          <Select size="middle" value={trangThaiDangSua} options={TUY_CHON_TRANG_THAI} onChange={onStatusChange} />
         </div>
       </div>
 
@@ -534,37 +534,37 @@ function OrderDetailPanel({
           <div className="noi-bo-don-hang-detail-grid">
             <label className="noi-bo-don-hang-detail-field">
               <span><UserOutlined /> Khách hàng</span>
-              <Input size="middle" value={sourceOrder.customer?.fullName || 'Khách lẻ'} readOnly />
+              <Input size="middle" value={donHangNguon.customer?.fullName || 'Khách lẻ'} readOnly />
             </label>
             <label className="noi-bo-don-hang-detail-field">
               <span><FieldTimeOutlined /> Thời gian</span>
-              <Input size="middle" value={dinhDangNgay(sourceOrder.orderDate)} readOnly />
+              <Input size="middle" value={dinhDangNgay(donHangNguon.orderDate)} readOnly />
             </label>
             <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
               <span><CreditCardOutlined /> Thanh toán</span>
-              <Input size="middle" value={layNhanPhuongThucThanhToan(sourceOrder.paymentMethod)} readOnly />
+              <Input size="middle" value={layNhanPhuongThucThanhToan(donHangNguon.paymentMethod)} readOnly />
             </label>
             <div className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
               <span>Tổng kết thanh toán</span>
               <div className="noi-bo-don-hang-money-summary">
                 <div className="noi-bo-don-hang-money-summary__row">
                   <span>Tạm tính</span>
-                  <strong>{dinhDangTienTe(moneySummary.subtotal)}</strong>
+                  <strong>{dinhDangTienTe(tongKetTien.subtotal)}</strong>
                 </div>
                 <div className="noi-bo-don-hang-money-summary__row">
                   <span>Phí dịch vụ</span>
-                  <strong>{dinhDangTienTe(moneySummary.serviceFee)}</strong>
+                  <strong>{dinhDangTienTe(tongKetTien.serviceFee)}</strong>
                 </div>
-                {moneySummary.discountAmount > 0 ? (
+                {tongKetTien.discountAmount > 0 ? (
                   <div className="noi-bo-don-hang-money-summary__row">
                     <span>Voucher</span>
-                    <strong>-{dinhDangTienTe(moneySummary.discountAmount)}</strong>
+                    <strong>-{dinhDangTienTe(tongKetTien.discountAmount)}</strong>
                   </div>
                 ) : null}
                 <div className="noi-bo-don-hang-money-summary__divider" />
                 <div className="noi-bo-don-hang-money-summary__row noi-bo-don-hang-money-summary__row--total">
                   <span>Tổng cộng</span>
-                  <strong>{dinhDangTienTe(moneySummary.total)}</strong>
+                  <strong>{dinhDangTienTe(tongKetTien.total)}</strong>
                 </div>
               </div>
             </div>
@@ -577,17 +577,17 @@ function OrderDetailPanel({
               <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Ghi chú</p>
               <h3 className="m-0 text-sm font-semibold text-slate-900">Thông tin bổ sung</h3>
             </div>
-            <Button size="small" icon={<ReloadOutlined />} onClick={onReloadDetail} loading={loadingDetail}>
+            <Button size="small" icon={<ReloadOutlined />} onClick={onReloadDetail} loading={dangTaiChiTiet}>
               Tải lại
             </Button>
           </div>
 
           <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
             <span><FileTextOutlined /> Ghi chú đơn</span>
-            <TextArea size="middle" rows={3} value={sourceOrder.note || 'Không có ghi chú cho đơn này.'} readOnly />
+            <TextArea size="middle" rows={3} value={donHangNguon.note || 'Không có ghi chú cho đơn này.'} readOnly />
           </label>
 
-          {detailError ? <Alert type="warning" showIcon title={detailError} /> : null}
+          {loiChiTiet ? <Alert type="warning" showIcon title={loiChiTiet} /> : null}
         </section>
 
         <section className="space-y-3 rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">
@@ -596,7 +596,7 @@ function OrderDetailPanel({
             <h3 className="m-0 text-sm font-semibold text-slate-900">Chi tiết phục vụ</h3>
           </div>
 
-          {loadingDetail ? (
+          {dangTaiChiTiet ? (
             <div className="noi-bo-don-hang-detail-loading">
               <Spin size="small" />
               <span>Đang tải chi tiết món...</span>
@@ -606,7 +606,7 @@ function OrderDetailPanel({
               <Table
                 size="small"
                 pagination={false}
-                columns={buildItemsTableColumns()}
+                columns={taoCotBangMon()}
                 dataSource={items.map((item, index) => ({ ...item, key: item.id || `item-${index + 1}` }))}
                 rowKey="key"
                 scroll={laMobile ? { x: 720 } : undefined}
@@ -625,8 +625,8 @@ function OrderDetailPanel({
             size="middle"
             icon={<CheckCircleOutlined />}
             onClick={onSubmit}
-            loading={savingStatus}
-            disabled={!hasStatusChanged}
+            loading={dangLuuTrangThai}
+            disabled={!daDoiTrangThai}
           >
             Cập nhật
           </Button>
@@ -634,14 +634,14 @@ function OrderDetailPanel({
             size="middle"
             icon={<PrinterOutlined />}
             onClick={onPrint}
-            disabled={!canPrint || savingStatus}
+            disabled={!coTheIn || dangLuuTrangThai}
           >
             In hóa đơn
           </Button>
           <Button
             size="middle"
             onClick={onQuickPay}
-            loading={savingStatus}
+            loading={dangLuuTrangThai}
             disabled={order.status === 'Paid' || order.status === 'Cancelled'}
           >
             Thanh toán
@@ -653,54 +653,54 @@ function OrderDetailPanel({
 }
 
 function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUpdateOrderStatus }) {
-  const [activeFilter, setActiveFilter] = useState('all')
-  const [selectedOrderId, setSelectedOrderId] = useState(orders[0]?.id ?? null)
-  const [orderDetailsById, setOrderDetailsById] = useState({})
-  const [loadingDetail, setLoadingDetail] = useState(false)
-  const [detailError, setDetailError] = useState('')
-  const [formStatus, setFormStatus] = useState('')
-  const [savingStatus, setSavingStatus] = useState(false)
+  const [boLocDangChon, setActiveFilter] = useState('all')
+  const [idDonHangDangChon, setSelectedOrderId] = useState(orders[0]?.id ?? null)
+  const [chiTietDonHangTheoId, setOrderDetailsById] = useState({})
+  const [dangTaiChiTiet, setLoadingDetail] = useState(false)
+  const [loiChiTiet, setDetailError] = useState('')
+  const [trangThaiDangSua, setFormStatus] = useState('')
+  const [dangLuuTrangThai, setSavingStatus] = useState(false)
 
-  const filterCounts = useMemo(() => buildFilterCounts(orders), [orders])
+  const soLuongTheoBoLoc = useMemo(() => tinhSoLuongTheoBoLoc(orders), [orders])
 
-  const filteredOrders = useMemo(
-    () => orders.filter((order) => matchOrderFilter(order, activeFilter)),
-    [orders, activeFilter],
+  const danhSachDonDaLoc = useMemo(
+    () => orders.filter((order) => khopBoLocDonHang(order, boLocDangChon)),
+    [orders, boLocDangChon],
   )
 
   useEffect(() => {
-    if (!filteredOrders.length) {
+    if (!danhSachDonDaLoc.length) {
       setSelectedOrderId(null)
       return
     }
 
-    const stillExists = filteredOrders.some((order) => String(order.id) === String(selectedOrderId))
-    if (!stillExists) {
-      setSelectedOrderId(filteredOrders[0].id)
+    const vanConTonTai = danhSachDonDaLoc.some((order) => String(order.id) === String(idDonHangDangChon))
+    if (!vanConTonTai) {
+      setSelectedOrderId(danhSachDonDaLoc[0].id)
     }
-  }, [filteredOrders, selectedOrderId])
+  }, [danhSachDonDaLoc, idDonHangDangChon])
 
-  const selectedOrder = useMemo(
-    () => filteredOrders.find((order) => String(order.id) === String(selectedOrderId)) || null,
-    [filteredOrders, selectedOrderId],
+  const donHangDangChon = useMemo(
+    () => danhSachDonDaLoc.find((order) => String(order.id) === String(idDonHangDangChon)) || null,
+    [danhSachDonDaLoc, idDonHangDangChon],
   )
 
-  const detailOrder = selectedOrder ? orderDetailsById[selectedOrder.id] || null : null
+  const chiTietDonHang = donHangDangChon ? chiTietDonHangTheoId[donHangDangChon.id] || null : null
 
   useEffect(() => {
-    if (!selectedOrder) {
+    if (!donHangDangChon) {
       setFormStatus('')
       return
     }
 
-    setFormStatus((detailOrder || selectedOrder).status)
-  }, [selectedOrder, detailOrder])
+    setFormStatus((chiTietDonHang || donHangDangChon).status)
+  }, [donHangDangChon, chiTietDonHang])
 
   useEffect(() => {
-    let cancelled = false
+    let daHuy = false
 
-    const fetchDetail = async () => {
-      if (!selectedOrder || orderDetailsById[selectedOrder.id]) {
+    const taiChiTiet = async () => {
+      if (!donHangDangChon || chiTietDonHangTheoId[donHangDangChon.id]) {
         return
       }
 
@@ -708,37 +708,37 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
       setDetailError('')
 
       try {
-        const detail = await layChiTietDonHang(selectedOrder.id)
-        if (!cancelled && detail) {
-          setOrderDetailsById((current) => ({ ...current, [selectedOrder.id]: detail }))
+        const detail = await layChiTietDonHang(donHangDangChon.id)
+        if (!daHuy && detail) {
+          setOrderDetailsById((current) => ({ ...current, [donHangDangChon.id]: detail }))
         }
       } catch (error) {
-        if (!cancelled) {
+        if (!daHuy) {
           setDetailError(error?.message || 'Không thể tải chi tiết đơn hàng.')
         }
       } finally {
-        if (!cancelled) {
+        if (!daHuy) {
           setLoadingDetail(false)
         }
       }
     }
 
-    fetchDetail()
+    taiChiTiet()
 
     return () => {
-      cancelled = true
+      daHuy = true
     }
-  }, [selectedOrder, orderDetailsById, layChiTietDonHang])
+  }, [donHangDangChon, chiTietDonHangTheoId, layChiTietDonHang])
 
-  const handleReloadDetail = async () => {
-    if (!selectedOrder) return
+  const xuLyTaiLaiChiTiet = async () => {
+    if (!donHangDangChon) return
 
     setLoadingDetail(true)
     setDetailError('')
 
     try {
-      const detail = await layChiTietDonHang(selectedOrder.id)
-      setOrderDetailsById((current) => ({ ...current, [selectedOrder.id]: detail }))
+      const detail = await layChiTietDonHang(donHangDangChon.id)
+      setOrderDetailsById((current) => ({ ...current, [donHangDangChon.id]: detail }))
     } catch (error) {
       setDetailError(error?.message || 'Không thể tải lại chi tiết đơn hàng.')
     } finally {
@@ -746,28 +746,28 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
     }
   }
 
-  const handlePrintInvoice = () => {
-    const sourceOrder = detailOrder || selectedOrder
+  const xuLyInHoaDon = () => {
+    const donHangNguon = chiTietDonHang || donHangDangChon
 
-    if (!sourceOrder || !Array.isArray(sourceOrder.items) || !sourceOrder.items.length) {
+    if (!donHangNguon || !Array.isArray(donHangNguon.items) || !donHangNguon.items.length) {
       setDetailError('Cần tải đầy đủ chi tiết món trước khi in hóa đơn.')
       return
     }
 
-    const printWindow = window.open('', '_blank', 'width=960,height=720')
-    if (!printWindow) {
+    const cuaSoIn = window.open('', '_blank', 'width=960,height=720')
+    if (!cuaSoIn) {
       setDetailError('Không thể mở cửa sổ in hóa đơn. Vui lòng kiểm tra chặn popup của trình duyệt.')
       return
     }
 
     setDetailError('')
-    printWindow.document.write(taoNoiDungInHoaDon(sourceOrder))
-    printWindow.document.close()
-    printWindow.focus()
+    cuaSoIn.document.write(taoNoiDungInHoaDon(donHangNguon))
+    cuaSoIn.document.close()
+    cuaSoIn.focus()
   }
 
-  const submitStatusUpdate = async (nextStatus) => {
-    if (!selectedOrder || nextStatus === selectedOrder.status) {
+  const guiCapNhatTrangThai = async (nextStatus) => {
+    if (!donHangDangChon || nextStatus === donHangDangChon.status) {
       return
     }
 
@@ -775,15 +775,15 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
     setDetailError('')
 
     try {
-      const result = await onUpdateOrderStatus(selectedOrder.id, nextStatus)
-      const nextOrder = result?.duLieu || null
-      if (nextOrder) {
+      const result = await onUpdateOrderStatus(donHangDangChon.id, nextStatus)
+      const donHangKeTiep = result?.duLieu || null
+      if (donHangKeTiep) {
         setOrderDetailsById((current) => ({
           ...current,
-          [selectedOrder.id]: {
-            ...(current[selectedOrder.id] || selectedOrder),
-            ...nextOrder,
-            items: current[selectedOrder.id]?.items || selectedOrder.items || [],
+          [donHangDangChon.id]: {
+            ...(current[donHangDangChon.id] || donHangDangChon),
+            ...donHangKeTiep,
+            items: current[donHangDangChon.id]?.items || donHangDangChon.items || [],
           },
         }))
       }
@@ -795,43 +795,43 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
     }
   }
 
-  const handleSubmit = async () => {
-    await submitStatusUpdate(formStatus)
+  const xuLyCapNhatTrangThai = async () => {
+    await guiCapNhatTrangThai(trangThaiDangSua)
   }
 
-  const handleQuickPay = async () => {
+  const xuLyThanhToanNhanh = async () => {
     setFormStatus('Paid')
-    await submitStatusUpdate('Paid')
+    await guiCapNhatTrangThai('Paid')
   }
 
   return (
     <section className="space-y-4 noi-bo-page-stack">
-      <OrderFilterBar
-        activeFilter={activeFilter}
+      <ThanhBoLocDonHang
+        boLocDangChon={boLocDangChon}
         onFilterChange={setActiveFilter}
-        counts={filterCounts}
-        visibleCount={filteredOrders.length}
+        counts={soLuongTheoBoLoc}
+        visibleCount={danhSachDonDaLoc.length}
         totalCount={tomTatDonHang?.total || orders.length}
         donChoXuLy={donChoXuLy}
       />
 
       <section className="noi-bo-don-hang-layout">
         <div className="space-y-3 noi-bo-don-hang-list-col">
-          <OrderTicketList orders={filteredOrders} selectedOrderId={selectedOrderId} onSelectOrder={setSelectedOrderId} />
+          <DanhSachTheDonHang orders={danhSachDonDaLoc} idDonHangDangChon={idDonHangDangChon} onSelectOrder={setSelectedOrderId} />
         </div>
 
-        <OrderDetailPanel
-          order={selectedOrder}
-          detailOrder={detailOrder}
-          loadingDetail={loadingDetail}
-          detailError={detailError}
-          formStatus={formStatus}
+        <BangChiTietDonHang
+          order={donHangDangChon}
+          chiTietDonHang={chiTietDonHang}
+          dangTaiChiTiet={dangTaiChiTiet}
+          loiChiTiet={loiChiTiet}
+          trangThaiDangSua={trangThaiDangSua}
           onStatusChange={setFormStatus}
-          onReloadDetail={handleReloadDetail}
-          onSubmit={handleSubmit}
-          onQuickPay={handleQuickPay}
-          onPrint={handlePrintInvoice}
-          savingStatus={savingStatus}
+          onReloadDetail={xuLyTaiLaiChiTiet}
+          onSubmit={xuLyCapNhatTrangThai}
+          onQuickPay={xuLyThanhToanNhanh}
+          onPrint={xuLyInHoaDon}
+          dangLuuTrangThai={dangLuuTrangThai}
         />
       </section>
     </section>

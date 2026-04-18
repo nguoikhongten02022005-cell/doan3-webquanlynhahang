@@ -1,19 +1,19 @@
 import { Card, Col, Row, Statistic } from 'antd'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 
-const STAT_VALUE_STYLE = {
+const KIEU_GIA_TRI_THONG_KE = {
   fontSize: 30,
   fontWeight: 700,
   lineHeight: 1.05,
 }
 
-const STAT_TITLE_STYLE = {
+const KIEU_TIEU_DE_THONG_KE = {
   color: '#6b7280',
   fontSize: 13,
 }
 
-function StatCards({ stats }) {
-  const items = [
+function TheThongKe({ stats }) {
+  const danhSachTheThongKe = [
     {
       key: 'today-revenue',
       title: 'Doanh thu hôm nay',
@@ -34,10 +34,10 @@ function StatCards({ stats }) {
 
   return (
     <Row gutter={[16, 16]}>
-      {items.map((item) => (
-        <Col key={item.key} xs={24} sm={12} lg={8}>
+      {danhSachTheThongKe.map((theThongKe) => (
+        <Col key={theThongKe.key} xs={24} sm={12} lg={8}>
           <Card className="noi-bo-dashboard-card" variant="borderless" styles={{ body: { padding: '10px 14px' } }}>
-            <Statistic title={item.title} value={item.value} formatter={item.formatter} styles={{ title: STAT_TITLE_STYLE, content: STAT_VALUE_STYLE }} />
+            <Statistic title={theThongKe.title} value={theThongKe.value} formatter={theThongKe.formatter} styles={{ title: KIEU_TIEU_DE_THONG_KE, content: KIEU_GIA_TRI_THONG_KE }} />
           </Card>
         </Col>
       ))}
@@ -45,4 +45,4 @@ function StatCards({ stats }) {
   )
 }
 
-export default StatCards
+export default TheThongKe

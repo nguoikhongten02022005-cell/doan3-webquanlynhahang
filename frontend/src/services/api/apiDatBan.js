@@ -1,4 +1,13 @@
-import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import {
+  taoPhanHoiOffline,
+  layDanhSachDatBanOffline,
+  layLichSuDatBanTheoKhachHangOffline,
+  taoHoacCapNhatDatBanOffline,
+  capNhatTrangThaiDatBanOffline,
+  ganBanChoDatBanOffline,
+  layDanhSachBanOffline,
+} from '../offline/dichVuOfflineStore'
 
 const sinhMaDatBan = () => `DB_${Date.now()}`
 
@@ -29,10 +38,11 @@ const chuanHoaDatBan = (booking) => {
 
   return {
     ...booking,
-    bookingCode: booking.maDatBan || booking.MaDatBan,
-    guests: String(booking.soNguoi ?? booking.SoNguoi ?? ''),
-    date: chuanHoaNgayDat(booking.ngayDat || booking.NgayDat),
-    time: booking.gioDat || booking.GioDat,
+    id: booking.id || booking.bookingId || booking.bookingCode || booking.maDatBan || booking.MaDatBan || '',
+    bookingCode: booking.bookingCode || booking.id || booking.bookingId || booking.maDatBan || booking.MaDatBan || '',
+    guests: String(booking.soNguoi ?? booking.SoNguoi ?? booking.guestCount ?? booking.guests ?? ''),
+    date: chuanHoaNgayDat(booking.ngayDat || booking.NgayDat || booking.date),
+    time: booking.gioDat || booking.GioDat || booking.time,
     endTime: booking.gioKetThuc || booking.GioKetThuc || '',
     note: booking.ghiChu || booking.GhiChu || '',
     notes: booking.ghiChu || booking.GhiChu || '',
@@ -74,9 +84,46 @@ const chuanHoaDatBanPayload = (payload = {}) => ({
   ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
 })
 
-export const layDanhSachDatBanApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/dat-ban')))
-export const layLichSuDatBanApi = async (maKh = 'KH001') => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get(`/dat-ban/khach/${maKh}`)))
+export const layDanhSachDatBanApi = async () => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(layDanhSachDatBanOffline(), 'Lay danh sach dat ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/dat-ban')))
+}
+
+export const layLichSuDatBanApi = async (maKh = 'KH001') => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(layLichSuDatBanTheoKhachHangOffline(maKh), 'Lay lich su dat ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get(`/dat-ban/khach/${maKh}`)))
+}
+
 export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc = 'KHONG_UU_TIEN' }) => {
+  if (!coSuDungMayChu()) {
+    const ngayDaChuanHoa = chuanHoaNgayDat(ngayDat)
+    const danhSachBan = layDanhSachBanOffline()
+    const danhSachDatBan = layDanhSachDatBanOffline()
+    const tongBanPhuHop = danhSachBan.filter((ban) => {
+      const khopKhuVuc = khuVuc === 'KHONG_UU_TIEN' || String(ban.areaId || '').trim() === String(khuVuc || '').trim()
+      const khopSoNguoi = Number(ban.capacity || 0) >= Number(soNguoi || 0)
+      const banTrong = !['CO_KHACH', 'CHO_THANH_TOAN', 'Occupied', 'Reserved'].includes(String(ban.status || '').trim())
+      return khopKhuVuc && khopSoNguoi && banTrong
+    }).length - danhSachDatBan.filter((booking) => String(booking.date || booking.ngayDat || '') === ngayDaChuanHoa && String(booking.time || booking.gioDat || '') === String(gioDat || '').trim() && !['Cancelled', 'DA_HUY', 'KHONG_DEN'].includes(String(booking.status || booking.trangThai || ''))).length
+
+    const tongPhuHop = Math.max(0, tongBanPhuHop)
+    const mucKhaDung = tongPhuHop <= 0 ? 'FULL' : tongPhuHop <= 2 ? 'LIMITED' : 'AVAILABLE'
+
+    return tachPhanHoiApi(taoPhanHoiOffline({
+      ngayDat: ngayDaChuanHoa,
+      gioDat: String(gioDat || '').trim(),
+      tongBanPhuHop: tongPhuHop,
+      mucKhaDung,
+      isDisabled: tongPhuHop <= 0,
+    }, 'Lay kha dung dat ban thanh cong'))
+  }
+
   const thamSo = new URLSearchParams({
     ngayDat: chuanHoaNgayDat(ngayDat),
     gioDat: String(gioDat || '').trim(),
@@ -86,9 +133,45 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
 
   return tachPhanHoiApi(await trinhKhachApi.get(`/dat-ban/availability?${thamSo.toString()}`))
 }
-export const taoDatBanApi = async (payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/dat-ban', chuanHoaDatBanPayload(payload))))
+
+export const taoDatBanApi = async (payload) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(taoHoacCapNhatDatBanOffline({ booking: chuanHoaDatBanPayload(payload) }), 'Tao dat ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/dat-ban', chuanHoaDatBanPayload(payload))))
+}
+
 export const taoDatBanNoiBoApi = async (payload) => taoDatBanApi(payload)
-export const capNhatDatBanApi = async (id, payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}`, chuanHoaDatBanPayload({ ...payload, maDatBan: id }))))
-export const capNhatTrangThaiDatBanApi = async (id, status) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: status })))
-export const ganBanChoDatBanApi = async (id, danhSachIdBan = []) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/assign-tables`, { danhSachMaBan: danhSachIdBan })))
-export const huyDatBanApi = async (id) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: 'Cancelled' })))
+
+export const capNhatDatBanApi = async (id, payload) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(taoHoacCapNhatDatBanOffline({ booking: chuanHoaDatBanPayload({ ...payload, maDatBan: id }), maDatBan: id }), 'Cap nhat dat ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}`, chuanHoaDatBanPayload({ ...payload, maDatBan: id }))))
+}
+
+export const capNhatTrangThaiDatBanApi = async (id, status) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDatBanOffline(id, status), 'Cap nhat trang thai dat ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: status })))
+}
+
+export const ganBanChoDatBanApi = async (id, danhSachIdBan = []) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(ganBanChoDatBanOffline(id, danhSachIdBan), 'Gan ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/assign-tables`, { danhSachMaBan: danhSachIdBan })))
+}
+
+export const huyDatBanApi = async (id) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDatBanOffline(id, 'Cancelled'), 'Huy dat ban thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.patch(`/dat-ban/${id}/status`, { trangThai: 'Cancelled' })))
+}

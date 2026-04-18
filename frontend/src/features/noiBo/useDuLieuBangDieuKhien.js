@@ -25,12 +25,23 @@ import { chuanHoaNguoiDungApi } from '../../services/api/apiXacThuc'
 
 const chuanHoaDonHangNoiBo = (order) => {
   if (!order || typeof order !== 'object') return null
+
+  const pricingSummary = order.pricingSummary || order.PricingSummary || {}
+  const tongTien = Number(
+    order.total
+    ?? order.tongTien
+    ?? order.TongTien
+    ?? pricingSummary.tongTien
+    ?? pricingSummary.TongTien
+    ?? 0,
+  )
+
   return {
     ...order,
     id: order.id || order.orderCode || order.maDonHang || order.MaDonHang,
     orderCode: order.orderCode || order.maDonHang || order.MaDonHang || '',
     status: order.status || order.trangThai || order.TrangThai || '',
-    total: Number(order.total ?? order.tongTien ?? order.TongTien ?? 0),
+    total: tongTien,
   }
 }
 

@@ -22,6 +22,11 @@ import {
 
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
+const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
+  ...payload,
+  maND: payload.maND || nguoiDung?.maND || nguoiDung?.id || '',
+  id: payload.id || nguoiDung?.id || nguoiDung?.maND || '',
+})
 
 const XacThucContext = createContext(null)
 
@@ -101,13 +106,6 @@ function useXacThucState() {
   }, [])
 
   const dangNhapBangApi = useCallback(async (hamDangNhap, email, matKhau, thongDiepLoiMacDinh) => {
-    if (!coSuDungMayChu()) {
-      return {
-        success: false,
-        error: 'Ứng dụng hiện được cấu hình không dùng backend.',
-      }
-    }
-
     try {
       const { duLieu } = await hamDangNhap(email, matKhau)
       const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
@@ -210,12 +208,12 @@ function useXacThucState() {
 
   const capNhatHoSo = useCallback(async (payload) => {
     try {
-      const { duLieu } = await capNhatHoSoApi(payload)
+      const nguoiDungDangLuu = layNguoiDungHienTai()
+      const { duLieu } = await capNhatHoSoApi(taoPayloadCoMaND(nguoiDungDangLuu, payload))
       if (!duLieu) {
         return { success: false, error: 'Cập nhật hồ sơ thất bại.' }
       }
 
-      const nguoiDungDangLuu = layNguoiDungHienTai()
       const nguoiDungTuApi = chuanHoaNguoiDungApi(duLieu)
       luuNguoiDungHienTai({
         ...nguoiDungDangLuu,
@@ -233,7 +231,8 @@ function useXacThucState() {
 
   const capNhatMatKhau = useCallback(async (payload) => {
     try {
-      await doiMatKhauApi(payload)
+      const nguoiDungDangLuu = layNguoiDungHienTai()
+      await doiMatKhauApi(taoPayloadCoMaND(nguoiDungDangLuu, payload))
       return { success: true }
     } catch (error) {
       return { success: false, error: error?.message || 'Đổi mật khẩu thất bại.' }

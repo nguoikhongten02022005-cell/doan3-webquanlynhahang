@@ -6,7 +6,7 @@ import { useThongBao } from '../context/ThongBaoContext'
 import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
 import { taoDonHangApi } from '../services/api/apiDonHang'
-import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung, tinhSoTienGiamTheoVoucher } from '../services/dichVuPhieuGiamGia'
+import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung, tinhSoTienGiamTheoPhieuGiamGia } from '../services/dichVuPhieuGiamGia'
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
@@ -18,7 +18,7 @@ function ThanhToanPage() {
   const { nguoiDungHienTai } = useXacThuc()
   const { hienLoi, hienThanhCong, hienCanhBao } = useThongBao()
 
-  const [formData, setFormData] = useState({
+  const [duLieuForm, setDuLieuForm] = useState({
     fullName: '',
     phone: '',
     address: '',
@@ -26,20 +26,20 @@ function ThanhToanPage() {
     tableNumber: '',
     paymentMethod: 'TienMat',
   })
-  const [appliedVoucher, setAppliedVoucher] = useState(null)
+  const [phieuGiamGiaDaApDung, setPhieuGiamGiaDaApDung] = useState(null)
 
   useEffect(() => {
-    const voucher = layPhieuGiamGiaDaApDung()
+    const phieuGiamGiaDaLuu = layPhieuGiamGiaDaApDung()
 
-    if (!voucher) {
+    if (!phieuGiamGiaDaLuu) {
       xoaPhieuGiamGiaDaApDung()
     } else {
-      setAppliedVoucher(voucher)
+      setPhieuGiamGiaDaApDung(phieuGiamGiaDaLuu)
     }
 
     const banNhapTam = layBanNhapTamThanhToan()
     if (banNhapTam) {
-      setFormData((prev) => ({
+      setDuLieuForm((prev) => ({
         ...prev,
         note: String(banNhapTam.note ?? '').slice(0, 300),
         tableNumber: '',
@@ -47,37 +47,37 @@ function ThanhToanPage() {
     }
   }, [])
 
-  const subtotal = useMemo(
-    () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
+  const tamTinh = useMemo(
+    () => cartItems.reduce((tong, item) => tong + item.price * item.quantity, 0),
     [cartItems],
   )
 
-  const serviceFee = tinhPhiDichVu(subtotal)
-  const tongTienXetVoucher = subtotal + serviceFee
-  const discountAmount = tinhSoTienGiamTheoVoucher(appliedVoucher, tongTienXetVoucher)
-  const tongCong = Math.max(0, tongTienXetVoucher - discountAmount)
+  const phiDichVu = tinhPhiDichVu(tamTinh)
+  const tongTienXetPhieuGiamGia = tamTinh + phiDichVu
+  const soTienGiam = tinhSoTienGiamTheoPhieuGiamGia(phieuGiamGiaDaApDung, tongTienXetPhieuGiamGia)
+  const tongCong = Math.max(0, tongTienXetPhieuGiamGia - soTienGiam)
 
-  const handleChange = (event) => {
+  const handleDoiTruong = (event) => {
     const { name, value } = event.target
     const giaTriDaChuanHoa = name === 'note' ? value.slice(0, 300) : value
 
-    setFormData((prev) => {
-      const nextFormData = {
+    setDuLieuForm((prev) => {
+      const duLieuFormKeTiep = {
         ...prev,
         [name]: giaTriDaChuanHoa,
         tableNumber: '',
       }
 
       luuBanNhapTamThanhToan({
-        note: nextFormData.note,
+        note: duLieuFormKeTiep.note,
         tableNumber: '',
       })
 
-      return nextFormData
+      return duLieuFormKeTiep
     })
   }
 
-  const handleSubmit = async (event) => {
+  const handleGuiDon = async (event) => {
     event.preventDefault()
 
     if (cartItems.length === 0) {
@@ -86,34 +86,34 @@ function ThanhToanPage() {
       return
     }
 
-    if (!formData.fullName || !formData.phone) {
+    if (!duLieuForm.fullName || !duLieuForm.phone) {
       hienCanhBao('Vui lòng nhập đầy đủ họ tên và số điện thoại.')
       return
     }
 
-    const invalidOrderItems = layMonKhongHopLeTrongDonHang(cartItems)
-    if (invalidOrderItems.length > 0) {
+    const danhSachMonKhongHopLe = layMonKhongHopLeTrongDonHang(cartItems)
+    if (danhSachMonKhongHopLe.length > 0) {
       hienLoi('Có món trong giỏ hàng không còn hợp lệ để tạo đơn. Vui lòng quay lại menu và thêm lại món.')
       return
     }
 
     try {
-        const orderPayload = taoDuLieuTaoDonHang({
+        const payloadTaoDonHang = taoDuLieuTaoDonHang({
           cartItems,
-          voucherCode: appliedVoucher?.code,
+          voucherCode: phieuGiamGiaDaApDung?.code,
           customer: {
             customerCode: nguoiDungHienTai?.maKH ?? '',
-            fullName: formData.fullName,
-            phone: formData.phone,
+            fullName: duLieuForm.fullName,
+            phone: duLieuForm.phone,
             email: nguoiDungHienTai?.email ?? '',
-            address: formData.address,
+            address: duLieuForm.address,
           },
-        note: formData.note,
-        tableNumber: formData.tableNumber,
-        paymentMethod: formData.paymentMethod,
+        note: duLieuForm.note,
+        tableNumber: duLieuForm.tableNumber,
+        paymentMethod: duLieuForm.paymentMethod,
       })
 
-        await taoDonHangApi(orderPayload)
+        await taoDonHangApi(payloadTaoDonHang)
 
         xoaPhieuGiamGiaDaApDung()
         xoaBanNhapTamThanhToan()
@@ -137,7 +137,7 @@ function ThanhToanPage() {
           <h1>Thanh toán đơn hàng</h1>
         </div>
 
-        <form className="thanh-toan-layout" onSubmit={handleSubmit}>
+        <form className="thanh-toan-layout" onSubmit={handleGuiDon}>
           <section className="thanh-toan-form-panel">
             <h2>Thông tin liên hệ</h2>
 
@@ -152,8 +152,8 @@ function ThanhToanPage() {
                   type="text"
                   className="truong-nhap"
                   placeholder="Nhập họ tên người đặt hoặc người nhận món"
-                  value={formData.fullName}
-                  onChange={handleChange}
+                  value={duLieuForm.fullName}
+                  onChange={handleDoiTruong}
                   required
                 />
               </div>
@@ -168,8 +168,8 @@ function ThanhToanPage() {
                   type="tel"
                   className="truong-nhap"
                   placeholder="0901 234 567"
-                  value={formData.phone}
-                  onChange={handleChange}
+                  value={duLieuForm.phone}
+                  onChange={handleDoiTruong}
                   required
                 />
               </div>
@@ -184,8 +184,8 @@ function ThanhToanPage() {
                   type="text"
                   className="truong-nhap"
                   placeholder="Nhập địa chỉ nếu cần giao hoặc xác nhận vị trí phục vụ"
-                  value={formData.address}
-                  onChange={handleChange}
+                  value={duLieuForm.address}
+                  onChange={handleDoiTruong}
                 />
               </div>
 
@@ -200,10 +200,10 @@ function ThanhToanPage() {
                   placeholder="Dị ứng thực phẩm, yêu cầu đặc biệt về món ăn, hoặc ghi chú khác cho bếp..."
                   rows="4"
                   maxLength={300}
-                  value={formData.note}
-                  onChange={handleChange}
+                  value={duLieuForm.note}
+                  onChange={handleDoiTruong}
                 />
-                <div className="gio-hang-note-counter thanh-toan-note-counter">{formData.note.length}/300</div>
+                <div className="gio-hang-note-counter thanh-toan-note-counter">{duLieuForm.note.length}/300</div>
               </div>
             </div>
 
@@ -216,8 +216,8 @@ function ThanhToanPage() {
                       type="radio"
                       name="paymentMethod"
                       value={method.value}
-                      checked={formData.paymentMethod === method.value}
-                      onChange={handleChange}
+                      checked={duLieuForm.paymentMethod === method.value}
+                      onChange={handleDoiTruong}
                     />
                     <span>
                       <strong>{method.label}</strong>
@@ -275,7 +275,7 @@ function ThanhToanPage() {
                   </div>
                   <div className="thanh-toan-voucher-xem-list">
                     {DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.map((maGiamGia) => {
-                      const dangDuocApDung = appliedVoucher?.code === maGiamGia.code
+                      const dangDuocApDung = phieuGiamGiaDaApDung?.code === maGiamGia.code
 
                       return (
                         <div
@@ -295,15 +295,15 @@ function ThanhToanPage() {
 
                 <div className="tom-tat-row">
                   <span>Tạm tính món</span>
-                  <span>{dinhDangTienTeVietNam(subtotal)}</span>
+                  <span>{dinhDangTienTeVietNam(tamTinh)}</span>
                 </div>
                 <div className="tom-tat-row">
                   <span>Phí dịch vụ (5%)</span>
-                  <span>{dinhDangTienTeVietNam(serviceFee)}</span>
+                  <span>{dinhDangTienTeVietNam(phiDichVu)}</span>
                 </div>
                 <div className="tom-tat-row tom-tat-discount">
-                  <span>Giảm giá {appliedVoucher ? `(${appliedVoucher.code})` : ''}</span>
-                  <span>-{dinhDangTienTeVietNam(discountAmount)}</span>
+                  <span>Giảm giá {phieuGiamGiaDaApDung ? `(${phieuGiamGiaDaApDung.code})` : ''}</span>
+                  <span>-{dinhDangTienTeVietNam(soTienGiam)}</span>
                 </div>
                 <div className="tom-tat-row tom-tat-total">
                   <span>Tổng cộng</span>

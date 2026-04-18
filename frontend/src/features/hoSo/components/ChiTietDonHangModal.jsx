@@ -48,7 +48,7 @@ function ChiTietDonHangModal({ donHang, dangMo, onClose }) {
         },
       }}
     >
-      <Space direction="vertical" size={20} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={20} style={{ width: '100%' }}>
         <div>
           <Tag color={nhanTrangThai.mau} style={{ marginBottom: 12, borderRadius: 999, paddingInline: 10, paddingBlock: 4 }}>
             {nhanTrangThai.label}

@@ -1,4 +1,10 @@
-import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import { layNguoiDungHienTai } from '../dichVuXacThuc'
+import {
+  taoPhanHoiOffline,
+  layTongQuanDiemTheoKhachHangOffline,
+  layLichSuDiemTheoKhachHangOffline,
+} from '../offline/dichVuOfflineStore'
 
 const chuanHoaTongQuanDiemTichLuy = (duLieu) => ({
   maKH: String(duLieu?.maKH || duLieu?.MaKH || ''),
@@ -24,6 +30,15 @@ const chuanHoaGiaoDichDiem = (giaoDich) => {
 }
 
 export const layTongQuanDiemTichLuyApi = async () => {
+  if (!coSuDungMayChu()) {
+    const maKH = layNguoiDungHienTai()?.maKH || ''
+    const duLieu = chuanHoaTongQuanDiemTichLuy(layTongQuanDiemTheoKhachHangOffline(maKH))
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay tong quan diem thanh cong')),
+      duLieu,
+    }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/diem-tich-luy/me'))
   return {
     ...phanHoi,
@@ -32,6 +47,15 @@ export const layTongQuanDiemTichLuyApi = async () => {
 }
 
 export const layLichSuDiemTichLuyApi = async () => {
+  if (!coSuDungMayChu()) {
+    const maKH = layNguoiDungHienTai()?.maKH || ''
+    const duLieu = layLichSuDiemTheoKhachHangOffline(maKH).map(chuanHoaGiaoDichDiem).filter(Boolean)
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay lich su diem thanh cong')),
+      duLieu,
+    }
+  }
+
   const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/diem-tich-luy/me/history'))
   return {
     ...phanHoi,

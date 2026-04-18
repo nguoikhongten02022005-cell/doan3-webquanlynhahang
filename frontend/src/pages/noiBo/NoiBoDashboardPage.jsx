@@ -1,10 +1,10 @@
 import { Col, Flex, Grid, Row, Space, Typography } from 'antd'
 import { useOutletContext } from 'react-router-dom'
-import BookingAndOrders from '../../features/noiBo/dashboard/BookingAndOrders'
-import RevenueChart from '../../features/noiBo/dashboard/RevenueChart'
-import StatCards from '../../features/noiBo/dashboard/StatCards'
-import TablePressure from '../../features/noiBo/dashboard/TablePressure'
-import UrgentActions from '../../features/noiBo/dashboard/UrgentActions'
+import DatBanVaDonHang from '../../features/noiBo/dashboard/DatBanVaDonHang'
+import BieuDoDoanhThu from '../../features/noiBo/dashboard/BieuDoDoanhThu'
+import TheThongKe from '../../features/noiBo/dashboard/TheThongKe'
+import ApLucBanAn from '../../features/noiBo/dashboard/ApLucBanAn'
+import HanhDongUuTien from '../../features/noiBo/dashboard/HanhDongUuTien'
 
 const { useBreakpoint } = Grid
 
@@ -24,20 +24,20 @@ function NoiBoDashboardPage() {
         </Typography.Text>
       </Space>
 
-      <StatCards stats={bangDieuKhienData?.stats} />
+      <TheThongKe stats={bangDieuKhienData?.stats} />
 
       <Row gutter={[laMobile ? 14 : 20, laMobile ? 14 : 20]}>
         <Col xs={24} xl={16}>
-          <RevenueChart revenue={bangDieuKhienData?.revenue} />
+          <BieuDoDoanhThu revenue={bangDieuKhienData?.revenue} />
         </Col>
         <Col xs={24} xl={8}>
-          <TablePressure tablePressure={bangDieuKhienData?.tablePressure} />
+          <ApLucBanAn tablePressure={bangDieuKhienData?.tablePressure} />
         </Col>
       </Row>
 
-      <UrgentActions urgentTasks={bangDieuKhienData?.urgentTasks} />
+      <HanhDongUuTien urgentTasks={bangDieuKhienData?.urgentTasks} />
 
-      <BookingAndOrders bookings={bangDieuKhienData?.bookings} orders={bangDieuKhienData?.orders} />
+      <DatBanVaDonHang bookings={bangDieuKhienData?.bookings} orders={bangDieuKhienData?.orders} />
     </Flex>
   )
 }

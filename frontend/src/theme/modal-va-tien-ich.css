@@ -438,14 +438,14 @@
   padding-top: 0.5rem; border-top: 1px solid var(--line-light);
 }
 .tom-tat-form { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.8rem; }
-.voucher-block { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line-light); }
-.voucher-header h3 {
+.phieu-giam-gia-block { margin-bottom: 1rem; padding-bottom: 1rem; border-bottom: 1px solid var(--line-light); }
+.phieu-giam-gia-header h3 {
   font-family: 'Cormorant Garamond', serif;
   font-size: 1rem; font-weight: 700; color: var(--dark); margin-bottom: 0.2rem;
 }
-.voucher-header p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; }
-.voucher-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
-.voucher-clear-btn { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
+.phieu-giam-gia-header p { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.5rem; }
+.phieu-giam-gia-controls { display: flex; gap: 0.5rem; flex-wrap: wrap; }
+.phieu-giam-gia-clear-btn { font-size: 0.78rem; padding: 0.4rem 0.8rem; }
 .w-full { width: 100%; }
 
 

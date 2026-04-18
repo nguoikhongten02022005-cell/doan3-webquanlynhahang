@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { layDanhSachDanhGiaApi, taoDanhGiaApi } from '../services/api/apiDanhGia'
 import { layDonHangCoTheDanhGiaApi } from '../services/api/apiDonHang'
 import { useXacThuc } from '../hooks/useXacThuc'
@@ -115,7 +115,7 @@ function DanhGiaPage() {
     hinhAnh: [],
   })
 
-  const taiDanhSach = async () => {
+  const taiDanhSach = useCallback(async () => {
     try {
       setDangTaiDanhGia(true)
       setLoi('')
@@ -130,9 +130,9 @@ function DanhGiaPage() {
     } finally {
       setDangTaiDanhGia(false)
     }
-  }
+  }, [])
 
-  const taiDonHangDanhGia = async () => {
+  const taiDonHangDanhGia = useCallback(async () => {
     try {
       setDangTaiDonHang(true)
       const { duLieu } = await layDonHangCoTheDanhGiaApi()
@@ -151,7 +151,7 @@ function DanhGiaPage() {
     } finally {
       setDangTaiDonHang(false)
     }
-  }
+  }, [hienLoi])
 
   useEffect(() => {
     taiDanhSach()
@@ -162,7 +162,7 @@ function DanhGiaPage() {
       setDonHangCoTheDanhGia([])
       setMaDonHangDangChon('')
     }
-  }, [nguoiDungHienTai?.maKH])
+  }, [nguoiDungHienTai?.maKH, taiDanhSach, taiDonHangDanhGia])
 
   useEffect(() => {
     if (!hienCamOn) return undefined

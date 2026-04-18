@@ -1,4 +1,14 @@
-import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi'
+import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import { layNguoiDungHienTai } from '../dichVuXacThuc'
+import {
+  taoPhanHoiOffline,
+  layDanhSachDonHangOffline,
+  timDonHangOfflineTheoMa,
+  taoHoacCapNhatDonHangOffline,
+  capNhatTrangThaiDonHangOffline,
+  layDonHangHoSoTheoKhachHangOffline,
+  layDonHangCoTheDanhGiaOffline,
+} from '../offline/dichVuOfflineStore'
 import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
 import { chuanHoaPricingSummary, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
 
@@ -106,9 +116,27 @@ const tachVaChuanHoaHoSo = (phanHoi) => ({
   duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonHangHoSo).filter(Boolean) : [],
 })
 
-export const layDonHangCuaToiApi = async () => tachVaChuanHoaHoSo(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/me')))
+export const layDonHangCuaToiApi = async () => {
+  if (!coSuDungMayChu()) {
+    const maKH = layNguoiDungHienTai()?.maKH || ''
+    const duLieu = layDonHangHoSoTheoKhachHangOffline(maKH).map(chuanHoaDonHangHoSo).filter(Boolean)
+    return {
+      ...tachVaChuanHoaHoSo(tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay don hang cua toi thanh cong'))),
+      duLieu,
+    }
+  }
 
-export const layDonHangCoTheDanhGiaApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/co-the-danh-gia')))
+  return tachVaChuanHoaHoSo(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/me')))
+}
+
+export const layDonHangCoTheDanhGiaApi = async () => {
+  if (!coSuDungMayChu()) {
+    const maKH = layNguoiDungHienTai()?.maKH || ''
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(layDonHangCoTheDanhGiaOffline(maKH), 'Lay don hang co the danh gia thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/co-the-danh-gia')))
+}
 
 export const layDanhSachDonHangHoSoApi = async () => layDonHangCuaToiApi()
 
@@ -119,7 +147,35 @@ const tachVaChuanHoaChiTiet = (phanHoi) => ({
   duLieu: chuanHoaChiTietResponse(phanHoi.duLieu),
 })
 
-export const layDanhSachDonHangApi = async () => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang')))
-export const layChiTietDonHangApi = async (id) => tachVaChuanHoaChiTiet(tachPhanHoiApi(await trinhKhachApi.get(`/don-hang/${id}`)))
-export const taoDonHangApi = async (payload) => tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', buildPayloadTaoDon(payload))))
-export const capNhatTrangThaiDonHangApi = async (id, status) => tachVaChuanHoaChiTiet(tachPhanHoiApi(await trinhKhachApi.patch(`/don-hang/${id}/status`, { trangThai: status })))
+export const layDanhSachDonHangApi = async () => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(layDanhSachDonHangOffline(), 'Lay danh sach don hang thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang')))
+}
+
+export const layChiTietDonHangApi = async (id) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoaChiTiet(tachPhanHoiApi(taoPhanHoiOffline(timDonHangOfflineTheoMa(id), 'Lay chi tiet don hang thanh cong')))
+  }
+
+  return tachVaChuanHoaChiTiet(tachPhanHoiApi(await trinhKhachApi.get(`/don-hang/${id}`)))
+}
+
+export const taoDonHangApi = async (payload) => {
+  if (!coSuDungMayChu()) {
+    const duLieu = taoHoacCapNhatDonHangOffline(buildPayloadTaoDon(payload))
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Tao don hang thanh cong')))
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', buildPayloadTaoDon(payload))))
+}
+
+export const capNhatTrangThaiDonHangApi = async (id, status) => {
+  if (!coSuDungMayChu()) {
+    return tachVaChuanHoaChiTiet(tachPhanHoiApi(taoPhanHoiOffline(capNhatTrangThaiDonHangOffline(id, status), 'Cap nhat trang thai don hang thanh cong')))
+  }
+
+  return tachVaChuanHoaChiTiet(tachPhanHoiApi(await trinhKhachApi.patch(`/don-hang/${id}/status`, { trangThai: status })))
+}

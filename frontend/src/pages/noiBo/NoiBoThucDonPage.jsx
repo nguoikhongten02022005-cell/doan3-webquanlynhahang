@@ -8,7 +8,7 @@ function NoiBoThucDonPage() {
   const { laQuanLy } = useXacThuc()
 
   return (
-    <Space direction="vertical" size={16} style={{ width: '100%' }}>
+    <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       {!laQuanLy ? (
         <Alert
           type="info"

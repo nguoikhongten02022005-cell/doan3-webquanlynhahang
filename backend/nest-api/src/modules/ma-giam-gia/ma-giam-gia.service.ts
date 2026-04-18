@@ -4,7 +4,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 type BanGhi = Record<string, any>;
 
 @Injectable()
-export class VoucherService {
+export class MaGiamGiaService {
   constructor(private readonly mysql: MySqlService) {}
 
   private taoPhanHoi(duLieu: unknown, thongDiep = 'Thanh cong', meta: unknown = null) {

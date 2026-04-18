@@ -1,6 +1,6 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { layMaXacThuc, xoaPhienXacThuc } from './dichVuXacThuc'
-import { datMucLuuTru, layMucLuuTru } from './dichVuLuuTru'
+import { layMucLuuTru } from './dichVuLuuTru'
 
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
 

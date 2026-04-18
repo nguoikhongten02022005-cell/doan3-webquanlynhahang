@@ -4,7 +4,7 @@ import { useGioHangMangVe } from '../context/GioHangMangVeContext'
 import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { layJsonLuuTru, datJsonLuuTru } from '../services/dichVuLuuTru'
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { xoaPhieuGiamGiaDaApDung as clearStoredVoucher, layPhieuGiamGiaDaApDung as getStoredVoucher, luuPhieuGiamGiaDaApDung as saveVoucher, tinhSoTienGiamTheoVoucher } from '../services/dichVuPhieuGiamGia'
+import { xoaPhieuGiamGiaDaApDung as xoaPhieuGiamGiaDaLuu, layPhieuGiamGiaDaApDung as layPhieuGiamGiaDaLuu, luuPhieuGiamGiaDaApDung as luuPhieuGiamGiaDaLuu, tinhSoTienGiamTheoPhieuGiamGia } from '../services/dichVuPhieuGiamGia'
 import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 
@@ -21,17 +21,17 @@ function MangVeGioHangPage() {
   const [diaChiGiao, setDiaChiGiao] = useState('')
   const [gioGiao, setGioGiao] = useState('')
   const [ghiChu, setGhiChu] = useState('')
-  const [maVoucherNhap, setMaVoucherNhap] = useState('')
-  const [voucherDaApDung, setVoucherDaApDung] = useState(null)
-  const [loiVoucher, setLoiVoucher] = useState('')
-  const [dangApVoucher, setDangApVoucher] = useState(false)
+  const [maPhieuGiamGiaNhap, setMaPhieuGiamGiaNhap] = useState('')
+  const [phieuGiamGiaDaApDung, setPhieuGiamGiaDaApDung] = useState(null)
+  const [loiPhieuGiamGia, setLoiPhieuGiamGia] = useState('')
+  const [dangApDungPhieuGiamGia, setDangApDungPhieuGiamGia] = useState(false)
 
   const tamTinh = useMemo(() => cartItems.reduce((tong, item) => tong + item.price * item.quantity, 0), [cartItems])
   const phiDichVu = tinhPhiDichVu(tamTinh)
   const phiShip = loaiNhanHang === 'MANG_VE_GIAO_HANG' ? PHI_SHIP_CO_DINH : 0
-  const tongTienXetVoucher = tamTinh + phiDichVu + phiShip
-  const soTienGiam = tinhSoTienGiamTheoVoucher(voucherDaApDung, tongTienXetVoucher)
-  const tongTien = Math.max(0, tongTienXetVoucher - soTienGiam)
+  const tongTienXetPhieuGiamGia = tamTinh + phiDichVu + phiShip
+  const soTienGiam = tinhSoTienGiamTheoPhieuGiamGia(phieuGiamGiaDaApDung, tongTienXetPhieuGiamGia)
+  const tongTien = Math.max(0, tongTienXetPhieuGiamGia - soTienGiam)
 
   useEffect(() => {
     const draft = layJsonLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_MANG_VE, null)
@@ -42,57 +42,57 @@ function MangVeGioHangPage() {
       setDiaChiGiao(String(draft.diaChiGiao || ''))
       setGhiChu(String(draft.ghiChu || ''))
     }
-    const voucher = getStoredVoucher()
-    if (voucher) {
-      setVoucherDaApDung(voucher)
-      setMaVoucherNhap(voucher.code)
+    const phieuGiamGiaDaLuu = layPhieuGiamGiaDaLuu()
+    if (phieuGiamGiaDaLuu) {
+      setPhieuGiamGiaDaApDung(phieuGiamGiaDaLuu)
+      setMaPhieuGiamGiaNhap(phieuGiamGiaDaLuu.code)
     }
   }, [])
 
-  const handleApplyVoucher = async () => {
-    const maVoucher = maVoucherNhap.trim().toUpperCase()
+  const handleApDungPhieuGiamGia = async () => {
+    const maPhieuGiamGia = maPhieuGiamGiaNhap.trim().toUpperCase()
 
-    if (!maVoucher || tamTinh <= 0) {
-      setVoucherDaApDung(null)
-      setLoiVoucher('Mã không hợp lệ hoặc chưa đủ điều kiện áp dụng.')
-      clearStoredVoucher()
+    if (!maPhieuGiamGia || tamTinh <= 0) {
+      setPhieuGiamGiaDaApDung(null)
+      setLoiPhieuGiamGia('Mã không hợp lệ hoặc chưa đủ điều kiện áp dụng.')
+      xoaPhieuGiamGiaDaLuu()
       return
     }
 
-    setDangApVoucher(true)
+    setDangApDungPhieuGiamGia(true)
 
     try {
-      const { duLieu } = await kiemTraPhieuGiamGiaApi(maVoucher, tongTienXetVoucher, loaiNhanHang)
+      const { duLieu } = await kiemTraPhieuGiamGiaApi(maPhieuGiamGia, tongTienXetPhieuGiamGia, loaiNhanHang)
 
       if (!duLieu?.code) {
-        setVoucherDaApDung(null)
-        setLoiVoucher('Mã không hợp lệ hoặc đã hết hạn.')
-        clearStoredVoucher()
+        setPhieuGiamGiaDaApDung(null)
+        setLoiPhieuGiamGia('Mã không hợp lệ hoặc đã hết hạn.')
+        xoaPhieuGiamGiaDaLuu()
         return
       }
 
-      const voucher = saveVoucher(duLieu)
+      const phieuGiamGiaHopLe = luuPhieuGiamGiaDaLuu(duLieu)
 
-      setVoucherDaApDung(voucher)
-      setMaVoucherNhap(voucher.code)
-      setLoiVoucher('')
+      setPhieuGiamGiaDaApDung(phieuGiamGiaHopLe)
+      setMaPhieuGiamGiaNhap(phieuGiamGiaHopLe.code)
+      setLoiPhieuGiamGia('')
     } catch (error) {
-      setVoucherDaApDung(null)
-      setLoiVoucher(error?.message || 'Mã không hợp lệ hoặc đã hết hạn.')
-      clearStoredVoucher()
+      setPhieuGiamGiaDaApDung(null)
+      setLoiPhieuGiamGia(error?.message || 'Mã không hợp lệ hoặc đã hết hạn.')
+      xoaPhieuGiamGiaDaLuu()
     } finally {
-      setDangApVoucher(false)
+      setDangApDungPhieuGiamGia(false)
     }
   }
 
-  const diTiep = () => {
+  const handleDiTiep = () => {
     datJsonLuuTru(STORAGE_KEYS.BAN_NHAP_TAM_MANG_VE, {
       loaiNhanHang,
       gioLayHang,
       gioGiao,
       diaChiGiao,
       ghiChu,
-      voucherCode: voucherDaApDung?.code || '',
+      voucherCode: phieuGiamGiaDaApDung?.code || '',
     })
     navigate('/mang-ve/thanh-toan')
   }
@@ -166,14 +166,14 @@ function MangVeGioHangPage() {
                   <p className="thanh-toan-tom-tat-note">Chỉ giao trong nội thành TP.HCM.</p>
                 </>
               ) : null}
-              <div className="voucher-block">
-                <div className="voucher-header">
+              <div className="phieu-giam-gia-block">
+                <div className="phieu-giam-gia-header">
                   <h3>Mã giảm giá</h3>
                   <p>{DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.length} mã đang khả dụng theo cấu hình hiện tại.</p>
                 </div>
                 <div className="thanh-toan-voucher-xem-list" style={{ marginBottom: '0.75rem' }}>
                   {DANH_SACH_PHIEU_GIAM_GIA_GOI_Y.map((phieuGiamGia) => {
-                    const dangDuocApDung = voucherDaApDung?.code === phieuGiamGia.code
+                    const dangDuocApDung = phieuGiamGiaDaApDung?.code === phieuGiamGia.code
 
                     return (
                       <button
@@ -181,8 +181,8 @@ function MangVeGioHangPage() {
                         type="button"
                         className={`thanh-toan-voucher-xem-item ${dangDuocApDung ? 'active' : ''}`}
                         onClick={() => {
-                          setMaVoucherNhap(phieuGiamGia.code)
-                          if (loiVoucher) setLoiVoucher('')
+                          setMaPhieuGiamGiaNhap(phieuGiamGia.code)
+                          if (loiPhieuGiamGia) setLoiPhieuGiamGia('')
                         }}
                       >
                         <div>
@@ -194,12 +194,12 @@ function MangVeGioHangPage() {
                     )
                   })}
                 </div>
-                <div className="voucher-controls">
-                  <input className="truong-nhap voucher-input" aria-label="Nhập mã giảm giá" placeholder="Nhập mã giảm giá" value={maVoucherNhap} onChange={(e) => setMaVoucherNhap(e.target.value)} />
-                  <button type="button" className="btn nut-chinh voucher-apply-btn" onClick={handleApplyVoucher} disabled={dangApVoucher}>{dangApVoucher ? 'Đang kiểm tra...' : 'Áp dụng'}</button>
+                <div className="phieu-giam-gia-controls">
+                  <input className="truong-nhap phieu-giam-gia-input" aria-label="Nhập mã giảm giá" placeholder="Nhập mã giảm giá" value={maPhieuGiamGiaNhap} onChange={(e) => setMaPhieuGiamGiaNhap(e.target.value)} />
+                  <button type="button" className="btn nut-chinh phieu-giam-gia-apply-btn" onClick={handleApDungPhieuGiamGia} disabled={dangApDungPhieuGiamGia}>{dangApDungPhieuGiamGia ? 'Đang kiểm tra...' : 'Áp dụng'}</button>
                 </div>
-                {loiVoucher ? <p className="voucher-message error">{loiVoucher}</p> : null}
-                {!loiVoucher && voucherDaApDung ? <p className="voucher-message success">Đã áp dụng mã {voucherDaApDung.code}.</p> : null}
+                {loiPhieuGiamGia ? <p className="phieu-giam-gia-message error">{loiPhieuGiamGia}</p> : null}
+                {!loiPhieuGiamGia && phieuGiamGiaDaApDung ? <p className="phieu-giam-gia-message success">Đã áp dụng mã {phieuGiamGiaDaApDung.code}.</p> : null}
               </div>
               <div className="nhom-truong">
                 <label className="nhan-truong" htmlFor="ghi-chu-mang-ve">Ghi chú</label>
@@ -210,7 +210,7 @@ function MangVeGioHangPage() {
               {loaiNhanHang === 'MANG_VE_GIAO_HANG' ? <div className="tom-tat-row"><span>Phí ship</span><span>{dinhDangTienTeVietNam(phiShip)}</span></div> : null}
               <div className="tom-tat-row tom-tat-discount"><span>Giảm giá</span><span>-{dinhDangTienTeVietNam(soTienGiam)}</span></div>
               <div className="tom-tat-row tom-tat-total"><span>Tổng cộng</span><strong>{dinhDangTienTeVietNam(tongTien)}</strong></div>
-              <button type="button" className="btn gio-hang-checkout-btn w-full" disabled={!(loaiNhanHang === 'MANG_VE_GIAO_HANG' ? (gioGiao && diaChiGiao.trim()) : gioLayHang) || cartItems.length === 0} onClick={diTiep}>Tiếp tục thanh toán</button>
+              <button type="button" className="btn gio-hang-checkout-btn w-full" disabled={!(loaiNhanHang === 'MANG_VE_GIAO_HANG' ? (gioGiao && diaChiGiao.trim()) : gioLayHang) || cartItems.length === 0} onClick={handleDiTiep}>Tiếp tục thanh toán</button>
             </div>
           </div>
         </div>

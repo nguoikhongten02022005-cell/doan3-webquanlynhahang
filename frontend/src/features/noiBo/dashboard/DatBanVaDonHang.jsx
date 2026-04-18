@@ -4,22 +4,22 @@ import { dinhDangSoKhach, layNhanChoNgoi, layNhanTrangThaiDatBan, laySacThaiTran
 import { layNhanTrangThaiDonHang } from '../../../utils/donHang'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 
-const BOOKING_TAG_COLOR = {
+const MAU_NHAN_DAT_BAN = {
   danger: 'error',
   warning: 'warning',
   success: 'success',
   neutral: 'blue',
 }
 
-const ORDER_TAG_COLOR = {
+const MAU_NHAN_DON_HANG = {
   danger: 'error',
   warning: 'warning',
   success: 'success',
   neutral: 'processing',
 }
 
-function BookingAndOrders({ bookings, orders }) {
-  const bookingColumns = [
+function DatBanVaDonHang({ bookings, orders }) {
+  const cotDatBan = [
     {
       title: 'Booking',
       dataIndex: 'bookingCode',
@@ -42,14 +42,14 @@ function BookingAndOrders({ bookings, orders }) {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag color={BOOKING_TAG_COLOR[laySacThaiTrangThaiDatBan(status)] || 'default'}>
+        <Tag color={MAU_NHAN_DAT_BAN[laySacThaiTrangThaiDatBan(status)] || 'default'}>
           {layNhanTrangThaiDatBan(status)}
         </Tag>
       ),
     },
   ]
 
-  const orderColumns = [
+  const cotDonHang = [
     {
       title: 'Đơn hàng',
       dataIndex: 'id',
@@ -80,30 +80,30 @@ function BookingAndOrders({ bookings, orders }) {
       dataIndex: 'status',
       key: 'status',
       render: (status) => (
-        <Tag color={ORDER_TAG_COLOR[laySacThaiDonHang(status)] || 'default'}>
+        <Tag color={MAU_NHAN_DON_HANG[laySacThaiDonHang(status)] || 'default'}>
           {layNhanTrangThaiDonHang(status)}
         </Tag>
       ),
     },
   ]
 
-  const bookingTable = (
+  const bangDatBan = (
     <Table
       rowKey="id"
       size="small"
       pagination={{ pageSize: 5, size: 'small' }}
-      columns={bookingColumns}
+      columns={cotDatBan}
       dataSource={bookings || []}
       scroll={{ x: 720, y: 316 }}
     />
   )
 
-  const orderTable = (
+  const bangDonHang = (
     <Table
       rowKey="id"
       size="small"
       pagination={{ pageSize: 5, size: 'small' }}
-      columns={orderColumns}
+      columns={cotDonHang}
       dataSource={orders || []}
       scroll={{ x: 620, y: 316 }}
     />
@@ -118,12 +118,12 @@ function BookingAndOrders({ bookings, orders }) {
               {
                 key: 'bookings',
                 label: 'Booking',
-                children: bookingTable,
+                children: bangDatBan,
               },
               {
                 key: 'orders',
                 label: 'Đơn hàng',
-                children: orderTable,
+                children: bangDonHang,
               },
             ]}
           />
@@ -134,12 +134,12 @@ function BookingAndOrders({ bookings, orders }) {
         <Row gutter={[16, 16]}>
           <Col xs={24} xxl={13}>
             <Card className="noi-bo-dashboard-card" title="Booking ưu tiên" styles={{ body: { padding: '10px 14px' } }}>
-              {bookingTable}
+              {bangDatBan}
             </Card>
           </Col>
           <Col xs={24} xxl={11}>
             <Card className="noi-bo-dashboard-card" title="Đơn đang xử lý" styles={{ body: { padding: '10px 14px' } }}>
-              {orderTable}
+              {bangDonHang}
             </Card>
           </Col>
         </Row>
@@ -148,4 +148,4 @@ function BookingAndOrders({ bookings, orders }) {
   )
 }
 
-export default BookingAndOrders
+export default DatBanVaDonHang

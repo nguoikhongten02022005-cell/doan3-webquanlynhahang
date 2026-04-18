@@ -2,14 +2,14 @@ import { useEffect, useMemo, useState } from 'react'
 import { Button, Form, Input, Upload } from 'antd'
 import { useThongBao } from '../../../context/ThongBaoContext'
 
-const UserAvatarIcon = () => (
+const BieuTuongAnhDaiDienNguoiDung = () => (
   <svg viewBox="0 0 24 24" fill="none" aria-hidden="true">
     <circle cx="12" cy="8" r="3.5" stroke="currentColor" strokeWidth="1.8" />
     <path d="M5 19c1.6-3 4-4.5 7-4.5s5.4 1.5 7 4.5" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" />
   </svg>
 )
 
-const taoGiaTriHoSoBanDau = (nguoiDung) => ({
+const khoiTaoGiaTriHoSo = (nguoiDung) => ({
   fullName: String(nguoiDung?.fullName ?? nguoiDung?.name ?? ''),
   email: String(nguoiDung?.email ?? ''),
   phone: String(nguoiDung?.phone ?? ''),
@@ -33,17 +33,17 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
   const { hienThongBao } = useThongBao()
   const [formHoSo] = Form.useForm()
   const [formMatKhau] = Form.useForm()
-  const [formData, setFormData] = useState(() => taoGiaTriHoSoBanDau(nguoiDung))
-  const [daChinhSuaHoSo, setDaChinhSuaHoSo] = useState(false)
-  const [avatarPreview, setAvatarPreview] = useState('')
+  const [duLieuHoSo, setDuLieuHoSo] = useState(() => khoiTaoGiaTriHoSo(nguoiDung))
+  const [daSuaHoSo, setDaSuaHoSo] = useState(false)
+  const [xemTruocAnhDaiDien, setXemTruocAnhDaiDien] = useState('')
   const [matKhauForm, setMatKhauForm] = useState({
     currentPassword: '',
     newPassword: '',
     confirmPassword: '',
   })
-  const [dangLuuHoSo, setDangLuuHoSo] = useState(false)
-  const [dangCapNhatMatKhau, setDangCapNhatMatKhau] = useState(false)
-  const avatarMacDinh = String(nguoiDung?.avatarUrl ?? nguoiDung?.avatar ?? '')
+  const [dangLuuThongTinHoSo, setDangLuuThongTinHoSo] = useState(false)
+  const [dangCapNhatMatKhauHoSo, setDangCapNhatMatKhauHoSo] = useState(false)
+  const anhDaiDienMacDinh = String(nguoiDung?.avatarUrl ?? nguoiDung?.avatar ?? '')
   const tongQuanDiem = useMemo(() => ({
     tongDiem: Number(tongQuanDiemTichLuy?.tongDiem || 0),
     diemCoTheDoi: Number(tongQuanDiemTichLuy?.diemCoTheDoi || 0),
@@ -51,28 +51,28 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
   }), [tongQuanDiemTichLuy])
 
   useEffect(() => {
-    if (daChinhSuaHoSo) {
+    if (daSuaHoSo) {
       return
     }
 
-    const giaTriBanDau = taoGiaTriHoSoBanDau(nguoiDung)
-    setFormData(giaTriBanDau)
+    const giaTriBanDau = khoiTaoGiaTriHoSo(nguoiDung)
+    setDuLieuHoSo(giaTriBanDau)
     formHoSo.setFieldsValue(giaTriBanDau)
-  }, [daChinhSuaHoSo, formHoSo, nguoiDung])
+  }, [daSuaHoSo, formHoSo, nguoiDung])
 
   useEffect(() => () => {
-    if (avatarPreview) {
-      URL.revokeObjectURL(avatarPreview)
+    if (xemTruocAnhDaiDien) {
+      URL.revokeObjectURL(xemTruocAnhDaiDien)
     }
-  }, [avatarPreview])
+  }, [xemTruocAnhDaiDien])
 
-  const handleProfileFieldChange = (field) => (event) => {
+  const taoXuLyDoiTruongHoSo = (field) => (event) => {
     const value = event?.target?.value ?? ''
-    setDaChinhSuaHoSo(true)
-    setFormData((prev) => ({ ...prev, [field]: value }))
+    setDaSuaHoSo(true)
+    setDuLieuHoSo((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleAvatarChange = (file) => {
+  const handleDoiAnhDaiDien = (file) => {
     if (!file) {
       return false
     }
@@ -87,19 +87,19 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
       return Upload.LIST_IGNORE
     }
 
-    if (avatarPreview) {
-      URL.revokeObjectURL(avatarPreview)
+    if (xemTruocAnhDaiDien) {
+      URL.revokeObjectURL(xemTruocAnhDaiDien)
     }
 
-    const nextPreview = URL.createObjectURL(file)
-    setAvatarPreview(nextPreview)
+    const anhXemTruocTiepTheo = URL.createObjectURL(file)
+    setXemTruocAnhDaiDien(anhXemTruocTiepTheo)
     return false
   }
 
-  const handleSaveProfile = async () => {
+  const handleLuuHoSo = async () => {
     try {
       const giaTriHopLe = await formHoSo.validateFields()
-      setDangLuuHoSo(true)
+      setDangLuuThongTinHoSo(true)
       const ketQua = await onCapNhatHoSo?.(giaTriHopLe)
       if (!ketQua?.success) {
         hienThongBao({
@@ -111,8 +111,8 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
         return
       }
 
-      setFormData(giaTriHopLe)
-      setDaChinhSuaHoSo(false)
+      setDuLieuHoSo(giaTriHopLe)
+      setDaSuaHoSo(false)
       formHoSo.setFieldsValue(giaTriHopLe)
 
       hienThongBao({
@@ -122,19 +122,19 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
         title: '',
       })
     } finally {
-      setDangLuuHoSo(false)
+      setDangLuuThongTinHoSo(false)
     }
   }
 
-  const handlePasswordFieldChange = (field) => (event) => {
+  const taoXuLyDoiTruongMatKhau = (field) => (event) => {
     const value = event?.target?.value ?? ''
     setMatKhauForm((prev) => ({ ...prev, [field]: value }))
   }
 
-  const handleUpdatePassword = async () => {
+  const handleCapNhatMatKhau = async () => {
     try {
       const values = await formMatKhau.validateFields()
-      setDangCapNhatMatKhau(true)
+      setDangCapNhatMatKhauHoSo(true)
       const ketQua = await onDoiMatKhau?.(values)
       if (!ketQua?.success) {
         hienThongBao({
@@ -160,11 +160,11 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
         title: 'Thành công',
       })
     } finally {
-      setDangCapNhatMatKhau(false)
+      setDangCapNhatMatKhauHoSo(false)
     }
   }
 
-  const avatarSrc = avatarPreview || avatarMacDinh
+  const anhDaiDienHienThi = xemTruocAnhDaiDien || anhDaiDienMacDinh
 
   return (
     <article className="ho-so-card ho-so-personal-card ho-so-ant-hybrid">
@@ -180,19 +180,19 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
 
       <div className="ho-so-avatar-block">
         <div className="ho-so-avatar-preview" aria-label="Ảnh đại diện">
-          {avatarSrc ? <img src={avatarSrc} alt="Ảnh đại diện" /> : <UserAvatarIcon />}
+          {anhDaiDienHienThi ? <img src={anhDaiDienHienThi} alt="Ảnh đại diện" /> : <BieuTuongAnhDaiDienNguoiDung />}
         </div>
-        <Upload accept="image/*" showUploadList={false} beforeUpload={handleAvatarChange}>
+        <Upload accept="image/*" showUploadList={false} beforeUpload={handleDoiAnhDaiDien}>
           <Button htmlType="button" className="btn ho-so-avatar-btn">
             Đổi ảnh
           </Button>
         </Upload>
       </div>
 
-      <Form form={formHoSo} layout="vertical" initialValues={formData}>
+      <Form form={formHoSo} layout="vertical" initialValues={duLieuHoSo}>
         <div className="ho-so-form-grid">
           <Form.Item className="nhom-truong" label={<span className="nhan-truong">Tên</span>} name="fullName" rules={[{ required: true, message: 'Vui lòng nhập tên.' }]}>
-            <Input id="ho-so-full-name" className="truong-nhap" onChange={handleProfileFieldChange('fullName')} />
+            <Input id="ho-so-full-name" className="truong-nhap" onChange={taoXuLyDoiTruongHoSo('fullName')} />
           </Form.Item>
 
           <Form.Item
@@ -204,54 +204,54 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
               { type: 'email', message: 'Email không hợp lệ.' },
             ]}
           >
-            <Input id="ho-so-email" type="email" className="truong-nhap" onChange={handleProfileFieldChange('email')} />
+            <Input id="ho-so-email" type="email" className="truong-nhap" onChange={taoXuLyDoiTruongHoSo('email')} />
           </Form.Item>
 
           <Form.Item className="nhom-truong full" label={<span className="nhan-truong">SĐT</span>} name="phone" rules={[{ required: true, message: 'Vui lòng nhập số điện thoại.' }]}>
-            <Input id="ho-so-phone" className="truong-nhap" onChange={handleProfileFieldChange('phone')} />
+            <Input id="ho-so-phone" className="truong-nhap" onChange={taoXuLyDoiTruongHoSo('phone')} />
           </Form.Item>
         </div>
       </Form>
 
       <div className="ho-so-profile-actions">
-        <Button htmlType="button" className="btn nut-chinh ho-so-save-btn" loading={dangLuuHoSo} onClick={handleSaveProfile}>
+        <Button htmlType="button" className="btn nut-chinh ho-so-save-btn" loading={dangLuuThongTinHoSo} onClick={handleLuuHoSo}>
           Lưu thay đổi
         </Button>
       </div>
 
-      <section className="ho-so-loyalty-section" aria-label="Điểm tích lũy">
+      <section className="ho-so-diem-tich-luy-section" aria-label="Điểm tích lũy">
         <div className="ho-so-subsection-heading">
           <h3>Điểm tích lũy</h3>
           <p>Theo dõi số điểm hiện có và lịch sử biến động điểm từ các đơn hàng của bạn.</p>
         </div>
 
-        <div className="ho-so-loyalty-grid">
-          <article className="ho-so-loyalty-card">
-            <span className="ho-so-loyalty-label">Tổng điểm hiện có</span>
-            <strong className="ho-so-loyalty-value">{dinhDangSo(tongQuanDiem.tongDiem)}</strong>
+        <div className="ho-so-diem-tich-luy-grid">
+          <article className="ho-so-diem-tich-luy-card">
+            <span className="ho-so-diem-tich-luy-label">Tổng điểm hiện có</span>
+            <strong className="ho-so-diem-tich-luy-value">{dinhDangSo(tongQuanDiem.tongDiem)}</strong>
           </article>
 
-          <article className="ho-so-loyalty-card">
-            <span className="ho-so-loyalty-label">Điểm có thể đổi</span>
-            <strong className="ho-so-loyalty-value">{dinhDangSo(tongQuanDiem.diemCoTheDoi)}</strong>
+          <article className="ho-so-diem-tich-luy-card">
+            <span className="ho-so-diem-tich-luy-label">Điểm có thể đổi</span>
+            <strong className="ho-so-diem-tich-luy-value">{dinhDangSo(tongQuanDiem.diemCoTheDoi)}</strong>
           </article>
 
-          <article className="ho-so-loyalty-card">
-            <span className="ho-so-loyalty-label">Tỷ lệ quy đổi</span>
-            <strong className="ho-so-loyalty-value">1 điểm / {dinhDangSo(tongQuanDiem.tiLeQuyDoi)}đ</strong>
+          <article className="ho-so-diem-tich-luy-card">
+            <span className="ho-so-diem-tich-luy-label">Tỷ lệ quy đổi</span>
+            <strong className="ho-so-diem-tich-luy-value">1 điểm / {dinhDangSo(tongQuanDiem.tiLeQuyDoi)}đ</strong>
           </article>
         </div>
 
-        <div className="ho-so-loyalty-history">
-          <div className="ho-so-loyalty-history-header">
+        <div className="ho-so-diem-tich-luy-history">
+          <div className="ho-so-diem-tich-luy-history-header">
             <h4>Lịch sử điểm gần đây</h4>
             <span>{lichSuDiemTichLuy.length} giao dịch</span>
           </div>
 
           {lichSuDiemTichLuy.length ? (
-            <div className="ho-so-loyalty-history-list">
+            <div className="ho-so-diem-tich-luy-history-list">
               {lichSuDiemTichLuy.map((giaoDich) => (
-                <article key={giaoDich.maGiaoDichDiem || `${giaoDich.ngayTao}-${giaoDich.maDonHang}`} className="ho-so-loyalty-history-item">
+                <article key={giaoDich.maGiaoDichDiem || `${giaoDich.ngayTao}-${giaoDich.maDonHang}`} className="ho-so-diem-tich-luy-history-item">
                   <div>
                     <strong>{giaoDich.moTa || giaoDich.loaiBienDong || 'Biến động điểm'}</strong>
                     <p>
@@ -259,8 +259,8 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                       {dinhDangThoiGianDiem(giaoDich.ngayTao)}
                     </p>
                   </div>
-                  <div className="ho-so-loyalty-history-meta">
-                    <strong className={giaoDich.soDiem >= 0 ? 'ho-so-loyalty-plus' : 'ho-so-loyalty-minus'}>
+                  <div className="ho-so-diem-tich-luy-history-meta">
+                    <strong className={giaoDich.soDiem >= 0 ? 'ho-so-diem-tich-luy-cong' : 'ho-so-diem-tich-luy-tru'}>
                       {giaoDich.soDiem >= 0 ? '+' : ''}{dinhDangSo(giaoDich.soDiem)} điểm
                     </strong>
                     <span>
@@ -271,7 +271,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
               ))}
             </div>
           ) : (
-            <div className="ho-so-loyalty-empty">Chưa có lịch sử điểm tích lũy.</div>
+            <div className="ho-so-diem-tich-luy-empty">Chưa có lịch sử điểm tích lũy.</div>
           )}
         </div>
       </section>
@@ -282,8 +282,8 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
           <p>Thiết lập lại mật khẩu đăng nhập để bảo mật tài khoản tốt hơn.</p>
         </div>
 
-        <Form form={formMatKhau} layout="vertical" initialValues={matKhauForm} onFinish={handleUpdatePassword}>
-          <input type="text" name="username" autoComplete="username" value={formData.email || ''} readOnly hidden />
+        <Form form={formMatKhau} layout="vertical" initialValues={matKhauForm} onFinish={handleCapNhatMatKhau}>
+          <input type="text" name="username" autoComplete="username" value={duLieuHoSo.email || ''} readOnly hidden />
           <div className="ho-so-form-grid">
             <Form.Item
               className="nhom-truong full"
@@ -291,7 +291,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
               name="currentPassword"
               rules={[{ required: true, message: 'Vui lòng nhập mật khẩu hiện tại.' }]}
             >
-              <Input.Password id="ho-so-current-password" autoComplete="current-password" className="truong-nhap" onChange={handlePasswordFieldChange('currentPassword')} />
+              <Input.Password id="ho-so-current-password" autoComplete="current-password" className="truong-nhap" onChange={taoXuLyDoiTruongMatKhau('currentPassword')} />
             </Form.Item>
 
             <Form.Item
@@ -303,7 +303,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                 { min: 8, message: 'Mật khẩu mới phải có ít nhất 8 ký tự.' },
               ]}
             >
-              <Input.Password id="ho-so-new-password" autoComplete="new-password" className="truong-nhap" onChange={handlePasswordFieldChange('newPassword')} />
+              <Input.Password id="ho-so-new-password" autoComplete="new-password" className="truong-nhap" onChange={taoXuLyDoiTruongMatKhau('newPassword')} />
             </Form.Item>
 
             <Form.Item
@@ -324,12 +324,12 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                 }),
               ]}
             >
-              <Input.Password id="ho-so-confirm-password" autoComplete="new-password" className="truong-nhap" onChange={handlePasswordFieldChange('confirmPassword')} />
+              <Input.Password id="ho-so-confirm-password" autoComplete="new-password" className="truong-nhap" onChange={taoXuLyDoiTruongMatKhau('confirmPassword')} />
             </Form.Item>
           </div>
 
           <div className="ho-so-profile-actions">
-            <Button htmlType="submit" className="btn nut-chinh ho-so-save-btn" loading={dangCapNhatMatKhau}>
+            <Button htmlType="submit" className="btn nut-chinh ho-so-save-btn" loading={dangCapNhatMatKhauHoSo}>
               Cập nhật mật khẩu
             </Button>
             <Button htmlType="button" className="btn ho-so-logout-btn ho-so-logout-btn--mobile" onClick={onLogout}>
