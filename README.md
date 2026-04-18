@@ -217,7 +217,7 @@ Backend hiện phục vụ các nhóm route có prefix `/api`:
 - `/api/ma-giam-gia/validate`
 - `/api/danh-gia`
 - `/api/mang-ve`
-- `/api/loyalty`
+- `/api/diem-tich-luy`
 
 Swagger UI mặc định tại:
 

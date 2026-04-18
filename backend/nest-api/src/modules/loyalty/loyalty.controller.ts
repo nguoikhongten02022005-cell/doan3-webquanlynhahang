@@ -2,9 +2,9 @@ import { Controller, Get, Headers } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { LoyaltyService } from './loyalty.service';
 
-@ApiTags('loyalty')
+@ApiTags('diem-tich-luy')
 @ApiBearerAuth('access-token')
-@Controller('api/loyalty')
+@Controller('api/diem-tich-luy')
 export class LoyaltyController {
   constructor(private readonly loyaltyService: LoyaltyService) {}
 

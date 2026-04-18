@@ -15,7 +15,7 @@ Mục tiêu của phần backend là cung cấp API cho các nghiệp vụ lõi 
 - `api/ma-giam-gia/validate`
 - `api/danh-gia`
 - `api/mang-ve`
-- `api/loyalty`
+- `api/diem-tich-luy`
 - static file upload tại `/uploads`
 
 ## Công nghệ
@@ -113,7 +113,7 @@ Backend đã nối các nghiệp vụ chính mà frontend đang dùng:
 - đơn mang về
 - voucher / mã giảm giá
 - đánh giá
-- loyalty cơ bản
+- điểm tích lũy của tôi và lịch sử điểm tích lũy
 
 Các phần như báo cáo sâu hoặc quản lý kho/nguyên liệu không nên mô tả là đã hoàn thiện end-to-end nếu chưa được phát triển thêm ngoài phạm vi hiện tại.
 

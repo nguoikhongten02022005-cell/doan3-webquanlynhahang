@@ -24,7 +24,7 @@ const chuanHoaGiaoDichDiem = (giaoDich) => {
 }
 
 export const layTongQuanDiemTichLuyApi = async () => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/loyalty/me'))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/diem-tich-luy/me'))
   return {
     ...phanHoi,
     duLieu: chuanHoaTongQuanDiemTichLuy(phanHoi.duLieu),
@@ -32,7 +32,7 @@ export const layTongQuanDiemTichLuyApi = async () => {
 }
 
 export const layLichSuDiemTichLuyApi = async () => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/loyalty/me/history'))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/diem-tich-luy/me/history'))
   return {
     ...phanHoi,
     duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaGiaoDichDiem).filter(Boolean) : [],

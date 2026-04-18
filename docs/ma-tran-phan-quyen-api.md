@@ -62,8 +62,8 @@ Tai lieu nay tom tat quyen truy cap cho cac endpoint trong `backend/nest-api/src
 | PATCH | `/api/mang-ve/admin/don-hang/:maDonHang/trang-thai` | staff | Cap nhat trang thai don mang ve |
 | GET | `/api/mang-ve/lich-su` | customer-own | Lich su don mang ve cua chinh user |
 | PATCH | `/api/mang-ve/don-hang/:maDonHang/huy` | customer-own | Khach chi huy don cua minh; staff/admin co the huy noi bo |
-| GET | `/api/loyalty/me` | customer-own | Tong quan diem tich luy cua chinh user |
-| GET | `/api/loyalty/me/history` | customer-own | Lich su diem cua chinh user |
+| GET | `/api/diem-tich-luy/me` | customer-own | Tong quan diem tich luy cua toi |
+| GET | `/api/diem-tich-luy/me/history` | customer-own | Lich su bien dong diem tich luy cua toi |
 
 ## Ghi chu trien khai
 

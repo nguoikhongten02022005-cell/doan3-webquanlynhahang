@@ -126,7 +126,7 @@ Các nhóm controller chính:
 - `voucher`
 - `danh-gia`
 - `mang-ve`
-- `loyalty`
+- `diem-tich-luy`
 
 ## 6. Các điểm nghiệp vụ đã nối frontend - backend
 
