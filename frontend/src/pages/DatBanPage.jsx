@@ -18,7 +18,7 @@ import { useDatBan } from '../features/datBan/hooks/useDatBan'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { layDanhSachBanApi } from '../services/api/apiBanAn'
 import { layKhaDungDatBanApi } from '../services/api/apiDatBan'
-import { taoAnhChupBanNhapTamDatBan } from '../features/datBan/utils/banNhapTamDatBan'
+import { taoDuLieuBanNhapTamDatBan } from '../features/datBan/utils/banNhapTamDatBan'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 import BuocMotDatBan from '../features/datBan/components/BuocMotDatBan'
 import BuocHaiDatBan from '../features/datBan/components/BuocHaiDatBan'
@@ -263,7 +263,7 @@ function DatBanPage() {
       return
     }
 
-    luuBanNhapTam(taoAnhChupBanNhapTamDatBan(formData))
+    luuBanNhapTam(taoDuLieuBanNhapTamDatBan(formData))
   }, [didBootstrapDraft, formData, luuBanNhapTam, submitSuccess])
 
   useEffect(() => {

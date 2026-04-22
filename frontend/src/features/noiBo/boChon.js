@@ -9,17 +9,17 @@ import {
 } from './hangSo'
 import { laySacThaiDonHang } from './dinhDang'
 
-export const laDatBanVip = (booking) => booking.seatingArea === 'PHONG_VIP'
+export const laDatBanVip = (datBan) => datBan.seatingArea === 'PHONG_VIP'
 const laTrangThaiChoXuLy = (trangThai) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(trangThai) || trangThai === 'Pending'
 const laTrangThaiDaXacNhan = (trangThai) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(trangThai) || trangThai === 'Confirmed'
 
-export const canXacNhanThuCong = (booking) => laTrangThaiChoXuLy(booking.status) || laDatBanVip(booking)
+export const canXacNhanThuCong = (datBan) => laTrangThaiChoXuLy(datBan.status) || laDatBanVip(datBan)
 
-export const layGhiChuUuTienDatBan = (booking) => {
-  if (laDatBanVip(booking)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc khu riêng.'
-  if (booking.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
-  if (!Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0) return 'Booking chưa được gán bàn cụ thể.'
-  if (booking.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ban công.'
+export const layGhiChuUuTienDatBan = (datBan) => {
+  if (laDatBanVip(datBan)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc khu riêng.'
+  if (datBan.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
+  if (!Array.isArray(datBan.assignedTableIds) || datBan.assignedTableIds.length === 0) return 'Booking chưa được gán bàn cụ thể.'
+  if (datBan.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ban công.'
   return ''
 }
 
@@ -30,88 +30,88 @@ const CAC_TRANG_THAI_DAT_BAN_KET_THUC = new Set([
   'TU_CHOI_HET_CHO',
 ])
 
-export const daGanBan = (booking) => Array.isArray(booking?.assignedTableIds) && booking.assignedTableIds.length > 0
-export const laDatBanDaCheckIn = (booking) => booking.status === 'DA_CHECK_IN' || booking.status === 'DA_XEP_BAN'
-export const laTrangThaiDatBanKetThuc = (booking) => CAC_TRANG_THAI_DAT_BAN_KET_THUC.has(booking?.status)
+export const daGanBan = (datBan) => Array.isArray(datBan?.assignedTableIds) && datBan.assignedTableIds.length > 0
+export const laDatBanDaCheckIn = (datBan) => datBan.status === 'DA_CHECK_IN' || datBan.status === 'DA_XEP_BAN'
+export const laTrangThaiDatBanKetThuc = (datBan) => CAC_TRANG_THAI_DAT_BAN_KET_THUC.has(datBan?.status)
 
-export const coTheGanBanChoDatBan = (booking) => !laTrangThaiDatBanKetThuc(booking)
-export const coTheCheckInDatBan = (booking) => daGanBan(booking) && !laDatBanDaCheckIn(booking) && !laTrangThaiDatBanKetThuc(booking)
-export const coTheHoanThanhDatBan = (booking) => booking?.status === 'DA_CHECK_IN' || booking?.status === 'DA_XEP_BAN'
-export const coTheDanhDauKhongDen = (booking) => !laDatBanDaCheckIn(booking) && !laTrangThaiDatBanKetThuc(booking)
+export const coTheGanBanChoDatBan = (datBan) => !laTrangThaiDatBanKetThuc(datBan)
+export const coTheCheckInDatBan = (datBan) => daGanBan(datBan) && !laDatBanDaCheckIn(datBan) && !laTrangThaiDatBanKetThuc(datBan)
+export const coTheHoanThanhDatBan = (datBan) => datBan?.status === 'DA_CHECK_IN' || datBan?.status === 'DA_XEP_BAN'
+export const coTheDanhDauKhongDen = (datBan) => !laDatBanDaCheckIn(datBan) && !laTrangThaiDatBanKetThuc(datBan)
 
-export const phanTichNgayGioDatBan = (date, time) => {
-  if (!date) return null
+export const phanTichNgayGioDatBan = (ngay, gio) => {
+  if (!ngay) return null
 
-  const gioDaChuanHoa = time && /^\d{2}:\d{2}$/.test(time) ? `${time}:00` : time || '00:00:00'
-  const ngayDaPhanTich = new Date(`${date}T${gioDaChuanHoa}`)
+  const gioDaChuanHoa = gio && /^\d{2}:\d{2}$/.test(gio) ? `${gio}:00` : gio || '00:00:00'
+  const ngayDaPhanTich = new Date(`${ngay}T${gioDaChuanHoa}`)
 
   return Number.isNaN(ngayDaPhanTich.getTime()) ? null : ngayDaPhanTich
 }
 
-const laCungNgayLich = (left, right) => (
-  left.getFullYear() === right.getFullYear()
-  && left.getMonth() === right.getMonth()
-  && left.getDate() === right.getDate()
+const laCungNgayLich = (ngayTrai, ngayPhai) => (
+  ngayTrai.getFullYear() === ngayPhai.getFullYear()
+  && ngayTrai.getMonth() === ngayPhai.getMonth()
+  && ngayTrai.getDate() === ngayPhai.getDate()
 )
 
-export const khopBoLocNgay = (booking, dayFilter, now) => {
-  if (dayFilter === 'all') return true
+export const khopBoLocNgay = (datBan, boLocNgay, hienTai) => {
+  if (boLocNgay === 'all') return true
 
-  const ngayDatBan = phanTichNgayGioDatBan(booking.date, booking.time)
+  const ngayDatBan = phanTichNgayGioDatBan(datBan.date, datBan.time)
   if (!ngayDatBan) return false
 
-  if (dayFilter === 'today') {
-    return laCungNgayLich(ngayDatBan, now)
+  if (boLocNgay === 'today') {
+    return laCungNgayLich(ngayDatBan, hienTai)
   }
 
-  if (dayFilter === 'tomorrow') {
-    const tomorrow = new Date(now)
-    tomorrow.setDate(now.getDate() + 1)
-    return laCungNgayLich(ngayDatBan, tomorrow)
+  if (boLocNgay === 'tomorrow') {
+    const ngayMai = new Date(hienTai)
+    ngayMai.setDate(hienTai.getDate() + 1)
+    return laCungNgayLich(ngayDatBan, ngayMai)
   }
 
   return true
 }
 
-export const khopBoLocCa = (booking, shiftFilter) => {
-  if (shiftFilter === 'all') return true
+export const khopBoLocCa = (datBan, boLocCa) => {
+  if (boLocCa === 'all') return true
 
-  const [hour] = String(booking.time || '').split(':')
-  const gioSo = Number(hour)
+  const [gio] = String(datBan.time || '').split(':')
+  const gioSo = Number(gio)
 
   if (Number.isNaN(gioSo)) return false
-  if (shiftFilter === 'lunch') return gioSo < 16
-  if (shiftFilter === 'dinner') return gioSo >= 16
+  if (boLocCa === 'lunch') return gioSo < 16
+  if (boLocCa === 'dinner') return gioSo >= 16
 
   return true
 }
 
-export const khopTimKiemDatBan = (booking, searchQuery) => {
-  const tuKhoaDaChuanHoa = String(searchQuery || '').trim().toLowerCase()
+export const khopTimKiemDatBan = (datBan, tuKhoaTimKiem) => {
+  const tuKhoaDaChuanHoa = String(tuKhoaTimKiem || '').trim().toLowerCase()
   if (!tuKhoaDaChuanHoa) return true
 
   return [
-    booking.bookingCode,
-    booking.name,
-    booking.phone,
-    booking.email,
-  ].some((value) => String(value || '').toLowerCase().includes(tuKhoaDaChuanHoa))
+    datBan.bookingCode,
+    datBan.name,
+    datBan.phone,
+    datBan.email,
+  ].some((giaTri) => String(giaTri || '').toLowerCase().includes(tuKhoaDaChuanHoa))
 }
 
-export const layTomTatDonHang = (orders) => ({
-  total: orders.length,
-  pending: orders.filter((order) => laySacThaiDonHang(order?.status) === 'warning').length,
-  revenue: orders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0),
+export const layTomTatDonHang = (danhSachDonHang) => ({
+  total: danhSachDonHang.length,
+  pending: danhSachDonHang.filter((donHang) => laySacThaiDonHang(donHang?.status) === 'warning').length,
+  revenue: danhSachDonHang.reduce((tong, donHang) => tong + (Number(donHang?.total) || 0), 0),
 })
 
-export const layTomTatBan = (tables) => {
-  const thongKe = tables.reduce((boDem, table) => {
-    const khuVuc = table.areaId || 'KHONG_UU_TIEN'
+export const layTomTatBan = (danhSachBan) => {
+  const boDemTheoKhuVuc = danhSachBan.reduce((boDem, banAn) => {
+    const khuVuc = banAn.areaId || 'KHONG_UU_TIEN'
 
     if (!boDem[khuVuc]) {
       boDem[khuVuc] = {
         id: khuVuc,
-        name: table.rawAreaText || khuVuc,
+        name: banAn.rawAreaText || khuVuc,
         total: 0,
         occupied: 0,
         dirty: 0,
@@ -121,123 +121,123 @@ export const layTomTatBan = (tables) => {
 
     boDem[khuVuc].total += 1
 
-    if (table.status === TRANG_THAI_BAN.DANG_SU_DUNG) {
+    if (banAn.status === TRANG_THAI_BAN.DANG_SU_DUNG) {
       boDem[khuVuc].occupied += 1
     }
 
-    if (table.status === TRANG_THAI_BAN.GIU_CHO) {
+    if (banAn.status === TRANG_THAI_BAN.GIU_CHO) {
       boDem[khuVuc].held += 1
     }
 
-    if (table.status === TRANG_THAI_BAN.BAN) {
+    if (banAn.status === TRANG_THAI_BAN.BAN) {
       boDem[khuVuc].dirty += 1
     }
 
     return boDem
   }, {})
 
-  const khuVucDong = Object.values(thongKe).map((khuVuc) => {
-    const khongKhaDung = khuVuc.occupied + khuVuc.held + khuVuc.dirty
-    const available = Math.max(khuVuc.total - khongKhaDung, 0)
+  const danhSachKhuVucTongHop = Object.values(boDemTheoKhuVuc).map((khuVuc) => {
+    const soBanKhongKhaDung = khuVuc.occupied + khuVuc.held + khuVuc.dirty
+    const available = Math.max(khuVuc.total - soBanKhongKhaDung, 0)
 
     return {
       ...khuVuc,
       available,
-      occupancyRate: khuVuc.total > 0 ? khongKhaDung / khuVuc.total : 0,
+      occupancyRate: khuVuc.total > 0 ? soBanKhongKhaDung / khuVuc.total : 0,
     }
   })
 
-  if (khuVucDong.length > 0) {
-    return khuVucDong
+  if (danhSachKhuVucTongHop.length > 0) {
+    return danhSachKhuVucTongHop
   }
 
-  return CAC_KHU_VUC_BAN.map((area) => ({
-    ...area,
+  return CAC_KHU_VUC_BAN.map((khuVuc) => ({
+    ...khuVuc,
     occupied: 0,
     held: 0,
     dirty: 0,
-    available: area.total,
+    available: khuVuc.total,
     occupancyRate: 0,
   }))
 }
 
-export const layTomTatTonKhoBan = (tables) => ({
-  total: tables.length,
-  available: tables.filter((table) => table.status === TRANG_THAI_BAN.TRONG).length,
-  held: tables.filter((table) => table.status === TRANG_THAI_BAN.GIU_CHO).length,
-  occupied: tables.filter((table) => table.status === TRANG_THAI_BAN.DANG_SU_DUNG).length,
-  dirty: tables.filter((table) => table.status === TRANG_THAI_BAN.BAN).length,
+export const layTomTatTonKhoBan = (danhSachBan) => ({
+  total: danhSachBan.length,
+  available: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.TRONG).length,
+  held: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.GIU_CHO).length,
+  occupied: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.DANG_SU_DUNG).length,
+  dirty: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.BAN).length,
 })
 
-export const layTomTatTaiKhoan = (accounts) => ({
-  total: accounts.length,
-  quanLy: accounts.filter((account) => account.role === 'admin').length,
-  nhanVien: accounts.filter((account) => account.role === 'staff').length,
-  khachHang: accounts.filter((account) => account.role === 'customer').length,
+export const layTomTatTaiKhoan = (danhSachTaiKhoan) => ({
+  total: danhSachTaiKhoan.length,
+  quanLy: danhSachTaiKhoan.filter((taiKhoan) => taiKhoan.role === 'admin').length,
+  nhanVien: danhSachTaiKhoan.filter((taiKhoan) => taiKhoan.role === 'staff').length,
+  khachHang: danhSachTaiKhoan.filter((taiKhoan) => taiKhoan.role === 'customer').length,
 })
 
-export const layNhanPhamViTongQuan = (dayFilter, shiftFilter) => {
-  const dayLabel = CAC_BO_LOC_NGAY.find((item) => item.key === dayFilter)?.label || 'Toàn bộ ngày'
-  const shiftLabel = CAC_BO_LOC_CA.find((item) => item.key === shiftFilter)?.label || 'Mọi ca'
-  return `${dayLabel} · ${shiftLabel}`
+export const layNhanBoLocTongQuan = (boLocNgay, boLocCa) => {
+  const nhanNgay = CAC_BO_LOC_NGAY.find((muc) => muc.key === boLocNgay)?.label || 'Toàn bộ ngày'
+  const nhanCa = CAC_BO_LOC_CA.find((muc) => muc.key === boLocCa)?.label || 'Mọi ca'
+  return `${nhanNgay} · ${nhanCa}`
 }
 
-export const laDatBanDaHoanThanh = (booking) => booking.status === 'DA_HOAN_THANH'
-export const laDatBanSapDienRa = (booking, now) => {
-  const thoiDiemDatBan = phanTichNgayGioDatBan(booking.date, booking.time)
+export const laDatBanDaHoanThanh = (datBan) => datBan.status === 'DA_HOAN_THANH'
+export const laDatBanSapDienRa = (datBan, hienTai) => {
+  const thoiDiemDatBan = phanTichNgayGioDatBan(datBan.date, datBan.time)
   if (!thoiDiemDatBan) return false
 
-  const chenhLech = thoiDiemDatBan.getTime() - now.getTime()
+  const chenhLech = thoiDiemDatBan.getTime() - hienTai.getTime()
   return chenhLech >= 0 && chenhLech <= 2 * 60 * 60 * 1000
 }
 
-export const layDatBanChuaGanBan = (bookings) => bookings.filter((booking) => {
-  if (!CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(booking.status)) {
+export const layDatBanChuaGanBan = (danhSachDatBan) => danhSachDatBan.filter((datBan) => {
+  if (!CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(datBan.status)) {
     return false
   }
 
-  return !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
+  return !Array.isArray(datBan.assignedTableIds) || datBan.assignedTableIds.length === 0
 })
 
-export const layDoUuTienDatBan = (booking, now) => {
-  const thoiDiemDatBan = phanTichNgayGioDatBan(booking.date, booking.time)
-  const chenhLech = thoiDiemDatBan ? thoiDiemDatBan.getTime() - now.getTime() : Number.POSITIVE_INFINITY
-  const datBanDaGanBan = Array.isArray(booking.assignedTableIds) && booking.assignedTableIds.length > 0
+export const layDoUuTienDatBan = (datBan, hienTai) => {
+  const thoiDiemDatBan = phanTichNgayGioDatBan(datBan.date, datBan.time)
+  const chenhLech = thoiDiemDatBan ? thoiDiemDatBan.getTime() - hienTai.getTime() : Number.POSITIVE_INFINITY
+  const datBanDaDuocGan = Array.isArray(datBan.assignedTableIds) && datBan.assignedTableIds.length > 0
 
-  if (canXacNhanThuCong(booking)) return 0
-  if (!datBanDaGanBan && laTrangThaiDaXacNhan(booking.status)) return 1
+  if (canXacNhanThuCong(datBan)) return 0
+  if (!datBanDaDuocGan && laTrangThaiDaXacNhan(datBan.status)) return 1
   if (chenhLech >= 0 && chenhLech <= 2 * 60 * 60 * 1000) return 2
-  if (laDatBanDaCheckIn(booking)) return 3
-  if (laTrangThaiDaXacNhan(booking.status)) return 4
+  if (laDatBanDaCheckIn(datBan)) return 3
+  if (laTrangThaiDaXacNhan(datBan.status)) return 4
   return 5
 }
 
-export const sapXepDatBanChoVanHanh = (bookings, now) => [...bookings].sort((left, right) => {
-  const doUuTienTrai = layDoUuTienDatBan(left, now)
-  const doUuTienPhai = layDoUuTienDatBan(right, now)
+export const sapXepDatBanChoVanHanh = (danhSachDatBan, hienTai) => [...danhSachDatBan].sort((datBanTrai, datBanPhai) => {
+  const doUuTienTrai = layDoUuTienDatBan(datBanTrai, hienTai)
+  const doUuTienPhai = layDoUuTienDatBan(datBanPhai, hienTai)
 
   if (doUuTienTrai !== doUuTienPhai) {
     return doUuTienTrai - doUuTienPhai
   }
 
-  const thoiGianTrai = phanTichNgayGioDatBan(left.date, left.time)?.getTime() || Number.POSITIVE_INFINITY
-  const thoiGianPhai = phanTichNgayGioDatBan(right.date, right.time)?.getTime() || Number.POSITIVE_INFINITY
+  const thoiGianTrai = phanTichNgayGioDatBan(datBanTrai.date, datBanTrai.time)?.getTime() || Number.POSITIVE_INFINITY
+  const thoiGianPhai = phanTichNgayGioDatBan(datBanPhai.date, datBanPhai.time)?.getTime() || Number.POSITIVE_INFINITY
 
   if (thoiGianTrai !== thoiGianPhai) {
     return thoiGianTrai - thoiGianPhai
   }
 
-  return (Number(right.id) || 0) - (Number(left.id) || 0)
+  return (Number(datBanPhai.id) || 0) - (Number(datBanTrai.id) || 0)
 })
 
-export const sapXepDonHangChoVanHanh = (orders) => [...orders].sort((left, right) => {
-  const sacThaiTrai = laySacThaiDonHang(left.status)
-  const sacThaiPhai = laySacThaiDonHang(right.status)
+export const sapXepDonHangChoVanHanh = (danhSachDonHang) => [...danhSachDonHang].sort((donHangTrai, donHangPhai) => {
+  const sacThaiTrai = laySacThaiDonHang(donHangTrai.status)
+  const sacThaiPhai = laySacThaiDonHang(donHangPhai.status)
   const thuHangSacThai = { warning: 0, neutral: 1, success: 2, danger: 3 }
 
   if (thuHangSacThai[sacThaiTrai] !== thuHangSacThai[sacThaiPhai]) {
     return thuHangSacThai[sacThaiTrai] - thuHangSacThai[sacThaiPhai]
   }
 
-  return (Number(right.id) || 0) - (Number(left.id) || 0)
+  return (Number(donHangPhai.id) || 0) - (Number(donHangTrai.id) || 0)
 })

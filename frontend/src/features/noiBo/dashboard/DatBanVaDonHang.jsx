@@ -1,4 +1,5 @@
 import { Card, Col, Row, Table, Tabs, Tag, Typography } from 'antd'
+import DashboardEmptyState from './DashboardEmptyState'
 import { ClockCircleOutlined, EnvironmentOutlined, InboxOutlined, TableOutlined } from '@ant-design/icons'
 import { dinhDangSoKhach, layNhanChoNgoi, layNhanTrangThaiDatBan, laySacThaiTrangThaiDatBan, laySacThaiDonHang } from '../dinhDang'
 import { layNhanTrangThaiDonHang } from '../../../utils/donHang'
@@ -18,7 +19,14 @@ const MAU_NHAN_DON_HANG = {
   neutral: 'processing',
 }
 
+const taoEmptyState = (tieuDe, moTa) => (
+  <DashboardEmptyState table title={tieuDe} description={moTa} />
+)
+
 function DatBanVaDonHang({ bookings, orders }) {
+  const danhSachBooking = Array.isArray(bookings) ? bookings : []
+  const danhSachDonHang = Array.isArray(orders) ? orders : []
+
   const cotDatBan = [
     {
       title: 'Booking',
@@ -89,30 +97,38 @@ function DatBanVaDonHang({ bookings, orders }) {
 
   const bangDatBan = (
     <Table
+      className="noi-bo-dashboard-table"
       rowKey="id"
       size="small"
-      pagination={{ pageSize: 5, size: 'small' }}
+      pagination={danhSachBooking.length > 5 ? { pageSize: 5, size: 'small' } : false}
       columns={cotDatBan}
-      dataSource={bookings || []}
-      scroll={{ x: 720, y: 316 }}
+      dataSource={danhSachBooking}
+      scroll={danhSachBooking.length > 0 ? { x: 720, y: 300 } : { x: 720 }}
+      locale={{
+        emptyText: taoEmptyState('Không có booking ưu tiên', 'Các booking cần chú ý sẽ hiển thị tại đây.'),
+      }}
     />
   )
 
   const bangDonHang = (
     <Table
+      className="noi-bo-dashboard-table"
       rowKey="id"
       size="small"
-      pagination={{ pageSize: 5, size: 'small' }}
+      pagination={danhSachDonHang.length > 5 ? { pageSize: 5, size: 'small' } : false}
       columns={cotDonHang}
-      dataSource={orders || []}
-      scroll={{ x: 620, y: 316 }}
+      dataSource={danhSachDonHang}
+      scroll={danhSachDonHang.length > 0 ? { x: 620, y: 300 } : { x: 620 }}
+      locale={{
+        emptyText: taoEmptyState('Không có đơn đang xử lý', 'Các đơn mở cần theo dõi sẽ hiển thị tại đây.'),
+      }}
     />
   )
 
   return (
     <>
       <div className="noi-bo-dashboard-mobile-only">
-        <Card className="noi-bo-dashboard-card" styles={{ body: { padding: '10px 14px' } }}>
+        <Card className="noi-bo-dashboard-card" styles={{ body: { padding: '12px 14px' } }}>
           <Tabs
             items={[
               {
@@ -131,14 +147,14 @@ function DatBanVaDonHang({ bookings, orders }) {
       </div>
 
       <div className="noi-bo-dashboard-desktop-only">
-        <Row gutter={[16, 16]}>
+        <Row className="noi-bo-dashboard-secondary-grid" gutter={[16, 16]}>
           <Col xs={24} xxl={13}>
-            <Card className="noi-bo-dashboard-card" title="Booking ưu tiên" styles={{ body: { padding: '10px 14px' } }}>
+            <Card className="noi-bo-dashboard-card" title="Booking ưu tiên" styles={{ body: { padding: '12px 14px' } }}>
               {bangDatBan}
             </Card>
           </Col>
           <Col xs={24} xxl={11}>
-            <Card className="noi-bo-dashboard-card" title="Đơn đang xử lý" styles={{ body: { padding: '10px 14px' } }}>
+            <Card className="noi-bo-dashboard-card" title="Đơn đang xử lý" styles={{ body: { padding: '12px 14px' } }}>
               {bangDonHang}
             </Card>
           </Col>

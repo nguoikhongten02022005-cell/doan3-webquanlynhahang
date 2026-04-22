@@ -1,6 +1,6 @@
 import { useOutletContext } from 'react-router-dom'
 import BanAnTab from '../../features/noiBo/components/BanAnTab'
-import { layNhanPhamViTongQuan } from '../../features/noiBo/boChon'
+import { layNhanBoLocTongQuan } from '../../features/noiBo/boChon'
 
 function NoiBoSoDoBanPage() {
   const {
@@ -15,7 +15,7 @@ function NoiBoSoDoBanPage() {
     danhSachDonHangDaSapXep,
   } = useOutletContext()
 
-  const phamViLabel = layNhanPhamViTongQuan('all', 'all')
+  const phamViLabel = layNhanBoLocTongQuan('all', 'all')
 
   return (
     <div className="noi-bo-page-stack">

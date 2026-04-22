@@ -6,13 +6,13 @@ function SectionDanhSachMonDongBo({
   danhSachMon,
   xuLyMoChiTiet,
   thamChieuMuc,
-  thuocTinhDuLieu,
+  maDanhMuc,
 }) {
   return (
     <section
       ref={thamChieuMuc}
       className="thuc-don-category-section"
-      data-category={thuocTinhDuLieu}
+      data-category={maDanhMuc}
     >
       <div className="thuc-don-results-head thuc-don-results-head--minimal thuc-don-results-head--section">
         <div>

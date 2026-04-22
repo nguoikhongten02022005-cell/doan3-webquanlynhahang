@@ -73,7 +73,7 @@ export const xoaBanNhapTamDatBan = (khoaLuuTru) => {
   xoaMucLuuTru(khoaLuuTru)
 }
 
-export const taoAnhChupBanNhapTamDatBan = (duLieuForm) => ({
+export const taoDuLieuBanNhapTamDatBan = (duLieuForm) => ({
   guests: duLieuForm?.guests,
   date: duLieuForm?.date,
   time: duLieuForm?.time,

@@ -119,7 +119,7 @@ function TrangChuPage() {
             nhanMuc="Món được chọn nhiều"
             danhSachMon={danhSachMonDacTrung}
             xuLyMoChiTiet={moChiTietMon}
-            thuocTinhDuLieu="mon-noi-bat"
+            maDanhMuc="mon-noi-bat"
           />
 
           <div className="noi-bat-section-action-wrap">

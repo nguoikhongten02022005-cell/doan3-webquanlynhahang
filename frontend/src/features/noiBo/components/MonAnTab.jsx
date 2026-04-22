@@ -1,18 +1,18 @@
 import { useMemo, useState } from 'react'
-import { DeleteOutlined, EditOutlined, EyeInvisibleOutlined, EyeOutlined, PictureOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
-import { Alert, Badge, Button, Card, Col, Drawer, Empty, Form, Input, Row, Segmented, Select, Space, Switch, Tag, Typography, Upload } from 'antd'
+import { EditOutlined, EyeInvisibleOutlined, EyeOutlined, PictureOutlined, PlusOutlined, SearchOutlined } from '@ant-design/icons'
+import { Alert, Button, Card, Col, Drawer, Empty, Form, Input, Row, Segmented, Select, Space, Switch, Tag, Typography, Upload } from 'antd'
 import { CAC_DANH_MUC_CHUAN_THUC_DON, DANH_MUC_MAC_DINH_THUC_DON } from '../../thucDon/constants/danhMucThucDon'
-import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON, ANH_DU_PHONG_THUC_DON } from '../../thucDon/constants/tuyChonThucDon'
+import { NHAN_MAC_DINH_THUC_DON, SAC_DO_MAC_DINH_THUC_DON } from '../../thucDon/constants/tuyChonThucDon'
 import { taoMonApi, xoaMonApi, capNhatMonApi, uploadAnhMonApi } from '../../../services/api/apiThucDon'
 import { anhXaFormMonThanhDuLieuGuiDi, anhXaMonThanhGiaTriForm, chuanHoaDanhMucThucDon } from '../../../services/mappers/anhXaThucDon'
 import { phanTichGiaThanhSo } from '../../../utils/giaTien'
 
 const { Search, TextArea } = Input
-const { Title, Paragraph, Text } = Typography
+const { Title, Paragraph } = Typography
 
-const TAG_OPTIONS = ['Best Seller', 'Món mới', 'Cay', 'Chef Choice', 'Combo', 'Signature']
-const CATEGORY_OPTIONS = CAC_DANH_MUC_CHUAN_THUC_DON
-const CATEGORY_FILTERS = ['Tất cả', ...CATEGORY_OPTIONS]
+const TUY_CHON_NHAN = ['Best Seller', 'Món mới', 'Cay', 'Chef Choice', 'Combo', 'Signature']
+const TUY_CHON_DANH_MUC = CAC_DANH_MUC_CHUAN_THUC_DON
+const BO_LOC_DANH_MUC = ['Tất cả', ...TUY_CHON_DANH_MUC]
 
 function taoFormMacDinh() {
   return {
@@ -32,14 +32,14 @@ function chuanHoaChuoiTimKiem(value) {
   return String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim()
 }
 
-function dinhDangGiaMon(dish) {
-  if (dish.price) return dish.price
-  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(dish.priceValue) || 0)
+function dinhDangGiaMon(mon) {
+  if (mon.price) return mon.price
+  return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(mon.priceValue) || 0)
 }
 
-function taoUploadFileList(imageUrl) {
-  if (!imageUrl) return []
-  return [{ uid: 'dish-image', name: 'dish-image.png', status: 'done', url: imageUrl }]
+function taoDanhSachTapTinTaiLen(urlAnh) {
+  if (!urlAnh) return []
+  return [{ uid: 'dish-image', name: 'dish-image.png', status: 'done', url: urlAnh }]
 }
 
 function taoTagsMacDinh(mon) {
@@ -49,71 +49,71 @@ function taoTagsMacDinh(mon) {
 }
 
 function suyRaTrangThaiHienThi(mon) {
-  const rawValue = String(mon?.status ?? mon?.availability ?? mon?.visibilityStatus ?? '').trim().toLowerCase()
-  return !['hidden', 'inactive', 'soldout', 'out_of_stock', 'tam_an', 'het_hang'].includes(rawValue)
+  const giaTriTho = String(mon?.status ?? mon?.availability ?? mon?.visibilityStatus ?? '').trim().toLowerCase()
+  return !['hidden', 'inactive', 'soldout', 'out_of_stock', 'tam_an', 'het_hang'].includes(giaTriTho)
 }
 
-function layMetaMon(mon, dishMetaById) {
-  const override = dishMetaById[mon.id] || {}
+function layTuyChinhMon(mon, tuyChinhMonTheoId) {
+  const tuyChinhDaLuu = tuyChinhMonTheoId[mon.id] || {}
   return {
-    isVisible: typeof override.isVisible === 'boolean' ? override.isVisible : suyRaTrangThaiHienThi(mon),
-    tags: Array.isArray(override.tags) ? override.tags : taoTagsMacDinh(mon),
+    isVisible: typeof tuyChinhDaLuu.isVisible === 'boolean' ? tuyChinhDaLuu.isVisible : suyRaTrangThaiHienThi(mon),
+    tags: Array.isArray(tuyChinhDaLuu.tags) ? tuyChinhDaLuu.tags : taoTagsMacDinh(mon),
   }
 }
 
-function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
-  const [drawerOpen, setDrawerOpen] = useState(false)
-  const [cheDoForm, setCheDoForm] = useState('create')
-  const [idMonDangSua, setIdMonDangSua] = useState(null)
-  const [formValues, setFormValues] = useState(taoFormMacDinh)
-  const [loiForm, setLoiForm] = useState('')
-  const [danhMucDangLoc, setDanhMucDangLoc] = useState('Tất cả')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [uploadFileList, setUploadFileList] = useState([])
-  const [dangUploadAnh, setDangUploadAnh] = useState(false)
-  const [dishMetaById, setDishMetaById] = useState({})
+function MonAnTab({ dishes: danhSachMonNguon, reloadDishes: taiLaiDanhSachMon, cheDoChiXem = false }) {
+  const [nganKeoDangMo, datNganKeoDangMo] = useState(false)
+  const [cheDoBieuMau, datCheDoBieuMau] = useState('create')
+  const [idMonDangSua, datIdMonDangSua] = useState(null)
+  const [giaTriBieuMau, datGiaTriBieuMau] = useState(taoFormMacDinh)
+  const [loiBieuMau, datLoiBieuMau] = useState('')
+  const [danhMucDangLoc, datDanhMucDangLoc] = useState('Tất cả')
+  const [tuKhoaTimKiem, datTuKhoaTimKiem] = useState('')
+  const [danhSachTapTinTaiLen, datDanhSachTapTinTaiLen] = useState([])
+  const [dangTaiLenAnh, datDangTaiLenAnh] = useState(false)
+  const [tuyChinhMonTheoId, datTuyChinhMonTheoId] = useState({})
 
-  const sortedDishes = useMemo(() => [...dishes].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0)), [dishes])
+  const danhSachMonSapXep = useMemo(() => [...danhSachMonNguon].sort((monA, monB) => (Number(monB.id) || 0) - (Number(monA.id) || 0)), [danhSachMonNguon])
 
-  const filteredDishes = useMemo(() => {
-    const normalizedQuery = chuanHoaChuoiTimKiem(searchQuery)
-    return sortedDishes.filter((dish) => {
-      if (danhMucDangLoc !== 'Tất cả' && chuanHoaDanhMucThucDon(dish.category) !== danhMucDangLoc) return false
-      if (!normalizedQuery) return true
-      return chuanHoaChuoiTimKiem(dish.name).includes(normalizedQuery)
+  const danhSachMonDaLoc = useMemo(() => {
+    const tuKhoaDaChuanHoa = chuanHoaChuoiTimKiem(tuKhoaTimKiem)
+    return danhSachMonSapXep.filter((mon) => {
+      if (danhMucDangLoc !== 'Tất cả' && chuanHoaDanhMucThucDon(mon.category) !== danhMucDangLoc) return false
+      if (!tuKhoaDaChuanHoa) return true
+      return chuanHoaChuoiTimKiem(mon.name).includes(tuKhoaDaChuanHoa)
     })
-  }, [danhMucDangLoc, searchQuery, sortedDishes])
+  }, [danhMucDangLoc, tuKhoaTimKiem, danhSachMonSapXep])
 
-  const resetForm = () => {
-    setCheDoForm('create')
-    setIdMonDangSua(null)
-    setFormValues(taoFormMacDinh())
-    setUploadFileList([])
-    setLoiForm('')
-    setDrawerOpen(false)
+  const datLaiBieuMau = () => {
+    datCheDoBieuMau('create')
+    datIdMonDangSua(null)
+    datGiaTriBieuMau(taoFormMacDinh())
+    datDanhSachTapTinTaiLen([])
+    datLoiBieuMau('')
+    datNganKeoDangMo(false)
   }
 
-  const moDrawerTaoMoi = () => {
+  const moNganKeoTaoMoi = () => {
     if (cheDoChiXem) return
 
-    setCheDoForm('create')
-    setIdMonDangSua(null)
-    setFormValues(taoFormMacDinh())
-    setUploadFileList([])
-    setLoiForm('')
-    setDrawerOpen(true)
+    datCheDoBieuMau('create')
+    datIdMonDangSua(null)
+    datGiaTriBieuMau(taoFormMacDinh())
+    datDanhSachTapTinTaiLen([])
+    datLoiBieuMau('')
+    datNganKeoDangMo(true)
   }
 
-  const handleInputChange = (field) => (event) => setFormValues((cur) => ({ ...cur, [field]: event.target.value }))
-  const handleSelectChange = (field) => (value) => setFormValues((cur) => ({ ...cur, [field]: value }))
-  const handleSwitchChange = (checked) => setFormValues((cur) => ({ ...cur, isVisible: checked }))
+  const xuLyDoiTruongNhap = (truong) => (event) => datGiaTriBieuMau((giaTriHienTai) => ({ ...giaTriHienTai, [truong]: event.target.value }))
+  const xuLyDoiLuaChon = (truong) => (giaTri) => datGiaTriBieuMau((giaTriHienTai) => ({ ...giaTriHienTai, [truong]: giaTri }))
+  const xuLyDoiCongTac = (duocBat) => datGiaTriBieuMau((giaTriHienTai) => ({ ...giaTriHienTai, isVisible: duocBat }))
 
-  const xuLyTaiAnhMon = async (tapTin) => {
+  const xuLyTaiLenAnhMon = async (tapTin) => {
     if (!tapTin) return false
 
     try {
-      setDangUploadAnh(true)
-      setLoiForm('')
+      datDangTaiLenAnh(true)
+      datLoiBieuMau('')
       const { duLieu } = await uploadAnhMonApi(tapTin)
       const urlAnh = String(duLieu?.url || '').trim()
 
@@ -122,124 +122,124 @@ function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
       }
 
       const danhSachTapTinMoi = [{ uid: `dish-image-${Date.now()}`, name: tapTin.name || 'dish-image.png', status: 'done', url: urlAnh, thumbUrl: urlAnh }]
-      setUploadFileList(danhSachTapTinMoi)
-      setFormValues((cur) => ({ ...cur, image: urlAnh }))
+      datDanhSachTapTinTaiLen(danhSachTapTinMoi)
+      datGiaTriBieuMau((giaTriHienTai) => ({ ...giaTriHienTai, image: urlAnh }))
     } catch (error) {
-      setLoiForm(error?.message || 'Không thể tải ảnh món lên máy chủ.')
+      datLoiBieuMau(error?.message || 'Không thể tải ảnh món lên máy chủ.')
     } finally {
-      setDangUploadAnh(false)
+      datDangTaiLenAnh(false)
     }
 
     return false
   }
 
-  const handleRemoveUpload = () => {
-    setUploadFileList([])
-    setFormValues((cur) => ({ ...cur, image: '' }))
+  const xuLyXoaAnhDaTai = () => {
+    datDanhSachTapTinTaiLen([])
+    datGiaTriBieuMau((giaTriHienTai) => ({ ...giaTriHienTai, image: '' }))
   }
 
-  const customUploadTrigger = uploadFileList.length >= 1
-    ? <Button type="default" loading={dangUploadAnh}>Đổi ảnh</Button>
-    : <div><PictureOutlined /><div style={{ marginTop: 8 }}>{dangUploadAnh ? 'Đang tải...' : 'Tải ảnh lên'}</div></div>
+  const nutTaiAnh = danhSachTapTinTaiLen.length >= 1
+    ? <Button type="default" loading={dangTaiLenAnh}>Đổi ảnh</Button>
+    : <div><PictureOutlined /><div style={{ marginTop: 8 }}>{dangTaiLenAnh ? 'Đang tải...' : 'Tải ảnh lên'}</div></div>
 
-  const customUploadHint = uploadFileList.length >= 1
+  const goiYTaiAnh = danhSachTapTinTaiLen.length >= 1
     ? 'Bấm "Đổi ảnh" để chọn ảnh mới cho món này.'
     : 'Ảnh được upload lên máy chủ và lưu URL ảnh qua API món ăn.'
 
-  const validateForm = () => {
-    if (!formValues.name.trim()) return 'Vui lòng nhập tên món.'
-    if (!formValues.description.trim()) return 'Vui lòng nhập mô tả món.'
-    if (!formValues.price.trim()) return 'Vui lòng nhập giá món.'
-    if (!CATEGORY_OPTIONS.includes(chuanHoaDanhMucThucDon(formValues.category))) return 'Danh mục món ăn không hợp lệ.'
-    if (phanTichGiaThanhSo(formValues.price) <= 0) return 'Giá món phải là số dương hợp lệ.'
+  const kiemTraBieuMau = () => {
+    if (!giaTriBieuMau.name.trim()) return 'Vui lòng nhập tên món.'
+    if (!giaTriBieuMau.description.trim()) return 'Vui lòng nhập mô tả món.'
+    if (!giaTriBieuMau.price.trim()) return 'Vui lòng nhập giá món.'
+    if (!TUY_CHON_DANH_MUC.includes(chuanHoaDanhMucThucDon(giaTriBieuMau.category))) return 'Danh mục món ăn không hợp lệ.'
+    if (phanTichGiaThanhSo(giaTriBieuMau.price) <= 0) return 'Giá món phải là số dương hợp lệ.'
     return ''
   }
 
-  const handleSubmit = async (event) => {
+  const xuLyGuiBieuMau = async (event) => {
     event.preventDefault()
 
     if (cheDoChiXem) {
-      setLoiForm('Bạn không có quyền cập nhật thực đơn.')
+      datLoiBieuMau('Bạn không có quyền cập nhật thực đơn.')
       return
     }
 
-    const nextError = validateForm()
-    if (nextError) {
-      setLoiForm(nextError)
+    const loiKeTiep = kiemTraBieuMau()
+    if (loiKeTiep) {
+      datLoiBieuMau(loiKeTiep)
       return
     }
 
-    const duLieuGuiDi = anhXaFormMonThanhDuLieuGuiDi({ ...formValues, badge: formValues.tags[0] || formValues.badge })
+    const duLieuGuiDi = anhXaFormMonThanhDuLieuGuiDi({ ...giaTriBieuMau, badge: giaTriBieuMau.tags[0] || giaTriBieuMau.badge })
 
     try {
-      const { duLieu: savedDish } = cheDoForm === 'edit' ? await capNhatMonApi(idMonDangSua, duLieuGuiDi) : await taoMonApi(duLieuGuiDi)
-      if (!savedDish) {
-        setLoiForm('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')
+      const { duLieu: monDaLuu } = cheDoBieuMau === 'edit' ? await capNhatMonApi(idMonDangSua, duLieuGuiDi) : await taoMonApi(duLieuGuiDi)
+      if (!monDaLuu) {
+        datLoiBieuMau('Không thể lưu món ăn. Vui lòng kiểm tra lại dữ liệu.')
         return
       }
 
-      const nextDishId = cheDoForm === 'edit' ? idMonDangSua : savedDish.id
-      if (nextDishId !== undefined && nextDishId !== null) {
-        setDishMetaById((currentMeta) => ({
-          ...currentMeta,
-          [nextDishId]: { ...(currentMeta[nextDishId] || {}), isVisible: formValues.isVisible, tags: formValues.tags },
+      const idMonKeTiep = cheDoBieuMau === 'edit' ? idMonDangSua : monDaLuu.id
+      if (idMonKeTiep !== undefined && idMonKeTiep !== null) {
+        datTuyChinhMonTheoId((tuyChinhHienTai) => ({
+          ...tuyChinhHienTai,
+          [idMonKeTiep]: { ...(tuyChinhHienTai[idMonKeTiep] || {}), isVisible: giaTriBieuMau.isVisible, tags: giaTriBieuMau.tags },
         }))
       }
 
-      await reloadDishes?.()
-      resetForm()
+      await taiLaiDanhSachMon?.()
+      datLaiBieuMau()
     } catch (error) {
-      setLoiForm(error?.message || 'Không thể lưu món ăn. Vui lòng thử lại.')
+      datLoiBieuMau(error?.message || 'Không thể lưu món ăn. Vui lòng thử lại.')
     }
   }
 
-  const handleEditDish = (dish) => {
+  const xuLySuaMon = (mon) => {
     if (cheDoChiXem) return
 
-    const nextMeta = layMetaMon(dish, dishMetaById)
-    const nextFormValues = { ...anhXaMonThanhGiaTriForm(dish), isVisible: nextMeta.isVisible, tags: nextMeta.tags }
-    setCheDoForm('edit')
-    setIdMonDangSua(dish.id)
-    setFormValues(nextFormValues)
-    setUploadFileList(taoUploadFileList(nextFormValues.image))
-    setLoiForm('')
-    setDrawerOpen(true)
+    const tuyChinhKeTiep = layTuyChinhMon(mon, tuyChinhMonTheoId)
+    const giaTriBieuMauKeTiep = { ...anhXaMonThanhGiaTriForm(mon), isVisible: tuyChinhKeTiep.isVisible, tags: tuyChinhKeTiep.tags }
+    datCheDoBieuMau('edit')
+    datIdMonDangSua(mon.id)
+    datGiaTriBieuMau(giaTriBieuMauKeTiep)
+    datDanhSachTapTinTaiLen(taoDanhSachTapTinTaiLen(giaTriBieuMauKeTiep.image))
+    datLoiBieuMau('')
+    datNganKeoDangMo(true)
   }
 
-  const handleToggleVisibility = (dish) => {
+  const xuLyBatTatHienThi = (mon) => {
     if (cheDoChiXem) return
 
-    const currentMeta = layMetaMon(dish, dishMetaById)
-    const nextVisible = !currentMeta.isVisible
-    setDishMetaById((currentMetaById) => ({
-      ...currentMetaById,
-      [dish.id]: { ...(currentMetaById[dish.id] || {}), isVisible: nextVisible, tags: currentMeta.tags },
+    const tuyChinhHienTai = layTuyChinhMon(mon, tuyChinhMonTheoId)
+    const hienThiKeTiep = !tuyChinhHienTai.isVisible
+    datTuyChinhMonTheoId((tuyChinhHienTaiTheoId) => ({
+      ...tuyChinhHienTaiTheoId,
+      [mon.id]: { ...(tuyChinhHienTaiTheoId[mon.id] || {}), isVisible: hienThiKeTiep, tags: tuyChinhHienTai.tags },
     }))
-    if (idMonDangSua === dish.id) {
-      setFormValues((currentValues) => ({ ...currentValues, isVisible: nextVisible }))
+    if (idMonDangSua === mon.id) {
+      datGiaTriBieuMau((giaTriHienTai) => ({ ...giaTriHienTai, isVisible: hienThiKeTiep }))
     }
   }
 
-  const handleDeleteDish = async () => {
+  const xuLyXoaMon = async () => {
     if (cheDoChiXem || !idMonDangSua) return
-    const currentDish = dishes.find((dish) => dish.id === idMonDangSua)
-    if (!window.confirm(`Xóa món "${currentDish?.name || 'này'}" khỏi menu?`)) return
+    const monHienTai = danhSachMonNguon.find((mon) => mon.id === idMonDangSua)
+    if (!window.confirm(`Xóa món "${monHienTai?.name || 'này'}" khỏi menu?`)) return
 
     try {
-      const { duLieu: deletedDish } = await xoaMonApi(idMonDangSua)
-      if (deletedDish === undefined) {
-        setLoiForm('Không thể xóa món ăn. Vui lòng thử lại.')
+      const { duLieu: monDaXoa } = await xoaMonApi(idMonDangSua)
+      if (monDaXoa === undefined) {
+        datLoiBieuMau('Không thể xóa món ăn. Vui lòng thử lại.')
         return
       }
-      setDishMetaById((currentMeta) => {
-        const nextMeta = { ...currentMeta }
-        delete nextMeta[idMonDangSua]
-        return nextMeta
+      datTuyChinhMonTheoId((tuyChinhHienTai) => {
+        const tuyChinhKeTiep = { ...tuyChinhHienTai }
+        delete tuyChinhKeTiep[idMonDangSua]
+        return tuyChinhKeTiep
       })
-      await reloadDishes?.()
-      resetForm()
+      await taiLaiDanhSachMon?.()
+      datLaiBieuMau()
     } catch (error) {
-      setLoiForm(error?.message || 'Không thể xóa món ăn. Vui lòng thử lại.')
+      datLoiBieuMau(error?.message || 'Không thể xóa món ăn. Vui lòng thử lại.')
     }
   }
 
@@ -254,46 +254,46 @@ function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
           <Col xs={24} xl={16}>
             <Space orientation="vertical" size={12} style={{ width: '100%' }}>
               <Space wrap style={{ width: '100%', justifyContent: 'flex-end' }}>
-                <Search allowClear placeholder="Tìm tên món..." value={searchQuery} onChange={(event) => setSearchQuery(event.target.value)} enterButton={<SearchOutlined />} style={{ width: 280 }} />
-                {!cheDoChiXem ? <Button type="primary" icon={<PlusOutlined />} onClick={moDrawerTaoMoi}>Thêm món mới</Button> : null}
+                <Search allowClear placeholder="Tìm tên món..." value={tuKhoaTimKiem} onChange={(event) => datTuKhoaTimKiem(event.target.value)} enterButton={<SearchOutlined />} style={{ width: 280 }} />
+                {!cheDoChiXem ? <Button type="primary" icon={<PlusOutlined />} onClick={moNganKeoTaoMoi}>Thêm món mới</Button> : null}
               </Space>
-              <Segmented options={CATEGORY_FILTERS} value={danhMucDangLoc} onChange={setDanhMucDangLoc} block />
+              <Segmented options={BO_LOC_DANH_MUC} value={danhMucDangLoc} onChange={datDanhMucDangLoc} block />
             </Space>
           </Col>
         </Row>
       </Card>
 
-      <Card title={<span>Hiển thị <strong>{filteredDishes.length}</strong> / {dishes.length} món</span>}>
-        {filteredDishes.length === 0 ? (
+      <Card title={<span>Hiển thị <strong>{danhSachMonDaLoc.length}</strong> / {danhSachMonNguon.length} món</span>}>
+        {danhSachMonDaLoc.length === 0 ? (
           <Empty description="Chưa có món ăn phù hợp với bộ lọc hiện tại." />
         ) : (
           <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-4">
-            {filteredDishes.map((dish) => {
-              const meta = layMetaMon(dish, dishMetaById)
+            {danhSachMonDaLoc.map((mon) => {
+              const tuyChinhMon = layTuyChinhMon(mon, tuyChinhMonTheoId)
               return (
                 <Card
-                  key={dish.id}
+                  key={mon.id}
                   hoverable
-                  cover={dish.image ? <img alt={dish.name} src={dish.image} style={{ aspectRatio: '1 / 1', objectFit: 'cover' }} /> : <div style={{ aspectRatio: '1 / 1', display: 'grid', placeItems: 'center', background: '#f1f5f9' }}><PictureOutlined style={{ fontSize: 32, color: '#94a3b8' }} /></div>}
+                  cover={mon.image ? <img alt={mon.name} src={mon.image} style={{ aspectRatio: '1 / 1', objectFit: 'cover' }} /> : <div style={{ aspectRatio: '1 / 1', display: 'grid', placeItems: 'center', background: '#f1f5f9' }}><PictureOutlined style={{ fontSize: 32, color: '#94a3b8' }} /></div>}
                   actions={cheDoChiXem ? undefined : [
-                    <Button key={`sua-${dish.id}`} type="link" icon={<EditOutlined />} onClick={() => handleEditDish(dish)}>Sửa</Button>,
-                    <Button key={`an-hien-${dish.id}`} type="link" icon={meta.isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />} onClick={() => handleToggleVisibility(dish)}>{meta.isVisible ? 'Ẩn' : 'Hiện'}</Button>,
+                    <Button key={`sua-${mon.id}`} type="link" icon={<EditOutlined />} onClick={() => xuLySuaMon(mon)}>Sửa</Button>,
+                    <Button key={`an-hien-${mon.id}`} type="link" icon={tuyChinhMon.isVisible ? <EyeInvisibleOutlined /> : <EyeOutlined />} onClick={() => xuLyBatTatHienThi(mon)}>{tuyChinhMon.isVisible ? 'Ẩn' : 'Hiện'}</Button>,
                   ]}
                 >
                   <Space orientation="vertical" size={10} style={{ width: '100%' }}>
                     <Space wrap>
-                      <Tag color={meta.isVisible ? 'green' : 'red'}>{meta.isVisible ? 'Đang bán' : 'Tạm ẩn'}</Tag>
-                      {dish.badge ? <Tag color="gold">{dish.badge}</Tag> : null}
+                      <Tag color={tuyChinhMon.isVisible ? 'green' : 'red'}>{tuyChinhMon.isVisible ? 'Đang bán' : 'Tạm ẩn'}</Tag>
+                      {mon.badge ? <Tag color="gold">{mon.badge}</Tag> : null}
                     </Space>
-                    <Typography.Text type="secondary">{dish.category || 'Chưa phân loại'}</Typography.Text>
-                    <Typography.Title level={5} style={{ margin: 0 }}>{dish.name}</Typography.Title>
+                    <Typography.Text type="secondary">{mon.category || 'Chưa phân loại'}</Typography.Text>
+                    <Typography.Title level={5} style={{ margin: 0 }}>{mon.name}</Typography.Title>
                     <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                      <Typography.Text strong style={{ color: '#ea580c', fontSize: 18 }}>{dinhDangGiaMon(dish)}</Typography.Text>
-                      <Typography.Text type="secondary">#{dish.id}</Typography.Text>
+                      <Typography.Text strong style={{ color: '#ea580c', fontSize: 18 }}>{dinhDangGiaMon(mon)}</Typography.Text>
+                      <Typography.Text type="secondary">#{mon.id}</Typography.Text>
                     </Space>
                     <Space wrap>
-                      {meta.tags.slice(0, 2).map((tag) => <Tag key={`${dish.id}-${tag}`}>{tag}</Tag>)}
-                      {meta.tags.length > 2 ? <Tag>+{meta.tags.length - 2}</Tag> : null}
+                      {tuyChinhMon.tags.slice(0, 2).map((tag) => <Tag key={`${mon.id}-${tag}`}>{tag}</Tag>)}
+                      {tuyChinhMon.tags.length > 2 ? <Tag>+{tuyChinhMon.tags.length - 2}</Tag> : null}
                     </Space>
                   </Space>
                 </Card>
@@ -304,37 +304,37 @@ function MonAnTab({ dishes, reloadDishes, cheDoChiXem = false }) {
       </Card>
 
       <Drawer
-        title={cheDoForm === 'edit' ? `Cập nhật món #${idMonDangSua}` : 'Thêm món ăn mới'}
+        title={cheDoBieuMau === 'edit' ? `Cập nhật món #${idMonDangSua}` : 'Thêm món ăn mới'}
         placement="right"
         size={520}
-        open={drawerOpen && !cheDoChiXem}
-        onClose={resetForm}
-        footer={<Space style={{ width: '100%', justifyContent: 'space-between' }}>{cheDoForm === 'edit' ? <Button danger onClick={handleDeleteDish}>Xóa món</Button> : <span />}{<Space><Button onClick={resetForm}>Hủy</Button><Button form="mon-an-form" htmlType="submit" type="primary">{cheDoForm === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}</Button></Space>}</Space>}
+        open={nganKeoDangMo && !cheDoChiXem}
+        onClose={datLaiBieuMau}
+        footer={<Space style={{ width: '100%', justifyContent: 'space-between' }}>{cheDoBieuMau === 'edit' ? <Button danger onClick={xuLyXoaMon}>Xóa món</Button> : <span />}{<Space><Button onClick={datLaiBieuMau}>Hủy</Button><Button form="mon-an-form" htmlType="submit" type="primary">{cheDoBieuMau === 'edit' ? 'Lưu cập nhật' : 'Thêm món'}</Button></Space>}</Space>}
       >
-        <Form id="mon-an-form" layout="vertical" onSubmitCapture={handleSubmit}>
-          {loiForm ? <Alert type="error" showIcon title={loiForm} style={{ marginBottom: 16 }} /> : null}
+        <Form id="mon-an-form" layout="vertical" onSubmitCapture={xuLyGuiBieuMau}>
+          {loiBieuMau ? <Alert type="error" showIcon title={loiBieuMau} style={{ marginBottom: 16 }} /> : null}
           <Form.Item label="Ảnh món">
             <Upload
               accept="image/*"
               listType="picture-card"
               maxCount={1}
-              beforeUpload={xuLyTaiAnhMon}
-              fileList={uploadFileList}
-              onRemove={handleRemoveUpload}
-              disabled={dangUploadAnh}
+              beforeUpload={xuLyTaiLenAnhMon}
+              fileList={danhSachTapTinTaiLen}
+              onRemove={xuLyXoaAnhDaTai}
+              disabled={dangTaiLenAnh}
             >
-              {customUploadTrigger}
+              {nutTaiAnh}
             </Upload>
-            <Typography.Text type="secondary">{customUploadHint}</Typography.Text>
+            <Typography.Text type="secondary">{goiYTaiAnh}</Typography.Text>
           </Form.Item>
-          <Form.Item label="Tên món"><Input value={formValues.name} onChange={handleInputChange('name')} /></Form.Item>
-          <Form.Item label="Mô tả"><TextArea rows={4} value={formValues.description} onChange={handleInputChange('description')} /></Form.Item>
+          <Form.Item label="Tên món"><Input value={giaTriBieuMau.name} onChange={xuLyDoiTruongNhap('name')} /></Form.Item>
+          <Form.Item label="Mô tả"><TextArea rows={4} value={giaTriBieuMau.description} onChange={xuLyDoiTruongNhap('description')} /></Form.Item>
           <Row gutter={12}>
-            <Col span={12}><Form.Item label="Giá"><Input value={formValues.price} onChange={handleInputChange('price')} /></Form.Item></Col>
-            <Col span={12}><Form.Item label="Danh mục"><Select value={formValues.category} options={CATEGORY_OPTIONS.map((category) => ({ value: category, label: category }))} onChange={handleSelectChange('category')} /></Form.Item></Col>
+            <Col span={12}><Form.Item label="Giá"><Input value={giaTriBieuMau.price} onChange={xuLyDoiTruongNhap('price')} /></Form.Item></Col>
+            <Col span={12}><Form.Item label="Danh mục"><Select value={giaTriBieuMau.category} options={TUY_CHON_DANH_MUC.map((danhMuc) => ({ value: danhMuc, label: danhMuc }))} onChange={xuLyDoiLuaChon('category')} /></Form.Item></Col>
           </Row>
-          <Form.Item label="Trạng thái hiển thị"><Switch checked={formValues.isVisible} onChange={handleSwitchChange} checkedChildren="Bật" unCheckedChildren="Ẩn" /></Form.Item>
-          <Form.Item label="Tags"><Select mode="tags" value={formValues.tags} options={TAG_OPTIONS.map((tag) => ({ value: tag, label: tag }))} onChange={handleSelectChange('tags')} tokenSeparators={[',']} /></Form.Item>
+          <Form.Item label="Trạng thái hiển thị"><Switch checked={giaTriBieuMau.isVisible} onChange={xuLyDoiCongTac} checkedChildren="Bật" unCheckedChildren="Ẩn" /></Form.Item>
+          <Form.Item label="Tags"><Select mode="tags" value={giaTriBieuMau.tags} options={TUY_CHON_NHAN.map((tag) => ({ value: tag, label: tag }))} onChange={xuLyDoiLuaChon('tags')} tokenSeparators={[',']} /></Form.Item>
         </Form>
       </Drawer>
     </Space>

@@ -227,7 +227,7 @@ function ThucDonPage() {
                   thamChieuMuc={(phanTu) => {
                     danhMucRefs.current[section.category] = phanTu
                   }}
-                  thuocTinhDuLieu={section.category}
+                  maDanhMuc={section.category}
                 />
               ))}
             </div>

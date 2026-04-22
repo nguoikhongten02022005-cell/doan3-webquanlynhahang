@@ -5,18 +5,18 @@ export const dinhDangNgay = (giaTri) => {
   if (!giaTri) return '--'
 
   const chuoiGiaTri = String(giaTri).trim()
-  const ketQuaNgay = chuoiGiaTri.match(/^(\d{4})-(\d{2})-(\d{2})/)
-  if (ketQuaNgay) {
-    const [, nam, thang, ngay] = ketQuaNgay
+  const khopNamThangNgay = chuoiGiaTri.match(/^(\d{4})-(\d{2})-(\d{2})/)
+  if (khopNamThangNgay) {
+    const [, nam, thang, ngay] = khopNamThangNgay
     return `${ngay}/${thang}/${nam}`
   }
 
-  const ngay = new Date(chuoiGiaTri)
-  if (Number.isNaN(ngay.getTime())) {
+  const doiTuongNgay = new Date(chuoiGiaTri)
+  if (Number.isNaN(doiTuongNgay.getTime())) {
     return '--'
   }
 
-  return ngay.toLocaleDateString('vi-VN')
+  return doiTuongNgay.toLocaleDateString('vi-VN')
 }
 
 export const dinhDangNgayGio = (ngay, gio) => {
@@ -59,7 +59,7 @@ export const layNhanTrangThaiDatBan = (trangThai) => {
 
 export const laySacThaiDonHang = (trangThai) => laySacThaiDonHangChuan(trangThai)
 
-export const layNhanKenhXacNhan = (kenh) => {
-  if (Array.isArray(kenh) && kenh.length > 0) return kenh.join(' / ')
+export const layNhanKenhXacNhan = (danhSachKenh) => {
+  if (Array.isArray(danhSachKenh) && danhSachKenh.length > 0) return danhSachKenh.join(' / ')
   return 'SMS'
 }

@@ -526,3 +526,268 @@ INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, So
 UPDATE NguoiDung
 SET MatKhau = '$2b$10$xSUYzc6LpQ0g/8eC1AZH3OpBGSWp4qZQNfJZfA.0e9WsHKQeBdcbi'
 WHERE LOWER(Email) = LOWER('khach1@gmail.com');
+
+-- ============================================================
+-- MO RONG DU LIEU MAU DE KIEM TRA END-TO-END VOI BACKEND THAT
+-- Cac tai khoan noi bo bo sung dung mat khau: Staff@123
+-- Cac tai khoan khach hang bo sung dung mat khau: 123
+-- ============================================================
+INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro, TrangThai) VALUES
+('ND006', 'Pham Hoang Long', 'long.host@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
+('ND007', 'Tran Thu Ha', 'ha.phucvu@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
+('ND008', 'Vo Gia Bao', 'bao.thungan@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Inactive'),
+('ND009', 'Nguyen Thi Quyen', 'quyen.admin@nhahang.com', '$2b$10$QQjUYOP2RIOusra.a.Sig.dnEWuKOnYCqQoMEqhJPX/T/XJ.dMEiW', 'Admin', 'Active'),
+('ND010', 'Le Minh Chau', 'chau.lm@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND011', 'Hoang Anh Thu', 'thu.ha@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND012', 'Bui Quoc Dat', 'dat.bq@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND013', 'Nguyen Bao Ngoc', 'ngoc.nb@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND014', 'Do Khanh Linh', 'linh.dk@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Inactive'),
+('ND015', 'Phan Gia Huy', 'huy.pg@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Banned');
+
+INSERT INTO NhanVien (MaNV, MaND, HoTen, GioiTinh, SDT, DiaChi, ChucVu, LuongCoBan, NgayVaoLam, TinhTrang) VALUES
+('NV004', 'ND006', 'Pham Hoang Long', 'Nam', '0901112222', 'Quan 1, TP.HCM', 'Host', 8500000, '2025-06-10', 'Active'),
+('NV005', 'ND007', 'Tran Thu Ha', 'Nu', '0901113333', 'Quan 3, TP.HCM', 'PhucVu', 7800000, '2025-08-01', 'Active'),
+('NV006', 'ND008', 'Vo Gia Bao', 'Nam', '0901114444', 'Quan 7, TP.HCM', 'ThuNgan', 9200000, '2025-03-01', 'Inactive'),
+('NV007', 'ND009', 'Nguyen Thi Quyen', 'Nu', '0901115555', 'Thu Duc, TP.HCM', 'QuanLyCa', 13500000, '2024-09-15', 'Active');
+
+INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES
+('KH004', NULL, 'Khach Le Cong Ty', NULL, 'Van phong cong ty tai Quan 1', 0),
+('KH005', NULL, 'Khach Ban Tiec', NULL, 'Khach doan dat tiec cuoi tu su kien', 0),
+('KH006', 'ND010', 'Le Minh Chau', '0908800001', '45 Le Loi, Quan 1, TP.HCM', 320),
+('KH007', 'ND011', 'Hoang Anh Thu', '0908800002', '88 Cach Mang Thang 8, Quan 3, TP.HCM', 45),
+('KH008', 'ND012', 'Bui Quoc Dat', '0908800003', '12 Nguyen Hue, Quan 1, TP.HCM', 95),
+('KH009', 'ND013', 'Nguyen Bao Ngoc', '0908800004', '67 Dien Bien Phu, Binh Thanh, TP.HCM', 12),
+('KH010', 'ND014', 'Do Khanh Linh', '0908800005', '90 Tran Hung Dao, Quan 5, TP.HCM', 0),
+('KH011', 'ND015', 'Phan Gia Huy', '0908800006', '14 Ho Tung Mau, Quan 1, TP.HCM', 0);
+
+INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai, NgayTao, NgayCapNhat) VALUES
+('M014', 'DM001', 'Salad Ca Ngu', 'Salad ca ngu sot chanh day thanh mat.', 68000, NULL, 12, 'Available', NOW(), NOW()),
+('M015', 'DM002', 'Suon Nuong Mat Ong', 'Suon nuong mem, sot mat ong dam vi.', 129000, NULL, 25, 'Available', NOW(), NOW()),
+('M016', 'DM002', 'Lau Thai Hai San', 'Lau thai chua cay nhe cho nhom 2-4 nguoi.', 259000, NULL, 30, 'Available', NOW(), NOW()),
+('M017', 'DM004', 'Tra Vai Hoa Hong', 'Do uong theo mua, tam thoi het hang.', 42000, NULL, 5, 'Unavailable', NOW(), NOW()),
+('M018', 'DM003', 'Banh Tiramisu', 'Trang mieng vi ca phe nhe.', 45000, NULL, 8, 'Available', NOW(), NOW()),
+('M019', 'DM005', 'Combo Van Phong', 'Combo trua gon nhe cho nhan vien van phong.', 159000, NULL, 15, 'Unavailable', NOW(), NOW()),
+('M020', 'DM002', 'Mi Y Sot Bo Bam', 'Mon tam ngung kinh doanh de cap nhat cong thuc.', 89000, NULL, 18, 'Deleted', NOW(), NOW());
+
+INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
+('B012', 'Ban 12', 'Trong nha', 12, 4, 'Tang 1 - Khu D', NULL, 'Available', NOW(), NOW()),
+('B013', 'Ban 13', 'Quay bar', 13, 2, 'Quay bar', 'Phu hop khach di 2 nguoi', 'Available', NOW(), NOW()),
+('B014', 'Ban 14', 'Tang 2', 14, 6, 'Tang 2 - Phong rieng 2', 'Ban du phong cho booking VIP', 'Available', NOW(), NOW());
+
+INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan, TrangThai) VALUES
+('QR012', 'B012', 'http://localhost:5173/ban/B012', '2027-12-31 23:59:59', 'Active'),
+('QR013', 'B013', 'http://localhost:5173/ban/B013', '2027-12-31 23:59:59', 'Active'),
+('QR014', 'B014', 'http://localhost:5173/ban/B014', '2027-12-31 23:59:59', 'Inactive');
+
+INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai) VALUES
+('VIP25', 'Uu dai VIP 25%', 25, 'PhanTram', 90000, 250000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 60 DAY), 200, 15, 'Active'),
+('FREESHIP20', 'Ho tro phi ship 20k', 20000, 'SoTien', NULL, 120000, DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 45 DAY), NULL, 12, 'Active'),
+('LOYAL25K', 'Tri an thanh vien 25k', 25000, 'SoTien', NULL, 180000, DATE_SUB(CURRENT_DATE(), INTERVAL 15 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY), NULL, 8, 'Active'),
+('MORNING15', 'Uu dai buoi sang', 15, 'PhanTram', 30000, 80000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY), 100, 100, 'Inactive'),
+('FLASH30', 'Flash sale 30%', 30, 'PhanTram', 60000, 150000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), 50, 50, 'HetHan');
+
+-- Dong bo bo seed goc ve moc thoi gian co y nghia hon cho viec test.
+UPDATE DatBan
+SET NgayDat = DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY),
+    GioDat = '18:00:00',
+    GioKetThuc = '20:00:00',
+    TrangThai = 'Completed',
+    NgayTao = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '14:00:00'),
+    NgayCapNhat = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:05:00')
+WHERE MaDatBan = 'DB001';
+
+UPDATE DonHang
+SET NgayTao = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:15:00'),
+    NgayCapNhat = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:10:00')
+WHERE MaDonHang = 'DH001';
+
+UPDATE HoaDon
+SET NgayXuat = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:10:00')
+WHERE MaHoaDon = 'HD001';
+
+UPDATE ThanhToan
+SET ThoiGian = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:12:00')
+WHERE MaThanhToan = 'TT001';
+
+UPDATE LichSuDiemTichLuy
+SET SoDiemTruoc = 150,
+    SoDiemSau = 165,
+    MoTa = 'Cong diem tu don hang pickup DH002',
+    NgayTao = TIMESTAMP(CURRENT_DATE(), '18:45:00')
+WHERE MaGiaoDichDiem = 'LSD002';
+
+INSERT INTO DatBan (
+    MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
+    NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
+    TrangThai, NgayTao, NgayCapNhat
+) VALUES
+('DB002', 'KH002', NULL, 'NV004', 'Pham Thi Mai', '0987654321', 'mai.pt@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 210 MINUTE)), 2, 'Ban gan cua so neu con cho.', 'SANH_CHINH', 'Booking sap den, can xac nhan qua dien thoai.', 'CHO_XAC_NHAN', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
+('DB003', 'KH006', NULL, 'NV004', 'Le Minh Chau', '0908800001', 'chau.lm@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 180 MINUTE)), 6, 'Can khong gian rieng cho nhom hop mat.', 'PHONG_VIP', 'Khach VIP, neu het cho can goi lai de doi khung gio.', 'CAN_GOI_LAI', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)),
+('DB004', 'KH006', 'B005', 'NV002', 'Le Minh Chau', '0908800001', 'chau.lm@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '19:00:00', '21:00:00', 4, 'Sinh nhat gia dinh.', 'PHONG_VIP', 'Da xac nhan va giu ban VIP.', 'DA_XAC_NHAN', TIMESTAMP(CURRENT_DATE(), '09:15:00'), TIMESTAMP(CURRENT_DATE(), '09:25:00')),
+('DB005', 'KH007', 'B011', 'NV005', 'Hoang Anh Thu', '0908800002', 'thu.ha@gmail.com', DATE(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)), TIME(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), 4, 'Da den du gio.', 'PHONG_VIP', 'Khach da check-in va dang dung bua.', 'DA_CHECK_IN', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 HOUR), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
+('DB006', 'KH001', 'B002', 'NV002', 'Tran Van Khach', '0912345678', 'khach1@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '12:00:00', '13:30:00', 2, 'Khach quen dat ban trua.', 'SANH_CHINH', 'Tam giu cho den khi xac nhan lai so khach.', 'GIU_CHO_TAM', TIMESTAMP(CURRENT_DATE(), '10:05:00'), TIMESTAMP(CURRENT_DATE(), '10:10:00')),
+('DB007', 'KH004', NULL, 'NV004', 'Khach Le Cong Ty', '0907772001', 'booking.doanhnghiep@demo.local', DATE_ADD(CURRENT_DATE(), INTERVAL 2 DAY), '18:30:00', '20:30:00', 8, 'Can hoa don cong ty.', 'SANH_CHINH', 'Booking doan tu website, cho goi xac nhan.', 'YEU_CAU_DAT_BAN', TIMESTAMP(CURRENT_DATE(), '08:20:00'), TIMESTAMP(CURRENT_DATE(), '08:20:00')),
+('DB008', 'KH002', 'B006', 'NV005', 'Pham Thi Mai', '0987654321', 'mai.pt@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:00:00', '19:30:00', 2, 'Dat ban ngoai troi.', 'BAN_CONG', 'Khach khong den sau 20 phut.', 'KHONG_DEN', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '11:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:30:00')),
+('DB009', 'KH008', NULL, 'NV004', 'Bui Quoc Dat', '0908800003', 'dat.bq@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '19:00:00', '21:00:00', 3, 'Khach doi lich sang tuan sau.', 'SANH_CHINH', 'Da huy theo yeu cau khach.', 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '16:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '12:00:00')),
+('DB010', 'KH005', NULL, 'NV004', 'Khach Ban Tiec', '0907772002', 'ban.tiec@demo.local', DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), '20:00:00', '22:00:00', 10, 'Doan khach muon phong rieng.', 'PHONG_VIP', 'Het suc chua vao cuoi tuan.', 'TU_CHOI_HET_CHO', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY), '15:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), '10:30:00')),
+('DB011', 'KH009', 'B014', 'NV007', 'Nguyen Bao Ngoc', '0908800004', 'ngoc.nb@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY), '18:00:00', '20:00:00', 5, 'Dat phong rieng tiep doi tac.', 'PHONG_VIP', 'Admin da duyet booking VIP.', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '13:10:00'), TIMESTAMP(CURRENT_DATE(), '13:20:00')),
+('DB012', 'KH008', 'B012', 'NV002', 'Bui Quoc Dat', '0908800003', 'dat.bq@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '18:15:00', '20:15:00', 4, 'Khach se den sau gio tan lam.', 'SANH_CHINH', 'Da ghi nhan va tam giu ban tang 1.', 'DA_GHI_NHAN', TIMESTAMP(CURRENT_DATE(), '14:00:00'), TIMESTAMP(CURRENT_DATE(), '14:05:00')),
+('DB013', 'KH_TEST_01', NULL, 'NV004', 'Nguyen Van Test', '0901239999', 'khachtest01@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '17:30:00', '19:00:00', 3, 'Muon ngoi gan may lanh.', 'SANH_CHINH', 'Khach moi tao booking, chua gan ban.', 'Pending', TIMESTAMP(CURRENT_DATE(), '15:15:00'), TIMESTAMP(CURRENT_DATE(), '15:15:00')),
+('DB014', 'KH001', 'B013', 'NV005', 'Tran Van Khach', '0912345678', 'khach1@gmail.com', DATE(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)), TIME(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), 2, 'Khach vao ban va da goi mon.', 'QUAY_BAR', 'Da xep ban tai quay bar.', 'DA_XEP_BAN', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)),
+('DB015', 'KH006', 'B010', 'NV004', 'Le Minh Chau', '0908800001', 'chau.lm@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '18:30:00', '20:00:00', 2, 'Booking cu khach khong den.', 'BAN_CONG', 'Khach bao tre nhung khong den.', 'NoShow', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '09:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '19:00:00'));
+
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH004', 'KH003', 'B003', 'B003', 'NV004', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 110000, 'Preparing', 'QRCode', 'Khach tai ban goi them mon va nuoc.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)),
+('DH005', 'KH006', 'B009', 'B009', 'NV002', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 351000, 'Ready', 'QRCode', 'Khach yeu cau xuat hoa don tai ban.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 70 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 8 MINUTE)),
+('DH006', 'KH007', 'B011', 'B011', 'NV005', 'DB005', 'TAI_QUAN', NULL, NULL, NULL, 0, 205000, 'Served', 'DatBan', 'Da phuc vu xong mon chinh, cho danh gia.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 MINUTE)),
+('DH007', 'KH006', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '11:30:00', NULL, 0, 210000, 'Paid', 'Online', 'Khach dat pickup cho buoi trua.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:45:00')),
+('DH008', 'KH008', NULL, NULL, 'NV005', NULL, 'MANG_VE_GIAO_HANG', '12 Nguyen Hue, Quan 1, TP.HCM', NULL, '19:10:00', 15000, 168000, 'Paid', 'Online', 'Giao tan noi trong khung toi.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:40:00')),
+('DH009', 'KH009', NULL, NULL, 'NV007', NULL, 'MANG_VE_GIAO_HANG', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '18:20:00', 15000, 115000, 'Cancelled', 'Online', 'Khach huy don sau khi tai xe chua nhan.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
+('DH010', 'KH002', 'B001', NULL, 'NV003', NULL, 'TAI_QUAN', NULL, NULL, NULL, 0, 147000, 'Paid', 'TaiQuay', 'Khach an tai quan vao gio trua.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:10:00')),
+('DH011', 'KH001', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '18:40:00', NULL, 0, 188000, 'Paid', 'Online', 'Don pickup buoi toi cho gia dinh.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:45:00')),
+('DH012', 'KH006', NULL, NULL, 'NV002', NULL, 'MANG_VE_GIAO_HANG', '45 Le Loi, Quan 1, TP.HCM', NULL, '19:00:00', 20000, 307000, 'Paid', 'Online', 'Don giao hang VIP da ap dung uu dai.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:30:00')),
+('DH013', 'KH001', 'B013', 'B013', 'NV005', 'DB014', 'TAI_BAN', NULL, NULL, NULL, 0, 105000, 'Confirmed', 'QRCode', 'Order tai quay bar vua tao, dang cho bep tiep nhan.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 MINUTE));
+
+INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
+('CT011', 'DH004', 'M002', 1, 45000, 45000, 'Lam gion ky', 'Preparing', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 34 MINUTE)),
+('CT012', 'DH004', 'M008', 1, 25000, 25000, 'It da', 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 33 MINUTE)),
+('CT013', 'DH004', 'M009', 1, 35000, 35000, NULL, 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 32 MINUTE)),
+('CT014', 'DH005', 'M011', 1, 299000, 299000, NULL, 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 68 MINUTE)),
+('CT015', 'DH005', 'M009', 1, 35000, 35000, 'Khong da', 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 66 MINUTE)),
+('CT016', 'DH006', 'M004', 1, 75000, 75000, NULL, 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 48 MINUTE)),
+('CT017', 'DH006', 'M005', 1, 65000, 65000, 'Bot cay', 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 47 MINUTE)),
+('CT018', 'DH006', 'M008', 1, 25000, 25000, NULL, 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 46 MINUTE)),
+('CT019', 'DH006', 'M010', 1, 30000, 30000, NULL, 'Done', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)),
+('CT020', 'DH007', 'M012', 1, 199000, 199000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:22:00')),
+('CT021', 'DH007', 'M007', 1, 25000, 25000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:23:00')),
+('CT022', 'DH008', 'M003', 1, 55000, 55000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:42:00')),
+('CT023', 'DH008', 'M004', 1, 75000, 75000, 'Them hanh', 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:43:00')),
+('CT024', 'DH008', 'M009', 1, 35000, 35000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:44:00')),
+('CT025', 'DH009', 'M005', 1, 65000, 65000, NULL, 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:52:00')),
+('CT026', 'DH009', 'M010', 1, 30000, 30000, NULL, 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:53:00')),
+('CT027', 'DH010', 'M001', 1, 35000, 35000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:21:00')),
+('CT028', 'DH010', 'M003', 1, 55000, 55000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:22:00')),
+('CT029', 'DH010', 'M008', 2, 25000, 50000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:23:00')),
+('CT030', 'DH011', 'M013', 1, 129000, 129000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:02:00')),
+('CT031', 'DH011', 'M008', 2, 25000, 50000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:03:00')),
+('CT032', 'DH012', 'M011', 1, 299000, 299000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:16:00')),
+('CT033', 'DH012', 'M010', 2, 30000, 60000, NULL, 'Done', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:17:00')),
+('CT034', 'DH013', 'M002', 1, 45000, 45000, 'Khong hanh phi', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 19 MINUTE)),
+('CT035', 'DH013', 'M003', 1, 55000, 55000, NULL, 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 18 MINUTE));
+
+INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
+('HD004', 'DH007', 'KH006', 'LOYAL25K', 210000, 25000, 10, 21000, 231000, 'Don pickup tri an thanh vien.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:46:00')),
+('HD005', 'DH008', 'KH008', 'FREESHIP20', 168000, 20000, 10, 16800, 184800, 'Ho tro phi ship cho don giao hang.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:42:00')),
+('HD006', 'DH009', 'KH009', NULL, 115000, 0, 10, 11500, 126500, 'Thanh toan that bai truoc khi khach huy don.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:08:00')),
+('HD007', 'DH010', 'KH002', NULL, 147000, 0, 10, 14700, 161700, 'Hoa don tai quay gio trua.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:12:00')),
+('HD008', 'DH011', 'KH001', NULL, 188000, 0, 8, 15040, 203040, 'Hoa don pickup buoi toi.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:46:00')),
+('HD009', 'DH012', 'KH006', 'VIP25', 307000, 90000, 8, 24560, 331560, 'Don giao hang VIP co ap dung ma giam gia.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:32:00'));
+
+INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
+('TT004', 'HD004', 'ChuyenKhoan', 231000, 'CK_DH007_001', 'Success', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:48:00')),
+('TT005', 'HD005', 'MoMo', 184800, 'MOMO_DH008_001', 'Success', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:44:00')),
+('TT006', 'HD006', 'VNPay', 126500, 'VNPAY_DH009_001', 'Failed', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:09:00')),
+('TT007', 'HD007', 'TienMat', 161700, NULL, 'Success', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:15:00')),
+('TT008', 'HD008', 'TheNganHang', 203040, 'CARD_DH011_001', 'Success', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:48:00')),
+('TT009', 'HD009', 'ZaloPay', 331560, 'ZALOPAY_DH012_001', 'Success', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:35:00'));
+
+INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, SoLuotHuuIch, NgayDanhGia, NgayCapNhat, TrangThai) VALUES
+('DG001', 'KH001', 'DH001', 5, 'Khong gian dep, mon len nhanh va phuc vu lich su.', 'Cam on quy khach da ung ho nha hang.', NULL, 12, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '09:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '10:00:00'), 'Approved'),
+('DG002', 'KH006', 'DH007', 4, 'Dong goi can than, den lay hang dung gio.', NULL, NULL, 3, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), 'Pending'),
+('DG003', 'KH008', 'DH008', 2, 'Mon giao hoi nguoi va nuoc cham bi thieu.', 'Nha hang da lien he xin loi va gui uu dai cho don tiep theo.', NULL, 1, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:20:00'), 'Rejected'),
+('DG004', 'KH002', 'DH010', 5, 'Com rang vua vi, phuc vu nhanh vao gio cao diem.', NULL, '["/uploads/reviews/dg004-1.jpg"]', 8, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:00:00'), 'Approved'),
+('DG005', 'KH001', 'DH011', 4, 'Combo pickup tien, do an van nong khi mang ve nha.', NULL, NULL, 5, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), 'Approved'),
+('DG006', 'KH006', 'DH012', 5, 'Giao hang dung gio, tai xe goi truoc rat chuyen nghiep.', 'Cam on quy khach, hen gap lai o don tiep theo.', '["/uploads/reviews/dg006-1.jpg","/uploads/reviews/dg006-2.jpg"]', 15, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 19 DAY), '20:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 19 DAY), '20:40:00'), 'Approved');
+
+INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES
+('LS013', 'DH001', NULL, 'Pending', 'Tao don tu booking da xac nhan', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:15:00')),
+('LS014', 'DH001', 'Pending', 'Confirmed', 'Thu ngan xac nhan order tai quan', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:17:00')),
+('LS015', 'DH001', 'Confirmed', 'Preparing', 'Bep tiep nhan mon', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:22:00')),
+('LS016', 'DH001', 'Preparing', 'Paid', 'Hoan tat thanh toan don tai quan', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:12:00')),
+('LS017', 'DH004', NULL, 'Pending', 'Tao order moi qua QR tai ban', 'System', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE)),
+('LS018', 'DH004', 'Pending', 'Confirmed', 'Nhan vien da xac nhan order tai ban', 'NV004', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 25 MINUTE)),
+('LS019', 'DH004', 'Confirmed', 'Preparing', 'Bep dang chuan bi mon', 'NV004', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)),
+('LS020', 'DH005', NULL, 'Pending', 'Khach tai ban goi combo gia dinh', 'System', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 70 MINUTE)),
+('LS021', 'DH005', 'Pending', 'Confirmed', 'Nhan vien tiep nhan don tai ban', 'NV002', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)),
+('LS022', 'DH005', 'Confirmed', 'Preparing', 'Bep hoan tat mon chinh', 'NV002', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)),
+('LS023', 'DH005', 'Preparing', 'Ready', 'Ban da yeu cau thanh toan, cho xuat hoa don', 'NV002', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 8 MINUTE)),
+('LS024', 'DH006', NULL, 'Pending', 'Tao don theo booking check-in', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE)),
+('LS025', 'DH006', 'Pending', 'Confirmed', 'Order duoc xac nhan tai ban', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 42 MINUTE)),
+('LS026', 'DH006', 'Confirmed', 'Preparing', 'Bep bat dau che bien', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)),
+('LS027', 'DH006', 'Preparing', 'Ready', 'Da san sang phuc vu', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
+('LS028', 'DH006', 'Ready', 'Served', 'Nhan vien da mang mon ra ban', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 MINUTE)),
+('LS029', 'DH007', NULL, 'Pending', 'Khach tao don pickup online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00')),
+('LS030', 'DH007', 'Pending', 'Confirmed', 'Thu ngan goi xac nhan don', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:25:00')),
+('LS031', 'DH007', 'Confirmed', 'Preparing', 'Bep xu ly don trua', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:30:00')),
+('LS032', 'DH007', 'Preparing', 'Paid', 'Khach den lay va thanh toan', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:48:00')),
+('LS033', 'DH008', NULL, 'Pending', 'Khach tao don giao hang online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00')),
+('LS034', 'DH008', 'Pending', 'Confirmed', 'Nhan vien xac nhan dia chi giao', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:45:00')),
+('LS035', 'DH008', 'Confirmed', 'Preparing', 'Bep chuan bi don giao hang', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:55:00')),
+('LS036', 'DH008', 'Preparing', 'Paid', 'Don giao thanh cong va da thanh toan', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:44:00')),
+('LS037', 'DH009', NULL, 'Pending', 'Tao don giao hang online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00')),
+('LS038', 'DH009', 'Pending', 'Cancelled', 'Khach huy don truoc khi tai xe nhan', 'NV007', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
+('LS039', 'DH010', NULL, 'Pending', 'Tao don tai quay gio trua', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:20:00')),
+('LS040', 'DH010', 'Pending', 'Confirmed', 'Thu ngan xac nhan order', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:25:00')),
+('LS041', 'DH010', 'Confirmed', 'Preparing', 'Bep ra mon nhanh cho khach an tai quan', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:35:00')),
+('LS042', 'DH010', 'Preparing', 'Paid', 'Khach thanh toan xong tai quay', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:15:00')),
+('LS043', 'DH011', NULL, 'Pending', 'Don pickup buoi toi duoc tao tu app', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00')),
+('LS044', 'DH011', 'Pending', 'Confirmed', 'Thu ngan xac nhan gio lay', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:10:00')),
+('LS045', 'DH011', 'Confirmed', 'Paid', 'Khach den lay va quet the thanh cong', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:48:00')),
+('LS046', 'DH012', NULL, 'Pending', 'Khach VIP tao don giao hang lon', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00')),
+('LS047', 'DH012', 'Pending', 'Confirmed', 'Nhan vien goi xac nhan va ap ma VIP', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:25:00')),
+('LS048', 'DH012', 'Confirmed', 'Preparing', 'Bep xu ly don lon', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:45:00')),
+('LS049', 'DH012', 'Preparing', 'Ready', 'Tai xe da nhan don giao hang', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:10:00')),
+('LS050', 'DH012', 'Ready', 'Paid', 'Thanh toan thanh cong qua ZaloPay', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:35:00')),
+('LS051', 'DH013', NULL, 'Pending', 'Khach vua tao order tai quay bar', 'System', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
+('LS052', 'DH013', 'Pending', 'Confirmed', 'Nhan vien tiep nhan order tai bar', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 MINUTE));
+
+INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, SoDiem, SoDiemTruoc, SoDiemSau, MoTa, NgayTao) VALUES
+('LSD004', 'KH001', 'DH011', 'CONG', 120, 0, 120, 'Cong diem tu don pickup DH011', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:50:00')),
+('LSD005', 'KH001', 'DH001', 'CONG', 115, 120, 235, 'Cong diem tu don tai quan DH001', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:15:00')),
+('LSD006', 'KH002', 'DH010', 'CONG', 150, 0, 150, 'Cong diem tu don tai quay DH010', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:20:00')),
+('LSD007', 'KH006', 'DH012', 'CONG', 180, 0, 180, 'Cong diem tu don giao hang VIP DH012', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:40:00')),
+('LSD008', 'KH006', 'DH007', 'CONG', 140, 180, 320, 'Cong diem tu don pickup DH007', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:50:00')),
+('LSD009', 'KH007', NULL, 'DIEU_CHINH', 45, 0, 45, 'Admin dieu chinh diem khuyen khich khach hang than thiet', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '09:00:00')),
+('LSD010', 'KH008', 'DH008', 'CONG', 95, 0, 95, 'Cong diem tu don giao hang DH008', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:50:00')),
+('LSD011', 'KH009', NULL, 'CONG', 12, 0, 12, 'Tang diem cho khach doi tac moi dang ky', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '10:00:00'));
+
+UPDATE KhachHang
+SET DiemTichLuy = CASE MaKH
+    WHEN 'KH001' THEN 235
+    WHEN 'KH002' THEN 165
+    WHEN 'KH006' THEN 320
+    WHEN 'KH007' THEN 45
+    WHEN 'KH008' THEN 95
+    WHEN 'KH009' THEN 12
+    WHEN 'KH_TEST_01' THEN 14
+    ELSE DiemTichLuy
+END
+WHERE MaKH IN ('KH001', 'KH002', 'KH006', 'KH007', 'KH008', 'KH009', 'KH_TEST_01');
+
+UPDATE MaGiamGia
+SET SoLanDaDung = CASE MaCode
+    WHEN 'WELCOME10' THEN 1
+    WHEN 'GIAM50K' THEN 1
+    WHEN 'LOYAL25K' THEN 1
+    WHEN 'FREESHIP20' THEN 1
+    WHEN 'VIP25' THEN 1
+    ELSE SoLanDaDung
+END
+WHERE MaCode IN ('WELCOME10', 'GIAM50K', 'LOYAL25K', 'FREESHIP20', 'VIP25');
+
+INSERT INTO ThongBao (MaThongBao, MaND, TieuDe, NoiDung, LoaiThongBao, MaThamChieu, DaDoc, NgayTao) VALUES
+('TB001', 'ND001', 'Co danh gia moi cho duyet', 'Danh gia DG002 dang o trang thai Pending va can admin xu ly.', 'DanhGia', 'DG002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE)),
+('TB002', 'ND002', 'Booking sap den can goi lai', 'Booking DB002 sap den trong vong 2 gio va chua chot hoan tat.', 'DatBan', 'DB002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE)),
+('TB003', 'ND003', 'Don pickup san sang tra khach', 'Don DH002 da san sang, can lien he khach den lay.', 'DonHang', 'DH002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
+('TB004', 'ND006', 'Ban B003 vua co order moi', 'Khach tai ban B003 vua gui them mon qua QR.', 'DonHang', 'DH004', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
+('TB005', 'ND007', 'Booking VIP da duoc xac nhan', 'Booking DB004 da giu phong VIP cho khach Le Minh Chau.', 'DatBan', 'DB004', TRUE, TIMESTAMP(CURRENT_DATE(), '09:30:00')),
+('TB006', 'ND004', 'Diem tich luy vua duoc cap nhat', 'Ban vua nhan them diem tu don hang DH001.', 'HeThong', 'DH001', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:20:00')),
+('TB007', 'ND010', 'Don pickup thanh cong', 'Don DH007 da thanh toan thanh cong, diem tich luy da duoc cong.', 'DonHang', 'DH007', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:55:00')),
+('TB008', 'ND001', 'Can xu ly thanh toan that bai', 'Thanh toan TT006 cua don DH009 dang o trang thai Failed.', 'HeThong', 'TT006', FALSE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:10:00')),
+('TB009', 'ND003', 'Khach vua danh gia 5 sao', 'Danh gia DG004 da duoc khach gui cho don DH010.', 'DanhGia', 'DG004', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:05:00')),
+('TB010', 'ND009', 'Bao cao cuoi ngay da san sang', 'Du lieu doanh thu va booking hom nay da san sang de doi chieu.', 'HeThong', 'REPORT_001', FALSE, TIMESTAMP(CURRENT_DATE(), '22:00:00'));
+
+UPDATE Ban SET TrangThai = 'Available' WHERE MaBan IN ('B001', 'B004', 'B006', 'B008', 'B010');
+UPDATE Ban SET TrangThai = 'Reserved' WHERE MaBan IN ('B002', 'B005', 'B009', 'B012', 'B014');
+UPDATE Ban SET TrangThai = 'Occupied' WHERE MaBan IN ('B003', 'B011', 'B013');
+UPDATE Ban SET TrangThai = 'Maintenance' WHERE MaBan = 'B007';

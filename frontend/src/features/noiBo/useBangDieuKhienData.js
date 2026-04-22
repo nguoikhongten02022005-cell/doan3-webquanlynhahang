@@ -2,13 +2,13 @@ import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { taoDuLieuThongKeDoanhThu } from './thongKeNoiBo'
 
-const laCungNgayLich = (trai, phai) => (
-  trai.getFullYear() === phai.getFullYear()
-  && trai.getMonth() === phai.getMonth()
-  && trai.getDate() === phai.getDate()
+const laCungNgayLich = (ngayTrai, ngayPhai) => (
+  ngayTrai.getFullYear() === ngayPhai.getFullYear()
+  && ngayTrai.getMonth() === ngayPhai.getMonth()
+  && ngayTrai.getDate() === ngayPhai.getDate()
 )
 
-const layDoanhThuHomNay = (danhSachDonHang = []) => {
+const tinhDoanhThuHomNay = (danhSachDonHang = []) => {
   const homNay = new Date()
 
   return danhSachDonHang.reduce((tong, donHang) => {
@@ -22,7 +22,7 @@ const layDoanhThuHomNay = (danhSachDonHang = []) => {
   }, 0)
 }
 
-const taoSnapshotDashboard = (duLieuNoiBo = {}) => {
+const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
   const thongKeDoanhThu = taoDuLieuThongKeDoanhThu({
     orders: duLieuNoiBo.danhSachDonHang || [],
     bookings: duLieuNoiBo.danhSachDatBan || [],
@@ -30,7 +30,7 @@ const taoSnapshotDashboard = (duLieuNoiBo = {}) => {
 
   return {
     stats: {
-      todayRevenue: layDoanhThuHomNay(duLieuNoiBo.danhSachDonHang || []),
+      todayRevenue: tinhDoanhThuHomNay(duLieuNoiBo.danhSachDonHang || []),
       openBookings: duLieuNoiBo.hangDoiDatBan?.length || 0,
       servingTables: duLieuNoiBo.tomTatTonKhoBan?.occupied || 0,
     },
@@ -75,7 +75,7 @@ const taoSnapshotDashboard = (duLieuNoiBo = {}) => {
 }
 
 export const useBangDieuKhienData = (duLieuNoiBo = {}) => {
-  const dauVanTayDuLieu = useMemo(
+  const chuKyDuLieu = useMemo(
     () => JSON.stringify({
       bookings: (duLieuNoiBo?.hangDoiDatBan || []).map((datBan) => [
         datBan.id,
@@ -101,12 +101,12 @@ export const useBangDieuKhienData = (duLieuNoiBo = {}) => {
     [duLieuNoiBo?.hangDoiDatBan, duLieuNoiBo?.danhSachDonHangDaSapXep, duLieuNoiBo?.tomTatBan],
   )
 
-  const { data } = useQuery({
-    queryKey: ['noi-bo-bang-dieu-khien', dauVanTayDuLieu],
-    queryFn: async () => taoSnapshotDashboard(duLieuNoiBo),
-    initialData: () => taoSnapshotDashboard(duLieuNoiBo),
+  const { data: duLieuBangDieuKhien } = useQuery({
+    queryKey: ['noi-bo-bang-dieu-khien', chuKyDuLieu],
+    queryFn: async () => taoDuLieuBangDieuKhien(duLieuNoiBo),
+    initialData: () => taoDuLieuBangDieuKhien(duLieuNoiBo),
     refetchInterval: 30000,
   })
 
-  return data
+  return duLieuBangDieuKhien
 }

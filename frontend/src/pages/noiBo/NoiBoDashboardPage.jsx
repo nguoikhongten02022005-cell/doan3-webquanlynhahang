@@ -14,7 +14,7 @@ function NoiBoDashboardPage() {
   const laMobile = manHinh.xs && !manHinh.md
 
   return (
-    <Flex vertical gap={laMobile ? 14 : 20} style={{ width: '100%' }}>
+    <Flex vertical gap={laMobile ? 14 : 18} style={{ width: '100%' }} className="noi-bo-dashboard-page">
       <Space orientation="vertical" size={4} style={{ width: '100%' }}>
         <Typography.Title level={laMobile ? 4 : 3} style={{ margin: 0 }}>
           Bảng điều khiển nhà hàng hôm nay
@@ -26,7 +26,7 @@ function NoiBoDashboardPage() {
 
       <TheThongKe stats={bangDieuKhienData?.stats} />
 
-      <Row gutter={[laMobile ? 14 : 20, laMobile ? 14 : 20]}>
+      <Row className="noi-bo-dashboard-primary-grid" gutter={[laMobile ? 14 : 18, laMobile ? 14 : 18]} align="stretch">
         <Col xs={24} xl={16}>
           <BieuDoDoanhThu revenue={bangDieuKhienData?.revenue} />
         </Col>

@@ -1,4 +1,5 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import {
   layThongTinToiApi,
   dangNhapApi,
@@ -22,6 +23,8 @@ import {
 
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
+const layNguoiDungTheoPhien = () => (layMaXacThuc() ? layNguoiDungHienTai() : null)
+const coCanKhoiTaoXacThuc = () => Boolean(layMaXacThuc())
 const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
   ...payload,
   maND: payload.maND || nguoiDung?.maND || nguoiDung?.id || '',
@@ -30,9 +33,35 @@ const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
 
 const XacThucContext = createContext(null)
 
+const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai }) => {
+  const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
+  const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
+
+  if (!nguoiDung || !accessToken) {
+    xoaPhienXacThuc()
+    return {
+      success: false,
+      error: thongDiepLoiMacDinh,
+    }
+  }
+
+  luuPhienXacThuc({
+    user: nguoiDung,
+    accessToken,
+  })
+
+  const nguoiDungDaLuu = layNguoiDungHienTai()
+  setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
+
+  return {
+    success: true,
+    user: nguoiDungDaLuu || nguoiDung,
+  }
+}
+
 function useXacThucState() {
-  const [nguoiDungHienTai, setNguoiDungHienTai] = useState(() => layNguoiDungHienTai())
-  const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(true)
+  const [nguoiDungHienTai, setNguoiDungHienTai] = useState(layNguoiDungTheoPhien)
+  const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(coCanKhoiTaoXacThuc)
 
   useEffect(() => {
     if (typeof window !== 'undefined') {
@@ -48,7 +77,7 @@ function useXacThucState() {
     }
 
     const dongBoNguoiDungHienTai = () => {
-      setNguoiDungHienTai(layNguoiDungHienTai())
+      setNguoiDungHienTai(layNguoiDungTheoPhien())
     }
 
     const dongBoNguoiDungTuBackend = async () => {
@@ -88,7 +117,7 @@ function useXacThucState() {
     }
 
     const xuLyStorage = (event) => {
-      if (event.key && event.key !== 'restaurant_current_user') {
+      if (event.key && event.key !== STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI && event.key !== STORAGE_KEYS.MA_XAC_THUC) {
         return
       }
 
@@ -108,29 +137,7 @@ function useXacThucState() {
   const dangNhapBangApi = useCallback(async (hamDangNhap, email, matKhau, thongDiepLoiMacDinh) => {
     try {
       const { duLieu } = await hamDangNhap(email, matKhau)
-      const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
-      const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
-
-      if (!nguoiDung || !accessToken) {
-        xoaPhienXacThuc()
-        return {
-          success: false,
-          error: thongDiepLoiMacDinh,
-        }
-      }
-
-      luuPhienXacThuc({
-        user: nguoiDung,
-        accessToken,
-      })
-
-      const nguoiDungDaLuu = layNguoiDungHienTai()
-      setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
-
-      return {
-        success: true,
-        user: nguoiDungDaLuu || nguoiDung,
-      }
+      return apDungPhienXacThuc({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai })
     } catch (error) {
       xoaPhienXacThuc()
       return {
@@ -161,29 +168,7 @@ function useXacThucState() {
   const dangKy = useCallback(async (payload) => {
     try {
       const { duLieu } = await dangKyApi(payload)
-      const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
-      const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
-
-      if (!nguoiDung || !accessToken) {
-        xoaPhienXacThuc()
-        return {
-          success: false,
-          error: 'Đăng ký thất bại.',
-        }
-      }
-
-      luuPhienXacThuc({
-        user: nguoiDung,
-        accessToken,
-      })
-
-      const nguoiDungDaLuu = layNguoiDungHienTai()
-      setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
-
-      return {
-        success: true,
-        user: nguoiDungDaLuu || nguoiDung,
-      }
+      return apDungPhienXacThuc({ duLieu, thongDiepLoiMacDinh: 'Đăng ký thất bại.', setNguoiDungHienTai })
     } catch (error) {
       xoaPhienXacThuc()
       return {
@@ -251,7 +236,7 @@ function useXacThucState() {
     laNhanVien,
     coTheVaoNoiBo,
     daDangNhap: Boolean(nguoiDungHienTai),
-    dangKhoiTaoXacThuc: dangKhoiTaoXacThuc,
+    dangKhoiTaoXacThuc,
     dangNhap,
     dangNhapNoiBo,
     dangKy,

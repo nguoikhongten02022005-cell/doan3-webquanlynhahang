@@ -1,6 +1,5 @@
 import { Navigate, Outlet, useLocation, useOutletContext } from 'react-router-dom'
 import { useXacThuc } from '../hooks/useXacThuc'
-import { Result, Spin } from 'antd'
 
 function TuyenDuongBaoVe({
   children,
@@ -13,16 +12,8 @@ function TuyenDuongBaoVe({
   const outletContext = useOutletContext()
   const { daDangNhap, coTheVaoNoiBo, dangKhoiTaoXacThuc, laQuanLy } = useXacThuc()
 
-  if (dangKhoiTaoXacThuc) {
-    return (
-      <div style={{ minHeight: '100vh', display: 'grid', placeItems: 'center', background: '#f7f5f2' }}>
-        <Result
-          icon={<Spin size="large" />}
-          title="Đang xác thực phiên đăng nhập..."
-          subTitle="Vui lòng chờ trong giây lát"
-        />
-      </div>
-    )
+  if (dangKhoiTaoXacThuc && !daDangNhap) {
+    return null
   }
 
   if (!daDangNhap) {

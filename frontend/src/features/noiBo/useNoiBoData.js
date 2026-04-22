@@ -5,16 +5,16 @@ import { useBangDieuKhienData } from './useBangDieuKhienData'
 
 export const useNoiBoData = () => {
   const duLieuNoiBo = useDuLieuBangDieuKhien()
-  const bangDieuKhienData = useBangDieuKhienData(duLieuNoiBo)
+  const duLieuBangDieuKhien = useBangDieuKhienData(duLieuNoiBo)
 
-  const badges = useMemo(() => ({
+  const phuHieu = useMemo(() => ({
     bookings: duLieuNoiBo.danhSachDatBanChoXuLy.length,
     orders: duLieuNoiBo.danhSachDonHangDangMo.length,
     reviews: duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
     notifications: duLieuNoiBo.danhSachDatBanChoXuLy.length + duLieuNoiBo.danhSachDonHangDangMo.length + duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
   }), [duLieuNoiBo.danhSachDatBanChoXuLy.length, duLieuNoiBo.danhSachDonHangDangMo.length, duLieuNoiBo.danhSachDanhGiaChoDuyet.length])
 
-  const revenueStats = useMemo(
+  const thongKeDoanhThu = useMemo(
     () => taoDuLieuThongKeDoanhThu({
       orders: duLieuNoiBo.danhSachDonHang,
       bookings: duLieuNoiBo.danhSachDatBan,
@@ -22,7 +22,7 @@ export const useNoiBoData = () => {
     [duLieuNoiBo.danhSachDonHang, duLieuNoiBo.danhSachDatBan],
   )
 
-  const urgentItems = useMemo(
+  const danhSachUuTien = useMemo(
     () => [
       {
         key: 'pending-bookings',
@@ -63,9 +63,9 @@ export const useNoiBoData = () => {
 
   return {
     ...duLieuNoiBo,
-    badges,
-    revenueStats,
-    urgentItems,
-    bangDieuKhienData,
+    badges: phuHieu,
+    revenueStats: thongKeDoanhThu,
+    urgentItems: danhSachUuTien,
+    bangDieuKhienData: duLieuBangDieuKhien,
   }
 }

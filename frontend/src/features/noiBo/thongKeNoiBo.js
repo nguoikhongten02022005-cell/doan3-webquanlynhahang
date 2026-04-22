@@ -1,9 +1,9 @@
 import { DANH_SACH_MON } from '../thucDon/mocks/duLieuThucDon'
 import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../thucDon/constants/danhMucThucDon'
 
-const pad = (value) => String(value).padStart(2, '0')
+const chenSo0 = (giaTri) => String(giaTri).padStart(2, '0')
 
-const chuanHoaChuoi = (value = '') => String(value)
+const chuanHoaChuoi = (giaTri = '') => String(giaTri)
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
   .toLowerCase()
@@ -22,162 +22,165 @@ const suyRaDanhMucTuTenMon = (tenMon = '') => {
   return 'Món Chính'
 }
 
-const taoMocBatDauNgay = (date) => {
-  const clone = new Date(date)
-  clone.setHours(0, 0, 0, 0)
-  return clone
+const taoMocBatDauNgay = (ngay) => {
+  const ngaySaoChep = new Date(ngay)
+  ngaySaoChep.setHours(0, 0, 0, 0)
+  return ngaySaoChep
 }
 
-const laCungNgay = (left, right) => (
-  left.getFullYear() === right.getFullYear()
-  && left.getMonth() === right.getMonth()
-  && left.getDate() === right.getDate()
+const laCungNgay = (ngayTrai, ngayPhai) => (
+  ngayTrai.getFullYear() === ngayPhai.getFullYear()
+  && ngayTrai.getMonth() === ngayPhai.getMonth()
+  && ngayTrai.getDate() === ngayPhai.getDate()
 )
 
-const parseDateValue = (value) => {
-  if (!value) return null
-  const parsed = new Date(value)
-  return Number.isNaN(parsed.getTime()) ? null : parsed
+const phanTichGiaTriNgay = (giaTri) => {
+  if (!giaTri) return null
+  const ngayDaPhanTich = new Date(giaTri)
+  return Number.isNaN(ngayDaPhanTich.getTime()) ? null : ngayDaPhanTich
 }
 
-const isBookingCancelled = (booking) => ['DA_HUY', 'Cancelled', 'KHONG_DEN', 'NoShow'].includes(booking?.status)
-const isBookingCompleted = (booking) => ['DA_HOAN_THANH', 'DA_CHECK_IN', 'Completed'].includes(booking?.status)
-const isOrderCompleted = (order) => order?.status === 'Paid' || order?.status === 'DA_HOAN_THANH'
+const laDatBanDaHuy = (datBan) => ['DA_HUY', 'Cancelled', 'KHONG_DEN', 'NoShow'].includes(datBan?.status)
+const laDatBanHoanThanh = (datBan) => ['DA_HOAN_THANH', 'DA_CHECK_IN', 'Completed'].includes(datBan?.status)
+const laDonHangHoanThanh = (donHang) => donHang?.status === 'Paid' || donHang?.status === 'DA_HOAN_THANH'
 
-const filterOrdersByTimeRange = (orders, timeRange) => {
-  const now = new Date()
-  const startToday = taoMocBatDauNgay(now)
+const locDonHangTheoKhoangThoiGian = (danhSachDonHang, khoangThoiGian) => {
+  const hienTai = new Date()
+  const dauNgayHomNay = taoMocBatDauNgay(hienTai)
 
-  return orders.filter((order) => {
-    const orderDate = parseDateValue(order?.orderDate)
-    if (!orderDate) return false
+  return danhSachDonHang.filter((donHang) => {
+    const ngayDonHang = phanTichGiaTriNgay(donHang?.orderDate)
+    if (!ngayDonHang) return false
 
-    if (timeRange === 'today') return laCungNgay(orderDate, now)
-    if (timeRange === 'last7Days') {
-      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
-      return orderDate >= rangeStart && orderDate <= now
+    if (khoangThoiGian === 'today') return laCungNgay(ngayDonHang, hienTai)
+    if (khoangThoiGian === 'last7Days') {
+      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 6))
+      return ngayDonHang >= mocBatDau && ngayDonHang <= hienTai
     }
-    if (timeRange === 'last30Days') {
-      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29))
-      return orderDate >= rangeStart && orderDate <= now
+    if (khoangThoiGian === 'last30Days') {
+      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 29))
+      return ngayDonHang >= mocBatDau && ngayDonHang <= hienTai
     }
-    if (timeRange === 'thisMonth') {
-      return orderDate.getFullYear() === now.getFullYear() && orderDate.getMonth() === now.getMonth()
+    if (khoangThoiGian === 'thisMonth') {
+      return ngayDonHang.getFullYear() === hienTai.getFullYear() && ngayDonHang.getMonth() === hienTai.getMonth()
     }
 
-    return orderDate >= startToday
+    return ngayDonHang >= dauNgayHomNay
   })
 }
 
-const filterBookingsByTimeRange = (bookings, timeRange) => {
-  const now = new Date()
-  return bookings.filter((booking) => {
-    const bookingDate = parseDateValue(booking?.date)
-    if (!bookingDate) return false
+const locDatBanTheoKhoangThoiGian = (danhSachDatBan, khoangThoiGian) => {
+  const hienTai = new Date()
+  return danhSachDatBan.filter((datBan) => {
+    const ngayDatBan = phanTichGiaTriNgay(datBan?.date)
+    if (!ngayDatBan) return false
 
-    if (timeRange === 'today') return laCungNgay(bookingDate, now)
-    if (timeRange === 'last7Days') {
-      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 6))
-      return bookingDate >= rangeStart && bookingDate <= now
+    if (khoangThoiGian === 'today') return laCungNgay(ngayDatBan, hienTai)
+    if (khoangThoiGian === 'last7Days') {
+      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 6))
+      return ngayDatBan >= mocBatDau && ngayDatBan <= hienTai
     }
-    if (timeRange === 'last30Days') {
-      const rangeStart = taoMocBatDauNgay(new Date(now.getFullYear(), now.getMonth(), now.getDate() - 29))
-      return bookingDate >= rangeStart && bookingDate <= now
+    if (khoangThoiGian === 'last30Days') {
+      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 29))
+      return ngayDatBan >= mocBatDau && ngayDatBan <= hienTai
     }
-    if (timeRange === 'thisMonth') {
-      return bookingDate.getFullYear() === now.getFullYear() && bookingDate.getMonth() === now.getMonth()
+    if (khoangThoiGian === 'thisMonth') {
+      return ngayDatBan.getFullYear() === hienTai.getFullYear() && ngayDatBan.getMonth() === hienTai.getMonth()
     }
 
     return false
   })
 }
 
-const buildRevenueSeries = (orders = []) => {
-  const today = taoMocBatDauNgay(new Date())
+const taoChuoiDoanhThu = (danhSachDonHang = []) => {
+  const homNay = taoMocBatDauNgay(new Date())
 
-  return Array.from({ length: 7 }, (_, index) => {
-    const day = new Date(today)
-    day.setDate(today.getDate() - (6 - index))
+  return Array.from({ length: 7 }, (_, chiSo) => {
+    const ngay = new Date(homNay)
+    ngay.setDate(homNay.getDate() - (6 - chiSo))
 
-    const revenueFromOrders = orders.reduce((sum, order) => {
-      const orderDate = parseDateValue(order?.orderDate)
-      if (!orderDate || !laCungNgay(orderDate, day)) return sum
-      return sum + (Number(order?.total) || 0)
+    const doanhThuNgay = danhSachDonHang.reduce((tongDoanhThu, donHang) => {
+      const ngayDonHang = phanTichGiaTriNgay(donHang?.orderDate)
+      if (!ngayDonHang || !laCungNgay(ngayDonHang, ngay)) return tongDoanhThu
+      return tongDoanhThu + (Number(donHang?.total) || 0)
     }, 0)
 
     return {
-      label: `${pad(day.getDate())}/${pad(day.getMonth() + 1)}`,
-      revenue: revenueFromOrders,
+      label: `${chenSo0(ngay.getDate())}/${chenSo0(ngay.getMonth() + 1)}`,
+      revenue: doanhThuNgay,
     }
   })
 }
 
-const buildTopDishes = (orders = []) => {
-  const dishMap = new Map()
+const taoTopMonBanChay = (danhSachDonHang = []) => {
+  const banDoMon = new Map()
 
-  orders.forEach((order) => {
-    ;(order?.items || []).forEach((item) => {
-      const quantity = Number(item?.quantity) || 0
-      const price = Number(item?.price) || 0
-      const revenue = quantity * price
-      const key = item?.menuItemId || item?.name || item?.id || 'dish'
+  danhSachDonHang.forEach((donHang) => {
+    ;(donHang?.items || []).forEach((chiTietMon) => {
+      const soLuong = Number(chiTietMon?.quantity) || 0
+      const donGia = Number(chiTietMon?.price) || 0
+      const doanhThu = soLuong * donGia
+      const khoaMon = chiTietMon?.menuItemId || chiTietMon?.name || chiTietMon?.id || 'dish'
 
-      if (!dishMap.has(key)) {
-        dishMap.set(key, {
-          id: key,
-          name: item?.name || 'Món chưa đặt tên',
+      if (!banDoMon.has(khoaMon)) {
+        banDoMon.set(khoaMon, {
+          id: khoaMon,
+          name: chiTietMon?.name || 'Món chưa đặt tên',
           quantity: 0,
           revenue: 0,
         })
       }
 
-      const current = dishMap.get(key)
-      current.quantity += quantity
-      current.revenue += revenue
+      const monHienTai = banDoMon.get(khoaMon)
+      monHienTai.quantity += soLuong
+      monHienTai.revenue += doanhThu
     })
   })
 
-  if (dishMap.size === 0) {
-    return DANH_SACH_MON.slice(0, 5).map((dish, index) => ({
-      id: dish.id,
-      rank: index + 1,
-      name: dish.name,
+  if (banDoMon.size === 0) {
+    return DANH_SACH_MON.slice(0, 5).map((mon, chiSo) => ({
+      id: mon.id,
+      rank: chiSo + 1,
+      name: mon.name,
       quantity: 0,
       revenue: 0,
       percent: 0,
     }))
   }
 
-  const sorted = [...dishMap.values()].sort((left, right) => right.revenue - left.revenue || right.quantity - left.quantity).slice(0, 5)
-  const totalRevenue = sorted.reduce((sum, item) => sum + item.revenue, 0)
+  const danhSachMonSapXep = [...banDoMon.values()]
+    .sort((monTrai, monPhai) => monPhai.revenue - monTrai.revenue || monPhai.quantity - monTrai.quantity)
+    .slice(0, 5)
+  const tongDoanhThuTop = danhSachMonSapXep.reduce((tongDoanhThu, mon) => tongDoanhThu + mon.revenue, 0)
 
-  return sorted.map((item, index) => ({
-    ...item,
-    rank: index + 1,
-    percent: totalRevenue > 0 ? Math.round((item.revenue / totalRevenue) * 100) : 0,
+  return danhSachMonSapXep.map((mon, chiSo) => ({
+    ...mon,
+    rank: chiSo + 1,
+    percent: tongDoanhThuTop > 0 ? Math.round((mon.revenue / tongDoanhThuTop) * 100) : 0,
   }))
 }
 
-const buildCategoryShares = (orders = []) => {
-  const dishLookup = new Map(DANH_SACH_MON.map((dish) => [String(dish.id), dish]))
-  const dishNameLookup = new Map(DANH_SACH_MON.map((dish) => [chuanHoaChuoi(dish.name), dish]))
-  const categoryRevenueMap = new Map(CAC_DANH_MUC_CHUAN_THUC_DON.map((category) => [category, 0]))
+const taoTyTrongDanhMuc = (danhSachDonHang = []) => {
+  const traCuuMonTheoId = new Map(DANH_SACH_MON.map((mon) => [String(mon.id), mon]))
+  const traCuuMonTheoTen = new Map(DANH_SACH_MON.map((mon) => [chuanHoaChuoi(mon.name), mon]))
+  const doanhThuTheoDanhMuc = new Map(CAC_DANH_MUC_CHUAN_THUC_DON.map((danhMuc) => [danhMuc, 0]))
 
-  orders.forEach((order) => {
-    ;(order?.items || []).forEach((item) => {
-      const revenue = (Number(item?.quantity) || 0) * (Number(item?.price) || 0)
-      const matchedDish = dishLookup.get(String(item?.menuItemId || item?.id || '')) || dishNameLookup.get(chuanHoaChuoi(item?.name || ''))
-      const category = matchedDish?.category || matchedDish?.danhMuc || suyRaDanhMucTuTenMon(item?.name || '')
-      if (!categoryRevenueMap.has(category)) return
-      categoryRevenueMap.set(category, categoryRevenueMap.get(category) + revenue)
+  danhSachDonHang.forEach((donHang) => {
+    ;(donHang?.items || []).forEach((chiTietMon) => {
+      const doanhThu = (Number(chiTietMon?.quantity) || 0) * (Number(chiTietMon?.price) || 0)
+      const monPhuHop = traCuuMonTheoId.get(String(chiTietMon?.menuItemId || chiTietMon?.id || ''))
+        || traCuuMonTheoTen.get(chuanHoaChuoi(chiTietMon?.name || ''))
+      const danhMuc = monPhuHop?.category || monPhuHop?.danhMuc || suyRaDanhMucTuTenMon(chiTietMon?.name || '')
+      if (!doanhThuTheoDanhMuc.has(danhMuc)) return
+      doanhThuTheoDanhMuc.set(danhMuc, doanhThuTheoDanhMuc.get(danhMuc) + doanhThu)
     })
   })
 
-  const totalRevenue = [...categoryRevenueMap.values()].reduce((sum, value) => sum + value, 0)
+  const tongDoanhThu = [...doanhThuTheoDanhMuc.values()].reduce((tong, giaTri) => tong + giaTri, 0)
 
-  return CAC_DANH_MUC_CHUAN_THUC_DON.map((category) => ({
-    category,
-    percent: totalRevenue > 0 ? Math.round(((categoryRevenueMap.get(category) || 0) / totalRevenue) * 100) : 0,
+  return CAC_DANH_MUC_CHUAN_THUC_DON.map((danhMuc) => ({
+    category: danhMuc,
+    percent: tongDoanhThu > 0 ? Math.round(((doanhThuTheoDanhMuc.get(danhMuc) || 0) / tongDoanhThu) * 100) : 0,
   }))
 }
 
@@ -188,19 +191,19 @@ export const NOI_BO_THONG_KE_KHOANG_THOI_GIAN = Object.freeze([
   { key: 'thisMonth', label: 'Tháng này' },
 ])
 
-export const taoDuLieuThongKeDoanhThu = ({ orders = [], bookings = [], timeRange = 'today' } = {}) => {
-  const filteredOrders = filterOrdersByTimeRange(orders, timeRange)
-  const filteredBookings = filterBookingsByTimeRange(bookings, timeRange)
-  const tongDoanhThu = filteredOrders.reduce((sum, order) => sum + (Number(order?.total) || 0), 0)
-  const soDonHoanThanh = filteredOrders.filter((order) => isOrderCompleted(order)).length
-  const giaTriTrungBinh = filteredOrders.length > 0 ? Math.round(tongDoanhThu / filteredOrders.length) : 0
-  const revenueSeries = buildRevenueSeries(filteredOrders)
-  const giaTriLonNhat = Math.max(...revenueSeries.map((item) => item.revenue), 1)
-  const topDishes = buildTopDishes(filteredOrders)
-  const categoryShares = buildCategoryShares(filteredOrders)
-  const totalBookings = filteredBookings.length
-  const completedBookings = filteredBookings.filter(isBookingCompleted).length
-  const cancelledBookings = filteredBookings.filter(isBookingCancelled).length
+export const taoDuLieuThongKeDoanhThu = ({ orders: danhSachDonHangNguon = [], bookings: danhSachDatBanNguon = [], timeRange: khoangThoiGian = 'today' } = {}) => {
+  const danhSachDonHangDaLoc = locDonHangTheoKhoangThoiGian(danhSachDonHangNguon, khoangThoiGian)
+  const danhSachDatBanDaLoc = locDatBanTheoKhoangThoiGian(danhSachDatBanNguon, khoangThoiGian)
+  const tongDoanhThu = danhSachDonHangDaLoc.reduce((tong, donHang) => tong + (Number(donHang?.total) || 0), 0)
+  const soDonHoanThanh = danhSachDonHangDaLoc.filter((donHang) => laDonHangHoanThanh(donHang)).length
+  const giaTriTrungBinh = danhSachDonHangDaLoc.length > 0 ? Math.round(tongDoanhThu / danhSachDonHangDaLoc.length) : 0
+  const revenueSeries = taoChuoiDoanhThu(danhSachDonHangDaLoc)
+  const giaTriLonNhat = Math.max(...revenueSeries.map((mucDoanhThu) => mucDoanhThu.revenue), 1)
+  const topDishes = taoTopMonBanChay(danhSachDonHangDaLoc)
+  const categoryShares = taoTyTrongDanhMuc(danhSachDonHangDaLoc)
+  const totalBookings = danhSachDatBanDaLoc.length
+  const completedBookings = danhSachDatBanDaLoc.filter(laDatBanHoanThanh).length
+  const cancelledBookings = danhSachDatBanDaLoc.filter(laDatBanDaHuy).length
 
   return {
     overview: {

@@ -2,7 +2,7 @@ import { CalendarOutlined, ClockCircleOutlined, TableOutlined } from '@ant-desig
 import { Card, Col, Row, Statistic } from 'antd'
 import { useOutletContext } from 'react-router-dom'
 import DatBanTab from '../../features/noiBo/components/DatBanTab'
-import { layNhanPhamViTongQuan, laDatBanDaCheckIn } from '../../features/noiBo/boChon'
+import { layNhanBoLocTongQuan, laDatBanDaCheckIn } from '../../features/noiBo/boChon'
 
 function NoiBoDatBanPage() {
   const {
@@ -21,7 +21,7 @@ function NoiBoDatBanPage() {
     danhSachDatBanChuaGanBan,
   } = useOutletContext()
 
-  const phamViLabel = layNhanPhamViTongQuan('all', 'all')
+  const phamViLabel = layNhanBoLocTongQuan('all', 'all')
 
   const summaryItems = [
     {

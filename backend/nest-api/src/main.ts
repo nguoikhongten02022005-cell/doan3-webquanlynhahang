@@ -89,7 +89,19 @@ async function bootstrap() {
     .build();
 
   const taiLieuSwagger = SwaggerModule.createDocument(app, cauHinhSwagger);
-  SwaggerModule.setup('swagger', app, taiLieuSwagger);
+  SwaggerModule.setup('swagger', app, taiLieuSwagger, {
+    customSiteTitle: 'API Quan Ly Nha Hang - Swagger',
+    customJsStr: `
+      document.documentElement.lang = 'vi';
+      document.documentElement.setAttribute('translate', 'no');
+      document.documentElement.classList.add('notranslate');
+      document.body?.setAttribute('translate', 'no');
+      document.body?.classList.add('notranslate');
+    `,
+    swaggerOptions: {
+      defaultModelsExpandDepth: -1,
+    },
+  });
 
   await app.get(BootstrapService).khoiTaoNeuCan();
   await app.listen(congBackend);
