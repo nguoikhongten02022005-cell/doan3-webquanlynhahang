@@ -1,5 +1,11 @@
 import { Empty } from 'antd'
 
+const layKichThuocAnh = ({ compact, table }) => {
+  if (table) return { height: 42 }
+  if (compact) return { height: 36 }
+  return { height: 48 }
+}
+
 function DashboardEmptyState({ title, description, compact = false, table = false }) {
   const className = [
     'noi-bo-dashboard-empty',
@@ -11,6 +17,7 @@ function DashboardEmptyState({ title, description, compact = false, table = fals
     <Empty
       className={className}
       image={Empty.PRESENTED_IMAGE_SIMPLE}
+      imageStyle={layKichThuocAnh({ compact, table })}
       description={(
         <div className="noi-bo-dashboard-empty__description">
           <strong>{title}</strong>

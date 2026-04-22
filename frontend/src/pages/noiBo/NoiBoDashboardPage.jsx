@@ -9,13 +9,19 @@ import HanhDongUuTien from '../../features/noiBo/dashboard/HanhDongUuTien'
 const { useBreakpoint } = Grid
 
 function NoiBoDashboardPage() {
-  const { bangDieuKhienData } = useOutletContext()
+  const {
+    bangDieuKhienData,
+    dangTaiDuLieu,
+    daTaiDuLieuLanDau,
+  } = useOutletContext()
   const manHinh = useBreakpoint()
   const laMobile = manHinh.xs && !manHinh.md
+  const khoangCach = laMobile ? 14 : manHinh.xxl ? 20 : 18
+  const dangTaiKhoiTaoDashboard = dangTaiDuLieu && !daTaiDuLieuLanDau
 
   return (
-    <Flex vertical gap={laMobile ? 14 : 18} style={{ width: '100%' }} className="noi-bo-dashboard-page">
-      <Space orientation="vertical" size={4} style={{ width: '100%' }}>
+    <Flex vertical gap={khoangCach} style={{ width: '100%' }} className="noi-bo-dashboard-page">
+      <Space direction="vertical" size={4} style={{ width: '100%' }} className="noi-bo-dashboard-page__heading">
         <Typography.Title level={laMobile ? 4 : 3} style={{ margin: 0 }}>
           Bảng điều khiển nhà hàng hôm nay
         </Typography.Title>
@@ -24,20 +30,24 @@ function NoiBoDashboardPage() {
         </Typography.Text>
       </Space>
 
-      <TheThongKe stats={bangDieuKhienData?.stats} />
+      <TheThongKe stats={bangDieuKhienData?.stats} loading={dangTaiKhoiTaoDashboard} />
 
-      <Row className="noi-bo-dashboard-primary-grid" gutter={[laMobile ? 14 : 18, laMobile ? 14 : 18]} align="stretch">
+      <Row className="noi-bo-dashboard-primary-grid" gutter={[khoangCach, khoangCach]} align="stretch">
         <Col xs={24} xl={16}>
-          <BieuDoDoanhThu revenue={bangDieuKhienData?.revenue} />
+          <BieuDoDoanhThu revenue={bangDieuKhienData?.revenue} loading={dangTaiKhoiTaoDashboard} />
         </Col>
         <Col xs={24} xl={8}>
-          <ApLucBanAn tablePressure={bangDieuKhienData?.tablePressure} />
+          <ApLucBanAn tablePressure={bangDieuKhienData?.tablePressure} loading={dangTaiKhoiTaoDashboard} />
         </Col>
       </Row>
 
-      <HanhDongUuTien urgentTasks={bangDieuKhienData?.urgentTasks} />
+      <HanhDongUuTien urgentTasks={bangDieuKhienData?.urgentTasks} loading={dangTaiKhoiTaoDashboard} />
 
-      <DatBanVaDonHang bookings={bangDieuKhienData?.bookings} orders={bangDieuKhienData?.orders} />
+      <DatBanVaDonHang
+        bookings={bangDieuKhienData?.bookings}
+        orders={bangDieuKhienData?.orders}
+        loading={dangTaiKhoiTaoDashboard}
+      />
     </Flex>
   )
 }

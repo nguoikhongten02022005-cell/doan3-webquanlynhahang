@@ -65,6 +65,7 @@ export const useDuLieuBangDieuKhien = () => {
   const [danhSachBan, setDanhSachBan] = useState([])
   const [danhSachDanhGia, setDanhSachDanhGia] = useState([])
   const [dangTaiDuLieu, setDangTaiDuLieu] = useState(false)
+  const [daTaiDuLieuLanDau, setDaTaiDuLieuLanDau] = useState(false)
   const [loiTaiDuLieu, setLoiTaiDuLieu] = useState('')
 
   const taiLaiDuLieu = useCallback(async () => {
@@ -112,6 +113,7 @@ export const useDuLieuBangDieuKhien = () => {
       throw error
     } finally {
       setDangTaiDuLieu(false)
+      setDaTaiDuLieuLanDau(true)
     }
   }, [laQuanLy, layDanhSachDatBanHost])
 
@@ -279,6 +281,7 @@ export const useDuLieuBangDieuKhien = () => {
     danhSachMon,
     danhSachTaiKhoan,
     dangTaiDuLieu,
+    daTaiDuLieuLanDau,
     loiTaiDuLieu,
     xuLyGanBan,
     xuLyCapNhatTrangThaiDatBan,
