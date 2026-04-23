@@ -61,7 +61,7 @@ function TheMonAn({
       hoverable={canOpenDetail}
       className={`the-mon ${safeDish.tone || ''} ${isMenuVariant ? 'the-mon--menu' : ''}`}
       cover={phanAnh}
-      onClick={xuLyMoChiTiet}
+      onClick={canOpenDetail ? xuLyMoChiTiet : undefined}
     >
       <Meta
         title={<Typography.Text strong className="the-mon-title">{dishName}</Typography.Text>}

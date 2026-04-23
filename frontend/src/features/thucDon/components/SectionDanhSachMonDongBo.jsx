@@ -4,7 +4,6 @@ function SectionDanhSachMonDongBo({
   tenMuc,
   nhanMuc = 'Danh mục',
   danhSachMon,
-  xuLyMoChiTiet,
   thamChieuMuc,
   maDanhMuc,
 }) {
@@ -27,7 +26,6 @@ function SectionDanhSachMonDongBo({
             key={mon.id}
             dish={mon}
             variant="menu"
-            onOpenDetail={xuLyMoChiTiet}
           />
         ))}
       </div>

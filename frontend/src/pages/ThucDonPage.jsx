@@ -1,13 +1,10 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import ChiTietMonAnModal from '../features/thucDon/components/ChiTietMonAnModal'
 import SectionDanhSachMonDongBo from '../features/thucDon/components/SectionDanhSachMonDongBo'
-import { useGioHang } from '../context/GioHangContext'
 import {
   GHI_CHU_DANH_MUC_THUC_DON,
   HOME_CAC_DANH_MUC_THUC_DON,
 } from '../features/thucDon/constants/danhMucThucDon'
 import { layAnhMonTheoTen } from '../features/thucDon/constants/anhMonAn'
-import { useChiTietMonAnModal } from '../features/thucDon/hooks/useChiTietMonAnModal'
 import { useDanhSachMonAn } from '../features/thucDon/hooks/useDanhSachMonAn'
 
 const THONG_TIN_DANH_MUC_THUC_DON = Object.freeze(
@@ -29,26 +26,10 @@ const KHOANG_CANH_CAN_DINH_TAB = 120
 
 function ThucDonPage() {
   const [danhMucDangChon, setActiveCategory] = useState(DANH_SACH_TAB_THUC_DON[0])
-  const { themVaoGio } = useGioHang()
   const { dishes, daTaiLanDau, error, reloadDishes } = useDanhSachMonAn()
   const danhMucRefs = useRef({})
   const thamChieuHangTab = useRef(null)
   const thamChieuTabTheoDanhMuc = useRef({})
-  const {
-    dongChiTietMon,
-    giaChiTiet,
-    xuLyThemMonDaTuyChon,
-    xuLyBatTatTopping,
-    dangMoChiTiet,
-    moChiTietMon,
-    monDaChon,
-    kichCoDaChon,
-    phuThuDaChon,
-    toppingDaChon,
-    datKichCoDaChon,
-    datGhiChuRieng,
-    ghiChuRieng,
-  } = useChiTietMonAnModal({ themVaoGio })
 
   const danhSachTabDanhMuc = useMemo(
     () => DANH_SACH_TAB_THUC_DON.map((category) => ({
@@ -223,7 +204,6 @@ function ThucDonPage() {
                   tenMuc={section.label}
                   nhanMuc="Danh mục"
                   danhSachMon={section.dishes}
-                  xuLyMoChiTiet={moChiTietMon}
                   thamChieuMuc={(phanTu) => {
                     danhMucRefs.current[section.category] = phanTu
                   }}
@@ -235,21 +215,6 @@ function ThucDonPage() {
         </div>
       </section>
 
-      <ChiTietMonAnModal
-        giaChiTiet={giaChiTiet}
-        dangMo={dangMoChiTiet}
-        xuLyThemVaoGio={xuLyThemMonDaTuyChon}
-        xuLyDong={dongChiTietMon}
-        xuLyChonKichCo={datKichCoDaChon}
-        xuLyDoiGhiChuRieng={datGhiChuRieng}
-        xuLyBatTatTopping={xuLyBatTatTopping}
-        phamVi="menu"
-        monDaChon={monDaChon}
-        kichCoDaChon={kichCoDaChon}
-        phuThuDaChon={phuThuDaChon}
-        toppingDaChon={toppingDaChon}
-        ghiChuRieng={ghiChuRieng}
-      />
     </div>
   )
 }

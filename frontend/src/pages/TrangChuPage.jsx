@@ -1,35 +1,16 @@
 import { useMemo } from 'react'
 import { Button, ConfigProvider, Space, Typography } from 'antd'
 import { Link } from 'react-router-dom'
-import ChiTietMonAnModal from '../features/thucDon/components/ChiTietMonAnModal'
 import SectionDanhSachMonDongBo from '../features/thucDon/components/SectionDanhSachMonDongBo'
 import anhTimChungToi from '../assets/img/findus.585c393ccd3671513743.png'
 import knifeImage from '../assets/img/knife.1121c0a5afb62acb31cb.png'
 import { ANH_HERO_TRANG_CHU, layAnhMonTheoTen } from '../features/thucDon/constants/anhMonAn'
-import { useGioHang } from '../context/GioHangContext'
-import { useChiTietMonAnModal } from '../features/thucDon/hooks/useChiTietMonAnModal'
 import { useDanhSachMonAn } from '../features/thucDon/hooks/useDanhSachMonAn'
 import { layDanhSachMonNoiBatTrangChu } from '../services/mappers/anhXaThucDon'
 
 function TrangChuPage() {
   const { Title, Paragraph } = Typography
-  const { themVaoGio } = useGioHang()
   const { dishes } = useDanhSachMonAn()
-  const {
-    dongChiTietMon,
-    giaChiTiet,
-    xuLyThemMonDaTuyChon,
-    xuLyBatTatTopping,
-    dangMoChiTiet,
-    moChiTietMon,
-    monDaChon,
-    kichCoDaChon,
-    phuThuDaChon,
-    toppingDaChon,
-    datKichCoDaChon,
-    datGhiChuRieng,
-    ghiChuRieng,
-  } = useChiTietMonAnModal({ themVaoGio })
 
   const danhSachMonDacTrung = useMemo(
     () => layDanhSachMonNoiBatTrangChu(dishes).map((dish) => ({
@@ -118,7 +99,6 @@ function TrangChuPage() {
             tenMuc="Món Ngon Phải Thử"
             nhanMuc="Món được chọn nhiều"
             danhSachMon={danhSachMonDacTrung}
-            xuLyMoChiTiet={moChiTietMon}
             maDanhMuc="mon-noi-bat"
           />
 
@@ -164,22 +144,6 @@ function TrangChuPage() {
           </div>
         </div>
       </section>
-
-      <ChiTietMonAnModal
-        giaChiTiet={giaChiTiet}
-        dangMo={dangMoChiTiet}
-        xuLyThemVaoGio={xuLyThemMonDaTuyChon}
-        xuLyDong={dongChiTietMon}
-        xuLyChonKichCo={datKichCoDaChon}
-        xuLyDoiGhiChuRieng={datGhiChuRieng}
-        xuLyBatTatTopping={xuLyBatTatTopping}
-        phamVi="home"
-        monDaChon={monDaChon}
-        kichCoDaChon={kichCoDaChon}
-        phuThuDaChon={phuThuDaChon}
-        toppingDaChon={toppingDaChon}
-        ghiChuRieng={ghiChuRieng}
-      />
 
     </div>
     </ConfigProvider>
