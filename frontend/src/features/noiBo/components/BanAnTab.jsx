@@ -532,7 +532,7 @@ function BanAnTabPos({
   return (
     <>
       {contextHolder}
-      <article className="rounded-[28px] border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-5">
+      <article className="rounded-none border border-[#E5E0DB] bg-white/95 p-4 shadow-[0_18px_40px_rgba(55,39,28,0.08)] md:p-5">
         <div className="flex flex-col gap-4">
           <div className="flex flex-col justify-between gap-3 md:flex-row md:items-end">
             <div>
@@ -568,7 +568,7 @@ function BanAnTabPos({
             ))}
           </div>
 
-          <div className="rounded-[24px] border border-slate-200 bg-[#FCFCFD] px-2 py-3 md:px-3">
+          <div className="rounded-none border border-slate-200 bg-[#FCFCFD] px-2 py-3 md:px-3">
             <Tabs items={danhSachTab} animated size="middle" className="noi-bo-pos-table-tabs" />
           </div>
         </div>

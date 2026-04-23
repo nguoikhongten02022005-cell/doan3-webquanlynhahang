@@ -19,6 +19,7 @@ import { useXacThuc } from '../hooks/useXacThuc'
 import { layDanhSachBanApi } from '../services/api/apiBanAn'
 import { layKhaDungDatBanApi } from '../services/api/apiDatBan'
 import { taoDuLieuBanNhapTamDatBan } from '../features/datBan/utils/banNhapTamDatBan'
+import { taiDuLieuBanCongKhai } from '../features/datBan/utils/chinhSachDatBan'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 import BuocMotDatBan from '../features/datBan/components/BuocMotDatBan'
 import BuocHaiDatBan from '../features/datBan/components/BuocHaiDatBan'
@@ -199,7 +200,7 @@ const tinhTinhTrangKhungGio = ({ date, time, tables = [], bookings = [] }) => {
 }
 
 function DatBanPage() {
-  const { nguoiDungHienTai } = useXacThuc()
+  const { nguoiDungHienTai, coTheVaoNoiBo } = useXacThuc()
   const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan, layDanhSachDatBanHost } = useDatBan()
 
   const [tables, setTables] = useState([])
@@ -231,15 +232,16 @@ function DatBanPage() {
       setLoiTaiBan('')
 
       try {
-        const [{ duLieu: duLieuBan }, danhSachDatBan] = await Promise.all([
-          layDanhSachBanApi(),
-          layDanhSachDatBanHost(),
-        ])
+        const { duLieuBan, danhSachDatBan } = await taiDuLieuBanCongKhai({
+          coTheVaoNoiBo,
+          layDanhSachBanApi,
+          layDanhSachDatBanHost,
+        })
 
         if (!active) return
 
-        setTables(Array.isArray(duLieuBan) ? duLieuBan : [])
-        setDanhSachDatBanHienTai(Array.isArray(danhSachDatBan) ? danhSachDatBan : [])
+        setTables(duLieuBan)
+        setDanhSachDatBanHienTai(danhSachDatBan)
       } catch (error) {
         if (!active) return
         setTables([])
@@ -256,7 +258,7 @@ function DatBanPage() {
     return () => {
       active = false
     }
-  }, [layDanhSachDatBanHost])
+  }, [coTheVaoNoiBo, layDanhSachDatBanHost])
 
   useEffect(() => {
     if (!didBootstrapDraft || submitSuccess) {

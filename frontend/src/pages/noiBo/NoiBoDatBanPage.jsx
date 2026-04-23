@@ -1,4 +1,5 @@
-import { CalendarOutlined, ClockCircleOutlined, TableOutlined } from '@ant-design/icons'
+import { useCallback, useMemo } from 'react'
+import { CalendarOutlined, CheckCircleOutlined, ClockCircleOutlined, TableOutlined } from '@ant-design/icons'
 import { Card, Col, Row, Statistic } from 'antd'
 import { useOutletContext } from 'react-router-dom'
 import DatBanTab from '../../features/noiBo/components/DatBanTab'
@@ -22,15 +23,28 @@ function NoiBoDatBanPage() {
   } = useOutletContext()
 
   const phamViLabel = layNhanBoLocTongQuan('all', 'all')
+  const tongDaCheckIn = useMemo(
+    () => hangDoiDatBan.filter((booking) => laDatBanDaCheckIn(booking)).length,
+    [hangDoiDatBan],
+  )
 
-  const summaryItems = [
+  const layDanhSachBanPhuHop = useCallback(
+    (booking) => layBanPhuHopChoDatBan(booking, danhSachBan),
+    [danhSachBan, layBanPhuHopChoDatBan],
+  )
+
+  const xuLyCapNhatTrangThaiNhanh = useCallback(
+    (booking, status) => xuLyCapNhatTrangThaiDatBan(booking.id, status, 'Không thể cập nhật trạng thái booking.'),
+    [xuLyCapNhatTrangThaiDatBan],
+  )
+
+  const danhSachThongKe = useMemo(() => [
     {
       key: 'watching',
       label: 'Booking đang theo dõi',
       value: hangDoiDatBan.length,
       description: phamViLabel,
       icon: <CalendarOutlined />,
-      accent: 'from-slate-900 to-slate-700',
     },
     {
       key: 'pending',
@@ -38,7 +52,7 @@ function NoiBoDatBanPage() {
       value: danhSachDatBanChoXuLy.length,
       description: 'Ưu tiên liên hệ sớm để chốt bàn.',
       icon: <ClockCircleOutlined />,
-      accent: 'from-amber-500 to-orange-500',
+      color: '#d97706',
     },
     {
       key: 'unassigned',
@@ -46,7 +60,7 @@ function NoiBoDatBanPage() {
       value: danhSachDatBanChuaGanBan.length,
       description: 'Cần phân bàn trước khi khách đến.',
       icon: <TableOutlined />,
-      accent: 'from-rose-500 to-orange-500',
+      color: '#dc2626',
     },
     {
       key: 'arriving',
@@ -54,26 +68,38 @@ function NoiBoDatBanPage() {
       value: danhSachDatBanSapDienRa.length,
       description: 'Kiểm tra vị trí và ghi chú đặc biệt.',
       icon: <ClockCircleOutlined />,
-      accent: 'from-emerald-500 to-teal-500',
+      color: '#059669',
     },
     {
       key: 'checked-in',
       label: 'Đã check-in',
-      value: hangDoiDatBan.filter((booking) => laDatBanDaCheckIn(booking)).length,
+      value: tongDaCheckIn,
       description: 'Đang phục vụ hoặc đã xếp bàn.',
-      icon: <TableOutlined />,
-      accent: 'from-blue-500 to-cyan-500',
+      icon: <CheckCircleOutlined />,
+      color: '#2563eb',
     },
-  ]
+  ], [
+    danhSachDatBanChoXuLy.length,
+    danhSachDatBanChuaGanBan.length,
+    danhSachDatBanSapDienRa.length,
+    hangDoiDatBan.length,
+    phamViLabel,
+    tongDaCheckIn,
+  ])
 
   return (
-    <div className="space-y-4">
+    <div className="noi-bo-dat-ban-page">
       <Row gutter={[16, 16]}>
-        {summaryItems.map((item) => (
-          <Col key={item.key} xs={24} sm={12} xl={6}>
-            <Card>
-              <Statistic title={item.label} value={item.value} prefix={item.icon} />
-              <div className="mt-2 text-xs text-slate-500">{item.description}</div>
+        {danhSachThongKe.map((thongKe, index) => (
+          <Col key={thongKe.key} xs={24} sm={12} xl={index < 3 ? 8 : 12}>
+            <Card className="noi-bo-dat-ban-summary-card">
+              <Statistic
+                title={thongKe.label}
+                value={thongKe.value}
+                prefix={thongKe.icon}
+                styles={thongKe.color ? { content: { color: thongKe.color } } : undefined}
+              />
+              <div className="noi-bo-dat-ban-summary-note">{thongKe.description}</div>
             </Card>
           </Col>
         ))}
@@ -81,9 +107,9 @@ function NoiBoDatBanPage() {
 
       <DatBanTab
         hangDoiDatBan={hangDoiDatBan}
-        getAvailableTablesForBooking={(booking) => layBanPhuHopChoDatBan(booking, danhSachBan)}
+        getAvailableTablesForBooking={layDanhSachBanPhuHop}
         handleAssignTables={xuLyGanBan}
-        handleQuickStatusChange={(booking, status) => xuLyCapNhatTrangThaiDatBan(booking.id, status, 'Không thể cập nhật trạng thái booking.')}
+        handleQuickStatusChange={xuLyCapNhatTrangThaiNhanh}
         handleCheckIn={xuLyCheckIn}
         handleComplete={xuLyHoanThanh}
         handleCreateInternalBooking={xuLyTaoDatBanNoiBo}

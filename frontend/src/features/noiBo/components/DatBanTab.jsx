@@ -4,7 +4,6 @@ import {
   CalendarOutlined,
   CheckCircleOutlined,
   CheckOutlined,
-  ClockCircleOutlined,
   EditOutlined,
   EnvironmentOutlined,
   PhoneOutlined,
@@ -14,7 +13,27 @@ import {
   SwapOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, Badge, Button, Card, Col, Descriptions, Divider, Drawer, Empty, Form, Input, InputNumber, Modal, Row, Select, Segmented, Space, Tag, Typography } from 'antd'
+import {
+  Alert,
+  Button,
+  Card,
+  Col,
+  Descriptions,
+  Divider,
+  Drawer,
+  Empty,
+  Form,
+  Input,
+  InputNumber,
+  List,
+  Modal,
+  Row,
+  Select,
+  Segmented,
+  Space,
+  Tag,
+  Typography,
+} from 'antd'
 import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../datBan/mocks/duLieuDatBan'
 import {
   dinhDangNgayGio,
@@ -31,9 +50,19 @@ import {
   layGhiChuUuTienDatBan,
   khopTimKiemDatBan,
   canXacNhanThuCong,
+  laDatBanDaCheckIn,
 } from '../boChon'
+import { CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN } from '../hangSo'
 
 const { TextArea } = Input
+
+const KIEU_MUC_FORM_GON = { marginBottom: 12 }
+
+const TRANG_THAI_DAT_BAN = Object.freeze({
+  DA_XAC_NHAN: 'DA_XAC_NHAN',
+  CAN_GOI_LAI: 'CAN_GOI_LAI',
+  TU_CHOI_HET_CHO: 'TU_CHOI_HET_CHO',
+})
 
 const DEFAULT_FORM_VALUES = {
   name: '',
@@ -45,7 +74,7 @@ const DEFAULT_FORM_VALUES = {
   seatingArea: 'KHONG_UU_TIEN',
   notes: '',
   internalNote: '',
-  status: 'DA_XAC_NHAN',
+  status: TRANG_THAI_DAT_BAN.DA_XAC_NHAN,
 }
 
 const QUICK_FILTERS = [
@@ -55,7 +84,7 @@ const QUICK_FILTERS = [
   { key: 'pending', label: 'Chờ xác nhận' },
 ]
 
-const PENDING_STATUS_SET = new Set(['YEU_CAU_DAT_BAN', 'CAN_GOI_LAI', 'CHO_XAC_NHAN', 'Pending'])
+const PENDING_STATUS_SET = new Set([...CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN, 'Pending'])
 
 const CREATE_STATUS_OPTIONS = CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.filter((status) => Boolean(HOST_NHAN_TRANG_THAI_DAT_BAN[status]))
 
@@ -70,20 +99,23 @@ const ACTION_CONFIRMATION_COPY = {
   checkIn: {
     title: 'Xác nhận check-in',
     confirmLabel: 'Xác nhận check-in',
-    message: 'Khách sẽ được chuyển sang trạng thái đang phục vụ và bàn đi kèm sẽ được giữ cho booking này.',
-    getMessage: (booking) => `Đánh dấu booking ${booking.bookingCode} là đã check-in và chuyển bàn sang trạng thái đang phục vụ?`,
+    message: 'Booking sẽ chuyển sang trạng thái đang phục vụ và tiếp tục giữ bàn đã gán.',
+    description: 'Dùng khi khách đã đến và host muốn chuyển nhanh sang luồng phục vụ.',
+    getMessage: (booking) => `Đánh dấu booking ${layMaDatBan(booking)} là đã check-in?`,
   },
   complete: {
     title: 'Xác nhận hoàn thành',
     confirmLabel: 'Hoàn thành booking',
-    message: 'Hành động này sẽ giải phóng các bàn đang gán và đóng luồng phục vụ cho booking.',
-    getMessage: (booking) => `Hoàn thành booking ${booking.bookingCode} và giải phóng các bàn đang gán?`,
+    message: 'Booking sẽ được đóng và các bàn đang giữ sẽ được giải phóng.',
+    description: 'Dùng sau khi khách đã dùng bữa xong hoặc quy trình phục vụ đã hoàn tất.',
+    getMessage: (booking) => `Hoàn thành booking ${layMaDatBan(booking)} và trả lại bàn về trạng thái sẵn sàng?`,
   },
   noShow: {
     title: 'Xác nhận khách không đến',
     confirmLabel: 'Đánh dấu không đến',
-    message: 'Dùng khi cần trả lại bàn đang giữ và đóng booking mà không thực hiện check-in.',
-    getMessage: (booking) => `Đánh dấu khách của booking ${booking.bookingCode} là không đến và trả lại bàn đang giữ?`,
+    message: 'Hành động này sẽ đóng booking và trả lại toàn bộ bàn đang giữ.',
+    description: 'Chỉ dùng khi đã xác nhận khách không đến hoặc quá thời gian giữ bàn.',
+    getMessage: (booking) => `Đánh dấu booking ${layMaDatBan(booking)} là khách không đến?`,
   },
 }
 
@@ -97,21 +129,25 @@ const seatingAreaOptions = [
 
 const getStatusTagColor = (status) => STATUS_TAG_COLORS[laySacThaiTrangThaiDatBan(status)] || 'default'
 
-const isTodayLocal = (value) => {
+const layMaDatBan = (booking) => booking.bookingCode || booking.code || `DB-${booking.id}`
+const layNguonDatBan = (booking) => (booking.source === 'internal' ? 'Nội bộ' : 'Web')
+const laBookingChuaGanBan = (booking) => !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
+
+function laNgayHomNay(value, homNay) {
   if (!value) return false
   const parsed = dayjs(value)
-  return parsed.isValid() && parsed.isSame(dayjs(), 'day')
+  return parsed.isValid() && parsed.format('YYYY-MM-DD') === homNay
 }
 
-function applyQuickFilter(bookings, quickFilter) {
+function applyQuickFilter(bookings, quickFilter, homNay) {
   if (quickFilter === 'all') return bookings
 
   if (quickFilter === 'today') {
-    return bookings.filter((booking) => isTodayLocal(booking.date))
+    return bookings.filter((booking) => laNgayHomNay(booking.date, homNay))
   }
 
   if (quickFilter === 'unassigned') {
-    return bookings.filter((booking) => !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0)
+    return bookings.filter((booking) => laBookingChuaGanBan(booking))
   }
 
   if (quickFilter === 'pending') {
@@ -121,12 +157,55 @@ function applyQuickFilter(bookings, quickFilter) {
   return bookings
 }
 
-function getQuickFilterCounts(bookings) {
-  return {
+function getQuickFilterCounts(bookings, homNay) {
+  const ketQua = {
     all: bookings.length,
-    today: bookings.filter((booking) => isTodayLocal(booking.date)).length,
-    unassigned: bookings.filter((booking) => !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0).length,
-    pending: bookings.filter((booking) => PENDING_STATUS_SET.has(booking.status)).length,
+    today: 0,
+    unassigned: 0,
+    pending: 0,
+  }
+
+  bookings.forEach((booking) => {
+    if (laNgayHomNay(booking.date, homNay)) ketQua.today += 1
+    if (laBookingChuaGanBan(booking)) ketQua.unassigned += 1
+    if (PENDING_STATUS_SET.has(booking.status)) ketQua.pending += 1
+  })
+
+  return ketQua
+}
+
+function layThongTinTrangThaiTrong({ tongSoBooking, tuKhoaTimKiem, boLocNhanh }) {
+  if (tongSoBooking === 0) {
+    return {
+      tieuDe: 'Chưa có booking nội bộ nào',
+      moTa: 'Hãy tạo booking mới hoặc chờ dữ liệu đồng bộ từ hệ thống.',
+    }
+  }
+
+  if (tuKhoaTimKiem.trim() && boLocNhanh !== 'all') {
+    return {
+      tieuDe: 'Chưa có booking phù hợp với bộ lọc hiện tại',
+      moTa: 'Hãy thử đổi từ khóa tìm kiếm hoặc chuyển sang bộ lọc khác.',
+    }
+  }
+
+  if (tuKhoaTimKiem.trim()) {
+    return {
+      tieuDe: 'Không tìm thấy booking khớp với từ khóa',
+      moTa: 'Hãy thử tìm theo mã booking, tên khách hoặc số điện thoại khác.',
+    }
+  }
+
+  if (boLocNhanh !== 'all') {
+    return {
+      tieuDe: 'Chưa có booking phù hợp với bộ lọc hiện tại',
+      moTa: 'Hãy thử chuyển sang bộ lọc khác để tiếp tục xử lý.',
+    }
+  }
+
+  return {
+    tieuDe: 'Chưa có booking phù hợp',
+    moTa: 'Hãy thử điều chỉnh bộ lọc hiện tại.',
   }
 }
 
@@ -134,7 +213,7 @@ function DatBanToolbar({
   searchQuery,
   onSearchChange,
   onReset,
-  formMode,
+  dangChinhSua,
   visibleCount,
   phamViLabel,
   quickFilter,
@@ -142,22 +221,43 @@ function DatBanToolbar({
   filterCounts,
 }) {
   return (
-    <Card>
-      <Space orientation="vertical" size={12} style={{ width: '100%' }}>
-        <div className="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+    <Card className="dat-ban-noi-bo-toolbar-card">
+      <Space direction="vertical" size={14} style={{ width: '100%' }}>
+        <div className="dat-ban-noi-bo-toolbar-card__top">
           <div>
-            <Typography.Title level={4} style={{ margin: 0 }}>Danh sách booking</Typography.Title>
+            <span className="dat-ban-noi-bo-section-kicker">Đặt bàn nội bộ</span>
+            <Typography.Title level={4} style={{ margin: '4px 0 0' }}>Danh sách booking</Typography.Title>
             <Typography.Text type="secondary">{visibleCount} booking · {phamViLabel}</Typography.Text>
           </div>
-          <div className="flex flex-col gap-2 lg:min-w-[560px]">
-            <div className="flex flex-col gap-2 lg:flex-row lg:items-center">
-              <Input allowClear size="middle" value={searchQuery} prefix={<SearchOutlined className="text-slate-400" />} placeholder="Tìm theo mã booking, tên khách hoặc SĐT" onChange={(event) => onSearchChange(event.target.value)} />
-              <Button size="middle" onClick={onReset} icon={<PlusOutlined />}>{formMode === 'edit' ? 'Tạo mới' : 'Làm mới'}</Button>
-            </div>
-          </div>
+
+          <Space.Compact block className="dat-ban-noi-bo-toolbar-compact">
+            <Input
+              allowClear
+              size="large"
+              value={searchQuery}
+              prefix={<SearchOutlined className="text-slate-400" />}
+              placeholder="Tìm theo mã booking, tên khách hoặc SĐT"
+              onChange={(event) => onSearchChange(event.target.value)}
+              className="booking-noi-bo-search"
+            />
+            <Button size="large" onClick={onReset} icon={<PlusOutlined />}>
+              {dangChinhSua ? 'Tạo mới' : 'Làm mới'}
+            </Button>
+          </Space.Compact>
         </div>
+
         <Segmented
-          options={QUICK_FILTERS.map((filter) => ({ label: <Space size={6}><span>{filter.label}</span><Badge count={filterCounts[filter.key] || 0} size="small" /></Space>, value: filter.key }))}
+          block
+          className="dat-ban-noi-bo-segmented"
+          options={QUICK_FILTERS.map((boLoc) => ({
+            label: (
+              <span className="dat-ban-noi-bo-filter-option">
+                <span>{boLoc.label}</span>
+                <span className="dat-ban-noi-bo-filter-option__count">{filterCounts[boLoc.key] || 0}</span>
+              </span>
+            ),
+            value: boLoc.key,
+          }))}
           value={quickFilter}
           onChange={onQuickFilterChange}
         />
@@ -167,7 +267,6 @@ function DatBanToolbar({
 }
 
 function DatBanFormCard({
-  formMode,
   editingBookingId,
   formValues,
   formError,
@@ -175,295 +274,371 @@ function DatBanFormCard({
   onSubmit,
   onReset,
 }) {
-  const title = formMode === 'edit' ? `Sửa booking #${editingBookingId}` : 'Tạo đặt bàn nội bộ'
-  const subtitle = formMode === 'edit' ? 'Cập nhật nhanh cho lễ tân / host' : 'Điền nhanh yêu cầu để chốt chỗ ngay tại quầy'
+  const dangChinhSua = editingBookingId !== null
+  const title = dangChinhSua ? `Sửa booking #${editingBookingId}` : 'Tạo đặt bàn nội bộ'
+  const subtitle = dangChinhSua ? 'Cập nhật nhanh để host xử lý ngay tại quầy.' : 'Điền nhanh thông tin để chốt bàn ngay trong ca làm việc.'
 
   return (
     <Card
-      title={<Typography.Title level={4} style={{ margin: 0 }}>{title}</Typography.Title>}
-      extra={<Tag color="orange">{formMode === 'edit' ? 'Đang chỉnh sửa' : 'Tạo mới'}</Tag>}
+      className="dat-ban-noi-bo-form-card"
+      title={
+        <div className="dat-ban-noi-bo-form-card__title-block">
+          <Typography.Title level={4} style={{ margin: 0 }}>{title}</Typography.Title>
+          <Typography.Text type="secondary">{subtitle}</Typography.Text>
+        </div>
+      }
+      extra={<Tag color={dangChinhSua ? 'orange' : 'blue'}>{dangChinhSua ? 'Đang chỉnh sửa' : 'Tạo mới'}</Tag>}
     >
-      <Typography.Paragraph type="secondary" style={{ marginTop: -8 }}>{subtitle}</Typography.Paragraph>
+      <Space direction="vertical" size={14} style={{ width: '100%' }}>
+        <Alert
+          type="info"
+          showIcon
+          message={dangChinhSua ? 'Đang cập nhật booking hiện có' : 'Tạo nhanh booking nội bộ'}
+          description="Ưu tiên bố cục gọn, dễ quét và giữ nguyên toàn bộ flow nghiệp vụ hiện tại."
+        />
 
-      <Form layout="vertical" onSubmitCapture={onSubmit}>
-        <Card size="small" title="Thông tin biểu mẫu" style={{ marginBottom: 16 }}>
-          <Alert
-            type="info"
-            showIcon
-            title="Biểu mẫu này hiện đã hỗ trợ cả thông tin liên hệ khách, thời gian, số khách, khu vực ưu tiên và ghi chú nội bộ."
-            style={{ marginBottom: 16 }}
-          />
+        <Form layout="vertical" onSubmitCapture={onSubmit}>
+          <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Liên hệ khách</Divider>
           <Row gutter={12}>
             <Col xs={24} md={12}>
-              <Form.Item label="Tên khách">
-                <Input size="middle" value={formValues.name} onChange={onFieldChange('name')} placeholder="Nguyễn Văn A" />
+              <Form.Item label="Tên khách" style={KIEU_MUC_FORM_GON}>
+                <Input size="large" value={formValues.name} onChange={onFieldChange('name')} placeholder="Nguyễn Văn A" />
               </Form.Item>
             </Col>
             <Col xs={24} md={12}>
-              <Form.Item label="Số điện thoại">
-                <Input size="middle" value={formValues.phone} onChange={onFieldChange('phone')} placeholder="0901234567" />
+              <Form.Item label="Số điện thoại" style={KIEU_MUC_FORM_GON}>
+                <Input size="large" value={formValues.phone} onChange={onFieldChange('phone')} placeholder="0901234567" />
               </Form.Item>
             </Col>
             <Col span={24}>
-              <Form.Item label="Email">
-                <Input size="middle" type="email" value={formValues.email} onChange={onFieldChange('email')} placeholder="khach@example.com" />
+              <Form.Item label="Email" style={KIEU_MUC_FORM_GON}>
+                <Input size="large" type="email" value={formValues.email} onChange={onFieldChange('email')} placeholder="khach@example.com" />
               </Form.Item>
-            </Col>
-            <Col xs={24} md={12}><Form.Item label="Ngày"><Input size="middle" type="date" value={formValues.date} onChange={onFieldChange('date')} /></Form.Item></Col>
-            <Col xs={24} md={12}><Form.Item label="Giờ"><Input size="middle" type="time" value={formValues.time} onChange={onFieldChange('time')} /></Form.Item></Col>
-            <Col xs={24} md={12}><Form.Item label="Số khách"><InputNumber size="middle" min={1} value={formValues.guests === '' ? null : Number(formValues.guests)} placeholder="Nhập số khách" onChange={(value) => onFieldChange('guests')({ target: { value: value == null ? '' : String(value) } })} className="!w-full" /></Form.Item></Col>
-            <Col xs={24} md={12}><Form.Item label="Khu vực ưu tiên"><Select size="middle" value={formValues.seatingArea} options={seatingAreaOptions} onChange={(value) => onFieldChange('seatingArea')({ target: { value } })} /></Form.Item></Col>
-            {formMode === 'create' ? <Col xs={24} md={12}><Form.Item label="Trạng thái ban đầu"><Select size="middle" value={formValues.status} options={CREATE_STATUS_OPTIONS.map((status) => ({ value: status, label: HOST_NHAN_TRANG_THAI_DAT_BAN[status] }))} onChange={(value) => onFieldChange('status')({ target: { value } })} /></Form.Item></Col> : null}
-            <Col span={24}>
-              <Form.Item label="Ghi chú khách"><TextArea rows={3} value={formValues.notes} onChange={onFieldChange('notes')} placeholder="Yêu cầu bàn gần cửa sổ, có trẻ nhỏ..." /></Form.Item>
-            </Col>
-            <Col span={24}>
-              <Form.Item label="Ghi chú nội bộ"><TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." /></Form.Item>
             </Col>
           </Row>
-        </Card>
 
-        {formError ? <Alert type="error" showIcon title={formError} style={{ marginBottom: 16 }} /> : null}
+          <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Chi tiết đặt bàn</Divider>
+          <Row gutter={12}>
+            <Col xs={24} md={12}>
+              <Form.Item label="Ngày" style={KIEU_MUC_FORM_GON}>
+                <Input size="large" type="date" value={formValues.date} onChange={onFieldChange('date')} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item label="Giờ" style={KIEU_MUC_FORM_GON}>
+                <Input size="large" type="time" value={formValues.time} onChange={onFieldChange('time')} />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item label="Số khách" style={KIEU_MUC_FORM_GON}>
+                <InputNumber
+                  size="large"
+                  min={1}
+                  value={formValues.guests === '' ? null : Number(formValues.guests)}
+                  placeholder="Nhập số khách"
+                  onChange={(value) => onFieldChange('guests')({ target: { value: value == null ? '' : String(value) } })}
+                  className="!w-full"
+                />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item label="Khu vực ưu tiên" style={KIEU_MUC_FORM_GON}>
+                <Select
+                  size="large"
+                  value={formValues.seatingArea}
+                  options={seatingAreaOptions}
+                  onChange={(value) => onFieldChange('seatingArea')({ target: { value } })}
+                />
+              </Form.Item>
+            </Col>
+            {!dangChinhSua ? (
+              <Col span={24}>
+                <Form.Item label="Trạng thái ban đầu" style={KIEU_MUC_FORM_GON}>
+                  <Select
+                    size="large"
+                    value={formValues.status}
+                    options={CREATE_STATUS_OPTIONS.map((status) => ({ value: status, label: HOST_NHAN_TRANG_THAI_DAT_BAN[status] }))}
+                    onChange={(value) => onFieldChange('status')({ target: { value } })}
+                  />
+                </Form.Item>
+              </Col>
+            ) : null}
+          </Row>
 
-        <Divider style={{ marginTop: 0 }} />
-        <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
-          <Button size="middle" onClick={onReset}>{formMode === 'edit' ? 'Hủy' : 'Làm lại'}</Button>
-          <Button type="primary" size="middle" htmlType="submit" icon={<CheckCircleOutlined />}>{formMode === 'edit' ? 'Cập nhật' : 'Thêm mới'}</Button>
-        </Space>
-      </Form>
+          <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Ghi chú</Divider>
+          <Row gutter={12}>
+            <Col xs={24} md={12}>
+              <Form.Item label="Ghi chú khách" style={KIEU_MUC_FORM_GON}>
+                <TextArea rows={3} value={formValues.notes} onChange={onFieldChange('notes')} placeholder="Yêu cầu bàn gần cửa sổ, có trẻ nhỏ..." />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={12}>
+              <Form.Item label="Ghi chú nội bộ" style={KIEU_MUC_FORM_GON}>
+                <TextArea rows={3} value={formValues.internalNote} onChange={onFieldChange('internalNote')} placeholder="Ưu tiên gọi xác nhận lại, cần quản lý duyệt..." />
+              </Form.Item>
+            </Col>
+          </Row>
+
+          {formError ? <Alert type="error" showIcon title={formError} style={{ marginTop: 8, marginBottom: 14 }} /> : null}
+
+          <Space className="dat-ban-noi-bo-form-actions">
+            <Button size="large" onClick={onReset}>{dangChinhSua ? 'Hủy chỉnh sửa' : 'Làm lại'}</Button>
+            <Button type="primary" size="large" htmlType="submit" icon={<CheckCircleOutlined />}>{dangChinhSua ? 'Cập nhật' : 'Thêm mới'}</Button>
+          </Space>
+        </Form>
+      </Space>
     </Card>
   )
 }
 
-function DatBanBookingList({ bookings, onEdit, onAssign, onConfirmAction, onQuickStatusChange }) {
+function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickStatusChange }) {
+  const banDaGan = booking.assignedTables || []
+  const chuaGanBan = laBookingChuaGanBan(booking)
+  const dangChoXacNhan = PENDING_STATUS_SET.has(booking.status)
+  const canhBaoUuTien = chuaGanBan || dangChoXacNhan
+  const daCheckIn = laDatBanDaCheckIn(booking)
+  const ghiChuUuTien = canXacNhanThuCong(booking)
+    ? layGhiChuUuTienDatBan(booking) || 'Booking này cần host xác nhận trước khi chốt bàn.'
+    : ''
+
+  return (
+    <Card className={`dat-ban-noi-bo-booking-card${canhBaoUuTien ? ' dat-ban-noi-bo-booking-card--urgent' : ''}`}>
+      <div className="dat-ban-noi-bo-booking-card__layout">
+        <Space direction="vertical" size={12} style={{ width: '100%' }}>
+          <div>
+            <Space wrap size={[8, 8]}>
+              <Typography.Title level={5} style={{ margin: 0 }}>{layMaDatBan(booking)}</Typography.Title>
+              <Tag color={getStatusTagColor(booking.status)}>{HOST_NHAN_TRANG_THAI_DAT_BAN[booking.status] || booking.status}</Tag>
+              {chuaGanBan ? <Tag color="error">Chưa gán bàn</Tag> : null}
+            </Space>
+            <div className="dat-ban-noi-bo-booking-card__customer-row">
+              <Typography.Text strong>{booking.name}</Typography.Text>
+              <Typography.Text type="secondary">{booking.phone}</Typography.Text>
+            </div>
+          </div>
+
+          <Space wrap size={[8, 8]}>
+            <Tag icon={<CalendarOutlined />} className="dat-ban-noi-bo-meta-tag">{dinhDangNgayGio(booking.date, booking.time)}</Tag>
+            <Tag icon={<UserOutlined />} className="dat-ban-noi-bo-meta-tag">{dinhDangSoKhach(booking.guests)}</Tag>
+            <Tag icon={<EnvironmentOutlined />} className="dat-ban-noi-bo-meta-tag">{layNhanChoNgoi(booking.seatingArea)}</Tag>
+            <Tag icon={<PhoneOutlined />} className="dat-ban-noi-bo-meta-tag">{layNhanKenhXacNhan(booking.confirmationChannel)}</Tag>
+          </Space>
+
+          <Descriptions bordered size="small" column={{ xs: 1, lg: 3 }} className="dat-ban-noi-bo-booking-desc">
+            <Descriptions.Item label="Bàn đã gán">{banDaGan.length > 0 ? banDaGan.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
+            <Descriptions.Item label="Nguồn">{layNguonDatBan(booking)}</Descriptions.Item>
+            <Descriptions.Item label="Email">{booking.email || 'Chưa cập nhật'}</Descriptions.Item>
+          </Descriptions>
+
+          {ghiChuUuTien ? (
+            <Alert type="warning" showIcon message="Ưu tiên xử lý" description={ghiChuUuTien} />
+          ) : null}
+
+          {dangChoXacNhan ? (
+            <Alert
+              type="info"
+              showIcon
+              message="Duyệt nhanh booking"
+              description={(
+                <Space wrap>
+                  <Button type="primary" size="small" icon={<CheckCircleOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.DA_XAC_NHAN)}>
+                    Duyệt booking
+                  </Button>
+                  <Button size="small" icon={<PhoneOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.CAN_GOI_LAI)}>
+                    Cần gọi lại
+                  </Button>
+                  <Button size="small" danger icon={<StopOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.TU_CHOI_HET_CHO)}>
+                    Từ chối
+                  </Button>
+                </Space>
+              )}
+            />
+          ) : null}
+
+          {(booking.notes || booking.internalNote) ? (
+            <Row gutter={[12, 12]}>
+              {booking.notes ? (
+                <Col xs={24} md={12}>
+                  <Alert type="info" showIcon message="Ghi chú" description={booking.notes} className="dat-ban-noi-bo-note-alert" />
+                </Col>
+              ) : null}
+              {booking.internalNote ? (
+                <Col xs={24} md={12}>
+                  <Alert type="info" showIcon message="Nội bộ" description={booking.internalNote} className="dat-ban-noi-bo-note-alert dat-ban-noi-bo-note-alert--internal" />
+                </Col>
+              ) : null}
+            </Row>
+          ) : null}
+        </Space>
+
+        <Card size="small" className="dat-ban-noi-bo-actions-card" title="Thao tác">
+          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+            <Button block icon={<EditOutlined />} onClick={() => onEdit(booking)}>
+              Sửa
+            </Button>
+            {!daCheckIn ? (
+              <Button
+                block
+                type={chuaGanBan ? 'primary' : 'default'}
+                icon={<SwapOutlined />}
+                onClick={() => onAssign(booking)}
+                disabled={!coTheGanBanChoDatBan(booking)}
+              >
+                {chuaGanBan ? 'Gán bàn' : 'Đổi bàn'}
+              </Button>
+            ) : null}
+            <Button block type="primary" icon={<CheckOutlined />} onClick={() => onConfirmAction('checkIn', booking)} disabled={!coTheCheckInDatBan(booking)}>
+              Check-in
+            </Button>
+            <Button block icon={<CheckCircleOutlined />} onClick={() => onConfirmAction('complete', booking)} disabled={!coTheHoanThanhDatBan(booking)}>
+              Hoàn thành
+            </Button>
+            {!daCheckIn ? (
+              <Button block danger icon={<StopOutlined />} onClick={() => onConfirmAction('noShow', booking)} disabled={!coTheDanhDauKhongDen(booking)}>
+                Không đến
+              </Button>
+            ) : null}
+          </Space>
+        </Card>
+      </div>
+    </Card>
+  )
+}
+
+function DatBanBookingList({
+  bookings,
+  tongSoBooking,
+  tuKhoaTimKiem,
+  boLocNhanh,
+  onEdit,
+  onAssign,
+  onConfirmAction,
+  onQuickStatusChange,
+}) {
   if (bookings.length === 0) {
+    const trangThaiTrong = layThongTinTrangThaiTrong({ tongSoBooking, tuKhoaTimKiem, boLocNhanh })
+
     return (
-      <Card>
-        <Empty image={Empty.PRESENTED_IMAGE_SIMPLE} description="Chưa có booking phù hợp với bộ lọc hiện tại" />
+      <Card className="dat-ban-noi-bo-empty-card">
+        <Empty
+          image={Empty.PRESENTED_IMAGE_SIMPLE}
+          description={(
+            <Space direction="vertical" size={2}>
+              <Typography.Text strong>{trangThaiTrong.tieuDe}</Typography.Text>
+              <Typography.Text type="secondary">{trangThaiTrong.moTa}</Typography.Text>
+            </Space>
+          )}
+        />
       </Card>
     )
   }
 
   return (
-    <div className="grid gap-3">
-      {bookings.map((booking) => {
-        const assignedTables = booking.assignedTables || []
-        const isUnassigned = !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
-        const isPending = PENDING_STATUS_SET.has(booking.status)
-        const isUrgentCard = isUnassigned || isPending
-        const canAssignTables = coTheGanBanChoDatBan(booking)
-        const canCheckIn = coTheCheckInDatBan(booking)
-        const canComplete = coTheHoanThanhDatBan(booking)
-        const canNoShow = coTheDanhDauKhongDen(booking)
-        const daCheckIn = booking.status === 'DA_CHECK_IN'
-        const canQuickApprove = PENDING_STATUS_SET.has(booking.status)
-        const priorityNote = canXacNhanThuCong(booking)
-          ? layGhiChuUuTienDatBan(booking) || 'Booking này cần host xác nhận trước khi chốt bàn.'
-          : ''
-
-        return (
-          <Card key={booking.id} style={{ borderLeft: isUrgentCard ? '4px solid #ef4444' : undefined, background: isUrgentCard ? '#fff7f7' : '#fff' }}>
-            <div className="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
-              <div className="min-w-0 flex-1">
-                <div className="flex flex-col gap-2 md:flex-row md:items-start md:justify-between">
-                  <div className="min-w-0">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <strong className="text-base font-semibold tracking-[-0.03em] text-slate-900">
-                        {booking.bookingCode || booking.code || `DB-${booking.id}`}
-                      </strong>
-                      <Tag color={getStatusTagColor(booking.status)} className="!rounded-full !px-2.5 !py-0.5 !text-[10px] !font-semibold !uppercase !tracking-[0.14em]">
-                        {HOST_NHAN_TRANG_THAI_DAT_BAN[booking.status] || booking.status}
-                      </Tag>
-                      {isUnassigned ? (
-                        <span className="rounded-full bg-rose-100 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-rose-700">
-                          Chưa gán bàn
-                        </span>
-                      ) : null}
-                    </div>
-                    <p className="mt-1.5 mb-0 text-sm text-slate-600">
-                      <span className="font-semibold text-slate-900">{booking.name}</span>
-                      {' · '}
-                      {booking.phone}
-                    </p>
-                  </div>
-                </div>
-
-                <div className="mt-3 flex flex-wrap gap-1.5">
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                    <CalendarOutlined />
-                    {dinhDangNgayGio(booking.date, booking.time)}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                    <UserOutlined />
-                    {dinhDangSoKhach(booking.guests)}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                    <EnvironmentOutlined />
-                    {layNhanChoNgoi(booking.seatingArea)}
-                  </span>
-                  <span className="inline-flex items-center gap-1.5 rounded-full border border-slate-200 bg-slate-50 px-2.5 py-1 text-[11px] font-medium text-slate-600">
-                    <PhoneOutlined />
-                    {layNhanKenhXacNhan(booking.confirmationChannel)}
-                  </span>
-                </div>
-
-                <Descriptions size="small" column={{ xs: 1, sm: 2, xl: 3 }} bordered style={{ marginTop: 12 }}>
-                  <Descriptions.Item label="Bàn đã gán">{assignedTables.length > 0 ? assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
-                  <Descriptions.Item label="Nguồn">{booking.source === 'internal' ? 'Nội bộ' : 'Web'}</Descriptions.Item>
-                  {booking.email ? <Descriptions.Item label="Email">{booking.email}</Descriptions.Item> : null}
-                </Descriptions>
-
-                {priorityNote ? (
-                  <div className="mt-3 rounded-[16px] border border-amber-200 bg-amber-50 px-3 py-2.5 text-sm leading-6 text-amber-800">
-                    <span className="block text-[10px] font-semibold uppercase tracking-[0.14em] text-amber-600">Ưu tiên xử lý</span>
-                    <span>{priorityNote}</span>
-                  </div>
-                ) : null}
-
-                {canQuickApprove ? (
-                  <div className="mt-3 flex flex-wrap gap-2">
-                    <Button type="primary" size="small" icon={<CheckCircleOutlined />} onClick={() => onQuickStatusChange(booking, 'DA_XAC_NHAN')}>
-                      Duyệt booking
-                    </Button>
-                    <Button size="small" icon={<PhoneOutlined />} onClick={() => onQuickStatusChange(booking, 'CAN_GOI_LAI')}>
-                      Cần gọi lại
-                    </Button>
-                    <Button size="small" danger icon={<StopOutlined />} onClick={() => onQuickStatusChange(booking, 'TU_CHOI_HET_CHO')}>
-                      Từ chối
-                    </Button>
-                  </div>
-                ) : null}
-
-                {booking.notes ? (
-                  <p className="mt-3 mb-0 text-sm leading-6 text-slate-600"><span className="font-semibold text-slate-900">Ghi chú:</span> {booking.notes}</p>
-                ) : null}
-                {booking.internalNote ? (
-                  <p className="mt-1.5 mb-0 text-sm leading-6 text-slate-600"><span className="font-semibold text-slate-900">Nội bộ:</span> {booking.internalNote}</p>
-                ) : null}
-              </div>
-
-              <div className="w-full lg:max-w-[210px]">
-                <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-1">
-                  <Button size="small" icon={<EditOutlined />} onClick={() => onEdit(booking)}>
-                    Sửa
-                  </Button>
-                  {!daCheckIn ? (
-                    assignedTables.length === 0 ? (
-                      <Button type="primary" danger size="small" icon={<SwapOutlined />} onClick={() => onAssign(booking)} disabled={!canAssignTables}>
-                        Gán bàn
-                      </Button>
-                    ) : (
-                      <Button size="small" icon={<SwapOutlined />} onClick={() => onAssign(booking)} disabled={!canAssignTables}>
-                        Đổi bàn
-                      </Button>
-                    )
-                  ) : null}
-                  <Button size="small" type="primary" icon={<CheckOutlined />} onClick={() => onConfirmAction('checkIn', booking)} disabled={!canCheckIn}>
-                    Check-in
-                  </Button>
-                  <Button size="small" icon={<CheckCircleOutlined />} onClick={() => onConfirmAction('complete', booking)} disabled={!canComplete}>
-                    Hoàn thành
-                  </Button>
-                  {!daCheckIn ? (
-                    <Button
-                      size="small"
-                      icon={<StopOutlined />}
-                      onClick={() => onConfirmAction('noShow', booking)}
-                      disabled={!canNoShow}
-                      className="sm:col-span-2 lg:col-span-1 !border-rose-200 !text-rose-500 hover:!border-rose-300 hover:!text-rose-600"
-                    >
-                      Không đến
-                    </Button>
-                  ) : null}
-                </div>
-              </div>
-            </div>
-          </Card>
-        )
-      })}
-    </div>
+    <List
+      className="dat-ban-noi-bo-list"
+      split={false}
+      dataSource={bookings}
+      renderItem={(booking) => (
+        <List.Item key={booking.id} className="dat-ban-noi-bo-list__item">
+          <TheBookingDatBan
+            booking={booking}
+            onEdit={onEdit}
+            onAssign={onAssign}
+            onConfirmAction={onConfirmAction}
+            onQuickStatusChange={onQuickStatusChange}
+          />
+        </List.Item>
+      )}
+    />
   )
 }
 
-function DatBanAssignModal({ booking, open, selectedTableIds, assignableTables, selectedCapacity, error, onClose, onToggleTable, onSubmit }) {
+function DatBanAssignModal({
+  booking,
+  open,
+  selectedTableIds,
+  assignableTables,
+  selectedCapacity,
+  error,
+  onClose,
+  onToggleTable,
+  onSubmit,
+}) {
+  const sucChuaCan = Number(booking?.guests || 0)
+  const duSucChua = selectedCapacity >= sucChuaCan
+  const tapBanDangChon = useMemo(() => new Set(selectedTableIds), [selectedTableIds])
+  const tapBanDangGan = useMemo(
+    () => new Set(Array.isArray(booking?.assignedTableIds) ? booking.assignedTableIds : []),
+    [booking],
+  )
+
   return (
     <Drawer
       open={open}
       onClose={onClose}
-      title={booking ? `Gán bàn · ${booking.bookingCode}` : 'Gán bàn'}
-      size={420}
+      title={booking ? `Gán bàn · ${layMaDatBan(booking)}` : 'Gán bàn'}
+      width={460}
       destroyOnHidden
+      className="dat-ban-noi-bo-assign-drawer"
     >
       {booking ? (
-        <div className="space-y-4">
-          <div className="rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">
-            <div className="grid gap-3 sm:grid-cols-2">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Khách</div>
-                <div className="mt-1 text-sm font-semibold text-slate-900">{booking.name}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Số khách</div>
-                <div className="mt-1 text-sm font-semibold text-slate-900">{dinhDangSoKhach(booking.guests)}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Khu vực ưu tiên</div>
-                <div className="mt-1 text-sm font-semibold text-slate-900">{layNhanChoNgoi(booking.seatingArea)}</div>
-              </div>
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Thời gian</div>
-                <div className="mt-1 text-sm font-semibold text-slate-900">{dinhDangNgayGio(booking.date, booking.time)}</div>
-              </div>
-            </div>
-          </div>
+        <Space direction="vertical" size={14} style={{ width: '100%' }}>
+          <Descriptions bordered size="small" column={1} className="dat-ban-noi-bo-assign-desc">
+            <Descriptions.Item label="Khách">{booking.name}</Descriptions.Item>
+            <Descriptions.Item label="Số khách">{dinhDangSoKhach(booking.guests)}</Descriptions.Item>
+            <Descriptions.Item label="Thời gian">{dinhDangNgayGio(booking.date, booking.time)}</Descriptions.Item>
+            <Descriptions.Item label="Khu vực ưu tiên">{layNhanChoNgoi(booking.seatingArea)}</Descriptions.Item>
+            <Descriptions.Item label="Bàn hiện tại">{booking.assignedTables?.length ? booking.assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
+          </Descriptions>
 
-          <div className="rounded-[18px] border border-slate-200 bg-white p-3.5 shadow-sm">
-            <div className="flex items-center justify-between gap-4">
-              <div>
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Đang gán</div>
-                <div className="mt-1 text-sm font-semibold text-slate-900">
-                  {booking.assignedTables?.length ? booking.assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}
-                </div>
-              </div>
-              <div className="text-right">
-                <div className="text-[10px] font-semibold uppercase tracking-[0.14em] text-slate-400">Sức chứa đang chọn</div>
-                <div className={`mt-1 text-sm font-semibold ${selectedCapacity < Number(booking.guests || 0) ? 'text-rose-600' : 'text-emerald-600'}`}>
-                  {selectedCapacity}/{Number(booking.guests) || 0} khách
-                </div>
-              </div>
-            </div>
-          </div>
+          <Alert
+            type={duSucChua ? 'success' : 'warning'}
+            showIcon
+            message="Tổng sức chứa đang chọn"
+            description={`${selectedCapacity}/${sucChuaCan} khách`}
+          />
 
-          <div className="grid grid-cols-3 gap-2.5">
-            {assignableTables.map((table) => {
-              const isSelected = selectedTableIds.includes(table.id)
-              const isCurrent = Array.isArray(booking.assignedTableIds) && booking.assignedTableIds.includes(table.id)
+          <Space wrap size={[8, 8]}>
+            <Tag>Bàn trống</Tag>
+            <Tag color="warning">Đang gán</Tag>
+            <Tag color="success">Đã chọn</Tag>
+          </Space>
+
+          <List
+            className="dat-ban-noi-bo-ban-list"
+            grid={{ gutter: 12, xs: 1, sm: 2, md: 3 }}
+            dataSource={assignableTables}
+            renderItem={(table) => {
+              const daChon = tapBanDangChon.has(table.id)
+              const dangGan = tapBanDangGan.has(table.id)
 
               return (
-                <button
-                  key={table.id}
-                  type="button"
-                  onClick={() => onToggleTable(table.id)}
-                  className={`rounded-[18px] border p-3 text-center transition-all ${isSelected ? 'border-emerald-300 bg-emerald-100 shadow-sm' : 'border-emerald-200 bg-emerald-50 hover:border-emerald-300 hover:shadow-sm'}`}
-                >
-                  <strong className="block text-sm font-semibold text-slate-900">{table.code}</strong>
-                  <span className="mt-1 block text-[11px] font-medium text-emerald-700">{table.capacity} khách</span>
-                  <span className="mt-1 block text-[10px] uppercase tracking-[0.14em] text-slate-500">{layNhanChoNgoi(table.areaId)}</span>
-                  <span className="mt-2 block text-[10px] font-semibold uppercase tracking-[0.14em] text-emerald-700">
-                    {isCurrent ? 'Đang gán' : isSelected ? 'Đã chọn' : 'Bàn trống'}
-                  </span>
-                </button>
+                <List.Item>
+                  <Card
+                    size="small"
+                    hoverable
+                    onClick={() => onToggleTable(table.id)}
+                    className={`dat-ban-noi-bo-ban-tile${dangGan ? ' dat-ban-noi-bo-ban-tile--current' : ''}${daChon ? ' dat-ban-noi-bo-ban-tile--selected' : ''}`}
+                  >
+                    <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                      <Typography.Text strong>{table.code}</Typography.Text>
+                      <Typography.Text>{table.capacity} khách</Typography.Text>
+                      <Typography.Text type="secondary">{layNhanChoNgoi(table.areaId)}</Typography.Text>
+                      <Tag color={dangGan ? 'warning' : daChon ? 'success' : 'default'}>{dangGan ? 'Đang gán' : daChon ? 'Đã chọn' : 'Bàn trống'}</Tag>
+                    </Space>
+                  </Card>
+                </List.Item>
               )
-            })}
-          </div>
+            }}
+          />
 
           {error ? <Alert type="error" showIcon title={error} /> : null}
 
-          <div className="flex items-center justify-end gap-2">
-            <Button size="middle" onClick={onClose}>Hủy</Button>
-            <Button size="middle" type="primary" onClick={onSubmit}>Lưu gán bàn</Button>
-          </div>
-        </div>
+          <Space className="dat-ban-noi-bo-assign-actions">
+            <Button size="large" onClick={onClose}>Hủy</Button>
+            <Button size="large" type="primary" onClick={onSubmit}>Lưu gán bàn</Button>
+          </Space>
+        </Space>
       ) : null}
     </Drawer>
   )
@@ -484,11 +659,12 @@ function DatBanConfirmModal({ pendingAction, open, onClose, onConfirm }) {
       cancelText="Hủy"
       title={copy.title}
       centered
+      okButtonProps={{ danger: pendingAction.type === 'noShow' }}
     >
-      <div className="space-y-3">
-        <Alert type="warning" showIcon title={copy.message} />
-        <p className="mb-0 text-sm leading-6 text-slate-600">{copy.getMessage(pendingAction.booking)}</p>
-      </div>
+      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        <Alert type={pendingAction.type === 'noShow' ? 'warning' : 'info'} showIcon message={copy.message} description={copy.description} />
+        <Typography.Text className="dat-ban-noi-bo-confirm-text">{copy.getMessage(pendingAction.booking)}</Typography.Text>
+      </Space>
     </Modal>
   )
 }
@@ -507,36 +683,36 @@ function DatBanTab({
 }) {
   const [searchQuery, setSearchQuery] = useState('')
   const [quickFilter, setQuickFilter] = useState('all')
-  const [formMode, setFormMode] = useState('create')
   const [editingBookingId, setEditingBookingId] = useState(null)
   const [formValues, setFormValues] = useState(DEFAULT_FORM_VALUES)
   const [formError, setFormError] = useState('')
   const [assigningBooking, setAssigningBooking] = useState(null)
   const [selectedTableIds, setSelectedTableIds] = useState([])
+  const [assignableTables, setAssignableTables] = useState([])
   const [assignModalError, setAssignModalError] = useState('')
   const [pendingAction, setPendingAction] = useState(null)
 
-  const filterCounts = useMemo(() => getQuickFilterCounts(hangDoiDatBan), [hangDoiDatBan])
+  const homNay = dayjs().format('YYYY-MM-DD')
+  const dangChinhSua = editingBookingId !== null
+
+  const filterCounts = useMemo(
+    () => getQuickFilterCounts(hangDoiDatBan, homNay),
+    [hangDoiDatBan, homNay],
+  )
 
   const visibleBookings = useMemo(() => {
     const searched = hangDoiDatBan.filter((booking) => khopTimKiemDatBan(booking, searchQuery))
-    return applyQuickFilter(searched, quickFilter)
-  }, [hangDoiDatBan, quickFilter, searchQuery])
+    return applyQuickFilter(searched, quickFilter, homNay)
+  }, [hangDoiDatBan, quickFilter, searchQuery, homNay])
 
-  const assignableTables = useMemo(
-    () => (assigningBooking ? getAvailableTablesForBooking(assigningBooking) : []),
-    [assigningBooking, getAvailableTablesForBooking],
+  const tapBanDangChon = useMemo(() => new Set(selectedTableIds), [selectedTableIds])
+
+  const selectedCapacity = useMemo(
+    () => assignableTables.reduce((sum, table) => (tapBanDangChon.has(table.id) ? sum + (Number(table.capacity) || 0) : sum), 0),
+    [assignableTables, tapBanDangChon],
   )
-
-  const selectedTables = useMemo(
-    () => assignableTables.filter((table) => selectedTableIds.includes(table.id)),
-    [assignableTables, selectedTableIds],
-  )
-
-  const selectedCapacity = selectedTables.reduce((sum, table) => sum + (Number(table.capacity) || 0), 0)
 
   const resetForm = () => {
-    setFormMode('create')
     setEditingBookingId(null)
     setFormValues(DEFAULT_FORM_VALUES)
     setFormError('')
@@ -545,6 +721,7 @@ function DatBanTab({
   const resetAssignModal = () => {
     setAssigningBooking(null)
     setSelectedTableIds([])
+    setAssignableTables([])
     setAssignModalError('')
   }
 
@@ -587,10 +764,10 @@ function DatBanTab({
       seatingArea: formValues.seatingArea,
       notes: formValues.notes.trim(),
       internalNote: formValues.internalNote.trim(),
-      ...(formMode === 'create' ? { status: formValues.status } : {}),
+      ...(!dangChinhSua ? { status: formValues.status } : {}),
     }
 
-    const ketQua = formMode === 'edit'
+    const ketQua = dangChinhSua
       ? await handleUpdateInternalBooking(editingBookingId, duLieuGuiDi)
       : await handleCreateInternalBooking(duLieuGuiDi)
 
@@ -603,7 +780,6 @@ function DatBanTab({
   }
 
   const handleEditBooking = (booking) => {
-    setFormMode('edit')
     setEditingBookingId(booking.id)
     setFormValues({
       name: booking.name || '',
@@ -624,11 +800,12 @@ function DatBanTab({
     const danhSachBanPhuHop = getAvailableTablesForBooking(booking)
 
     if (danhSachBanPhuHop.length === 0) {
-      setFormError(`Không còn bàn phù hợp cho booking ${booking.bookingCode}.`)
+      setFormError(`Không còn bàn phù hợp cho booking ${layMaDatBan(booking)}.`)
       return
     }
 
     setAssigningBooking(booking)
+    setAssignableTables(danhSachBanPhuHop)
     setSelectedTableIds(Array.isArray(booking.assignedTableIds) ? booking.assignedTableIds : [])
     setAssignModalError('')
     setFormError('')
@@ -686,13 +863,13 @@ function DatBanTab({
   }
 
   return (
-    <section className="grid gap-4 xl:grid-cols-[minmax(0,1.32fr)_minmax(320px,0.78fr)]">
-      <div className="space-y-3">
+    <section className="dat-ban-noi-bo-layout">
+      <div className="dat-ban-noi-bo-layout__list-col">
         <DatBanToolbar
           searchQuery={searchQuery}
           onSearchChange={setSearchQuery}
           onReset={resetForm}
-          formMode={formMode}
+          dangChinhSua={dangChinhSua}
           visibleCount={visibleBookings.length}
           phamViLabel={phamViLabel}
           quickFilter={quickFilter}
@@ -702,6 +879,9 @@ function DatBanTab({
 
         <DatBanBookingList
           bookings={visibleBookings}
+          tongSoBooking={hangDoiDatBan.length}
+          tuKhoaTimKiem={searchQuery}
+          boLocNhanh={quickFilter}
           onEdit={handleEditBooking}
           onAssign={openAssignModal}
           onConfirmAction={openConfirmAction}
@@ -709,9 +889,8 @@ function DatBanTab({
         />
       </div>
 
-      <div className="xl:sticky xl:top-4 xl:self-start">
+      <div className="dat-ban-noi-bo-layout__form-col">
         <DatBanFormCard
-          formMode={formMode}
           editingBookingId={editingBookingId}
           formValues={formValues}
           formError={formError}

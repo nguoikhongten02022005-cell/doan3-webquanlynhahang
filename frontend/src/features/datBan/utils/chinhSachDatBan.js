@@ -85,6 +85,22 @@ export const coTheChuyenTrangThaiDatBanThuCong = (booking, nextStatus) => {
   return true
 }
 
+export const taiDuLieuBanCongKhai = async ({
+  coTheVaoNoiBo,
+  layDanhSachBanApi,
+  layDanhSachDatBanHost,
+}) => {
+  const [{ duLieu: duLieuBan }, danhSachDatBan] = await Promise.all([
+    layDanhSachBanApi(),
+    coTheVaoNoiBo ? layDanhSachDatBanHost() : Promise.resolve([]),
+  ])
+
+  return {
+    duLieuBan: Array.isArray(duLieuBan) ? duLieuBan : [],
+    danhSachDatBan: Array.isArray(danhSachDatBan) ? danhSachDatBan : [],
+  }
+}
+
 export const kiemTraBanDaGan = ({ assignedTableIds, tables, soLuongKhach, preferredArea, bookingId }) => {
   const selectedTables = assignedTableIds
     .map((tableId) => tables.find((table) => table.id === tableId))

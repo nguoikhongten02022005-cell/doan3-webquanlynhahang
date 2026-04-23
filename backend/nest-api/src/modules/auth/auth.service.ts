@@ -82,7 +82,7 @@ export class AuthService {
     const vaiTro = chuanHoaVaiTroNoiBo(String(thongTinToken.vaiTro || ''));
 
     if (vaiTro === 'KhachHang') {
-      throw new UnauthorizedException('Tai khoan nay khong co quyen truy cap khu vuc noi bo.');
+      throw new ForbiddenException('Tai khoan nay khong co quyen truy cap khu vuc noi bo.');
     }
 
     return thongTinToken;
