@@ -9,6 +9,9 @@ function TheMonAn({
   actionLabel = '',
   actionDisabled = false,
   variant = 'default',
+  selectorMode = false,
+  quantity = 0,
+  onQuantityChange,
 }) {
   const canOpenDetail = typeof onOpenDetail === 'function'
   const canAction = typeof onAction === 'function'
@@ -56,33 +59,88 @@ function TheMonAn({
     </div>
   )
 
+  const noiDungChanMon = selectorMode ? (
+    <div className="chan-mon chan-mon--selector">
+      <Typography.Text className="gia-mon price" strong>
+        {dishPrice}
+      </Typography.Text>
+      <div className="bo-chon-so-luong">
+        <button
+          type="button"
+          className="btn btn-giam"
+          onClick={(e) => { e.stopPropagation(); onQuantityChange?.(Math.max(0, quantity - 1)) }}
+          disabled={quantity <= 0}
+          aria-label="Giảm số lượng"
+        >
+          −
+        </button>
+        <span className="so-luong-hien-thi">{quantity}</span>
+        <button
+          type="button"
+          className="btn btn-tang"
+          onClick={(e) => { e.stopPropagation(); onQuantityChange?.(quantity + 1) }}
+          aria-label="Tăng số lượng"
+        >
+          +
+        </button>
+      </div>
+    </div>
+  ) : (
+    <div className="chan-mon">
+      <Typography.Text className="gia-mon price" strong>
+        {dishPrice}
+      </Typography.Text>
+      {canAction ? (
+        <button
+          type="button"
+          className="btn nut-chinh nut-them-mon--menu"
+          onClick={xuLyHanhDong}
+          disabled={actionDisabled}
+        >
+          {actionLabel || 'Thêm vào giỏ'}
+        </button>
+      ) : null}
+    </div>
+  )
+
   return (
     <Card
       hoverable={canOpenDetail}
-      className={`the-mon ${safeDish.tone || ''} ${isMenuVariant ? 'the-mon--menu' : ''}`}
+      className={`the-mon ${safeDish.tone || ''} ${isMenuVariant ? 'the-mon--menu' : ''} ${selectorMode ? 'the-mon--selector' : ''}`}
       cover={phanAnh}
-      onClick={canOpenDetail ? xuLyMoChiTiet : undefined}
+      onClick={selectorMode ? undefined : (canOpenDetail ? xuLyMoChiTiet : undefined)}
     >
       <Meta
-        title={<Typography.Text strong className="the-mon-title">{dishName}</Typography.Text>}
+        title={
+          <Typography.Text
+            strong
+            className="the-mon-title"
+            style={{
+              display: '-webkit-box',
+              WebkitLineClamp: 2,
+              WebkitBoxOrient: 'vertical',
+              overflow: 'hidden',
+              lineHeight: 1.3,
+            }}
+          >
+            {dishName}
+          </Typography.Text>
+        }
         description={
           <Flex vertical gap={12}>
-            <Typography.Paragraph className="the-mon-description">{dishDescription}</Typography.Paragraph>
-            <div className="chan-mon">
-              <Typography.Text className="gia-mon price" strong>
-                {dishPrice}
-              </Typography.Text>
-              {canAction ? (
-                <button
-                  type="button"
-                  className="btn nut-chinh nut-them-mon--menu"
-                  onClick={xuLyHanhDong}
-                  disabled={actionDisabled}
-                >
-                  {actionLabel || 'Thêm vào giỏ'}
-                </button>
-              ) : null}
-            </div>
+            <Typography.Paragraph
+              className="the-mon-description"
+              style={{
+                display: '-webkit-box',
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: 'vertical',
+                overflow: 'hidden',
+                marginBottom: 0,
+              }}
+            >
+              {dishDescription}
+            </Typography.Paragraph>
+            {noiDungChanMon}
           </Flex>
         }
         className="the-mon-meta"
