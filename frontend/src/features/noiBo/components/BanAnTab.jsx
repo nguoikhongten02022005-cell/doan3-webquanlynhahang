@@ -626,8 +626,8 @@ function BanAnTabPos({
                 <div className="mt-2 text-base font-semibold text-slate-900">{banDangChon.sucChua} khách</div>
               </div>
               <div className="rounded-[18px] border border-slate-200 bg-slate-50 px-3.5 py-3">
-                <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">Giờ vào</div>
-                <div className="mt-2 text-base font-semibold text-slate-900">{banDangChon.timeText || 'Chưa có'}</div>
+                <div className="text-[11px] font-medium uppercase tracking-[0.14em] text-slate-400">Khu vực</div>
+                <div className="mt-2 text-base font-semibold text-slate-900">{banDangChon.areaLabel || '--'}</div>
               </div>
             </div>
 
