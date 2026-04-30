@@ -26,7 +26,7 @@ const KHOANG_CANH_CAN_DINH_TAB = 120
 
 function ThucDonPage() {
   const [danhMucDangChon, setActiveCategory] = useState(DANH_SACH_TAB_THUC_DON[0])
-  const { dishes, daTaiLanDau, error, reloadDishes } = useDanhSachMonAn()
+  const { dishes, daTaiLanDau, error, _reloadDishes } = useDanhSachMonAn()
   const danhMucRefs = useRef({})
   const thamChieuHangTab = useRef(null)
   const thamChieuTabTheoDanhMuc = useRef({})
@@ -174,9 +174,6 @@ function ThucDonPage() {
               <p className="thuc-don-state-kicker">Không thể tải thực đơn</p>
               <h3>{error}</h3>
               <p>Vui lòng thử lại để cập nhật danh sách món đang phục vụ.</p>
-              <button type="button" className="btn nut-chinh" onClick={reloadDishes}>
-                Tải lại
-              </button>
             </div>
           ) : null}
 

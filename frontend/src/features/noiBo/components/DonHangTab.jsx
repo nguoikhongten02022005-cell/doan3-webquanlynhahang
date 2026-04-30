@@ -5,13 +5,30 @@ import {
   FieldTimeOutlined,
   FileTextOutlined,
   PrinterOutlined,
-  ReloadOutlined,
   UserOutlined,
 } from '@ant-design/icons'
-import { Alert, Badge, Button, Card, Descriptions, Empty, Grid, Input, List, Segmented, Select, Space, Spin, Table, Tag, Typography } from 'antd'
+import {
+  Alert,
+  Badge,
+  Button,
+  Card,
+  Descriptions,
+  Empty,
+  Grid,
+  Input,
+  List,
+  Segmented,
+  Select,
+  Space,
+  Spin,
+  Table,
+  Tag,
+  Typography,
+} from 'antd'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 import { dinhDangNgay } from '../dinhDang'
 import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../../utils/donHang'
+import { taoTongKetTienDonHang, moCuaSoInHoaDon } from '../../../utils/inHoaDon'
 
 const { TextArea } = Input
 const { useBreakpoint } = Grid
@@ -36,67 +53,24 @@ const TUY_CHON_TRANG_THAI = [
 ]
 
 const KIEU_THE_TRANG_THAI = {
-  Pending: {
-    tone: 'pending',
-    badge: 'badge-pending',
-    hint: 'Cần xác nhận và ưu tiên điều phối bếp.',
-  },
-  Confirmed: {
-    tone: 'pending',
-    badge: 'badge-pending',
-    hint: 'Đơn đã chốt, chờ bếp nhận lệnh.',
-  },
-  Preparing: {
-    tone: 'preparing',
-    badge: 'badge-preparing',
-    hint: 'Bếp đang xử lý, ưu tiên theo dõi thời gian ra món.',
-  },
-  Ready: {
-    tone: 'served',
-    badge: 'badge-served',
-    hint: 'Đơn đã sẵn sàng, chờ phục vụ hoặc giao cho khách.',
-  },
-  Served: {
-    tone: 'served',
-    badge: 'badge-served',
-    hint: 'Đơn đang phục vụ tại bàn, sẵn sàng chốt thanh toán.',
-  },
-  Paid: {
-    tone: 'paid',
-    badge: 'badge-paid',
-    hint: 'Đơn đã thanh toán và chốt doanh thu.',
-  },
-  Cancelled: {
-    tone: 'cancelled',
-    badge: 'badge-cancelled',
-    hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.',
-  },
+  Pending: { tone: 'pending', badge: 'badge-pending', hint: 'Cần xác nhận và ưu tiên điều phối bếp.' },
+  Confirmed: { tone: 'pending', badge: 'badge-pending', hint: 'Đơn đã chốt, chờ bếp nhận lệnh.' },
+  Preparing: { tone: 'preparing', badge: 'badge-preparing', hint: 'Bếp đang xử lý, ưu tiên theo dõi thời gian ra món.' },
+  Ready: { tone: 'served', badge: 'badge-served', hint: 'Đơn đã sẵn sàng, chờ phục vụ hoặc giao cho khách.' },
+  Served: { tone: 'served', badge: 'badge-served', hint: 'Đơn đang phục vụ tại bàn, sẵn sàng chốt thanh toán.' },
+  Paid: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã thanh toán và chốt doanh thu.' },
+  Cancelled: { tone: 'cancelled', badge: 'badge-cancelled', hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.' },
 }
 
-const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
-
-const maHoaHtmlIn = (value) => String(value ?? '')
-  .replaceAll('&', '&amp;')
-  .replaceAll('<', '&lt;')
-  .replaceAll('>', '&gt;')
-  .replaceAll('"', '&quot;')
-  .replaceAll("'", '&#39;')
-
 const tinhSoLuongTheoBoLoc = (orders) => BO_LOC_DON_HANG.reduce((acc, filter) => {
-  if (filter.key === 'all') {
-    acc[filter.key] = orders.length
-    return acc
-  }
-
-  acc[filter.key] = orders.filter((order) => filter.statuses.includes(order.status)).length
+  acc[filter.key] = filter.key === 'all'
+    ? orders.length
+    : orders.filter((order) => filter.statuses.includes(order.status)).length
   return acc
 }, {})
 
 const khopBoLocDonHang = (order, filterKey) => {
-  if (filterKey === 'all') {
-    return true
-  }
-
+  if (filterKey === 'all') return true
   const filter = BO_LOC_DON_HANG.find((item) => item.key === filterKey)
   return filter ? filter.statuses.includes(order.status) : true
 }
@@ -110,266 +84,6 @@ const dinhDangMaDonHang = (order) => order.orderCode || order.code || `DH-${orde
 
 const layKieuTheTrangThai = (status) => KIEU_THE_TRANG_THAI[status] || KIEU_THE_TRANG_THAI.Pending
 
-const taoTongKetTienDonHang = (order) => {
-  const items = Array.isArray(order?.items) ? order.items : []
-  const subtotalFromItems = items.reduce(
-    (tong, item) => tong + (Number(item.price) || 0) * (Number(item.quantity) || 0),
-    0,
-  )
-  const subtotalValue = Number(order?.subtotal)
-  const serviceFeeValue = Number(order?.serviceFee)
-  const discountValue = Number(order?.discountAmount)
-
-  const subtotal = Number.isFinite(subtotalValue) ? subtotalValue : subtotalFromItems
-  const serviceFee = Number.isFinite(serviceFeeValue) ? serviceFeeValue : tinhPhiDichVu(subtotal)
-  const discountAmount = Number.isFinite(discountValue) ? Math.max(0, discountValue) : 0
-  const total = Math.max(0, subtotal + serviceFee - discountAmount)
-
-  return {
-    subtotal,
-    serviceFee,
-    discountAmount,
-    total,
-  }
-}
-
-const taoNoiDungInHoaDon = (order) => {
-  const items = Array.isArray(order?.items) ? order.items : []
-  const tongKetTien = taoTongKetTienDonHang(order)
-  const itemRows = items.length
-    ? items.map((item, index) => {
-        const soLuong = Number(item.quantity) || 0
-        const donGia = Number(item.price) || 0
-        const thanhTien = soLuong * donGia
-        const ghiChu = item.note ? `<div class="invoice-note">${maHoaHtmlIn(item.note)}</div>` : ''
-        const size = item.size ? ` <span class="invoice-size">(Size ${maHoaHtmlIn(item.size)})</span>` : ''
-
-        return `
-          <tr>
-            <td>
-              <div class="invoice-item-name">${index + 1}. ${maHoaHtmlIn(item.name || `Món ${index + 1}`)}${size}</div>
-              ${ghiChu}
-            </td>
-            <td>${soLuong}</td>
-            <td>${maHoaHtmlIn(dinhDangTienTe(donGia))}</td>
-            <td>${maHoaHtmlIn(dinhDangTienTe(thanhTien))}</td>
-          </tr>
-        `
-      }).join('')
-    : '<tr><td colspan="4" class="invoice-empty">Chưa có dữ liệu món để in hóa đơn.</td></tr>'
-
-  return `
-    <!doctype html>
-    <html lang="vi">
-      <head>
-        <meta charset="utf-8" />
-        <title>Hóa đơn #${maHoaHtmlIn(dinhDangMaDonHang(order))}</title>
-        <style>
-          * { box-sizing: border-box; }
-          body {
-            margin: 0;
-            padding: 24px;
-            font-family: Arial, Helvetica, sans-serif;
-            color: #0f172a;
-            background: #ffffff;
-          }
-          .invoice {
-            max-width: 820px;
-            margin: 0 auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 18px;
-            padding: 28px;
-          }
-          .invoice-header {
-            display: flex;
-            justify-content: space-between;
-            gap: 16px;
-            padding-bottom: 18px;
-            border-bottom: 2px solid #e2e8f0;
-          }
-          .invoice-kicker {
-            margin: 0 0 8px;
-            font-size: 12px;
-            font-weight: 700;
-            letter-spacing: 0.18em;
-            text-transform: uppercase;
-            color: #64748b;
-          }
-          .invoice-title {
-            margin: 0;
-            font-size: 28px;
-            line-height: 1.2;
-          }
-          .invoice-subtitle,
-          .invoice-meta p,
-          .invoice-note,
-          .invoice-footer {
-            margin: 0;
-            color: #475569;
-            font-size: 14px;
-            line-height: 1.6;
-          }
-          .invoice-meta {
-            text-align: right;
-          }
-          .invoice-grid {
-            display: grid;
-            grid-template-columns: repeat(2, minmax(0, 1fr));
-            gap: 16px;
-            margin-top: 22px;
-          }
-          .invoice-panel {
-            border: 1px solid #e2e8f0;
-            border-radius: 14px;
-            padding: 14px 16px;
-            background: #f8fafc;
-          }
-          .invoice-panel h2 {
-            margin: 0 0 10px;
-            font-size: 14px;
-          }
-          .invoice-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin-top: 22px;
-          }
-          .invoice-table th,
-          .invoice-table td {
-            padding: 10px 12px;
-            border-bottom: 1px solid #e2e8f0;
-            vertical-align: top;
-            text-align: left;
-            font-size: 14px;
-          }
-          .invoice-table th:nth-child(2),
-          .invoice-table th:nth-child(3),
-          .invoice-table th:nth-child(4),
-          .invoice-table td:nth-child(2),
-          .invoice-table td:nth-child(3),
-          .invoice-table td:nth-child(4) {
-            width: 110px;
-            text-align: right;
-          }
-          .invoice-item-name {
-            font-weight: 700;
-            color: #0f172a;
-          }
-          .invoice-size {
-            font-weight: 400;
-            color: #475569;
-          }
-          .invoice-empty {
-            text-align: center !important;
-            color: #64748b;
-          }
-          .invoice-summary {
-            width: 320px;
-            margin-top: 20px;
-            margin-left: auto;
-          }
-          .invoice-summary-row {
-            display: flex;
-            justify-content: space-between;
-            gap: 12px;
-            padding: 8px 0;
-            font-size: 14px;
-          }
-          .invoice-summary-row.total {
-            margin-top: 8px;
-            padding-top: 14px;
-            border-top: 1px solid #cbd5e1;
-            font-size: 16px;
-            font-weight: 700;
-          }
-          .invoice-footer {
-            margin-top: 28px;
-            padding-top: 18px;
-            border-top: 1px dashed #cbd5e1;
-            text-align: center;
-          }
-          @media print {
-            body { padding: 0; }
-            .invoice {
-              border: none;
-              border-radius: 0;
-              padding: 0;
-            }
-          }
-        </style>
-      </head>
-      <body>
-        <main class="invoice">
-          <header class="invoice-header">
-            <div>
-              <p class="invoice-kicker">Hóa đơn thanh toán</p>
-              <h1 class="invoice-title">${maHoaHtmlIn(dinhDangNhanBan(order.tableNumber))}</h1>
-              <p class="invoice-subtitle">Mã đơn #${maHoaHtmlIn(dinhDangMaDonHang(order))}</p>
-            </div>
-            <div class="invoice-meta">
-              <p><strong>Thời gian:</strong> ${maHoaHtmlIn(dinhDangNgay(order.orderDate))}</p>
-              <p><strong>Trạng thái:</strong> ${maHoaHtmlIn(layNhanTrangThaiDonHang(order.status))}</p>
-              <p><strong>Thanh toán:</strong> ${maHoaHtmlIn(layNhanPhuongThucThanhToan(order.paymentMethod))}</p>
-            </div>
-          </header>
-
-          <section class="invoice-grid">
-            <div class="invoice-panel">
-              <h2>Khách hàng</h2>
-              <p>${maHoaHtmlIn(order.customer?.fullName || 'Khách lẻ')}</p>
-              <p>${maHoaHtmlIn(order.customer?.phone || 'Không có số điện thoại')}</p>
-            </div>
-            <div class="invoice-panel">
-              <h2>Ghi chú</h2>
-              <p>${maHoaHtmlIn(order.note || 'Không có ghi chú cho đơn này.')}</p>
-            </div>
-          </section>
-
-          <table class="invoice-table">
-            <thead>
-              <tr>
-                <th>Món</th>
-                <th>SL</th>
-                <th>Đơn giá</th>
-                <th>Thành tiền</th>
-              </tr>
-            </thead>
-            <tbody>
-              ${itemRows}
-            </tbody>
-          </table>
-
-          <section class="invoice-summary">
-            <div class="invoice-summary-row">
-              <span>Tạm tính</span>
-              <span>${maHoaHtmlIn(dinhDangTienTe(tongKetTien.subtotal))}</span>
-            </div>
-            <div class="invoice-summary-row">
-              <span>Phí dịch vụ</span>
-              <span>${maHoaHtmlIn(dinhDangTienTe(tongKetTien.serviceFee))}</span>
-            </div>
-            <div class="invoice-summary-row">
-              <span>Voucher</span>
-              <span>-${maHoaHtmlIn(dinhDangTienTe(tongKetTien.discountAmount))}</span>
-            </div>
-            <div class="invoice-summary-row total">
-              <span>Tổng cộng</span>
-              <span>${maHoaHtmlIn(dinhDangTienTe(tongKetTien.total))}</span>
-            </div>
-          </section>
-
-          <p class="invoice-footer">Cảm ơn quý khách đã sử dụng dịch vụ của nhà hàng.</p>
-        </main>
-        <script>
-          window.addEventListener('load', () => {
-            window.print();
-            window.onafterprint = () => window.close();
-          });
-        </script>
-      </body>
-    </html>
-  `
-}
-
 const taoCotBangMon = () => [
   {
     title: 'Món',
@@ -382,20 +96,8 @@ const taoCotBangMon = () => [
       </div>
     ),
   },
-  {
-    title: 'SL',
-    dataIndex: 'quantity',
-    key: 'quantity',
-    width: 64,
-    align: 'center',
-  },
-  {
-    title: 'Đơn giá',
-    dataIndex: 'price',
-    key: 'price',
-    width: 120,
-    render: (value) => dinhDangTienTe(value),
-  },
+  { title: 'SL', dataIndex: 'quantity', key: 'quantity', width: 64, align: 'center' },
+  { title: 'Đơn giá', dataIndex: 'price', key: 'price', width: 120, render: (value) => dinhDangTienTe(value) },
   {
     title: 'Thành tiền',
     key: 'lineTotal',
@@ -448,31 +150,43 @@ function DanhSachTheDonHang({ orders, idDonHangDangChon, onSelectOrder }) {
     <Card title="Danh sách order">
       <div className="grid gap-2.5">
         {orders.map((order) => {
-        const kieuThe = layKieuTheTrangThai(order.status)
-        const isSelected = String(idDonHangDangChon) === String(order.id)
+          const kieuThe = layKieuTheTrangThai(order.status)
+          const isSelected = String(idDonHangDangChon) === String(order.id)
+          const mauTag = kieuThe.tone === 'cancelled' ? 'red' : kieuThe.tone === 'paid' ? 'green' : kieuThe.tone === 'preparing' ? 'orange' : 'blue'
 
-        return (
-          <div key={order.id} onClick={() => onSelectOrder(order.id)} style={{ cursor: 'pointer', borderRadius: 16, padding: 14, marginBottom: 10, border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb', background: isSelected ? '#fff7ed' : '#fff' }}>
-            <Space orientation="vertical" size={10} style={{ width: '100%' }}>
-              <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                <div>
-                  <Typography.Text type="secondary">#{dinhDangMaDonHang(order)}</Typography.Text>
-                  <div><Typography.Text strong>{dinhDangNhanBan(order.tableNumber)}</Typography.Text></div>
-                </div>
-                <Tag color={kieuThe.tone === 'cancelled' ? 'red' : kieuThe.tone === 'paid' ? 'green' : kieuThe.tone === 'preparing' ? 'orange' : 'blue'}>{layNhanTrangThaiDonHang(order.status)}</Tag>
+          return (
+            <div
+              key={order.id}
+              onClick={() => onSelectOrder(order.id)}
+              style={{
+                cursor: 'pointer',
+                borderRadius: 16,
+                padding: 14,
+                marginBottom: 10,
+                border: isSelected ? '1px solid #f59e0b' : '1px solid #e5e7eb',
+                background: isSelected ? '#fff7ed' : '#fff',
+              }}
+            >
+              <Space orientation="vertical" size={10} style={{ width: '100%' }}>
+                <Space style={{ width: '100%', justifyContent: 'space-between' }}>
+                  <div>
+                    <Typography.Text type="secondary">#{dinhDangMaDonHang(order)}</Typography.Text>
+                    <div><Typography.Text strong>{dinhDangNhanBan(order.tableNumber)}</Typography.Text></div>
+                  </div>
+                  <Tag color={mauTag}>{layNhanTrangThaiDonHang(order.status)}</Tag>
+                </Space>
+                <Descriptions size="small" column={2} bordered>
+                  <Descriptions.Item label="Khách">{order.customer?.fullName || 'Khách lẻ'}</Descriptions.Item>
+                  <Descriptions.Item label="Giờ tạo">{dinhDangNgay(order.orderDate)}</Descriptions.Item>
+                  <Descriptions.Item label="Tổng tiền">{dinhDangTienTe(order.total)}</Descriptions.Item>
+                  <Descriptions.Item label="Thanh toán">{layNhanPhuongThucThanhToan(order.paymentMethod)}</Descriptions.Item>
+                </Descriptions>
+                <Typography.Text type="secondary">{kieuThe.hint}</Typography.Text>
+                {order.note ? <Typography.Text>{order.note}</Typography.Text> : null}
               </Space>
-              <Descriptions size="small" column={2} bordered>
-                <Descriptions.Item label="Khách">{order.customer?.fullName || 'Khách lẻ'}</Descriptions.Item>
-                <Descriptions.Item label="Giờ tạo">{dinhDangNgay(order.orderDate)}</Descriptions.Item>
-                <Descriptions.Item label="Tổng tiền">{dinhDangTienTe(order.total)}</Descriptions.Item>
-                <Descriptions.Item label="Thanh toán">{layNhanPhuongThucThanhToan(order.paymentMethod)}</Descriptions.Item>
-              </Descriptions>
-              <Typography.Text type="secondary">{kieuThe.hint}</Typography.Text>
-              {order.note ? <Typography.Text>{order.note}</Typography.Text> : null}
-            </Space>
-          </div>
-        )
-      })}
+            </div>
+          )
+        })}
       </div>
     </Card>
   )
@@ -485,7 +199,7 @@ function BangChiTietDonHang({
   loiChiTiet,
   trangThaiDangSua,
   onStatusChange,
-  onReloadDetail,
+  _onReloadDetail,
   onSubmit,
   onQuickPay,
   onPrint,
@@ -555,12 +269,12 @@ function BangChiTietDonHang({
                   <span>Phí dịch vụ</span>
                   <strong>{dinhDangTienTe(tongKetTien.serviceFee)}</strong>
                 </div>
-                {tongKetTien.discountAmount > 0 ? (
+                {tongKetTien.discountAmount > 0 && (
                   <div className="noi-bo-don-hang-money-summary__row">
                     <span>Voucher</span>
                     <strong>-{dinhDangTienTe(tongKetTien.discountAmount)}</strong>
                   </div>
-                ) : null}
+                )}
                 <div className="noi-bo-don-hang-money-summary__divider" />
                 <div className="noi-bo-don-hang-money-summary__row noi-bo-don-hang-money-summary__row--total">
                   <span>Tổng cộng</span>
@@ -577,9 +291,6 @@ function BangChiTietDonHang({
               <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Ghi chú</p>
               <h3 className="m-0 text-sm font-semibold text-slate-900">Thông tin bổ sung</h3>
             </div>
-            <Button size="small" icon={<ReloadOutlined />} onClick={onReloadDetail} loading={dangTaiChiTiet}>
-              Tải lại
-            </Button>
           </div>
 
           <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
@@ -587,7 +298,7 @@ function BangChiTietDonHang({
             <TextArea size="middle" rows={3} value={donHangNguon.note || 'Không có ghi chú cho đơn này.'} readOnly />
           </label>
 
-          {loiChiTiet ? <Alert type="warning" showIcon title={loiChiTiet} /> : null}
+          {loiChiTiet && <Alert type="warning" showIcon title={loiChiTiet} />}
         </section>
 
         <section className="space-y-3 rounded-[18px] border border-slate-200 bg-slate-50/80 p-3.5">
@@ -620,30 +331,13 @@ function BangChiTietDonHang({
         </section>
 
         <div className="noi-bo-don-hang-form-actions">
-          <Button
-            type="primary"
-            size="middle"
-            icon={<CheckCircleOutlined />}
-            onClick={onSubmit}
-            loading={dangLuuTrangThai}
-            disabled={!daDoiTrangThai}
-          >
+          <Button type="primary" size="middle" icon={<CheckCircleOutlined />} onClick={onSubmit} loading={dangLuuTrangThai} disabled={!daDoiTrangThai}>
             Cập nhật
           </Button>
-          <Button
-            size="middle"
-            icon={<PrinterOutlined />}
-            onClick={onPrint}
-            disabled={!coTheIn || dangLuuTrangThai}
-          >
+          <Button size="middle" icon={<PrinterOutlined />} onClick={onPrint} disabled={!coTheIn || dangLuuTrangThai}>
             In hóa đơn
           </Button>
-          <Button
-            size="middle"
-            onClick={onQuickPay}
-            loading={dangLuuTrangThai}
-            disabled={order.status === 'Paid' || order.status === 'Cancelled'}
-          >
+          <Button size="middle" onClick={onQuickPay} loading={dangLuuTrangThai} disabled={order.status === 'Paid' || order.status === 'Cancelled'}>
             Thanh toán
           </Button>
         </div>
@@ -748,22 +442,7 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
 
   const xuLyInHoaDon = () => {
     const donHangNguon = chiTietDonHang || donHangDangChon
-
-    if (!donHangNguon || !Array.isArray(donHangNguon.items) || !donHangNguon.items.length) {
-      setDetailError('Cần tải đầy đủ chi tiết món trước khi in hóa đơn.')
-      return
-    }
-
-    const cuaSoIn = window.open('', '_blank', 'width=960,height=720')
-    if (!cuaSoIn) {
-      setDetailError('Không thể mở cửa sổ in hóa đơn. Vui lòng kiểm tra chặn popup của trình duyệt.')
-      return
-    }
-
-    setDetailError('')
-    cuaSoIn.document.write(taoNoiDungInHoaDon(donHangNguon))
-    cuaSoIn.document.close()
-    cuaSoIn.focus()
+    moCuaSoInHoaDon(donHangNguon, setDetailError)
   }
 
   const guiCapNhatTrangThai = async (nextStatus) => {
@@ -827,7 +506,7 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
           loiChiTiet={loiChiTiet}
           trangThaiDangSua={trangThaiDangSua}
           onStatusChange={setFormStatus}
-          onReloadDetail={xuLyTaiLaiChiTiet}
+          _onReloadDetail={xuLyTaiLaiChiTiet}
           onSubmit={xuLyCapNhatTrangThai}
           onQuickPay={xuLyThanhToanNhanh}
           onPrint={xuLyInHoaDon}

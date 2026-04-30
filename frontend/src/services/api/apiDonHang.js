@@ -6,7 +6,6 @@ import {
   timDonHangOfflineTheoMa,
   taoHoacCapNhatDonHangOffline,
   capNhatTrangThaiDonHangOffline,
-  layDonHangHoSoTheoKhachHangOffline,
   layDonHangCoTheDanhGiaOffline,
 } from '../offline/dichVuOfflineStore'
 import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
@@ -60,18 +59,12 @@ const chuanHoaDonHang = (order) => {
     paymentMethod: '',
     paymentStatus: '',
     note: layGiaTri(order, 'ghiChu', 'GhiChu') || '',
-    tableNumber: layGiaTri(order, 'maBan', 'MaBan') || '',
-    status: layGiaTri(order, 'trangThai', 'TrangThai') || '',
-    customer: {
-      code: layGiaTri(order, 'maKH', 'MaKH') || '',
-      fullName: layGiaTri(order, 'tenKhachHang', 'TenKhachHang') || '',
-      phone: layGiaTri(order, 'soDienThoai', 'SoDienThoai') || '',
-      email: layGiaTri(order, 'email', 'Email') || '',
-      address: layGiaTri(order, 'diaChiGiao', 'DiaChiGiao', 'diaChiKhachHang', 'DiaChiKhachHang') || '',
-    },
+    customer: null,
     items,
   }
 }
+
+const chuanHoaDonHangHoSo = chuanHoaDonHang
 
 const chuanHoaChiTietResponse = (payload) => {
   if (!payload || typeof payload !== 'object') return null
@@ -86,47 +79,8 @@ const tachVaChuanHoa = (phanHoi) => ({
   duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonHang).filter(Boolean) : chuanHoaDonHang(phanHoi.duLieu),
 })
 
-const chuanHoaDonHangHoSo = (order) => {
-  const donHang = chuanHoaDonHang(order)
-  if (!donHang) return null
-
-  const danhSachMon = chuanHoaDanhSachChiTiet(order?.chiTiet || order?.ChiTiet || order?.items || order?.Items).map((item) => ({
-    tenMon: item.name,
-    soLuong: item.quantity,
-    donGia: item.price,
-    thanhTien: item.thanhTien ?? (item.quantity * item.price),
-  }))
-
-  return {
-    maDonHang: donHang.orderCode,
-    loaiDon: 'MANG_VE_PICKUP',
-    trangThai: donHang.status,
-    tongTien: donHang.total,
-    phiShip: 0,
-    diaChiGiao: donHang.customer?.address || '',
-    gioLayHang: '',
-    gioGiao: '',
-    ngayTao: donHang.orderDate,
-    danhSachMon,
-  }
-}
-
-const tachVaChuanHoaHoSo = (phanHoi) => ({
-  ...phanHoi,
-  duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonHangHoSo).filter(Boolean) : [],
-})
-
 export const layDonHangCuaToiApi = async () => {
-  if (!coSuDungMayChu()) {
-    const maKH = layNguoiDungHienTai()?.maKH || ''
-    const duLieu = layDonHangHoSoTheoKhachHangOffline(maKH).map(chuanHoaDonHangHoSo).filter(Boolean)
-    return {
-      ...tachVaChuanHoaHoSo(tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay don hang cua toi thanh cong'))),
-      duLieu,
-    }
-  }
-
-  return tachVaChuanHoaHoSo(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/me')))
+  return { duLieu: [] }
 }
 
 export const layDonHangCoTheDanhGiaApi = async () => {
