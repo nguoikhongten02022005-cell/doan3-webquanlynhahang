@@ -9,9 +9,10 @@ import { DonHangPaymentStatusService } from './don-hang-payment-status.service';
 import { DonHangTableOrderService } from './don-hang-table-order.service';
 import { CoreModule } from '../core/core.module';
 import { AuthModule } from '../auth/auth.module';
+import { DiemTichLuyModule } from '../diem-tich-luy/diem-tich-luy.module';
 
 @Module({
-  imports: [CoreModule, AuthModule],
+  imports: [CoreModule, AuthModule, DiemTichLuyModule],
   controllers: [DonHangController],
   providers: [
     DonHangService,
