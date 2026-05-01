@@ -9,9 +9,9 @@ import { BanModule } from './modules/ban/ban.module';
 import { DatBanModule } from './modules/dat-ban/dat-ban.module';
 import { DonHangModule } from './modules/don-hang/don-hang.module';
 import { DanhGiaModule } from './modules/danh-gia/danh-gia.module';
-import { MangVeModule } from './modules/mang-ve/mang-ve.module';
 import { DiemTichLuyModule } from './modules/diem-tich-luy/diem-tich-luy.module';
 import { MaGiamGiaModule } from './modules/ma-giam-gia/ma-giam-gia.module';
+import { KhachHangModule } from './modules/khach-hang/khach-hang.module';
 
 const moiTruong = process.env.NODE_ENV?.trim() || 'development';
 const tapTinMoiTruong = `.env.${moiTruong}`;
@@ -33,9 +33,9 @@ const tapTinMoiTruong = `.env.${moiTruong}`;
     DatBanModule,
     DonHangModule,
     DanhGiaModule,
-    MangVeModule,
-    DiemTichLuyModule,
     MaGiamGiaModule,
+    KhachHangModule,
+    DiemTichLuyModule,
   ],
 })
 export class AppModule {}
