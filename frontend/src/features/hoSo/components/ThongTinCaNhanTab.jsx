@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Button, Form, Input, Upload } from 'antd'
+import { Button, Form, Input, InputNumber, Upload } from 'antd'
+import { doiDiemTichLuyApi } from '../../../services/api/apiDiemTichLuy'
 import { useThongBao } from '../../../context/ThongBaoContext'
 
 const BieuTuongAnhDaiDienNguoiDung = () => (
@@ -29,7 +30,7 @@ const dinhDangThoiGianDiem = (giaTri) => {
 
 const dinhDangSo = (giaTri) => new Intl.NumberFormat('vi-VN').format(Number(giaTri || 0))
 
-function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy = [], onLogout, onCapNhatHoSo, onDoiMatKhau }) {
+function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy = [], onLogout, onCapNhatHoSo, onDoiMatKhau, onRefreshDiemTichLuy }) {
   const { hienThongBao } = useThongBao()
   const [formHoSo] = Form.useForm()
   const [formMatKhau] = Form.useForm()
@@ -43,6 +44,9 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
   })
   const [dangLuuThongTinHoSo, setDangLuuThongTinHoSo] = useState(false)
   const [dangCapNhatMatKhauHoSo, setDangCapNhatMatKhauHoSo] = useState(false)
+  const [soDiemMuonDoi, setSoDiemMuonDoi] = useState(null)
+  const [dangDoiDiem, setDangDoiDiem] = useState(false)
+  const [phanHoiDoiDiem, setPhanHoiDoiDiem] = useState(null)
   const anhDaiDienMacDinh = String(nguoiDung?.avatarUrl ?? nguoiDung?.avatar ?? '')
   const tongQuanDiem = useMemo(() => ({
     tongDiem: Number(tongQuanDiemTichLuy?.tongDiem || 0),
@@ -164,6 +168,68 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
     }
   }
 
+  const handleDoiDiem = async () => {
+    if (!soDiemMuonDoi || soDiemMuonDoi <= 0) {
+      hienThongBao({
+        message: 'Vui lòng nhập số điểm muốn đổi (lớn hơn 0).',
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+      return
+    }
+
+    if (soDiemMuonDoi > tongQuanDiem.diemCoTheDoi) {
+      hienThongBao({
+        message: `Số điểm muốn đổi vượt quá điểm có thể đổi (${dinhDangSo(tongQuanDiem.diemCoTheDoi)} điểm).`,
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+      return
+    }
+
+    try {
+      setDangDoiDiem(true)
+      setPhanHoiDoiDiem(null)
+      const phanHoi = await doiDiemTichLuyApi(soDiemMuonDoi)
+
+      if (!phanHoi.duLieu) {
+        hienThongBao({
+          message: phanHoi.thongDiep || 'Không thể đổi điểm lúc này.',
+          tone: 'error',
+          duration: 3000,
+          title: '',
+        })
+        return
+      }
+
+      setPhanHoiDoiDiem({
+        soDiemDaDoi: phanHoi.duLieu.soDiemDaDoi,
+        diemTruoc: phanHoi.duLieu.diemTruoc,
+        diemSau: phanHoi.duLieu.diemSau,
+      })
+      setSoDiemMuonDoi(null)
+
+      hienThongBao({
+        message: `Đã đổi ${dinhDangSo(phanHoi.duLieu.soDiemDaDoi)} điểm thành công!`,
+        tone: 'success',
+        duration: 3000,
+        title: 'Thành công',
+      })
+      onRefreshDiemTichLuy?.()
+    } catch (error) {
+      hienThongBao({
+        message: error?.message || 'Không thể đổi điểm lúc này.',
+        tone: 'error',
+        duration: 3000,
+        title: '',
+      })
+    } finally {
+      setDangDoiDiem(false)
+    }
+  }
+
   const anhDaiDienHienThi = xemTruocAnhDaiDien || anhDaiDienMacDinh
 
   return (
@@ -273,6 +339,54 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
           ) : (
             <div className="ho-so-diem-tich-luy-empty">Chưa có lịch sử điểm tích lũy.</div>
           )}
+        </div>
+
+        <div className="ho-so-doi-diem-section">
+          <div className="ho-so-subsection-heading">
+            <h4>Đổi điểm tích lũy</h4>
+            <p>Sử dụng điểm tích lũy để đổi các ưu đãi đặc biệt.</p>
+          </div>
+
+          <div className="ho-so-doi-diem-form">
+            <div className="ho-so-doi-diem-input-row">
+              <Form.Item className="nhom-truong" label={<span className="nhan-truong">Số điểm muốn đổi</span>}>
+                <InputNumber
+                  id="ho-so-so-diem-muon-doi"
+                  className="truong-nhap"
+                  min={1}
+                  max={tongQuanDiem.diemCoTheDoi}
+                  value={soDiemMuonDoi}
+                  onChange={(value) => setSoDiemMuonDoi(value)}
+                  placeholder={`Tối đa: ${dinhDangSo(tongQuanDiem.diemCoTheDoi)} điểm`}
+                  disabled={dangDoiDiem}
+                  style={{ width: '100%' }}
+                />
+              </Form.Item>
+              <Button
+                htmlType="button"
+                className="btn nut-chinh ho-so-doi-diem-btn"
+                onClick={handleDoiDiem}
+                loading={dangDoiDiem}
+                disabled={!soDiemMuonDoi || soDiemMuonDoi <= 0}
+              >
+                Đổi điểm
+              </Button>
+            </div>
+
+            {phanHoiDoiDiem && (
+              <div className="ho-so-doi-diem-result">
+                <p className="ho-so-doi-diem-success">
+                  Đã đổi <strong>{dinhDangSo(phanHoiDoiDiem.soDiemDaDoi)} điểm</strong> thành công!
+                </p>
+                <p className="ho-so-doi-diem-balance">
+                  Số dư điểm: {dinhDangSo(phanHoiDoiDiem.diemTruoc)} → <strong>{dinhDangSo(phanHoiDoiDiem.diemSau)} điểm</strong>
+                </p>
+                <Button htmlType="button" className="btn" onClick={onRefreshDiemTichLuy}>
+                  Cập nhật lại
+                </Button>
+              </div>
+            )}
+          </div>
         </div>
       </section>
 

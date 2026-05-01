@@ -62,3 +62,31 @@ export const layLichSuDiemTichLuyApi = async () => {
     duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaGiaoDichDiem).filter(Boolean) : [],
   }
 }
+
+export const doiDiemTichLuyApi = async (soDiem, moTa = 'Đổi điểm tích lũy') => {
+  if (!coSuDungMayChu()) {
+    return {
+      ...tachPhanHoiApi(taoPhanHoiOffline(null, 'Che do offline khong ho tro doi diem')),
+      duLieu: null,
+    }
+  }
+
+  const phanHoi = tachPhanHoiApi(
+    await trinhKhachApi.post('/diem-tich-luy/doi-diem', {
+      soDiem: Number(soDiem),
+      moTa,
+    }),
+  )
+  return {
+    ...phanHoi,
+    duLieu: phanHoi.duLieu
+      ? {
+          maGiaoDichDiem: String(phanHoi.duLieu.maGiaoDichDiem || phanHoi.duLieu.MaGiaoDichDiem || ''),
+          maKH: String(phanHoi.duLieu.maKH || phanHoi.duLieu.MaKH || ''),
+          soDiemDaDoi: Number(phanHoi.duLieu.soDiemDaDoi || phanHoi.duLieu.SoDiemDaDoi || 0),
+          diemTruoc: Number(phanHoi.duLieu.diemTruoc || phanHoi.duLieu.DiemTruoc || 0),
+          diemSau: Number(phanHoi.duLieu.diemSau || phanHoi.duLieu.DiemSau || 0),
+        }
+      : null,
+  }
+}

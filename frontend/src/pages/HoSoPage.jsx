@@ -1,16 +1,12 @@
 import { useEffect, useMemo, useState } from 'react'
 import { Tabs } from 'antd'
 import { Navigate, useNavigate } from 'react-router-dom'
-import ChiTietDonHangModal from '../features/hoSo/components/ChiTietDonHangModal'
-import DonHangMangVeTab from '../features/hoSo/components/DonHangMangVeTab'
 import LichSuDatBanTab from '../features/hoSo/components/LichSuDatBanTab'
 import ThongTinCaNhanTab from '../features/hoSo/components/ThongTinCaNhanTab'
 import { PROFILE_TABS } from '../features/hoSo/mocks/duLieuHoSo'
 import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useDatBan } from '../features/datBan/hooks/useDatBan'
-import { huyDonMangVeApi } from '../services/api/apiMangVe'
-import { layDanhSachDonHangHoSoApi } from '../services/api/apiDonHang'
 import { layLichSuDiemTichLuyApi, layTongQuanDiemTichLuyApi } from '../services/api/apiDiemTichLuy'
 
 function HoSoPage() {
@@ -20,11 +16,8 @@ function HoSoPage() {
   const { layLichSuDatBan, huyDatBan } = useDatBan()
   const [tabHienTai, setTabHienTai] = useState('personal')
   const [danhSachDatBan, setDanhSachDatBan] = useState([])
-  const [danhSachDonHang, setDanhSachDonHang] = useState([])
   const [tongQuanDiemTichLuy, setTongQuanDiemTichLuy] = useState(null)
   const [danhSachLichSuDiem, setDanhSachLichSuDiem] = useState([])
-  const [maDonChiTiet, setMaDonChiTiet] = useState('')
-  const [boLocTrangThaiDonHang, setBoLocTrangThaiDonHang] = useState('ALL')
 
   useEffect(() => {
     document.body.classList.add('ho-so-an-thanh-cuon')
@@ -37,14 +30,11 @@ function HoSoPage() {
   useEffect(() => {
     if (!nguoiDungHienTai) {
       setDanhSachDatBan([])
-      setDanhSachDonHang([])
       setTongQuanDiemTichLuy(null)
       setDanhSachLichSuDiem([])
-      setMaDonChiTiet('')
       return
     }
 
-    setMaDonChiTiet('')
     ;(async () => {
       try {
         if (nguoiDungHienTai.maKH) {
@@ -54,33 +44,40 @@ function HoSoPage() {
           setDanhSachDatBan([])
         }
 
-        const [phanHoiDonHang, phanHoiTongQuanDiem, phanHoiLichSuDiem] = await Promise.all([
-          layDanhSachDonHangHoSoApi(),
+        const [phanHoiTongQuanDiem, phanHoiLichSuDiem] = await Promise.all([
           layTongQuanDiemTichLuyApi(),
           layLichSuDiemTichLuyApi(),
         ])
 
-        setDanhSachDonHang(Array.isArray(phanHoiDonHang?.duLieu) ? phanHoiDonHang.duLieu : [])
         setTongQuanDiemTichLuy(phanHoiTongQuanDiem?.duLieu || null)
         setDanhSachLichSuDiem(Array.isArray(phanHoiLichSuDiem?.duLieu) ? phanHoiLichSuDiem.duLieu : [])
       } catch {
         setDanhSachDatBan([])
-        setDanhSachDonHang([])
         setTongQuanDiemTichLuy(null)
         setDanhSachLichSuDiem([])
       }
     })()
   }, [layLichSuDatBan, nguoiDungHienTai])
 
-  const donHangChiTiet = useMemo(
-    () => danhSachDonHang.find((order) => order.maDonHang === maDonChiTiet) || null,
-    [danhSachDonHang, maDonChiTiet],
-  )
-
   const danhSachTabHoSo = useMemo(
     () => PROFILE_TABS.map((tab) => ({ key: tab.key, label: tab.label })),
     [],
   )
+
+  const lamMoiDiemTichLuy = async () => {
+    try {
+      const [phanHoiTongQuanDiem, phanHoiLichSuDiem] = await Promise.all([
+        layTongQuanDiemTichLuyApi(),
+        layLichSuDiemTichLuyApi(),
+      ])
+
+      setTongQuanDiemTichLuy(phanHoiTongQuanDiem?.duLieu || null)
+      setDanhSachLichSuDiem(Array.isArray(phanHoiLichSuDiem?.duLieu) ? phanHoiLichSuDiem.duLieu : [])
+    } catch {
+      setTongQuanDiemTichLuy(null)
+      setDanhSachLichSuDiem([])
+    }
+  }
 
   const handleHuyDatBan = async (maDatBan) => {
     const xacNhan = window.confirm(`Bạn có chắc muốn hủy đặt bàn ${maDatBan}?`)
@@ -119,28 +116,6 @@ function HoSoPage() {
     navigate('/dat-ban')
   }
 
-  const handleMoChiTietDonHang = (orderCode) => {
-    setMaDonChiTiet(orderCode)
-  }
-
-  const handleHuyDonMangVe = async (maDonHang) => {
-    const xacNhan = window.confirm('Bạn có chắc muốn hủy đơn này?')
-    if (!xacNhan) return
-
-    try {
-      await huyDonMangVeApi(maDonHang)
-      const { duLieu } = await layDanhSachDonHangHoSoApi()
-      setDanhSachDonHang(Array.isArray(duLieu) ? duLieu : [])
-      hienThongBao({ message: `Đã hủy đơn ${maDonHang}.`, tone: 'success', duration: 3000, title: '' })
-    } catch (error) {
-      hienThongBao({ message: error?.message || 'Không thể hủy đơn lúc này.', tone: 'error', duration: 3000, title: '' })
-    }
-  }
-
-  const handleDongChiTietDonHang = () => {
-    setMaDonChiTiet('')
-  }
-
   const handleDangXuat = async () => {
     await dangXuat()
     navigate('/', { replace: true })
@@ -172,6 +147,7 @@ function HoSoPage() {
                 onLogout={handleDangXuat}
                 onCapNhatHoSo={capNhatHoSo}
                 onDoiMatKhau={capNhatMatKhau}
+                onRefreshDiemTichLuy={lamMoiDiemTichLuy}
               />
             )}
 
@@ -184,19 +160,14 @@ function HoSoPage() {
             )}
 
             {tabHienTai === 'orders' && (
-              <DonHangMangVeTab
-                danhSachDon={danhSachDonHang}
-                boLoc={boLocTrangThaiDonHang}
-                onDoiBoLoc={setBoLocTrangThaiDonHang}
-                onHuyDon={handleHuyDonMangVe}
-                onXemChiTiet={handleMoChiTietDonHang}
-              />
+              <div style={{ padding: '24px', textAlign: 'center', color: '#888' }}>
+                <p>Dịch vụ đặt hàng mang về hiện không khả dụng.</p>
+              </div>
             )}
           </section>
         </div>
       </div>
 
-      <ChiTietDonHangModal donHang={donHangChiTiet} dangMo={Boolean(donHangChiTiet)} onClose={handleDongChiTietDonHang} />
     </div>
   )
 }
