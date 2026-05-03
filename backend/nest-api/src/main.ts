@@ -41,7 +41,9 @@ function layOriginMacDinhTheoMoiTruong(moiTruong: string) {
 
 function taoDanhSachOriginDuocPhep(moiTruong: string) {
   const originMacDinh = layOriginMacDinhTheoMoiTruong(moiTruong);
-  const originOverride = tachDanhSachOrigin(docBienMoiTruongTuyChon('FRONTEND_ORIGIN'));
+  const originOverride = tachDanhSachOrigin(
+    docBienMoiTruongTuyChon('FRONTEND_ORIGIN'),
+  );
 
   return Array.from(new Set([...originMacDinh, ...originOverride]));
 }
@@ -73,12 +75,14 @@ async function bootstrap() {
     allowedHeaders: ['Content-Type', 'Authorization', 'Accept'],
   });
 
-  app.useGlobalPipes(new ValidationPipe({
-    transform: true,
-    whitelist: true,
-    forbidNonWhitelisted: true,
-    transformOptions: { enableImplicitConversion: true },
-  }));
+  app.useGlobalPipes(
+    new ValidationPipe({
+      transform: true,
+      whitelist: true,
+      forbidNonWhitelisted: true,
+      transformOptions: { enableImplicitConversion: true },
+    }),
+  );
 
   app.setGlobalPrefix('');
 

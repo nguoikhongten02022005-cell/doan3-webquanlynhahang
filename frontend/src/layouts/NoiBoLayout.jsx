@@ -9,10 +9,11 @@ import {
   MenuFoldOutlined,
   MenuUnfoldOutlined,
   OrderedListOutlined,
-  ReloadOutlined,
   ShopOutlined,
   TableOutlined,
+  TagOutlined,
   UserOutlined,
+  TeamOutlined,
 } from '@ant-design/icons'
 import { useMemo, useState } from 'react'
 import { Outlet, useLocation, useNavigate } from 'react-router-dom'
@@ -30,11 +31,12 @@ const ICON_MAP = {
   'so-do-ban': <TableOutlined />,
   'quan-ly-ban': <ShopOutlined />,
   'thuc-don': <AppstoreOutlined />,
+  'ma-giam-gia': <TagOutlined />,
   'don-hang': <OrderedListOutlined />,
-  'don-mang-ve': <OrderedListOutlined />,
   'danh-gia': <AuditOutlined />,
   'thong-ke': <DollarOutlined />,
   'nhan-vien': <UserOutlined />,
+  'khach-hang': <TeamOutlined />,
 }
 
 function NoiBoLayout() {
@@ -45,7 +47,7 @@ function NoiBoLayout() {
   const [drawerOpen, setDrawerOpen] = useState(false)
   const { nguoiDungHienTai, laQuanLy, dangXuat } = useXacThuc()
   const duLieuNoiBo = useNoiBoData()
-  const { badges, dangTaiDuLieu, loiTaiDuLieu, taiLaiDuLieu } = duLieuNoiBo
+  const { badges, loiTaiDuLieu, taiLaiDuLieu } = duLieuNoiBo
   const laMobile = manHinh.xs && !manHinh.md
   const laTabletTroLen = !!manHinh.md
 
@@ -72,13 +74,13 @@ function NoiBoLayout() {
 
   const menuNode = (
     <>
-      <div style={{ padding: collapsed && laTabletTroLen ? '20px 12px' : '20px 18px', borderBottom: '1px solid #f0e6dc' }}>
-        <Space align="center" size={12}>
+      <div style={{ padding: collapsed && laTabletTroLen ? '16px 8px' : '16px 14px', borderBottom: '1px solid #f0e6dc' }}>
+        <Space align="center" size={10}>
           <Avatar style={{ background: '#e96c4a' }}>NH</Avatar>
           {!(collapsed && laTabletTroLen) ? (
             <div>
-              <Title level={5} style={{ margin: 0 }}>Nguyên Vị Nội bộ</Title>
-              <Text type="secondary" style={{ fontSize: 12 }}>Trung tâm vận hành</Text>
+              <Text strong style={{ fontSize: 14 }}>Nguyên Vị</Text>
+              <Text type="secondary" style={{ fontSize: 11, display: 'block' }}>Nội bộ</Text>
             </div>
           ) : null}
         </Space>
@@ -92,23 +94,23 @@ function NoiBoLayout() {
           navigate(key)
           setDrawerOpen(false)
         }}
-        style={{ borderInlineEnd: 'none', paddingTop: 8 }}
+        style={{ borderInlineEnd: 'none', paddingTop: 4 }}
       />
 
-      <div style={{ marginTop: 'auto', padding: collapsed && laTabletTroLen ? 12 : 18, borderTop: '1px solid #f0e6dc' }}>
-        <Space align="center" size={12} style={{ width: '100%', justifyContent: collapsed && laTabletTroLen ? 'center' : 'space-between' }}>
-          <Space align="center" size={12}>
-            <Avatar style={{ background: '#f07d5c' }}>{String(nguoiDungHienTai?.fullName || 'A').charAt(0).toUpperCase()}</Avatar>
+      <div style={{ marginTop: 'auto', padding: collapsed && laTabletTroLen ? 10 : 14, borderTop: '1px solid #f0e6dc' }}>
+        <Space align="center" size={10} style={{ width: '100%', justifyContent: collapsed && laTabletTroLen ? 'center' : 'space-between' }}>
+          <Space align="center" size={10}>
+            <Avatar style={{ background: '#f07d5c', width: 32, height: 32 }}>{String(nguoiDungHienTai?.fullName || 'A').charAt(0).toUpperCase()}</Avatar>
             {!(collapsed && laTabletTroLen) ? (
               <div>
-                <Text strong style={{ display: 'block' }}>{nguoiDungHienTai?.fullName || 'Nhân sự nội bộ'}</Text>
-                <Text type="secondary" style={{ fontSize: 12 }}>{laQuanLy ? 'Quản lý' : 'Nhân viên'}</Text>
+                <Text strong style={{ display: 'block', fontSize: 13 }}>{nguoiDungHienTai?.fullName || 'NV'}</Text>
+                <Text type="secondary" style={{ fontSize: 11 }}>{laQuanLy ? 'Quản lý' : 'NV'}</Text>
               </div>
             ) : null}
           </Space>
-          {!(collapsed && laTabletTroLen) ? <Button icon={<LogoutOutlined />} onClick={handleLogout}>Đăng xuất</Button> : null}
+          {!(collapsed && laTabletTroLen) ? <Button icon={<LogoutOutlined />} onClick={handleLogout} size="small">Ra</Button> : null}
         </Space>
-        {collapsed && laTabletTroLen ? <Button icon={<LogoutOutlined />} onClick={handleLogout} style={{ marginTop: 12, width: '100%' }} /> : null}
+        {collapsed && laTabletTroLen ? <Button icon={<LogoutOutlined />} onClick={handleLogout} size="small" style={{ marginTop: 8, width: '100%' }} /> : null}
       </div>
     </>
   )
@@ -117,12 +119,12 @@ function NoiBoLayout() {
     <Layout style={{ minHeight: '100vh', background: '#f7f5f2' }}>
       {laTabletTroLen ? (
         <Sider
-          collapsedWidth={88}
+          collapsedWidth={64}
           collapsible
           collapsed={collapsed}
           onCollapse={setCollapsed}
           trigger={null}
-          width={280}
+          size={220}
           theme="light"
           style={{ borderRight: '1px solid #f0e6dc', position: 'sticky', top: 0, insetInlineStart: 0, height: '100vh', overflow: 'auto' }}
         >
@@ -135,20 +137,17 @@ function NoiBoLayout() {
       </Drawer>
 
       <Layout>
-        <Header style={{ background: '#fff', borderBottom: '1px solid #f0e6dc', padding: laMobile ? '0 14px' : '0 20px', display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}>
-          <Space align="center" size={12}>
+        <Header style={{ background: '#fff', borderBottom: '1px solid #f0e6dc', padding: laMobile ? '0 12px' : '0 16px', display: 'flex', alignItems: 'center', justifyContent: 'space-between', height: 52 }}>
+          <Space align="center" size={10}>
             {laMobile ? <Button type="text" icon={drawerOpen ? <MenuFoldOutlined /> : <MenuUnfoldOutlined />} onClick={() => setDrawerOpen(true)} className="noi-bo-mobile-toggle" /> : null}
-            <div>
-              <Title level={4} style={{ margin: 0 }}>{metaTrang.label}</Title>
-            </div>
+            <Title level={5} style={{ margin: 0 }}>{metaTrang.label}</Title>
           </Space>
-          <Space>
-            <Button icon={<ReloadOutlined />} loading={dangTaiDuLieu} onClick={() => taiLaiDuLieu?.()}>Tải lại</Button>
-            <Avatar style={{ background: '#f07d5c' }}>{String(nguoiDungHienTai?.fullName || 'A').charAt(0).toUpperCase()}</Avatar>
+          <Space size={10}>
+            <Avatar style={{ background: '#f07d5c', width: 28, height: 28 }}>{String(nguoiDungHienTai?.fullName || 'A').charAt(0).toUpperCase()}</Avatar>
           </Space>
         </Header>
 
-        <Content style={{ padding: laMobile ? 14 : 20 }}>
+        <Content style={{ padding: laMobile ? 10 : 16 }}>
           {loiTaiDuLieu ? <Alert type="error" showIcon title={loiTaiDuLieu} style={{ marginBottom: 16 }} action={<Button size="small" onClick={() => taiLaiDuLieu?.()}>Thử lại</Button>} /> : null}
           <Outlet context={duLieuNoiBo} />
         </Content>

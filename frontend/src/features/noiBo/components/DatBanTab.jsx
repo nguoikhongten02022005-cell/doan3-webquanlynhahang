@@ -222,7 +222,7 @@ function DatBanToolbar({
 }) {
   return (
     <Card className="dat-ban-noi-bo-toolbar-card">
-      <Space direction="vertical" size={14} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={14} style={{ width: '100%' }}>
         <div className="dat-ban-noi-bo-toolbar-card__top">
           <div>
             <span className="dat-ban-noi-bo-section-kicker">Đặt bàn nội bộ</span>
@@ -289,14 +289,7 @@ function DatBanFormCard({
       }
       extra={<Tag color={dangChinhSua ? 'orange' : 'blue'}>{dangChinhSua ? 'Đang chỉnh sửa' : 'Tạo mới'}</Tag>}
     >
-      <Space direction="vertical" size={14} style={{ width: '100%' }}>
-        <Alert
-          type="info"
-          showIcon
-          message={dangChinhSua ? 'Đang cập nhật booking hiện có' : 'Tạo nhanh booking nội bộ'}
-          description="Ưu tiên bố cục gọn, dễ quét và giữ nguyên toàn bộ flow nghiệp vụ hiện tại."
-        />
-
+      <Space orientation="vertical" size={14} style={{ width: '100%' }}>
         <Form layout="vertical" onSubmitCapture={onSubmit}>
           <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Liên hệ khách</Divider>
           <Row gutter={12}>
@@ -404,7 +397,7 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
   return (
     <Card className={`dat-ban-noi-bo-booking-card${canhBaoUuTien ? ' dat-ban-noi-bo-booking-card--urgent' : ''}`}>
       <div className="dat-ban-noi-bo-booking-card__layout">
-        <Space direction="vertical" size={12} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={12} style={{ width: '100%' }}>
           <div>
             <Space wrap size={[8, 8]}>
               <Typography.Title level={5} style={{ margin: 0 }}>{layMaDatBan(booking)}</Typography.Title>
@@ -472,7 +465,7 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
         </Space>
 
         <Card size="small" className="dat-ban-noi-bo-actions-card" title="Thao tác">
-          <Space direction="vertical" size={8} style={{ width: '100%' }}>
+          <Space orientation="vertical" size={8} style={{ width: '100%' }}>
             <Button block icon={<EditOutlined />} onClick={() => onEdit(booking)}>
               Sửa
             </Button>
@@ -523,7 +516,7 @@ function DatBanBookingList({
         <Empty
           image={Empty.PRESENTED_IMAGE_SIMPLE}
           description={(
-            <Space direction="vertical" size={2}>
+            <Space orientation="vertical" size={2}>
               <Typography.Text strong>{trangThaiTrong.tieuDe}</Typography.Text>
               <Typography.Text type="secondary">{trangThaiTrong.moTa}</Typography.Text>
             </Space>
@@ -577,12 +570,12 @@ function DatBanAssignModal({
       open={open}
       onClose={onClose}
       title={booking ? `Gán bàn · ${layMaDatBan(booking)}` : 'Gán bàn'}
-      width={460}
+      size={460}
       destroyOnHidden
       className="dat-ban-noi-bo-assign-drawer"
     >
       {booking ? (
-        <Space direction="vertical" size={14} style={{ width: '100%' }}>
+        <Space orientation="vertical" size={14} style={{ width: '100%' }}>
           <Descriptions bordered size="small" column={1} className="dat-ban-noi-bo-assign-desc">
             <Descriptions.Item label="Khách">{booking.name}</Descriptions.Item>
             <Descriptions.Item label="Số khách">{dinhDangSoKhach(booking.guests)}</Descriptions.Item>
@@ -620,7 +613,7 @@ function DatBanAssignModal({
                     onClick={() => onToggleTable(table.id)}
                     className={`dat-ban-noi-bo-ban-tile${dangGan ? ' dat-ban-noi-bo-ban-tile--current' : ''}${daChon ? ' dat-ban-noi-bo-ban-tile--selected' : ''}`}
                   >
-                    <Space direction="vertical" size={4} style={{ width: '100%' }}>
+                    <Space orientation="vertical" size={4} style={{ width: '100%' }}>
                       <Typography.Text strong>{table.code}</Typography.Text>
                       <Typography.Text>{table.capacity} khách</Typography.Text>
                       <Typography.Text type="secondary">{layNhanChoNgoi(table.areaId)}</Typography.Text>
@@ -661,7 +654,7 @@ function DatBanConfirmModal({ pendingAction, open, onClose, onConfirm }) {
       centered
       okButtonProps={{ danger: pendingAction.type === 'noShow' }}
     >
-      <Space direction="vertical" size={12} style={{ width: '100%' }}>
+      <Space orientation="vertical" size={12} style={{ width: '100%' }}>
         <Alert type={pendingAction.type === 'noShow' ? 'warning' : 'info'} showIcon message={copy.message} description={copy.description} />
         <Typography.Text className="dat-ban-noi-bo-confirm-text">{copy.getMessage(pendingAction.booking)}</Typography.Text>
       </Space>

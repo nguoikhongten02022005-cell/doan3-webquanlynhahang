@@ -3,7 +3,7 @@ import { CalendarOutlined, CheckCircleOutlined, ClockCircleOutlined, TableOutlin
 import { Card, Col, Row, Statistic } from 'antd'
 import { useOutletContext } from 'react-router-dom'
 import DatBanTab from '../../features/noiBo/components/DatBanTab'
-import { layNhanBoLocTongQuan, laDatBanDaCheckIn } from '../../features/noiBo/boChon'
+import { laDatBanDaCheckIn } from '../../features/noiBo/boChon'
 
 function NoiBoDatBanPage() {
   const {
@@ -22,7 +22,6 @@ function NoiBoDatBanPage() {
     danhSachDatBanChuaGanBan,
   } = useOutletContext()
 
-  const phamViLabel = layNhanBoLocTongQuan('all', 'all')
   const tongDaCheckIn = useMemo(
     () => hangDoiDatBan.filter((booking) => laDatBanDaCheckIn(booking)).length,
     [hangDoiDatBan],
@@ -39,13 +38,6 @@ function NoiBoDatBanPage() {
   )
 
   const danhSachThongKe = useMemo(() => [
-    {
-      key: 'watching',
-      label: 'Booking đang theo dõi',
-      value: hangDoiDatBan.length,
-      description: phamViLabel,
-      icon: <CalendarOutlined />,
-    },
     {
       key: 'pending',
       label: 'Chờ xác nhận',
@@ -83,23 +75,22 @@ function NoiBoDatBanPage() {
     danhSachDatBanChuaGanBan.length,
     danhSachDatBanSapDienRa.length,
     hangDoiDatBan.length,
-    phamViLabel,
     tongDaCheckIn,
   ])
 
   return (
     <div className="noi-bo-dat-ban-page">
-      <Row gutter={[16, 16]}>
+      <Row gutter={[12, 12]}>
         {danhSachThongKe.map((thongKe, index) => (
           <Col key={thongKe.key} xs={24} sm={12} xl={index < 3 ? 8 : 12}>
-            <Card className="noi-bo-dat-ban-summary-card">
+            <Card className="noi-bo-dat-ban-summary-card" styles={{ body: { padding: '12px 16px' } }}>
               <Statistic
                 title={thongKe.label}
                 value={thongKe.value}
                 prefix={thongKe.icon}
                 styles={thongKe.color ? { content: { color: thongKe.color } } : undefined}
               />
-              <div className="noi-bo-dat-ban-summary-note">{thongKe.description}</div>
+              {thongKe.description && <div className="noi-bo-dat-ban-summary-note">{thongKe.description}</div>}
             </Card>
           </Col>
         ))}
@@ -115,7 +106,7 @@ function NoiBoDatBanPage() {
         handleCreateInternalBooking={xuLyTaoDatBanNoiBo}
         xuLyKhachKhongDen={xuLyKhachKhongDen}
         handleUpdateInternalBooking={xuLyCapNhatDatBanNoiBo}
-        phamViLabel={phamViLabel}
+        phamViLabel=""
       />
     </div>
   )

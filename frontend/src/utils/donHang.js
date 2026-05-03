@@ -46,7 +46,7 @@ export const TUY_CHON_PHUONG_THUC_THANH_TOAN = Object.freeze([
   {
     value: 'ChuyenKhoan',
     label: 'Chuyển khoản',
-    description: 'Chuyển khoản cho đơn mang đi hoặc dùng tại bàn.',
+    description: 'Chuyển khoản khi thanh toán đơn hàng.',
   },
   {
     value: 'TheNganHang',
@@ -108,7 +108,7 @@ export const anhXaMonTrongGioThanhMonDonHang = (monTrongGio) => ({
   variantKey: chuanHoaVanBan(monTrongGio?.variantKey),
 })
 
-export const taoDuLieuTaoDonHang = ({ cartItems, voucherCode, customer, note, tableNumber, paymentMethod }) => ({
+export const taoDuLieuTaoDonHang = ({ cartItems, voucherCode, soDiem, customer, note, tableNumber, paymentMethod }) => ({
   maKH: chuanHoaVanBan(customer?.customerCode || customer?.maKH),
   maBan: chuanHoaVanBan(tableNumber) || null,
   maNV: null,
@@ -116,6 +116,7 @@ export const taoDuLieuTaoDonHang = ({ cartItems, voucherCode, customer, note, ta
   nguonTao: 'Online',
   items: Array.isArray(cartItems) ? cartItems.map(anhXaMonTrongGioThanhMonDonHang) : [],
   voucherCode: chuanHoaVanBan(voucherCode).toUpperCase(),
+  soDiem: Number(soDiem) || 0,
   customer: {
     fullName: chuanHoaVanBan(customer?.fullName),
     phone: chuanHoaVanBan(customer?.phone),

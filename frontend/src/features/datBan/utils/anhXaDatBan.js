@@ -59,7 +59,12 @@ export const chuanHoaDatBan = (booking) => {
     guests: String(booking.guests ?? booking.soNguoi ?? booking.SoNguoi ?? '').trim(),
     date: String(booking.date ?? booking.ngayDat ?? booking.NgayDat ?? '').trim(),
     time: String(booking.time ?? booking.gioDat ?? booking.GioDat ?? '').trim(),
-    seatingArea: String(booking.seatingArea ?? booking.khuVucUuTien ?? booking.KhuVucUuTien ?? 'KHONG_UU_TIEN').trim() || 'KHONG_UU_TIEN',
+    seatingArea: (() => {
+      const kvut = booking.khuVucUuTien ?? booking.KhuVucUuTien
+      if (kvut && kvut.trim()) return String(kvut).trim()
+      const sa = booking.seatingArea
+      return String(sa ?? 'KHONG_UU_TIEN').trim() || 'KHONG_UU_TIEN'
+    })(),
     notes: String(booking.notes ?? booking.ghiChu ?? booking.GhiChu ?? '').trim(),
     name: String(booking.name ?? booking.tenKhachDatBan ?? booking.TenKhachDatBan ?? booking.tenKH ?? booking.TenKH ?? '').trim(),
     phone: String(booking.phone ?? booking.sdtDatBan ?? booking.SDTDatBan ?? booking.sdt ?? booking.SDT ?? '').trim(),
@@ -84,6 +89,17 @@ export const chuanHoaDatBan = (booking) => {
     cancelledAt: String(booking.cancelledAt ?? '').trim(),
     noShowAt: String(booking.noShowAt ?? '').trim(),
     createdBy: String(booking.createdBy ?? '').trim(),
+    menuItems: (() => {
+      const raw = booking.chiTietMonAn ?? booking.ChiTietMonAn
+      if (!raw) return []
+      if (Array.isArray(raw)) return raw
+      try {
+        const parsed = JSON.parse(String(raw))
+        return Array.isArray(parsed) ? parsed : []
+      } catch {
+        return []
+      }
+    })(),
   }
 }
 
@@ -102,6 +118,7 @@ export const anhXaMucDatBan = (booking) => ({
   status: anhXaTrangThaiDatBan(booking.status),
   statusLabel: anhXaTrangThaiDatBan(booking.status).replace(/^[^\s]+\s/, ''),
   statusTone: booking.status === 'Confirmed' ? 'success' : booking.status === 'Cancelled' ? 'danger' : booking.status === 'Completed' ? 'neutral' : 'warning',
+  menuItems: booking.menuItems || booking.chiTietMonAn || [],
 })
 
 export const layBangTraCuuBan = (tables) => new Map(tables.map((table) => [table.id, table]))

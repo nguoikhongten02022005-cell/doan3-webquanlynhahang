@@ -159,11 +159,7 @@ function HoSoPage() {
               />
             )}
 
-            {tabHienTai === 'orders' && (
-              <div style={{ padding: '24px', textAlign: 'center', color: '#888' }}>
-                <p>Dịch vụ đặt hàng mang về hiện không khả dụng.</p>
-              </div>
-            )}
+            
           </section>
         </div>
       </div>

@@ -14,12 +14,18 @@ export class AuthController {
 
   @Post('login')
   dangNhap(@Body() body: Record<string, unknown>) {
-    return this.authService.dangNhap(String(body.email || ''), String(body.matKhau || ''));
+    return this.authService.dangNhap(
+      String(body.email || ''),
+      String(body.matKhau || ''),
+    );
   }
 
   @Post('internal-login')
   dangNhapNoiBo(@Body() body: Record<string, unknown>) {
-    return this.authService.dangNhapNoiBo(String(body.email || ''), String(body.matKhau || ''));
+    return this.authService.dangNhapNoiBo(
+      String(body.email || ''),
+      String(body.matKhau || ''),
+    );
   }
 
   @Post('logout')
@@ -38,12 +44,18 @@ export class AuthController {
   }
 
   @Put('profile')
-  capNhatHoSo(@Headers('authorization') authorization: string | undefined, @Body() body: Record<string, unknown>) {
+  capNhatHoSo(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: Record<string, unknown>,
+  ) {
     return this.authService.capNhatHoSo(authorization, body);
   }
 
   @Put('doi-mat-khau')
-  doiMatKhau(@Headers('authorization') authorization: string | undefined, @Body() body: Record<string, unknown>) {
+  doiMatKhau(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: Record<string, unknown>,
+  ) {
     return this.authService.doiMatKhau(authorization, body);
   }
 }

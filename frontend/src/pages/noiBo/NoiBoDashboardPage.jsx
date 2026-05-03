@@ -21,12 +21,12 @@ function NoiBoDashboardPage() {
 
   return (
     <Flex vertical gap={khoangCach} style={{ width: '100%' }} className="noi-bo-dashboard-page">
-      <Space direction="vertical" size={4} style={{ width: '100%' }} className="noi-bo-dashboard-page__heading">
+      <Space orientation="vertical" size={4} style={{ width: '100%' }} className="noi-bo-dashboard-page__heading">
         <Typography.Title level={laMobile ? 4 : 3} style={{ margin: 0 }}>
           Bảng điều khiển nhà hàng hôm nay
         </Typography.Title>
         <Typography.Text type="secondary" className="noi-bo-dashboard-subtitle">
-          Theo dõi doanh thu, áp lực bàn và các đầu việc ưu tiên trong cùng một màn hình.
+          Theo dõi doanh thu, mật độ sử dụng bàn và các đầu việc ưu tiên trong cùng một màn hình.
         </Typography.Text>
       </Space>
 

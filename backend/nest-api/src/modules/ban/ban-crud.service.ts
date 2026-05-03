@@ -11,7 +11,11 @@ export class BanCrudService {
     private readonly authService: AuthService,
   ) {}
 
-  private taoPhanHoi(duLieu: unknown, thongDiep = 'Thanh cong', meta: unknown = null) {
+  private taoPhanHoi(
+    duLieu: unknown,
+    thongDiep = 'Thanh cong',
+    meta: unknown = null,
+  ) {
     return { success: true, data: duLieu, message: thongDiep, meta };
   }
 
@@ -20,7 +24,9 @@ export class BanCrudService {
   }
 
   async thucHienLayDanhSachBan() {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM Ban ORDER BY SoBan ASC, NgayCapNhat DESC');
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM Ban ORDER BY SoBan ASC, NgayCapNhat DESC',
+    );
     return this.taoPhanHoi(
       danhSach.map((ban: BanGhi) => ({
         maBan: ban.MaBan,
@@ -41,18 +47,39 @@ export class BanCrudService {
 
     await this.mysql.thucThi(
       'INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [body.maBan, body.tenBan, body.khuVuc || null, Number(body.soBan || 0), Number(body.soChoNgoi || 0), body.viTri || null, body.ghiChu || null, 'Available'],
+      [
+        body.maBan,
+        body.tenBan,
+        body.khuVuc || null,
+        Number(body.soBan || 0),
+        Number(body.soChoNgoi || 0),
+        body.viTri || null,
+        body.ghiChu || null,
+        'Available',
+      ],
     );
 
     return this.taoPhanHoi({ maBan: body.maBan }, 'Tao ban thanh cong');
   }
 
-  async capNhatBan(authorization: string | undefined, maBan: string, body: BanGhi) {
+  async capNhatBan(
+    authorization: string | undefined,
+    maBan: string,
+    body: BanGhi,
+  ) {
     this.authService.yeuCauQuyenQuanTri(authorization);
 
     await this.mysql.thucThi(
       'UPDATE Ban SET TenBan = ?, KhuVuc = ?, SoBan = ?, SoChoNgoi = ?, ViTri = ?, GhiChu = ? WHERE MaBan = ?',
-      [body.tenBan, body.khuVuc || null, Number(body.soBan || 0), Number(body.soChoNgoi || 0), body.viTri || null, body.ghiChu || null, maBan],
+      [
+        body.tenBan,
+        body.khuVuc || null,
+        Number(body.soBan || 0),
+        Number(body.soChoNgoi || 0),
+        body.viTri || null,
+        body.ghiChu || null,
+        maBan,
+      ],
     );
 
     return this.taoPhanHoi({ maBan }, 'Cap nhat ban thanh cong');

@@ -7,10 +7,15 @@ import { dinhDangTienTeVietNam } from '../utils/tienTe'
 import { xoaBanNhapTamThanhToan, layBanNhapTamThanhToan, luuBanNhapTamThanhToan } from '../services/dichVuBanNhapTamThanhToan'
 import { taoDonHangApi } from '../services/api/apiDonHang'
 import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung, tinhSoTienGiamTheoPhieuGiamGia } from '../services/dichVuPhieuGiamGia'
+import { layTongQuanDiemTichLuyApi } from '../services/api/apiDiemTichLuy'
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
 
+const TI_LE_DIEM = 100
+const GIA_TRI_DIEM = 10000
+
 const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
+const tinhSoTienGiamTuDiem = (soDiem) => Math.floor(soDiem / TI_LE_DIEM) * GIA_TRI_DIEM
 
 function ThanhToanPage() {
   const navigate = useNavigate()
@@ -27,6 +32,9 @@ function ThanhToanPage() {
     paymentMethod: 'TienMat',
   })
   const [phieuGiamGiaDaApDung, setPhieuGiamGiaDaApDung] = useState(null)
+  const [soDiem, setSoDiem] = useState(0)
+  const [thongTinDiem, setThongTinDiem] = useState(null)
+  const [dangTaiDiem, setDangTaiDiem] = useState(false)
 
   useEffect(() => {
     const phieuGiamGiaDaLuu = layPhieuGiamGiaDaApDung()
@@ -45,7 +53,15 @@ function ThanhToanPage() {
         tableNumber: '',
       }))
     }
-  }, [])
+
+    if (nguoiDungHienTai?.maKH) {
+      setDangTaiDiem(true)
+      layTongQuanDiemTichLuyApi(nguoiDungHienTai.maKH)
+        .then((res) => setThongTinDiem(res.data || res))
+        .catch(() => setThongTinDiem(null))
+        .finally(() => setDangTaiDiem(false))
+    }
+  }, [nguoiDungHienTai])
 
   const tamTinh = useMemo(
     () => cartItems.reduce((tong, item) => tong + item.price * item.quantity, 0),
@@ -55,7 +71,8 @@ function ThanhToanPage() {
   const phiDichVu = tinhPhiDichVu(tamTinh)
   const tongTienXetPhieuGiamGia = tamTinh + phiDichVu
   const soTienGiam = tinhSoTienGiamTheoPhieuGiamGia(phieuGiamGiaDaApDung, tongTienXetPhieuGiamGia)
-  const tongCong = Math.max(0, tongTienXetPhieuGiamGia - soTienGiam)
+  const soTienGiamTuDiem = tinhSoTienGiamTuDiem(soDiem)
+  const tongCong = Math.max(0, tongTienXetPhieuGiamGia - soTienGiam - soTienGiamTuDiem)
 
   const handleDoiTruong = (event) => {
     const { name, value } = event.target
@@ -75,6 +92,13 @@ function ThanhToanPage() {
 
       return duLieuFormKeTiep
     })
+  }
+
+  const handleDiemChange = (e) => {
+    const giaTri = Number(e.target.value)
+    const diemToiDa = thongTinDiem?.tongDiem || 0
+    const diemCoTheDung = Math.min(diemToiDa, Math.floor(tongTienXetPhieuGiamGia / GIA_TRI_DIEM) * TI_LE_DIEM)
+    setSoDiem(Math.max(0, Math.min(giaTri, diemCoTheDung)))
   }
 
   const handleGuiDon = async (event) => {
@@ -101,6 +125,7 @@ function ThanhToanPage() {
         const payloadTaoDonHang = taoDuLieuTaoDonHang({
           cartItems,
           voucherCode: phieuGiamGiaDaApDung?.code,
+          soDiem: soDiem > 0 ? soDiem : undefined,
           customer: {
             customerCode: nguoiDungHienTai?.maKH ?? '',
             fullName: duLieuForm.fullName,
@@ -227,6 +252,37 @@ function ThanhToanPage() {
                 ))}
               </div>
             </div>
+
+            {thongTinDiem && (
+              <div className="thanh-toan-points-block">
+                <h3>Điểm tích lũy</h3>
+                <div className="thanh-toan-points-info">
+                  <span>Số dư điểm: <strong>{thongTinDiem.tongDiem || 0} điểm</strong></span>
+                  {dangTaiDiem && <span className="thanh-toan-points-loading">Đang tải...</span>}
+                </div>
+                {thongTinDiem.tongDiem > 0 ? (
+                  <div className="thanh-toan-points-input">
+                    <label htmlFor="soDiem">Sử dụng điểm (100 điểm = 10.000đ)</label>
+                    <input
+                      id="soDiem"
+                      type="number"
+                      min="0"
+                      max={Math.min(thongTinDiem.tongDiem, Math.floor(tongTienXetPhieuGiamGia / GIA_TRI_DIEM) * TI_LE_DIEM)}
+                      value={soDiem}
+                      onChange={handleDiemChange}
+                      className="truong-nhap"
+                    />
+                    {soDiem > 0 && (
+                      <span className="thanh-toan-points-value">
+                        Giảm: <strong>{dinhDangTienTeVietNam(soTienGiamTuDiem)}</strong>
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <p className="thanh-toan-points-empty">Bạn chưa có điểm tích lũy.</p>
+                )}
+              </div>
+            )}
           </section>
 
           <aside className="thanh-toan-tom-tat-panel">
@@ -305,6 +361,12 @@ function ThanhToanPage() {
                   <span>Giảm giá {phieuGiamGiaDaApDung ? `(${phieuGiamGiaDaApDung.code})` : ''}</span>
                   <span>-{dinhDangTienTeVietNam(soTienGiam)}</span>
                 </div>
+                {soDiem > 0 && (
+                  <div className="tom-tat-row tom-tat-discount">
+                    <span>Giảm điểm ({soDiem} điểm)</span>
+                    <span>-{dinhDangTienTeVietNam(soTienGiamTuDiem)}</span>
+                  </div>
+                )}
                 <div className="tom-tat-row tom-tat-total">
                   <span>Tổng cộng</span>
                   <strong>{dinhDangTienTeVietNam(tongCong)}</strong>

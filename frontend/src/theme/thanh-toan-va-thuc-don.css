@@ -2747,8 +2747,41 @@ main:has(.thuc-don-page) + .site-footer .social-links a {
 
 .buoc-hai-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 16px;
+}
+
+.buoc-hai-grid .the-mon--menu {
+  min-width: 0;
+  overflow: hidden;
+}
+
+.buoc-hai-grid .the-mon--menu .noi-dung-mon {
+  overflow: visible;
+}
+
+.buoc-hai-grid .the-mon--menu .noi-dung-mon h3 {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.buoc-hai-grid .the-mon--menu .noi-dung-mon .gia-mon {
+  white-space: nowrap;
+  font-size: 0.95rem;
+}
+
+.buoc-hai-grid .the-mon--menu .noi-dung-mon p {
+  white-space: normal;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  display: -webkit-box;
 }
 
 .btn-remove-item {

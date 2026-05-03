@@ -31,7 +31,15 @@ export class DonHangCommandService {
     return this.donHangPaymentStatusService.xacNhanThanhToanTaiBan(maBan);
   }
 
-  capNhatTrangThaiDonHang(dauTrang: string | undefined, maDonHang: string, trangThai: string) {
-    return this.donHangPaymentStatusService.capNhatTrangThaiDonHang(dauTrang, maDonHang, trangThai);
+  capNhatTrangThaiDonHang(
+    dauTrang: string | undefined,
+    maDonHang: string,
+    trangThai: string,
+  ) {
+    return this.donHangPaymentStatusService.capNhatTrangThaiDonHang(
+      dauTrang,
+      maDonHang,
+      trangThai,
+    );
   }
 }

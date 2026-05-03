@@ -30,7 +30,7 @@ export const phatSuKienThayDoiDuLieuDatBan = () => {
   window.dispatchEvent(new CustomEvent(SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN))
 }
 
-const locBanPhuHopChoDatBan = (booking, danhSachBanGhiDe = []) => {
+const locBanPhuHopChoDatBan = (booking, danhSachBanGhiDe = [], { filterByArea = true } = {}) => {
   const tables = Array.isArray(danhSachBanGhiDe) ? danhSachBanGhiDe : []
   const soLuongKhach = Number(booking?.guests) || 0
 
@@ -43,11 +43,10 @@ const locBanPhuHopChoDatBan = (booking, danhSachBanGhiDe = []) => {
       return false
     }
 
-    if (booking?.seatingArea && booking.seatingArea !== 'KHONG_UU_TIEN' && table.areaId !== booking.seatingArea) {
-      return false
-    }
+    const areaMatches = !filterByArea || !booking?.seatingArea || booking.seatingArea === 'KHONG_UU_TIEN' || table.areaId === booking.seatingArea
+    const capacityOk = table.capacity >= soLuongKhach || soLuongKhach <= 0
 
-    return table.capacity >= soLuongKhach || soLuongKhach <= 0
+    return areaMatches && capacityOk
   })
 }
 
@@ -189,16 +188,20 @@ export const useDatBan = () => {
       return []
     }
 
-    return duLieu
+    const result = duLieu
       .map((item) => {
         if (item && typeof item === 'object' && 'bookingId' in item && 'dateTime' in item && 'rawStatus' in item) {
           return item
         }
 
         const normalized = chuanHoaDatBan(item)
-        return normalized ? anhXaMucDatBan(normalized) : null
+        if (!normalized) {
+          return null
+        }
+        return anhXaMucDatBan(normalized)
       })
       .filter(Boolean)
+    return result
   }, [nguoiDungHienTai?.maKH])
 
   const huyDatBan = useCallback(async (bookingId, maDatBan) => {
@@ -230,7 +233,7 @@ export const useDatBan = () => {
     }
   }, [])
 
-  const layBanPhuHopChoDatBan = useCallback((booking, danhSachBanGhiDe = []) => locBanPhuHopChoDatBan(booking, danhSachBanGhiDe), [])
+  const layBanPhuHopChoDatBan = useCallback((booking, danhSachBanGhiDe = [], options) => locBanPhuHopChoDatBan(booking, danhSachBanGhiDe, options), [])
 
   return {
     thaoTacTrangThaiDatBan: CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST,

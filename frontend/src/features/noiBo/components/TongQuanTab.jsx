@@ -150,7 +150,7 @@ function TongQuanTab({
 
         <article className="van-hanh-board-card noi-bo-operations-card noi-bo-ban-pressure-card">
           <div className="van-hanh-board-head">
-            <h2>Áp lực bàn ăn</h2>
+            <h2>Mật độ sử dụng</h2>
             <span>{tomTatTonKhoBan.dirty + danhSachDatBanChuaGanBan.length} điểm cần chú ý</span>
           </div>
 

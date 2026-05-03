@@ -13,19 +13,19 @@ function ApLucBanAn({ tablePressure, loading = false }) {
   const danhSachKhuVuc = Array.isArray(tablePressure) ? tablePressure : []
 
   if (loading) {
-    return <Card className="noi-bo-dashboard-card noi-bo-dashboard-pressure-card" title="Áp lực bàn ăn" loading styles={{ body: { padding: '14px' } }} />
+    return <Card className="noi-bo-dashboard-card noi-bo-dashboard-pressure-card" title="Mật độ sử dụng" loading styles={{ body: { padding: '14px' } }} />
   }
 
   if (!danhSachKhuVuc.length) {
     return (
-      <Card className="noi-bo-dashboard-card noi-bo-dashboard-pressure-card" title="Áp lực bàn ăn" styles={{ body: { padding: '14px' } }}>
-        <DashboardEmptyState compact title="Chưa có áp lực bàn trong thời điểm này" description="Tình trạng bàn sẽ hiển thị khi có khu vực đang phục vụ hoặc giữ chỗ." />
+      <Card className="noi-bo-dashboard-card noi-bo-dashboard-pressure-card" title="Mật độ sử dụng" styles={{ body: { padding: '14px' } }}>
+        <DashboardEmptyState compact title="Chưa có dữ liệu mật độ trong thời điểm này" description="Tình trạng bàn sẽ hiển thị khi có khu vực đang phục vụ hoặc giữ chỗ." />
       </Card>
     )
   }
 
   return (
-    <Card className="noi-bo-dashboard-card noi-bo-dashboard-pressure-card" title="Áp lực bàn ăn" styles={{ body: { padding: '14px' } }}>
+    <Card className="noi-bo-dashboard-card noi-bo-dashboard-pressure-card" title="Mật độ sử dụng" styles={{ body: { padding: '14px' } }}>
       <Space size={12} style={{ width: '100%', flexDirection: 'column', alignItems: 'stretch' }}>
         {danhSachKhuVuc.map((khuVuc, index) => {
           const soBanGiuCho = Math.max(Number(khuVuc?.held) || 0, 0)
@@ -48,7 +48,7 @@ function ApLucBanAn({ tablePressure, loading = false }) {
           const nhanTai = tongSoBan === 0
             ? 'Chưa có bàn'
             : phanTramTai > 80
-              ? 'Áp lực cao'
+              ? 'Mật độ cao'
               : phanTramTai >= 50
                 ? 'Đang tăng tải'
                 : 'Ổn định'
@@ -72,7 +72,7 @@ function ApLucBanAn({ tablePressure, loading = false }) {
                 className="noi-bo-dashboard-pressure__bar"
                 percent={phanTramTai}
                 strokeColor={mauTai}
-                trailColor="#F2E8E1"
+                railColor="#F2E8E1"
                 size={{ height: 10 }}
                 showInfo={false}
               />

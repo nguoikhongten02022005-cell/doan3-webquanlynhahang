@@ -17,9 +17,11 @@ export const CAC_TAB_NOI_BO = Object.freeze([
 ])
 
 export const CAC_BO_LOC_NGAY = Object.freeze([
-  { key: 'all', label: 'Toàn bộ ngày' },
+  { key: 'all', label: 'Tất cả ngày' },
   { key: 'today', label: 'Hôm nay' },
   { key: 'tomorrow', label: 'Ngày mai' },
+  { key: 'last7Days', label: '7 ngày gần đây' },
+  { key: 'last30Days', label: '30 ngày gần đây' },
 ])
 
 export const CAC_BO_LOC_CA = Object.freeze([

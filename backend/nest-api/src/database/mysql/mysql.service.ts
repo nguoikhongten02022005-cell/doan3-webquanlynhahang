@@ -9,7 +9,9 @@ export class MySqlService {
     const giaTri = process.env[tenBien]?.trim();
 
     if (!giaTri) {
-      throw new ServiceUnavailableException(`Thiếu cấu hình bắt buộc: ${tenBien}`);
+      throw new ServiceUnavailableException(
+        `Thiếu cấu hình bắt buộc: ${tenBien}`,
+      );
     }
 
     return giaTri;

@@ -29,8 +29,16 @@ export class BanService {
     return this.banCrudService.xoaBan(authorization, maBan);
   }
 
-  capNhatTrangThaiBan(authorization: string | undefined, maBan: string, trangThai: string) {
-    return this.banTrangThaiQrService.capNhatTrangThaiBan(authorization, maBan, trangThai);
+  capNhatTrangThaiBan(
+    authorization: string | undefined,
+    maBan: string,
+    trangThai: string,
+  ) {
+    return this.banTrangThaiQrService.capNhatTrangThaiBan(
+      authorization,
+      maBan,
+      trangThai,
+    );
   }
 
   layQrBan(authorization: string | undefined, maBan: string) {

@@ -371,7 +371,7 @@ const DON_HANG_DH002 = Object.freeze({
   orderCode: 'DH002',
   orderDate: '2026-08-10T18:30:00',
   ngayTao: '2026-08-10T18:30:00',
-  loaiDon: 'MANG_VE_PICKUP',
+  loaiDon: 'TAI_QUAN',
   status: 'Ready',
   trangThai: 'Ready',
   total: 140000,
@@ -421,7 +421,7 @@ const DON_HANG_DH003 = Object.freeze({
   orderCode: 'DH003',
   orderDate: '2026-08-10T19:15:00',
   ngayTao: '2026-08-10T19:15:00',
-  loaiDon: 'MANG_VE_GIAO_HANG',
+  loaiDon: 'TAI_QUAN',
   status: 'Confirmed',
   trangThai: 'Confirmed',
   total: 180000,
@@ -483,38 +483,13 @@ export const CHI_TIET_DON_HANG_MAU_THEO_MA = Object.freeze({
   DH003: DON_HANG_DH003,
 })
 
-export const DANH_SACH_DON_HANG_HO_SO_MAU = Object.freeze([
-  Object.freeze({
-    maDonHang: 'DH002',
-    loaiDon: 'MANG_VE_PICKUP',
-    trangThai: 'Ready',
-    tongTien: 140000,
-    phiShip: 0,
-    diaChiGiao: '',
-    gioLayHang: '18:30',
-    gioGiao: '',
-    ngayTao: '2026-08-10T18:30:00',
-    danhSachMon: MON_DH002,
-  }),
-  Object.freeze({
-    maDonHang: 'DH003',
-    loaiDon: 'MANG_VE_GIAO_HANG',
-    trangThai: 'Confirmed',
-    tongTien: 180000,
-    phiShip: 15000,
-    diaChiGiao: '123 Nguyen Hue, Q1, TP.HCM',
-    gioLayHang: '',
-    gioGiao: '19:15',
-    ngayTao: '2026-08-10T19:15:00',
-    danhSachMon: MON_DH003,
-  }),
-])
+export const DANH_SACH_DON_HANG_HO_SO_MAU = Object.freeze([])
 
 export const DON_HANG_HO_SO_MAU_THEO_KHACH_HANG = Object.freeze({
   KH001: Object.freeze([]),
-  KH002: Object.freeze([DANH_SACH_DON_HANG_HO_SO_MAU[0]]),
+  KH002: Object.freeze([]),
   KH003: Object.freeze([]),
-  KH_TEST_01: Object.freeze([DANH_SACH_DON_HANG_HO_SO_MAU[1]]),
+  KH_TEST_01: Object.freeze([]),
 })
 
 export const DANH_SACH_HOA_DON_MAU = Object.freeze([
@@ -592,7 +567,7 @@ export const DANH_SACH_THANH_TOAN_MAU = Object.freeze([
 export const LICH_SU_TRANG_THAI_DON_HANG_MAU = Object.freeze({
   DH001: Object.freeze([]),
   DH002: Object.freeze([
-    Object.freeze({ maLichSu: 'LS007', maDonHang: 'DH002', trangThaiCu: '', trangThaiMoi: 'Pending', ghiChu: 'Tao don mang ve pickup', nguoiThucHien: 'System', thoiGian: '2026-08-10T18:30:00' }),
+    Object.freeze({ maLichSu: 'LS007', maDonHang: 'DH002', trangThaiCu: '', trangThaiMoi: 'Pending', ghiChu: 'Tao don tai quan pickup', nguoiThucHien: 'System', thoiGian: '2026-08-10T18:30:00' }),
     Object.freeze({ maLichSu: 'LS008', maDonHang: 'DH002', trangThaiCu: 'Pending', trangThaiMoi: 'Confirmed', ghiChu: 'Da goi xac nhan khach den lay', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:32:00' }),
     Object.freeze({ maLichSu: 'LS009', maDonHang: 'DH002', trangThaiCu: 'Confirmed', trangThaiMoi: 'Preparing', ghiChu: 'Bep tiep nhan don', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:34:00' }),
     Object.freeze({ maLichSu: 'LS010', maDonHang: 'DH002', trangThaiCu: 'Preparing', trangThaiMoi: 'Ready', ghiChu: 'San sang tra khach tai quay', nguoiThucHien: 'NV003', thoiGian: '2026-08-10T18:38:00' }),

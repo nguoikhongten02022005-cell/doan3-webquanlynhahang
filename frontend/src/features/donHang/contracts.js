@@ -10,8 +10,6 @@ export const TRANG_THAI_DON_HANG = Object.freeze({
 
 export const LOAI_DON_HANG = Object.freeze({
   TAI_QUAN: 'TAI_QUAN',
-  MANG_VE_PICKUP: 'MANG_VE_PICKUP',
-  MANG_VE_GIAO_HANG: 'MANG_VE_GIAO_HANG',
 })
 
 export const LOAI_GIAM_GIA = Object.freeze({
@@ -63,10 +61,4 @@ export const chuanHoaThongTinNhanHang = (nguon = {}) => ({
   diaChiGiao: String(layGiaTri(nguon, 'diaChiGiao', 'DiaChiGiao', 'address', 'Address') || '').trim(),
   gioLayHang: String(layGiaTri(nguon, 'gioLayHang', 'GioLayHang', 'pickupTime', 'PickupTime') || '').trim(),
   gioGiao: String(layGiaTri(nguon, 'gioGiao', 'GioGiao', 'deliveryTime', 'DeliveryTime') || '').trim(),
-})
-
-export const chuanHoaResponseDonHang = (nguon = {}) => ({
-  pricingSummary: chuanHoaPricingSummary(nguon.pricingSummary || nguon.PricingSummary || nguon),
-  voucher: chuanHoaKetQuaVoucher(nguon.voucher || nguon.Voucher || {}),
-  thongTinNhanHang: chuanHoaThongTinNhanHang(nguon.thongTinNhanHang || nguon.ThongTinNhanHang || nguon),
 })

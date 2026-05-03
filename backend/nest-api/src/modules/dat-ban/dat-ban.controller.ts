@@ -1,4 +1,13 @@
-import { Body, Controller, Get, Headers, Param, Patch, Post, Query } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+  Query,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { DatBanService } from './dat-ban.service';
 
@@ -13,12 +22,18 @@ export class DatBanController {
   }
 
   @Get('khach/:maKh')
-  layLichSuDatBan(@Headers('authorization') authorization: string | undefined, @Param('maKh') maKh: string) {
+  layLichSuDatBan(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maKh') maKh: string,
+  ) {
     return this.datBanService.layLichSuDatBan(authorization, maKh);
   }
 
   @Post()
-  taoDatBan(@Headers('authorization') authorization: string | undefined, @Body() body: Record<string, unknown>) {
+  taoDatBan(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: Record<string, unknown>,
+  ) {
     return this.datBanService.taoDatBan(authorization, body);
   }
 
@@ -28,17 +43,33 @@ export class DatBanController {
   }
 
   @Patch(':maDatBan')
-  capNhatDatBan(@Headers('authorization') authorization: string | undefined, @Param('maDatBan') maDatBan: string, @Body() body: Record<string, unknown>) {
+  capNhatDatBan(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maDatBan') maDatBan: string,
+    @Body() body: Record<string, unknown>,
+  ) {
     return this.datBanService.capNhatDatBan(authorization, maDatBan, body);
   }
 
   @Patch(':maDatBan/status')
-  capNhatTrangThaiDatBan(@Headers('authorization') authorization: string | undefined, @Param('maDatBan') maDatBan: string, @Body() body: Record<string, unknown>) {
-    return this.datBanService.capNhatTrangThaiDatBan(authorization, maDatBan, String(body.trangThai || ''));
+  capNhatTrangThaiDatBan(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maDatBan') maDatBan: string,
+    @Body() body: Record<string, unknown>,
+  ) {
+    return this.datBanService.capNhatTrangThaiDatBan(
+      authorization,
+      maDatBan,
+      String(body.trangThai || ''),
+    );
   }
 
   @Patch(':maDatBan/assign-tables')
-  ganBanChoDatBan(@Headers('authorization') authorization: string | undefined, @Param('maDatBan') maDatBan: string, @Body() body: Record<string, unknown>) {
+  ganBanChoDatBan(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maDatBan') maDatBan: string,
+    @Body() body: Record<string, unknown>,
+  ) {
     return this.datBanService.ganBanChoDatBan(authorization, maDatBan, body);
   }
 }

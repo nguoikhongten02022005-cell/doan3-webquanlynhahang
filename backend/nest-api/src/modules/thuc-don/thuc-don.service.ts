@@ -1,4 +1,8 @@
-import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { AuthService } from '../auth/auth.service';
 import { CapNhatMonDto } from './dto/cap-nhat-mon.dto';
@@ -49,14 +53,16 @@ export class ThucDonService {
       return null;
     }
 
-    const danhSachDanhMuc = await this.mysql.truyVan(
+    const danhSachDanhMuc = (await this.mysql.truyVan(
       'SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc WHERE MaDanhMuc = ? OR TenDanhMuc = ?',
       [giaTri, giaTri],
-    ) as DanhMucEntity[];
+    )) as DanhMucEntity[];
 
     const khoaTim = this.chuanHoaChuoiKhongDau(giaTri);
     const danhMucKhopChuanHoa = danhSachDanhMuc.find(
-      (danhMuc) => this.chuanHoaChuoiKhongDau(String(danhMuc.TenDanhMuc || '')) === khoaTim,
+      (danhMuc) =>
+        this.chuanHoaChuoiKhongDau(String(danhMuc.TenDanhMuc || '')) ===
+        khoaTim,
     );
     if (danhMucKhopChuanHoa?.MaDanhMuc) {
       return String(danhMucKhopChuanHoa.MaDanhMuc);
@@ -66,9 +72,13 @@ export class ThucDonService {
       return String(danhSachDanhMuc[0].MaDanhMuc);
     }
 
-    const tatCaDanhMuc = await this.mysql.truyVan('SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc') as DanhMucEntity[];
+    const tatCaDanhMuc = (await this.mysql.truyVan(
+      'SELECT MaDanhMuc, TenDanhMuc FROM DanhMuc',
+    )) as DanhMucEntity[];
     const danhMucTheoTen = tatCaDanhMuc.find(
-      (danhMuc) => this.chuanHoaChuoiKhongDau(String(danhMuc.TenDanhMuc || '')) === khoaTim,
+      (danhMuc) =>
+        this.chuanHoaChuoiKhongDau(String(danhMuc.TenDanhMuc || '')) ===
+        khoaTim,
     );
 
     return danhMucTheoTen?.MaDanhMuc ? String(danhMucTheoTen.MaDanhMuc) : null;
@@ -88,24 +98,36 @@ export class ThucDonService {
   }
 
   async layThucDon() {
-    const danhSach = await this.mysql.truyVan(
+    const danhSach = (await this.mysql.truyVan(
       'SELECT * FROM ThucDon WHERE TrangThai <> ? ORDER BY NgayCapNhat DESC',
       ['Deleted'],
-    ) as ThucDonEntity[];
+    )) as ThucDonEntity[];
 
-    return this.taoPhanHoi(danhSach.map((mon) => this.chuyenMonSangPhanHoi(mon)), 'Lay thuc don thanh cong');
+    return this.taoPhanHoi(
+      danhSach.map((mon) => this.chuyenMonSangPhanHoi(mon)),
+      'Lay thuc don thanh cong',
+    );
   }
 
   async taoMon(authorization: string | undefined, payload: TaoMonDto) {
     this.yeuCauQuyenQuanTri(authorization);
 
-    const maMon = String(payload.maMon || `M_${Date.now()}_${Math.floor(Math.random() * 1000)}`).trim();
+    const maMon = String(
+      payload.maMon || `M_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
+    ).trim();
     const maDanhMuc = await this.timMaDanhMucHopLe(payload.maDanhMuc);
     const tenMon = String(payload.tenMon || '').trim();
-    const moTa = payload.moTa == null || String(payload.moTa).trim() === '' ? null : String(payload.moTa).trim();
-    const hinhAnh = payload.hinhAnh == null || String(payload.hinhAnh).trim() === '' ? null : String(payload.hinhAnh).trim();
+    const moTa =
+      payload.moTa == null || String(payload.moTa).trim() === ''
+        ? null
+        : String(payload.moTa).trim();
+    const hinhAnh =
+      payload.hinhAnh == null || String(payload.hinhAnh).trim() === ''
+        ? null
+        : String(payload.hinhAnh).trim();
     const thoiGianChuanBi = Number(payload.thoiGianChuanBi ?? 0);
-    const trangThai = String(payload.trangThai || 'Available').trim() || 'Available';
+    const trangThai =
+      String(payload.trangThai || 'Available').trim() || 'Available';
 
     if (!maDanhMuc) {
       throw new BadRequestException('Ma danh muc khong hop le.');
@@ -113,31 +135,74 @@ export class ThucDonService {
 
     await this.mysql.thucThi(
       'INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [maMon, maDanhMuc, tenMon, moTa, Number(payload.gia || 0), hinhAnh, thoiGianChuanBi, trangThai],
+      [
+        maMon,
+        maDanhMuc,
+        tenMon,
+        moTa,
+        Number(payload.gia || 0),
+        hinhAnh,
+        thoiGianChuanBi,
+        trangThai,
+      ],
     );
-    const danhSach = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [maMon]) as ThucDonEntity[];
+    const danhSach = (await this.mysql.truyVan(
+      'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
+      [maMon],
+    )) as ThucDonEntity[];
 
-    return this.taoPhanHoi(this.chuyenMonSangPhanHoi(danhSach[0]), 'Tao mon thanh cong');
+    return this.taoPhanHoi(
+      this.chuyenMonSangPhanHoi(danhSach[0]),
+      'Tao mon thanh cong',
+    );
   }
 
-  async capNhatMon(authorization: string | undefined, maMon: string, payload: CapNhatMonDto) {
+  async capNhatMon(
+    authorization: string | undefined,
+    maMon: string,
+    payload: CapNhatMonDto,
+  ) {
     this.yeuCauQuyenQuanTri(authorization);
 
-    const danhSachHienTai = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [maMon]) as ThucDonEntity[];
+    const danhSachHienTai = (await this.mysql.truyVan(
+      'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
+      [maMon],
+    )) as ThucDonEntity[];
     const monHienTai = danhSachHienTai[0];
     if (!monHienTai) {
       throw new NotFoundException('Khong tim thay mon an.');
     }
 
-    const maDanhMuc = payload.maDanhMuc == null
-      ? monHienTai.MaDanhMuc
-      : await this.timMaDanhMucHopLe(payload.maDanhMuc);
-    const tenMon = payload.tenMon == null ? monHienTai.TenMon : String(payload.tenMon).trim();
-    const moTa = payload.moTa === undefined ? monHienTai.MoTa : (payload.moTa == null || String(payload.moTa).trim() === '' ? null : String(payload.moTa).trim());
-    const hinhAnh = payload.hinhAnh === undefined ? monHienTai.HinhAnh : (payload.hinhAnh == null || String(payload.hinhAnh).trim() === '' ? null : String(payload.hinhAnh).trim());
-    const thoiGianChuanBi = payload.thoiGianChuanBi == null ? Number(monHienTai.ThoiGianChuanBi || 0) : Number(payload.thoiGianChuanBi);
-    const trangThai = payload.trangThai == null ? String(monHienTai.TrangThai || 'Available') : String(payload.trangThai).trim() || 'Available';
-    const gia = payload.gia == null ? Number(monHienTai.Gia || 0) : Number(payload.gia);
+    const maDanhMuc =
+      payload.maDanhMuc == null
+        ? monHienTai.MaDanhMuc
+        : await this.timMaDanhMucHopLe(payload.maDanhMuc);
+    const tenMon =
+      payload.tenMon == null
+        ? monHienTai.TenMon
+        : String(payload.tenMon).trim();
+    const moTa =
+      payload.moTa === undefined
+        ? monHienTai.MoTa
+        : payload.moTa == null || String(payload.moTa).trim() === ''
+          ? null
+          : String(payload.moTa).trim();
+    const hinhAnh =
+      payload.hinhAnh === undefined
+        ? monHienTai.HinhAnh
+        : payload.hinhAnh == null || String(payload.hinhAnh).trim() === ''
+          ? null
+          : String(payload.hinhAnh).trim();
+    const thoiGianChuanBi =
+      payload.thoiGianChuanBi == null
+        ? Number(monHienTai.ThoiGianChuanBi || 0)
+        : Number(payload.thoiGianChuanBi);
+    const trangThai =
+      payload.trangThai == null
+        ? String(monHienTai.TrangThai || 'Available')
+        : String(payload.trangThai).trim() || 'Available';
+    const gia =
+      payload.gia == null ? Number(monHienTai.Gia || 0) : Number(payload.gia);
 
     if (!tenMon) {
       throw new BadRequestException('Ten mon la bat buoc.');
@@ -161,14 +226,23 @@ export class ThucDonService {
       ],
     );
 
-    const danhSach = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [maMon]) as ThucDonEntity[];
-    return this.taoPhanHoi(this.chuyenMonSangPhanHoi(danhSach[0]), 'Cap nhat mon thanh cong');
+    const danhSach = (await this.mysql.truyVan(
+      'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
+      [maMon],
+    )) as ThucDonEntity[];
+    return this.taoPhanHoi(
+      this.chuyenMonSangPhanHoi(danhSach[0]),
+      'Cap nhat mon thanh cong',
+    );
   }
 
   async xoaMon(authorization: string | undefined, maMon: string) {
     this.yeuCauQuyenQuanTri(authorization);
 
-    await this.mysql.thucThi('UPDATE ThucDon SET TrangThai = ? WHERE MaMon = ?', ['Deleted', maMon]);
+    await this.mysql.thucThi(
+      'UPDATE ThucDon SET TrangThai = ? WHERE MaMon = ?',
+      ['Deleted', maMon],
+    );
     return this.taoPhanHoi({ maMon }, 'Xoa mon thanh cong');
   }
 }

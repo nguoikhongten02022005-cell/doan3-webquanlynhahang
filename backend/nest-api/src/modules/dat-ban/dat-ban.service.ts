@@ -27,15 +27,39 @@ export class DatBanService {
     return this.datBanCommandService.taoDatBan(authorization, body);
   }
 
-  capNhatDatBan(authorization: string | undefined, maDatBan: string, body: BanGhi) {
-    return this.datBanCommandService.capNhatDatBan(authorization, maDatBan, body);
+  capNhatDatBan(
+    authorization: string | undefined,
+    maDatBan: string,
+    body: BanGhi,
+  ) {
+    return this.datBanCommandService.capNhatDatBan(
+      authorization,
+      maDatBan,
+      body,
+    );
   }
 
-  capNhatTrangThaiDatBan(authorization: string | undefined, maDatBan: string, trangThai: string) {
-    return this.datBanCommandService.capNhatTrangThaiDatBan(authorization, maDatBan, trangThai);
+  capNhatTrangThaiDatBan(
+    authorization: string | undefined,
+    maDatBan: string,
+    trangThai: string,
+  ) {
+    return this.datBanCommandService.capNhatTrangThaiDatBan(
+      authorization,
+      maDatBan,
+      trangThai,
+    );
   }
 
-  ganBanChoDatBan(authorization: string | undefined, maDatBan: string, body: BanGhi) {
-    return this.datBanCommandService.ganBanChoDatBan(authorization, maDatBan, body);
+  ganBanChoDatBan(
+    authorization: string | undefined,
+    maDatBan: string,
+    body: BanGhi,
+  ) {
+    return this.datBanCommandService.ganBanChoDatBan(
+      authorization,
+      maDatBan,
+      body,
+    );
   }
 }

@@ -8,5 +8,6 @@ import { AuthModule } from '../auth/auth.module';
   imports: [CoreModule, AuthModule],
   controllers: [DiemTichLuyController],
   providers: [DiemTichLuyService],
+  exports: [DiemTichLuyService],
 })
 export class DiemTichLuyModule {}

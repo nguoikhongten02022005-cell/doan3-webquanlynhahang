@@ -1,4 +1,8 @@
-import { BadRequestException, ForbiddenException, Injectable } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+} from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { AuthService } from '../auth/auth.service';
 
@@ -11,12 +15,19 @@ export class DatBanQueryService {
     private readonly authService: AuthService,
   ) {}
 
-  private taoPhanHoi(duLieu: unknown, thongDiep = 'Thanh cong', meta: unknown = null) {
+  private taoPhanHoi(
+    duLieu: unknown,
+    thongDiep = 'Thanh cong',
+    meta: unknown = null,
+  ) {
     return { success: true, data: duLieu, message: thongDiep, meta };
   }
 
   private async layKhachHangTheoMaNd(maND: string) {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1', [maND]);
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1',
+      [maND],
+    );
     return danhSach[0] || null;
   }
 
@@ -25,26 +36,56 @@ export class DatBanQueryService {
     const vaiTro = String(thongTinToken.vaiTro || '');
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      throw new ForbiddenException('Ban khong co quyen thuc hien thao tac noi bo nay.');
+      throw new ForbiddenException(
+        'Ban khong co quyen thuc hien thao tac noi bo nay.',
+      );
     }
 
     return thongTinToken;
   }
 
-  private async yeuCauKhachHangSoHuuTaiNguyen(authorization: string | undefined, maKh: string) {
+  private async yeuCauKhachHangSoHuuTaiNguyen(
+    authorization: string | undefined,
+    maKh: string,
+  ) {
     const thongTinToken = this.authService.giaiMaNguoiDung(authorization);
     const vaiTro = String(thongTinToken.vaiTro || '');
 
     if (vaiTro === 'Admin' || vaiTro === 'NhanVien') {
-      return { thongTinToken, vaiTro, khachHang: await this.layKhachHangTheoMaNd(String(thongTinToken.maND)) };
+      return {
+        thongTinToken,
+        vaiTro,
+        khachHang: await this.layKhachHangTheoMaNd(String(thongTinToken.maND)),
+      };
     }
 
-    const khachHang = await this.layKhachHangTheoMaNd(String(thongTinToken.maND));
-    if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
-      throw new ForbiddenException('Ban khong co quyen truy cap du lieu cua khach hang khac.');
+    const khachHang = await this.layKhachHangTheoMaNd(
+      String(thongTinToken.maND),
+    );
+    if (
+      !khachHang ||
+      String(khachHang.MaKH || '') !== String(maKh || '').trim()
+    ) {
+      throw new ForbiddenException(
+        'Ban khong co quyen truy cap du lieu cua khach hang khac.',
+      );
     }
 
     return { thongTinToken, vaiTro, khachHang };
+  }
+
+  private chuanNgayThanhChuoi(ngay: unknown): string {
+    if (!ngay) return '';
+    if (ngay instanceof Date) {
+      const nam = ngay.getFullYear();
+      const thang = String(ngay.getMonth() + 1).padStart(2, '0');
+      const ngayTrongThang = String(ngay.getDate()).padStart(2, '0');
+      return `${nam}-${thang}-${ngayTrongThang}`;
+    }
+    if (typeof ngay === 'string' && ngay.match(/^\d{4}-\d{2}-\d{2}/)) {
+      return ngay.substring(0, 10);
+    }
+    return String(ngay);
   }
 
   chuyenDatBanSangResponse(datBan: BanGhi) {
@@ -53,7 +94,7 @@ export class DatBanQueryService {
       maKH: datBan.MaKH || '',
       maBan: datBan.MaBan || '',
       maNV: datBan.MaNV || '',
-      ngayDat: datBan.NgayDat,
+      ngayDat: this.chuanNgayThanhChuoi(datBan.NgayDat),
       gioDat: datBan.GioDat,
       gioKetThuc: datBan.GioKetThuc || '',
       soNguoi: Number(datBan.SoNguoi || 0),
@@ -71,15 +112,26 @@ export class DatBanQueryService {
 
   async layDanhSachDatBan(authorization?: string) {
     this.yeuCauQuyenNhanVienHoacQuanTri(authorization);
-    const danhSach = await this.mysql.truyVan('SELECT * FROM DatBan ORDER BY NgayTao DESC');
-    return this.taoPhanHoi(danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)), 'Lay danh sach dat ban thanh cong');
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM DatBan ORDER BY NgayTao DESC',
+    );
+    return this.taoPhanHoi(
+      danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)),
+      'Lay danh sach dat ban thanh cong',
+    );
   }
 
   async layLichSuDatBan(authorization: string | undefined, maKh: string) {
     await this.yeuCauKhachHangSoHuuTaiNguyen(authorization, maKh);
 
-    const danhSach = await this.mysql.truyVan('SELECT * FROM DatBan WHERE MaKH = ? ORDER BY NgayTao DESC', [maKh]);
-    return this.taoPhanHoi(danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)), 'Lay lich su dat ban thanh cong');
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM DatBan WHERE MaKH = ? ORDER BY NgayTao DESC',
+      [maKh],
+    );
+    return this.taoPhanHoi(
+      danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)),
+      'Lay lich su dat ban thanh cong',
+    );
   }
 
   async layKhaDungDatBan(query: Record<string, unknown>) {
@@ -92,7 +144,9 @@ export class DatBanQueryService {
       throw new BadRequestException('Ngay dat va gio dat la bat buoc.');
     }
 
-    const danhSachBan = await this.mysql.truyVan('SELECT * FROM Ban ORDER BY SoBan ASC');
+    const danhSachBan = await this.mysql.truyVan(
+      'SELECT * FROM Ban ORDER BY SoBan ASC',
+    );
     const danhSachDatBan = await this.mysql.truyVan(
       `SELECT * FROM DatBan
        WHERE NgayDat = ? AND GioDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed')`,
@@ -100,28 +154,63 @@ export class DatBanQueryService {
     );
 
     const tapBanDaDuocDung = new Set(
-      danhSachDatBan.map((datBan) => String(datBan.MaBan || '').trim()).filter(Boolean),
+      danhSachDatBan
+        .map((datBan) => String(datBan.MaBan || '').trim())
+        .filter(Boolean),
     );
 
     const danhSachBanKhaDung = danhSachBan
       .filter((ban) => !tapBanDaDuocDung.has(String(ban.MaBan || '').trim()))
-      .filter((ban) => String(ban.TrangThai || '') !== 'Occupied' && String(ban.TrangThai || '') !== 'Maintenance')
+      .filter(
+        (ban) =>
+          String(ban.TrangThai || '') !== 'Occupied' &&
+          String(ban.TrangThai || '') !== 'Maintenance',
+      )
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') {
           return true;
         }
 
-        const giaTriKhuVuc = String(ban.KhuVuc || ban.ViTri || '').toLowerCase();
-        if (khuVuc === 'PHONG_VIP') return giaTriKhuVuc.includes('vip') || giaTriKhuVuc.includes('riêng') || giaTriKhuVuc.includes('rieng');
-        if (khuVuc === 'BAN_CONG') return giaTriKhuVuc.includes('ngoài') || giaTriKhuVuc.includes('ngoai') || giaTriKhuVuc.includes('ban công') || giaTriKhuVuc.includes('ban cong');
-        if (khuVuc === 'SANH_CHINH') return !giaTriKhuVuc.includes('vip') && !giaTriKhuVuc.includes('ngoài') && !giaTriKhuVuc.includes('ngoai') && !giaTriKhuVuc.includes('ban cong');
+        const giaTriKhuVuc = String(
+          ban.KhuVuc || ban.ViTri || '',
+        ).toLowerCase();
+        if (khuVuc === 'PHONG_VIP')
+          return (
+            giaTriKhuVuc.includes('vip') ||
+            giaTriKhuVuc.includes('riêng') ||
+            giaTriKhuVuc.includes('rieng')
+          );
+        if (khuVuc === 'BAN_CONG')
+          return (
+            giaTriKhuVuc.includes('ngoài') ||
+            giaTriKhuVuc.includes('ngoai') ||
+            giaTriKhuVuc.includes('ban công') ||
+            giaTriKhuVuc.includes('ban cong')
+          );
+        if (khuVuc === 'SANH_CHINH')
+          return (
+            !giaTriKhuVuc.includes('vip') &&
+            !giaTriKhuVuc.includes('ngoài') &&
+            !giaTriKhuVuc.includes('ngoai') &&
+            !giaTriKhuVuc.includes('ban cong')
+          );
         return true;
       });
 
-    const danhSachBanPhuHop = soNguoi > 0 ? danhSachBanKhaDung.filter((ban) => Number(ban.SoChoNgoi || 0) >= soNguoi) : danhSachBanKhaDung;
+    const danhSachBanPhuHop =
+      soNguoi > 0
+        ? danhSachBanKhaDung.filter(
+            (ban) => Number(ban.SoChoNgoi || 0) >= soNguoi,
+          )
+        : danhSachBanKhaDung;
     const tongBanConTrong = danhSachBanKhaDung.length;
     const tongBanPhuHop = danhSachBanPhuHop.length;
-    const mucKhaDung = tongBanPhuHop <= 0 ? 'FULL' : tongBanPhuHop <= 2 ? 'LIMITED' : 'AVAILABLE';
+    const mucKhaDung =
+      tongBanPhuHop <= 0
+        ? 'FULL'
+        : tongBanPhuHop <= 2
+          ? 'LIMITED'
+          : 'AVAILABLE';
 
     return this.taoPhanHoi(
       {

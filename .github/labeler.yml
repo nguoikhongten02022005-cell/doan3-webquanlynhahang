@@ -1,8 +1,0 @@
-frontend:
-  - 'frontend/**'
-backend:
-  - 'backend/**'
-docs:
-  - 'docs/**'
-ci:
-  - '.github/**'

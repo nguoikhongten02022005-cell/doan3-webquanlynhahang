@@ -463,10 +463,12 @@ function BanAnTabPos({
               const lopHinhDangBan = layLopHinhDangBan(table.sucChua)
 
               return (
-                <button
+                <div
                   key={table.id}
-                  type="button"
+                  role="button"
+                  tabIndex={0}
                   onClick={() => xuLyMoDrawer(table.id)}
+                  onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && xuLyMoDrawer(table.id)}
                   className={`group relative flex flex-col justify-center overflow-hidden border border-white/70 bg-gradient-to-br from-white via-white to-slate-50/90 p-3 text-left shadow-[0_18px_32px_rgba(148,163,184,0.14)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[0_22px_38px_rgba(249,115,22,0.18)] focus:outline-none focus:ring-2 focus:ring-orange-300 ${lopHinhDangBan.khung} ${table.kieuTrangThai.card}`}
                 >
                   <span className={`pointer-events-none absolute inset-[9px] border border-white/80 opacity-80 ${lopHinhDangBan.vienTrangTri}`} />
@@ -477,15 +479,16 @@ function BanAnTabPos({
 
                       <div className="flex items-center gap-2">
                         {table.status === 'DIRTY' && (
-                          <Button
-                            size="small"
-                            shape="circle"
-                            type="text"
-                            icon={<CheckOutlined />}
+                          <span
+                            role="button"
+                            tabIndex={0}
                             onClick={(event) => xuLyDanhDauSanSang(event, table.id)}
+                            onKeyDown={(e) => (e.key === 'Enter' || e.key === ' ') && xuLyDanhDauSanSang(event, table.id)}
                             aria-label={`Đánh dấu ${table.displayName} sẵn sàng lại`}
-                            className="!h-7 !w-7 !border !border-emerald-200 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100"
-                          />
+                            className="!h-7 !w-7 !border !border-emerald-200 !bg-emerald-50 !text-emerald-700 hover:!bg-emerald-100 flex items-center justify-center rounded-full cursor-pointer"
+                          >
+                            <CheckOutlined />
+                          </span>
                         )}
 
                         <span className={`inline-flex items-center gap-1 rounded-full border px-2 py-1 text-[11px] font-semibold shadow-sm ${table.kieuTrangThai.surface}`}>
@@ -516,7 +519,7 @@ function BanAnTabPos({
                       ) : <span />}
                     </div>
                   </div>
-                </button>
+                </div>
               )
             })()
           ))}

@@ -219,7 +219,7 @@ function NoiBoQuanLyBanPage() {
         ) : null}
       </Modal>
 
-      <Modal open={Boolean(orderDangXem)} title={orderDangXem ? `Order của ${orderDangXem.ban.name}` : 'Order'} onCancel={() => setOrderDangXem(null)} footer={null} width={720}>
+      <Modal open={Boolean(orderDangXem)} title={orderDangXem ? `Order của ${orderDangXem.ban.name}` : 'Order'} onCancel={() => setOrderDangXem(null)} footer={null} size={720}>
         {orderDangXem ? (
           <Space orientation="vertical" size={12} style={{ width: '100%' }}>
             {orderDangXem.khongCoOrder ? (

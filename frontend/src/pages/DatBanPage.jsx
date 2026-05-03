@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Col, ConfigProvider, Row } from 'antd'
+import { Navigate } from 'react-router-dom'
+import { Alert, Col, ConfigProvider, Row } from 'antd'
 import '../theme/dat-ban.css'
 import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
@@ -22,15 +23,17 @@ import { taoDuLieuBanNhapTamDatBan } from '../features/datBan/utils/banNhapTamDa
 import { taiDuLieuBanCongKhai } from '../features/datBan/utils/chinhSachDatBan'
 import { SITE_CONTACT } from '../constants/lienHeTrang'
 import BuocMotDatBan from '../features/datBan/components/BuocMotDatBan'
+import BuocHaiChonMon from '../features/datBan/components/BuocHaiChonMon'
 import BuocHaiDatBan from '../features/datBan/components/BuocHaiDatBan'
 import BuocBaDatBan from '../features/datBan/components/BuocBaDatBan'
 import ThanhBenDatBan from '../features/datBan/components/ThanhBenDatBan'
 import DatBanThanhCong from '../features/datBan/components/DatBanThanhCong'
 
 const STEPS = [
-  { id: 1, label: 'Chọn thông tin', description: 'Số khách, ngày, giờ và khu vực ưu tiên.' },
-  { id: 2, label: 'Thông tin liên hệ', description: 'Tên, số điện thoại và ghi chú.' },
-  { id: 3, label: 'Xác nhận', description: 'Rà soát toàn bộ thông tin trước khi gửi.' },
+  { id: 1, label: 'Chọn chỗ', description: 'Số khách, ngày, giờ và khu vực ưu tiên.' },
+  { id: 2, label: 'Chọn món', description: 'Chọn món trước (tuỳ chọn).' },
+  { id: 3, label: 'Thông tin liên hệ', description: 'Tên, số điện thoại và ghi chú.' },
+  { id: 4, label: 'Xác nhận', description: 'Rà soát toàn bộ thông tin trước khi gửi.' },
 ]
 
 const DEFAULT_FORM_DATA = {
@@ -140,6 +143,37 @@ const tinhSoBanTheoKhuVuc = (tables, guests) => {
   }, {})
 }
 
+const chuyenDoiKhuVucTable = (ban) => {
+  const viTri = ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || ''
+  const giaTri = String(viTri).toLowerCase()
+
+  if (giaTri.includes('vip') || giaTri.includes('riêng') || giaTri.includes('rieng')) {
+    return 'PHONG_VIP'
+  }
+
+  if (giaTri.includes('ngoài') || giaTri.includes('ngoai') || giaTri.includes('ban công') || giaTri.includes('ban cong')) {
+    return 'BAN_CONG'
+  }
+
+  return 'SANH_CHINH'
+}
+
+const tinhAreaAvailabilityTuApi = (danhSachBan, soKhach) => {
+  const soKhachNum = Number(soKhach) || 0
+
+  const counts = KHU_VUC_DAT_BAN_CONG_KHAI.reduce((result, area) => {
+    const count = danhSachBan.filter((ban) => {
+      const areaId = chuyenDoiKhuVucTable(ban)
+      const soCho = Number(ban.soChoNgoi || ban.SoChoNgoi || 0)
+      return areaId === area.value && soCho >= soKhachNum
+    }).length
+    result[area.value] = count
+    return result
+  }, {})
+
+  return Object.fromEntries(Object.entries(counts).map(([area, count]) => [area, tinhTinhTrangKhuVuc(count)]))
+}
+
 const tinhTinhTrangKhuVuc = (count) => {
   if (count <= 0) {
     return { count: 0, label: NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN.FULL, tone: 'full' }
@@ -199,8 +233,48 @@ const tinhTinhTrangKhungGio = ({ date, time, tables = [], bookings = [] }) => {
   }
 }
 
+const tinhYeuCauCoc = ({ guests, seatingArea, selectedMenuItems, subtotal }) => {
+  const soTienCocToiThieu = 500000
+  const tiLeCoc = 0.2
+
+  const yeuCauCoc = Boolean(
+    Number(guests) >= 5 ||
+    seatingArea === 'PHONG_VIP' ||
+    (Array.isArray(selectedMenuItems) && selectedMenuItems.length > 0)
+  )
+
+  if (!yeuCauCoc) {
+    return { isYeuCauCoc: false, soTienCoc: 0, liDo: [] }
+  }
+
+  const liDo = []
+  if (Number(guests) >= 5) liDo.push('Nhóm từ 5 người trở lên')
+  if (seatingArea === 'PHONG_VIP') liDo.push('Khu vực VIP/Khu riêng')
+  if (Array.isArray(selectedMenuItems) && selectedMenuItems.length > 0) liDo.push('Đặt món trước')
+
+  let soTienCoc = soTienCocToiThieu
+  if (subtotal > 0) {
+    soTienCoc = Math.max(soTienCoc, Math.round(subtotal * tiLeCoc))
+  }
+
+  return { isYeuCauCoc: true, soTienCoc, liDo }
+}
+
+const tinhTongTienMenu = (selectedMenuItems) => {
+  return selectedMenuItems.reduce((tong, item) => {
+    const giaTri = Number(String(item.price).replace(/\D/g, '')) || 0
+    return tong + giaTri * (item.quantity || 1)
+  }, 0)
+}
+
+const mapAreaLabel = (seatingArea) => {
+  const found = KHU_VUC_DAT_BAN_CONG_KHAI.find((area) => area.value === seatingArea)
+  if (found) return found.label
+  return layNhanChoNgoi(seatingArea)
+}
+
 function DatBanPage() {
-  const { nguoiDungHienTai, coTheVaoNoiBo } = useXacThuc()
+  const { nguoiDungHienTai, coTheVaoNoiBo, daDangNhap, dangKhoiTaoXacThuc } = useXacThuc()
   const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan, layDanhSachDatBanHost } = useDatBan()
 
   const [tables, setTables] = useState([])
@@ -215,6 +289,7 @@ function DatBanPage() {
   const [submitError, setSubmitError] = useState('')
   const [submitSuccess, setSubmitSuccess] = useState(null)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [selectedMenuItems, setSelectedMenuItems] = useState([])
   const [formData, setFormData] = useState(() => mergeDraftWithUser(layBanNhapTam(), nguoiDungHienTai))
 
   useEffect(() => {
@@ -318,13 +393,25 @@ function DatBanPage() {
   }), [formData.date, formData.guests, formData.seatingArea, formData.time])
 
   const candidateTables = useMemo(() => (
-    formData.guests ? layBanPhuHopChoDatBan(bookingDraft, tables) : []
+    formData.guests ? layBanPhuHopChoDatBan(bookingDraft, tables, { filterByArea: true }) : []
+  ), [bookingDraft, formData.guests, layBanPhuHopChoDatBan, tables])
+
+  const allTablesForArea = useMemo(() => (
+    formData.guests ? layBanPhuHopChoDatBan(bookingDraft, tables, { filterByArea: false }) : []
   ), [bookingDraft, formData.guests, layBanPhuHopChoDatBan, tables])
 
   const areaAvailability = useMemo(() => {
-    const counts = tinhSoBanTheoKhuVuc(candidateTables, formData.guests)
+    const coDuLieuApi = duLieuKhaDungDatBan &&
+      duLieuKhaDungDatBan.ngayDat === formData.date &&
+      duLieuKhaDungDatBan.gioDat === formData.time
+
+    if (coDuLieuApi && duLieuKhaDungDatBan.danhSachBan) {
+      return tinhAreaAvailabilityTuApi(duLieuKhaDungDatBan.danhSachBan, formData.guests)
+    }
+
+    const counts = tinhSoBanTheoKhuVuc(allTablesForArea, formData.guests)
     return Object.fromEntries(Object.entries(counts).map(([area, count]) => [area, tinhTinhTrangKhuVuc(count)]))
-  }, [candidateTables, formData.guests])
+  }, [allTablesForArea, duLieuKhaDungDatBan, formData.date, formData.guests, formData.time])
 
   const areaOptions = useMemo(() => {
     const soKhach = Number(formData.guests) || 0
@@ -392,7 +479,7 @@ function DatBanPage() {
     }))
   }, [danhSachDatBanHienTai, duLieuKhaDungDatBan, formData.date, tables])
 
-  const summaryAreaLabel = layNhanChoNgoi(formData.seatingArea)
+  const summaryAreaLabel = mapAreaLabel(formData.seatingArea)
   const todayIso = new Date().toISOString().slice(0, 10)
   const selectedDateOption = dateOptionMap.get(formData.date)
   const selectedDateLabel = selectedDateOption?.label || (formData.date ? dinhDangNgayGio(formData.date, '').trim() : 'Chưa chọn')
@@ -401,18 +488,30 @@ function DatBanPage() {
     ? areaAvailability[formData.seatingArea]
     : null
   const selectedAreaUnavailable = Boolean(selectedAreaAvailability && selectedAreaAvailability.count <= 0)
+  const otherAreasHaveTables = Boolean(
+    formData.seatingArea && formData.seatingArea !== 'KHONG_UU_TIEN' &&
+    Object.entries(areaAvailability).some(([area, info]) => area !== formData.seatingArea && info.count > 0)
+  )
   const selectedAreaUnavailableMessage = selectedAreaUnavailable
-    ? 'Khu vực này đã hết chỗ, vui lòng chọn khu vực khác hoặc bỏ chọn khu vực'
+    ? otherAreasHaveTables
+      ? 'Khu vực ưu tiên không có bàn phù hợp với số khách. Vui lòng chọn khu vực khác hoặc bỏ ưu tiên khu vực.'
+      : 'Khu vực này đã hết chỗ, vui lòng chọn khu vực khác hoặc bỏ chọn khu vực.'
     : ''
   const largePartyNotice = Number(formData.guests) >= 10 ? `Hotline ${SITE_CONTACT.phoneDisplay}` : ''
   const thongBaoTaiBan = loiTaiBan || (isLoadingTables ? 'Đang tải dữ liệu bàn khả dụng từ máy chủ...' : '') || (dangTaiKhaDung ? 'Đang cập nhật khả dụng đặt bàn...' : '')
 
-  const summary = useMemo(() => ({
-    guests: Number(formData.guests) > 0 ? `${Number(formData.guests)} người` : 'Chưa chọn',
-    date: formData.date ? selectedDateLabel : 'Chưa chọn',
-    time: formData.time || 'Chưa chọn',
-    area: summaryAreaLabel,
-  }), [formData.date, formData.guests, formData.time, selectedDateLabel, summaryAreaLabel])
+  const summary = useMemo(() => {
+    const subtotal = tinhTongTienMenu(selectedMenuItems)
+    return {
+      guests: Number(formData.guests) > 0 ? `${Number(formData.guests)} người` : 'Chưa chọn',
+      date: formData.date ? selectedDateLabel : 'Chưa chọn',
+      time: formData.time || 'Chưa chọn',
+      area: summaryAreaLabel,
+      selectedMenuItems,
+      subtotal,
+      subtotalLabel: subtotal > 0 ? new Intl.NumberFormat('vi-VN').format(subtotal) + 'đ' : null,
+    }
+  }, [formData.date, formData.guests, formData.time, selectedDateLabel, summaryAreaLabel, selectedMenuItems])
 
   const contactSummary = useMemo(() => ({
     name: formData.name || 'Chưa nhập',
@@ -511,7 +610,8 @@ function DatBanPage() {
     return !contactErrors.name && !contactErrors.phone
   }, [formData, validateContactFields])
 
-  const canProceedStepTwo = canProceedStepOne && coThongTinLienHeHopLe
+  const canProceedStepTwo = true
+  const canProceedStepThree = canProceedStepOne && coThongTinLienHeHopLe
 
   const handleFormFieldChange = (field) => (event) => {
     const nextValue = event.target.value
@@ -525,9 +625,15 @@ function DatBanPage() {
   }
 
   const handleSuggestionClick = (suggestion) => {
-    const nextNotes = formData.notes.includes(suggestion)
-      ? formData.notes
-      : [formData.notes.trim(), suggestion].filter(Boolean).join(formData.notes.trim() ? '. ' : '')
+    const currentNotes = formData.notes.trim()
+    const daCoSan = currentNotes.split(',').map((s) => s.trim()).includes(suggestion)
+
+    let nextNotes
+    if (daCoSan) {
+      nextNotes = currentNotes
+    } else {
+      nextNotes = currentNotes ? `${currentNotes}, ${suggestion}` : suggestion
+    }
 
     const nextFormData = {
       ...formData,
@@ -570,6 +676,24 @@ function DatBanPage() {
     }))
   }
 
+  const handleToggleMenuItem = (mon) => {
+    setSelectedMenuItems((current) => {
+      const existing = current.find((item) => item.id === mon.id)
+      if (existing) {
+        return current.filter((item) => item.id !== mon.id)
+      }
+      return [...current, { ...mon, quantity: 1 }]
+    })
+  }
+
+  const handleRemoveMenuItem = (monId) => {
+    setSelectedMenuItems((current) => current.filter((item) => item.id !== monId))
+  }
+
+  const handleClearMenuItems = () => {
+    setSelectedMenuItems([])
+  }
+
   const handleContinue = () => {
     if (currentStep === 1) {
       const error = validateStepOne()
@@ -583,6 +707,11 @@ function DatBanPage() {
     }
 
     if (currentStep === 2) {
+      setCurrentStep(3)
+      return
+    }
+
+    if (currentStep === 3) {
       const errors = validateContactFields()
       setStepErrors(errors)
       if (Object.keys(errors).length > 0) {
@@ -590,16 +719,31 @@ function DatBanPage() {
         return
       }
       setSubmitError('')
-      setCurrentStep(3)
+      setCurrentStep(4)
     }
   }
 
   const handleBackFromReview = () => {
     setSubmitError('')
+    setCurrentStep(3)
+  }
+
+  const handleBackToStep2 = () => {
+    setSubmitError('')
     setCurrentStep(2)
   }
 
-  const handleSubmit = async () => {
+  const handleBackToStep1 = () => {
+    setSubmitError('')
+    setCurrentStep(1)
+  }
+
+  const handleSkipToStep3 = () => {
+    setSubmitError('')
+    setCurrentStep(3)
+  }
+
+const handleSubmit = async () => {
     const stepOneError = validateStepOne()
     if (stepOneError) {
       setCurrentStep(1)
@@ -610,7 +754,7 @@ function DatBanPage() {
     const contactErrors = validateContactFields()
     setStepErrors(contactErrors)
     if (Object.keys(contactErrors).length > 0) {
-      setCurrentStep(2)
+      setCurrentStep(3)
       setSubmitError('Vui lòng hoàn thiện thông tin liên hệ trước khi xác nhận.')
       return
     }
@@ -642,21 +786,33 @@ function DatBanPage() {
           gioDat: formData.time,
           gioKetThuc: null,
           soNguoi: Number(formData.guests) || 0,
+          khuVucUuTien: formData.seatingArea,
+          chiTietMonAn: selectedMenuItems,
           notes: [
             formData.notes.trim(),
-            formData.seatingArea !== 'KHONG_UU_TIEN' ? `Ưu tiên khu vực: ${layNhanChoNgoi(formData.seatingArea)}` : '',
+            formData.seatingArea !== 'KHONG_UU_TIEN' ? `Ưu tiên khu vực: ${mapAreaLabel(formData.seatingArea)}` : '',
           ].filter(Boolean).join(' · '),
         },
         confirmationPayload,
       })
 
+      const depositInfo = tinhYeuCauCoc({
+        guests: formData.guests,
+        seatingArea: formData.seatingArea,
+        selectedMenuItems,
+        subtotal: tinhTongTienMenu(selectedMenuItems),
+      })
+
       setSubmitSuccess({
-        bookingCode: createdBooking?.bookingCode || confirmationPayload.bookingCode,
+        bookingCode: createdBooking?.bookingCode,
         dateTimeLabel: dinhDangNgayGio(formData.date, formData.time),
         guests: Number(formData.guests) || 0,
-        areaLabel: layNhanChoNgoi(formData.seatingArea),
+        areaLabel: mapAreaLabel(formData.seatingArea),
         phone: formData.phone,
         email: formData.email || SITE_CONTACT.emailDisplay,
+        selectedMenuItems,
+        subtotal: tinhTongTienMenu(selectedMenuItems),
+        depositInfo,
       })
       xoaBanNhapTam()
     } catch (error) {
@@ -664,6 +820,14 @@ function DatBanPage() {
     } finally {
       setIsSubmitting(false)
     }
+  }
+
+  if (dangKhoiTaoXacThuc) {
+    return null
+  }
+
+  if (!daDangNhap) {
+    return <Navigate to="/dang-nhap" replace state={{ from: '/dat-ban' }} />
   }
 
   if (submitSuccess) {
@@ -712,7 +876,7 @@ function DatBanPage() {
         <section className="dat-ban-customer-section dat-ban-customer-section-tight">
           <div className="container">
             <Row gutter={[24, 24]} align="start">
-              <Col xs={24} xl={16}>
+              <Col xs={24} xl={currentStep === 4 ? 24 : 16}>
               {currentStep === 1 ? (
                 <BuocMotDatBan
                   formData={formData}
@@ -736,6 +900,14 @@ function DatBanPage() {
               ) : null}
 
               {currentStep === 2 ? (
+                <BuocHaiChonMon
+                  selectedMenuItems={selectedMenuItems}
+                  onToggleItem={handleToggleMenuItem}
+                  onClearAll={handleClearMenuItems}
+                />
+              ) : null}
+
+              {currentStep === 3 ? (
                 <BuocHaiDatBan
                   formData={formData}
                   fieldErrors={stepErrors}
@@ -745,13 +917,19 @@ function DatBanPage() {
                 />
               ) : null}
 
-              {currentStep === 3 ? (
+              {currentStep === 4 ? (
                 <BuocBaDatBan
                   summary={summary}
                   contactSummary={contactSummary}
                   reviewNotice={REVIEW_NOTICE}
                   submitError={submitError}
                   isSubmitting={isSubmitting}
+                  yeuCauCoc={tinhYeuCauCoc({
+                    guests: formData.guests,
+                    seatingArea: formData.seatingArea,
+                    selectedMenuItems,
+                    subtotal: summary.subtotal,
+                  })}
                   onBack={handleBackFromReview}
                   onSubmit={handleSubmit}
                 />
@@ -759,17 +937,29 @@ function DatBanPage() {
 
               </Col>
 
+              {currentStep !== 4 && (
               <Col xs={24} xl={8}>
-                <ThanhBenDatBan
+<ThanhBenDatBan
                   steps={STEPS}
                   currentStep={currentStep}
                   summary={summary}
                   nextStage={nextStage}
-                  canProceed={currentStep === 1 ? canProceedStepOne : currentStep === 2 ? canProceedStepTwo : false}
+                  canProceed={
+                    currentStep === 1 ? canProceedStepOne :
+                    currentStep === 2 ? canProceedStepTwo :
+                    currentStep === 3 ? canProceedStepThree :
+                    false
+                  }
                   continueBlockedMessage={currentStep === 1 ? selectedAreaUnavailableMessage : ''}
                   onContinue={handleContinue}
+                  onBack={handleBackToStep2}
+                  onBackToStep1={handleBackToStep1}
+                  onSkip={handleSkipToStep3}
+                  onRemoveItem={handleRemoveMenuItem}
+                  onClearCart={handleClearMenuItems}
                 />
               </Col>
+              )}
             </Row>
           </div>
         </section>

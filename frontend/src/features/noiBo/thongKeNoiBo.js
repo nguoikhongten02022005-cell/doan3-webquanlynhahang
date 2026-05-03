@@ -28,10 +28,23 @@ const taoMocBatDauNgay = (ngay) => {
   return ngaySaoChep
 }
 
+// UTC-safe date comparison (không bị ảnh hưởng bởi timezone browser)
+const taoMocBatDauNgayUTC = () => {
+  const now = new Date()
+  return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0))
+}
+
 const laCungNgay = (ngayTrai, ngayPhai) => (
   ngayTrai.getFullYear() === ngayPhai.getFullYear()
   && ngayTrai.getMonth() === ngayPhai.getMonth()
   && ngayTrai.getDate() === ngayPhai.getDate()
+)
+
+// UTC-safe comparison - so sánh theo ngày UTC để tránh lệch timezone
+const laCungNgayUTC = (ngayTrai, ngayPhai) => (
+  ngayTrai.getUTCFullYear() === ngayPhai.getUTCFullYear()
+  && ngayTrai.getUTCMonth() === ngayPhai.getUTCMonth()
+  && ngayTrai.getUTCDate() === ngayPhai.getUTCDate()
 )
 
 const phanTichGiaTriNgay = (giaTri) => {
@@ -41,51 +54,59 @@ const phanTichGiaTriNgay = (giaTri) => {
 }
 
 const laDatBanDaHuy = (datBan) => ['DA_HUY', 'Cancelled', 'KHONG_DEN', 'NoShow'].includes(datBan?.status)
-const laDatBanHoanThanh = (datBan) => ['DA_HOAN_THANH', 'DA_CHECK_IN', 'Completed'].includes(datBan?.status)
-const laDonHangHoanThanh = (donHang) => donHang?.status === 'Paid' || donHang?.status === 'DA_HOAN_THANH'
+const laDatBanHoanThanh = (datBan) => ['DA_HOAN_THANH', 'DA_CHECK_IN', 'Completed', 'CheckedIn'].includes(datBan?.status)
+const laDonHangHoanThanh = (donHang) => ['Paid', 'DA_HOAN_THANH', 'Completed', 'Served'].includes(donHang?.status)
 
 const locDonHangTheoKhoangThoiGian = (danhSachDonHang, khoangThoiGian) => {
-  const hienTai = new Date()
-  const dauNgayHomNay = taoMocBatDauNgay(hienTai)
+  const hienTai = taoMocBatDauNgayUTC()
 
   return danhSachDonHang.filter((donHang) => {
     const ngayDonHang = phanTichGiaTriNgay(donHang?.orderDate)
     if (!ngayDonHang) return false
 
-    if (khoangThoiGian === 'today') return laCungNgay(ngayDonHang, hienTai)
+    if (khoangThoiGian === 'all') return true
+    if (khoangThoiGian === 'today') return laCungNgayUTC(ngayDonHang, hienTai)
     if (khoangThoiGian === 'last7Days') {
-      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 6))
+      const mocBatDau = new Date(hienTai)
+      mocBatDau.setUTCDate(mocBatDau.getUTCDate() - 6)
       return ngayDonHang >= mocBatDau && ngayDonHang <= hienTai
     }
     if (khoangThoiGian === 'last30Days') {
-      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 29))
+      const mocBatDau = new Date(hienTai)
+      mocBatDau.setUTCDate(mocBatDau.getUTCDate() - 29)
       return ngayDonHang >= mocBatDau && ngayDonHang <= hienTai
     }
     if (khoangThoiGian === 'thisMonth') {
-      return ngayDonHang.getFullYear() === hienTai.getFullYear() && ngayDonHang.getMonth() === hienTai.getMonth()
+      return ngayDonHang.getUTCFullYear() === hienTai.getUTCFullYear()
+        && ngayDonHang.getUTCMonth() === hienTai.getUTCMonth()
     }
 
-    return ngayDonHang >= dauNgayHomNay
+    return ngayDonHang >= hienTai
   })
 }
 
 const locDatBanTheoKhoangThoiGian = (danhSachDatBan, khoangThoiGian) => {
-  const hienTai = new Date()
+  const hienTai = taoMocBatDauNgayUTC()
+
   return danhSachDatBan.filter((datBan) => {
     const ngayDatBan = phanTichGiaTriNgay(datBan?.date)
     if (!ngayDatBan) return false
 
-    if (khoangThoiGian === 'today') return laCungNgay(ngayDatBan, hienTai)
+    if (khoangThoiGian === 'all') return true
+    if (khoangThoiGian === 'today') return laCungNgayUTC(ngayDatBan, hienTai)
     if (khoangThoiGian === 'last7Days') {
-      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 6))
+      const mocBatDau = new Date(hienTai)
+      mocBatDau.setUTCDate(mocBatDau.getUTCDate() - 6)
       return ngayDatBan >= mocBatDau && ngayDatBan <= hienTai
     }
     if (khoangThoiGian === 'last30Days') {
-      const mocBatDau = taoMocBatDauNgay(new Date(hienTai.getFullYear(), hienTai.getMonth(), hienTai.getDate() - 29))
+      const mocBatDau = new Date(hienTai)
+      mocBatDau.setUTCDate(mocBatDau.getUTCDate() - 29)
       return ngayDatBan >= mocBatDau && ngayDatBan <= hienTai
     }
     if (khoangThoiGian === 'thisMonth') {
-      return ngayDatBan.getFullYear() === hienTai.getFullYear() && ngayDatBan.getMonth() === hienTai.getMonth()
+      return ngayDatBan.getUTCFullYear() === hienTai.getUTCFullYear()
+        && ngayDatBan.getUTCMonth() === hienTai.getUTCMonth()
     }
 
     return false
@@ -93,20 +114,20 @@ const locDatBanTheoKhoangThoiGian = (danhSachDatBan, khoangThoiGian) => {
 }
 
 const taoChuoiDoanhThu = (danhSachDonHang = []) => {
-  const homNay = taoMocBatDauNgay(new Date())
+  const homNay = taoMocBatDauNgayUTC()
 
   return Array.from({ length: 7 }, (_, chiSo) => {
     const ngay = new Date(homNay)
-    ngay.setDate(homNay.getDate() - (6 - chiSo))
+    ngay.setUTCDate(homNay.getUTCDate() - (6 - chiSo))
 
     const doanhThuNgay = danhSachDonHang.reduce((tongDoanhThu, donHang) => {
       const ngayDonHang = phanTichGiaTriNgay(donHang?.orderDate)
-      if (!ngayDonHang || !laCungNgay(ngayDonHang, ngay)) return tongDoanhThu
+      if (!ngayDonHang || !laCungNgayUTC(ngayDonHang, ngay)) return tongDoanhThu
       return tongDoanhThu + (Number(donHang?.total) || 0)
     }, 0)
 
     return {
-      label: `${chenSo0(ngay.getDate())}/${chenSo0(ngay.getMonth() + 1)}`,
+      label: `${chenSo0(ngay.getUTCDate())}/${chenSo0(ngay.getUTCMonth() + 1)}`,
       revenue: doanhThuNgay,
     }
   })
@@ -191,10 +212,17 @@ export const NOI_BO_THONG_KE_KHOANG_THOI_GIAN = Object.freeze([
   { key: 'thisMonth', label: 'Tháng này' },
 ])
 
-export const taoDuLieuThongKeDoanhThu = ({ orders: danhSachDonHangNguon = [], bookings: danhSachDatBanNguon = [], timeRange: khoangThoiGian = 'today' } = {}) => {
+export const taoDuLieuThongKeDoanhThu = ({ orders: danhSachDonHangNguon = [], bookings: danhSachDatBanNguon = [], timeRange: khoangThoiGian = 'last7Days' } = {}) => {
   const danhSachDonHangDaLoc = locDonHangTheoKhoangThoiGian(danhSachDonHangNguon, khoangThoiGian)
   const danhSachDatBanDaLoc = locDatBanTheoKhoangThoiGian(danhSachDatBanNguon, khoangThoiGian)
-  const tongDoanhThu = danhSachDonHangDaLoc.reduce((tong, donHang) => tong + (Number(donHang?.total) || 0), 0)
+  const tongDoanhThuDonHang = danhSachDonHangDaLoc.reduce((tong, donHang) => tong + (Number(donHang?.total) || 0), 0)
+
+  // Tính tiền cọc từ booking đã xác nhận (không tính booking đã hủy)
+  const tienCocTuBooking = danhSachDatBanDaLoc
+    .filter((datBan) => !laDatBanDaHuy(datBan))
+    .reduce((tong, datBan) => tong + (Number(datBan?.soTienCoc) || Number(datBan?.deposit) || Number(datBan?.tienCoc) || 0), 0)
+
+  const tongDoanhThu = tongDoanhThuDonHang + tienCocTuBooking
   const soDonHoanThanh = danhSachDonHangDaLoc.filter((donHang) => laDonHangHoanThanh(donHang)).length
   const giaTriTrungBinh = danhSachDonHangDaLoc.length > 0 ? Math.round(tongDoanhThu / danhSachDonHangDaLoc.length) : 0
   const revenueSeries = taoChuoiDoanhThu(danhSachDonHangDaLoc)
@@ -208,6 +236,8 @@ export const taoDuLieuThongKeDoanhThu = ({ orders: danhSachDonHangNguon = [], bo
   return {
     overview: {
       revenue: tongDoanhThu,
+      revenueFromOrders: tongDoanhThuDonHang,
+      revenueFromDeposits: tienCocTuBooking,
       completedOrders: soDonHoanThanh,
       averageOrder: giaTriTrungBinh,
       totalBookings,

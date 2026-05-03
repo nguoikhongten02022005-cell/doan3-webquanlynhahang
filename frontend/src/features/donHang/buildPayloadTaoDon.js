@@ -43,7 +43,7 @@ export const buildPayloadTaoDon = (payload = {}) => {
   const voucher = payload.voucher || {}
 
   return {
-    maDonHang: payload.maDonHang || payload.orderCode || sinhMaTam(loaiDon.startsWith('MANG_VE') ? 'DHMV' : 'DH'),
+    maDonHang: payload.maDonHang || payload.orderCode || sinhMaTam('DH'),
     maKH: payload.maKH || payload.customerCode || payload.customer?.customerCode || null,
     maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
     maNV: payload.maNV || payload.staffCode || null,

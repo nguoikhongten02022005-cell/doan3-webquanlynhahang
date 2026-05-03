@@ -1,4 +1,10 @@
-import { BadRequestException, ForbiddenException, Injectable, NotFoundException, UnauthorizedException } from '@nestjs/common';
+import {
+  BadRequestException,
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { compare, hash } from 'bcryptjs';
 import { sign, verify } from 'jsonwebtoken';
 import { MySqlService } from '../../database/mysql/mysql.service';
@@ -14,7 +20,8 @@ export class AuthService {
   private readonly jwtSecret = this.docBienMoiTruongBatBuoc('JWT_SECRET');
   private readonly jwtIssuer = this.docBienMoiTruongBatBuoc('JWT_ISSUER');
   private readonly jwtAudience = this.docBienMoiTruongBatBuoc('JWT_AUDIENCE');
-  private readonly jwtExpiresIn = this.docBienMoiTruongBatBuoc('JWT_EXPIRES_IN');
+  private readonly jwtExpiresIn =
+    this.docBienMoiTruongBatBuoc('JWT_EXPIRES_IN');
 
   private docBienMoiTruongBatBuoc(tenBien: string) {
     const giaTri = process.env[tenBien]?.trim();
@@ -82,7 +89,9 @@ export class AuthService {
     const vaiTro = chuanHoaVaiTroNoiBo(String(thongTinToken.vaiTro || ''));
 
     if (vaiTro === 'KhachHang') {
-      throw new ForbiddenException('Tai khoan nay khong co quyen truy cap khu vuc noi bo.');
+      throw new ForbiddenException(
+        'Tai khoan nay khong co quyen truy cap khu vuc noi bo.',
+      );
     }
 
     return thongTinToken;
@@ -93,7 +102,9 @@ export class AuthService {
     const vaiTro = chuanHoaVaiTroNoiBo(String(thongTinToken.vaiTro || ''));
 
     if (vaiTro !== 'Admin') {
-      throw new ForbiddenException('Ban khong co quyen thuc hien thao tac quan tri nay.');
+      throw new ForbiddenException(
+        'Ban khong co quyen thuc hien thao tac quan tri nay.',
+      );
     }
 
     return thongTinToken;
@@ -104,13 +115,18 @@ export class AuthService {
     const vaiTro = chuanHoaVaiTroNoiBo(String(thongTinToken.vaiTro || ''));
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      throw new ForbiddenException('Ban khong co quyen thuc hien thao tac noi bo nay.');
+      throw new ForbiddenException(
+        'Ban khong co quyen thuc hien thao tac noi bo nay.',
+      );
     }
 
     return thongTinToken;
   }
 
-  private chuyenNguoiDungSangResponse(nguoiDung: BanGhi, khachHang?: BanGhi | null) {
+  private chuyenNguoiDungSangResponse(
+    nguoiDung: BanGhi,
+    khachHang?: BanGhi | null,
+  ) {
     return {
       maND: nguoiDung.MaND,
       maKH: khachHang?.MaKH || '',
@@ -125,22 +141,34 @@ export class AuthService {
   }
 
   private async layNguoiDungTheoEmail(email: string) {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM NguoiDung WHERE Email = ? LIMIT 1', [email]);
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM NguoiDung WHERE Email = ? LIMIT 1',
+      [email],
+    );
     return danhSach[0] || null;
   }
 
   private async layKhachHangTheoMaNd(maND: string) {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1', [maND]);
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1',
+      [maND],
+    );
     return danhSach[0] || null;
   }
 
   private async layNhanVienTheoMaNd(maND: string) {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM NhanVien WHERE MaND = ? LIMIT 1', [maND]);
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM NhanVien WHERE MaND = ? LIMIT 1',
+      [maND],
+    );
     return danhSach[0] || null;
   }
 
   private async layNguoiDungTheoMaNd(maND: string) {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM NguoiDung WHERE MaND = ? LIMIT 1', [maND]);
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM NguoiDung WHERE MaND = ? LIMIT 1',
+      [maND],
+    );
     return danhSach[0] || null;
   }
 
@@ -154,7 +182,9 @@ export class AuthService {
 
   async dangKy(payload: BanGhi) {
     const hoTen = String(payload.hoTen || '').trim();
-    const email = String(payload.email || '').trim().toLowerCase();
+    const email = String(payload.email || '')
+      .trim()
+      .toLowerCase();
     const matKhau = String(payload.matKhau || '').trim();
     const xacNhanMatKhau = String(payload.xacNhanMatKhau || '').trim();
     const soDienThoai = String(payload.soDienThoai || '').trim();
@@ -196,12 +226,19 @@ export class AuthService {
   }
 
   async dangNhap(email: string, matKhau: string) {
-    const nguoiDung = await this.layNguoiDungTheoEmail(String(email || '').trim().toLowerCase());
+    const nguoiDung = await this.layNguoiDungTheoEmail(
+      String(email || '')
+        .trim()
+        .toLowerCase(),
+    );
     if (!nguoiDung) {
       throw new UnauthorizedException('Email hoac mat khau khong dung.');
     }
 
-    const hopLe = await compare(String(matKhau || ''), String(nguoiDung.MatKhau || ''));
+    const hopLe = await compare(
+      String(matKhau || ''),
+      String(nguoiDung.MatKhau || ''),
+    );
     if (!hopLe) {
       throw new UnauthorizedException('Email hoac mat khau khong dung.');
     }
@@ -214,18 +251,27 @@ export class AuthService {
   }
 
   async dangNhapNoiBo(email: string, matKhau: string) {
-    const nguoiDung = await this.layNguoiDungTheoEmail(String(email || '').trim().toLowerCase());
+    const nguoiDung = await this.layNguoiDungTheoEmail(
+      String(email || '')
+        .trim()
+        .toLowerCase(),
+    );
     if (!nguoiDung) {
       throw new UnauthorizedException('Email hoac mat khau khong dung.');
     }
 
-    const hopLe = await compare(String(matKhau || ''), String(nguoiDung.MatKhau || ''));
+    const hopLe = await compare(
+      String(matKhau || ''),
+      String(nguoiDung.MatKhau || ''),
+    );
     if (!hopLe) {
       throw new UnauthorizedException('Email hoac mat khau khong dung.');
     }
 
     if (nguoiDung.VaiTro === 'KhachHang') {
-      throw new UnauthorizedException('Tai khoan nay khong co quyen dang nhap noi bo.');
+      throw new UnauthorizedException(
+        'Tai khoan nay khong co quyen dang nhap noi bo.',
+      );
     }
 
     const khachHang = await this.layKhachHangTheoMaNd(nguoiDung.MaND);
@@ -241,13 +287,18 @@ export class AuthService {
 
   async layThongTinToi(authorization?: string) {
     const thongTinToken = this.giaiMaNguoiDung(authorization);
-    const nguoiDung = await this.layNguoiDungTheoMaNd(String(thongTinToken.maND));
+    const nguoiDung = await this.layNguoiDungTheoMaNd(
+      String(thongTinToken.maND),
+    );
     if (!nguoiDung) {
       throw new NotFoundException('Khong tim thay nguoi dung.');
     }
 
     const khachHang = await this.layKhachHangTheoMaNd(nguoiDung.MaND);
-    return this.taoPhanHoi(this.chuyenNguoiDungSangResponse(nguoiDung, khachHang), 'Lay thong tin thanh cong');
+    return this.taoPhanHoi(
+      this.chuyenNguoiDungSangResponse(nguoiDung, khachHang),
+      'Lay thong tin thanh cong',
+    );
   }
 
   async layDanhSachNguoiDung(authorization?: string) {
@@ -281,11 +332,15 @@ export class AuthService {
     this.yeuCauQuyenQuanTri(authorization);
 
     const hoTen = String(payload.hoTen || '').trim();
-    const email = String(payload.email || '').trim().toLowerCase();
+    const email = String(payload.email || '')
+      .trim()
+      .toLowerCase();
     const soDienThoai = String(payload.soDienThoai || '').trim();
     const matKhau = String(payload.matKhau || '').trim();
     const xacNhanMatKhau = String(payload.xacNhanMatKhau || '').trim();
-    const vaiTro = this.chuanHoaVaiTroNoiBo(String(payload.vaiTro || 'NhanVien').trim());
+    const vaiTro = this.chuanHoaVaiTroNoiBo(
+      String(payload.vaiTro || 'NhanVien').trim(),
+    );
     const trangThai = String(payload.trangThai || 'Active').trim() || 'Active';
     const chucVu = String(payload.chucVu || this.taoChucVuNoiBo(vaiTro)).trim();
 
@@ -313,19 +368,33 @@ export class AuthService {
 
     await this.mysql.thucThi(
       'INSERT INTO NhanVien (MaNV, MaND, HoTen, SDT, ChucVu, TinhTrang) VALUES (?, ?, ?, ?, ?, ?)',
-      [maNV, maND, hoTen, soDienThoai || null, chucVu || this.taoChucVuNoiBo(vaiTro), trangThai === 'Active' ? 'Active' : 'Inactive'],
+      [
+        maNV,
+        maND,
+        hoTen,
+        soDienThoai || null,
+        chucVu || this.taoChucVuNoiBo(vaiTro),
+        trangThai === 'Active' ? 'Active' : 'Inactive',
+      ],
     );
 
     const nguoiDung = await this.layNguoiDungTheoMaNd(maND);
     const nhanVien = await this.layNhanVienTheoMaNd(maND);
 
-    return this.taoPhanHoi({
-      maND: nguoiDung?.MaND || maND,
-      maNV: nhanVien?.MaNV || maNV,
-    }, 'Tao nhan vien thanh cong');
+    return this.taoPhanHoi(
+      {
+        maND: nguoiDung?.MaND || maND,
+        maNV: nhanVien?.MaNV || maNV,
+      },
+      'Tao nhan vien thanh cong',
+    );
   }
 
-  async capNhatNguoiDungNoiBo(authorization: string | undefined, maND: string, payload: BanGhi) {
+  async capNhatNguoiDungNoiBo(
+    authorization: string | undefined,
+    maND: string,
+    payload: BanGhi,
+  ) {
     this.yeuCauQuyenQuanTri(authorization);
 
     const nguoiDung = await this.layNguoiDungTheoMaNd(maND);
@@ -334,10 +403,16 @@ export class AuthService {
     }
 
     const hoTen = String(payload.hoTen || nguoiDung.TenND || '').trim();
-    const email = String(payload.email || nguoiDung.Email || '').trim().toLowerCase();
+    const email = String(payload.email || nguoiDung.Email || '')
+      .trim()
+      .toLowerCase();
     const soDienThoai = String(payload.soDienThoai || '').trim();
-    const vaiTro = this.chuanHoaVaiTroNoiBo(String(payload.vaiTro || nguoiDung.VaiTro || 'NhanVien').trim());
-    const trangThai = String(payload.trangThai || nguoiDung.TrangThai || 'Active').trim() || 'Active';
+    const vaiTro = this.chuanHoaVaiTroNoiBo(
+      String(payload.vaiTro || nguoiDung.VaiTro || 'NhanVien').trim(),
+    );
+    const trangThai =
+      String(payload.trangThai || nguoiDung.TrangThai || 'Active').trim() ||
+      'Active';
     const chucVu = String(payload.chucVu || this.taoChucVuNoiBo(vaiTro)).trim();
 
     const nguoiDungCungEmail = await this.layNguoiDungTheoEmail(email);
@@ -356,12 +431,25 @@ export class AuthService {
     if (nhanVienHienTai) {
       await this.mysql.thucThi(
         'UPDATE NhanVien SET HoTen = ?, SDT = ?, ChucVu = ?, TinhTrang = ? WHERE MaND = ?',
-        [hoTen, soDienThoai || null, chucVu || this.taoChucVuNoiBo(vaiTro), tinhTrangNhanVien, maND],
+        [
+          hoTen,
+          soDienThoai || null,
+          chucVu || this.taoChucVuNoiBo(vaiTro),
+          tinhTrangNhanVien,
+          maND,
+        ],
       );
     } else {
       await this.mysql.thucThi(
         'INSERT INTO NhanVien (MaNV, MaND, HoTen, SDT, ChucVu, TinhTrang) VALUES (?, ?, ?, ?, ?, ?)',
-        [this.taoMa('NV'), maND, hoTen, soDienThoai || null, chucVu || this.taoChucVuNoiBo(vaiTro), tinhTrangNhanVien],
+        [
+          this.taoMa('NV'),
+          maND,
+          hoTen,
+          soDienThoai || null,
+          chucVu || this.taoChucVuNoiBo(vaiTro),
+          tinhTrangNhanVien,
+        ],
       );
     }
 
@@ -377,7 +465,10 @@ export class AuthService {
         throw new BadRequestException('Xac nhan mat khau khong khop.');
       }
 
-      await this.mysql.thucThi('UPDATE NguoiDung SET MatKhau = ? WHERE MaND = ?', [await hash(matKhau, 10), maND]);
+      await this.mysql.thucThi(
+        'UPDATE NguoiDung SET MatKhau = ? WHERE MaND = ?',
+        [await hash(matKhau, 10), maND],
+      );
     }
 
     return this.taoPhanHoi({ maND }, 'Cap nhat nhan vien thanh cong');
@@ -392,7 +483,9 @@ export class AuthService {
     }
 
     if (String(nguoiDung.VaiTro) === 'KhachHang') {
-      throw new BadRequestException('Chi co the xoa tai khoan nhan vien hoac quan ly.');
+      throw new BadRequestException(
+        'Chi co the xoa tai khoan nhan vien hoac quan ly.',
+      );
     }
 
     await this.mysql.thucThi('DELETE FROM NhanVien WHERE MaND = ?', [maND]);
@@ -405,19 +498,31 @@ export class AuthService {
     const thongTinToken = this.giaiMaNguoiDung(authorization);
     const maND = String(thongTinToken.maND);
     const hoTen = String(payload.hoTen || '').trim();
-    const email = String(payload.email || '').trim().toLowerCase();
+    const email = String(payload.email || '')
+      .trim()
+      .toLowerCase();
     const soDienThoai = String(payload.soDienThoai || '').trim();
     const diaChi = String(payload.diaChi || '').trim();
 
-    await this.mysql.thucThi('UPDATE NguoiDung SET TenND = ?, Email = ? WHERE MaND = ?', [hoTen, email, maND]);
-    await this.mysql.thucThi('UPDATE KhachHang SET TenKH = ?, SDT = ?, DiaChi = ? WHERE MaND = ?', [hoTen, soDienThoai || null, diaChi || null, maND]);
+    await this.mysql.thucThi(
+      'UPDATE NguoiDung SET TenND = ?, Email = ? WHERE MaND = ?',
+      [hoTen, email, maND],
+    );
+    await this.mysql.thucThi(
+      'UPDATE KhachHang SET TenKH = ?, SDT = ?, DiaChi = ? WHERE MaND = ?',
+      [hoTen, soDienThoai || null, diaChi || null, maND],
+    );
 
-    return this.layThongTinToi(`Bearer ${this.taoJwt(await this.layNguoiDungTheoMaNd(maND))}`);
+    return this.layThongTinToi(
+      `Bearer ${this.taoJwt(await this.layNguoiDungTheoMaNd(maND))}`,
+    );
   }
 
   async doiMatKhau(authorization: string | undefined, payload: BanGhi) {
     const thongTinToken = this.giaiMaNguoiDung(authorization);
-    const nguoiDung = await this.layNguoiDungTheoMaNd(String(thongTinToken.maND));
+    const nguoiDung = await this.layNguoiDungTheoMaNd(
+      String(thongTinToken.maND),
+    );
     if (!nguoiDung) {
       throw new NotFoundException('Khong tim thay nguoi dung.');
     }
@@ -430,12 +535,18 @@ export class AuthService {
       throw new BadRequestException('Xac nhan mat khau moi khong khop.');
     }
 
-    const hopLe = await compare(matKhauHienTai, String(nguoiDung.MatKhau || ''));
+    const hopLe = await compare(
+      matKhauHienTai,
+      String(nguoiDung.MatKhau || ''),
+    );
     if (!hopLe) {
       throw new UnauthorizedException('Mat khau hien tai khong dung.');
     }
 
-    await this.mysql.thucThi('UPDATE NguoiDung SET MatKhau = ? WHERE MaND = ?', [await hash(matKhauMoi, 10), nguoiDung.MaND]);
+    await this.mysql.thucThi(
+      'UPDATE NguoiDung SET MatKhau = ? WHERE MaND = ?',
+      [await hash(matKhauMoi, 10), nguoiDung.MaND],
+    );
     return this.taoPhanHoi(null, 'Doi mat khau thanh cong');
   }
 }

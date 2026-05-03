@@ -70,6 +70,18 @@ export const khopBoLocNgay = (datBan, boLocNgay, hienTai) => {
     return laCungNgayLich(ngayDatBan, ngayMai)
   }
 
+  if (boLocNgay === 'last7Days') {
+    const ngayBatDau = new Date(hienTai)
+    ngayBatDau.setDate(hienTai.getDate() - 6)
+    return ngayDatBan >= ngayBatDau && laCungNgayLich(ngayDatBan, hienTai)
+  }
+
+  if (boLocNgay === 'last30Days') {
+    const ngayBatDau = new Date(hienTai)
+    ngayBatDau.setDate(hienTai.getDate() - 29)
+    return ngayDatBan >= ngayBatDau && laCungNgayLich(ngayDatBan, hienTai)
+  }
+
   return true
 }
 

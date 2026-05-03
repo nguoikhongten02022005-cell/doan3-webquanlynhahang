@@ -43,15 +43,23 @@ export const laySacThaiTrangThaiDatBan = (trangThai) => {
 export const layNhanTrangThaiDatBan = (trangThai) => {
   if (!trangThai) return 'Chờ xác nhận'
   const banDo = {
+    YEU_CAU_DAT_BAN: 'Yêu cầu đặt bàn',
+    CHO_XAC_NHAN: 'Chờ xác nhận',
     Pending: 'Chờ xác nhận',
+    GIU_CHO_TAM: 'Đã giữ chỗ tạm',
+    DA_XAC_NHAN: 'Đã xác nhận',
     Confirmed: 'Đã xác nhận',
-    Cancelled: 'Đã hủy',
+    CAN_GOI_LAI: 'Cần gọi lại',
+    TU_CHOI_HET_CHO: 'Từ chối / hết chỗ',
+    DA_CHECK_IN: 'Đang phục vụ',
+    DA_XEP_BAN: 'Đã vào bàn',
+    DA_HOAN_THANH: 'Đã hoàn thành',
     Completed: 'Đã hoàn thành',
     DA_HUY: 'Đã hủy',
-    DA_XAC_NHAN: 'Đã xác nhận',
-    DA_HOAN_THANH: 'Đã hoàn thành',
-    DA_CHECK_IN: 'Đang phục vụ',
+    Cancelled: 'Đã hủy',
     KHONG_DEN: 'Không đến',
+    NoShow: 'Không đến',
+    DA_GHI_NHAN: 'Đã ghi nhận',
   }
 
   return banDo[trangThai] || trangThai

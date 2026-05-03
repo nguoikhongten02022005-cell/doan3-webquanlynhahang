@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Headers, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { DanhGiaService } from './danh-gia.service';
 
@@ -15,12 +23,19 @@ export class DanhGiaController {
   }
 
   @Post()
-  taoDanhGia(@Headers('authorization') authorization: string | undefined, @Body() body: BanGhi) {
+  taoDanhGia(
+    @Headers('authorization') authorization: string | undefined,
+    @Body() body: BanGhi,
+  ) {
     return this.danhGiaService.taoDanhGia(authorization, body);
   }
 
   @Patch(':maDanhGia/duyet')
-  duyetDanhGia(@Headers('authorization') authorization: string | undefined, @Param('maDanhGia') maDanhGia: string, @Body() body: BanGhi) {
+  duyetDanhGia(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maDanhGia') maDanhGia: string,
+    @Body() body: BanGhi,
+  ) {
     return this.danhGiaService.duyetDanhGia(authorization, maDanhGia, body);
   }
 }

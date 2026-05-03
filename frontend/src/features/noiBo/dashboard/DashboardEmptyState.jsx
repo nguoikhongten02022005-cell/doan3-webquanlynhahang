@@ -17,7 +17,7 @@ function DashboardEmptyState({ title, description, compact = false, table = fals
     <Empty
       className={className}
       image={Empty.PRESENTED_IMAGE_SIMPLE}
-      imageStyle={layKichThuocAnh({ compact, table })}
+      styles={{ image: layKichThuocAnh({ compact, table }) }}
       description={(
         <div className="noi-bo-dashboard-empty__description">
           <strong>{title}</strong>

@@ -1294,6 +1294,55 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
   border-color: #E8664A;
   color: #d95a3f;
 }
+.ho-so-action-btn--detail {
+  border: 1px solid #E5E0DB;
+  background: #FAFAF9;
+  color: #6B6560;
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  font-size: 0.85rem;
+}
+.ho-so-action-btn--detail:hover {
+  border-color: #E8664A;
+  color: #E8664A;
+  background: #FFF7F2;
+}
+.ho-so-history-detail-toggle {
+  margin: 0.5rem 0;
+}
+.ho-so-history-mon-an {
+  background: #FAFAF9;
+  border: 1px solid #EDE9E4;
+  border-radius: 0.9rem;
+  padding: 0.75rem;
+  margin-top: 0.5rem;
+  overflow-x: auto;
+}
+.ho-so-mon-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.875rem;
+}
+.ho-so-mon-table th {
+  text-align: left;
+  padding: 0.5rem 0.75rem;
+  color: #8C8680;
+  font-weight: 600;
+  border-bottom: 1px solid #EDE9E4;
+}
+.ho-so-mon-table td {
+  padding: 0.5rem 0.75rem;
+  border-bottom: 1px solid #F5F2EE;
+}
+.ho-so-mon-table tbody tr:last-child td {
+  border-bottom: none;
+}
+.ho-so-mon-table tfoot td {
+  padding: 0.6rem 0.75rem 0;
+  border-top: 2px solid #EDE9E4;
+  color: #E8664A;
+}
 .ho-so-empty-state {
   display: grid;
   justify-items: center;

@@ -38,7 +38,7 @@ function ChiTietDonHangModal({ donHang, dangMo, onClose }) {
           Đóng
         </Button>,
       ]}
-      width={760}
+      size={760}
       centered
       destroyOnClose
       title={null}

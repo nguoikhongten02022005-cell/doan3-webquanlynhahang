@@ -1,4 +1,12 @@
-import { Body, Controller, Get, Headers, Param, Patch, Post } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Headers,
+  Param,
+  Patch,
+  Post,
+} from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { DonHangService } from './don-hang.service';
 
@@ -23,7 +31,10 @@ export class DonHangController {
   }
 
   @Get(':maDonHang')
-  layChiTietDonHang(@Headers('authorization') authorization: string | undefined, @Param('maDonHang') maDonHang: string) {
+  layChiTietDonHang(
+    @Headers('authorization') authorization: string | undefined,
+    @Param('maDonHang') maDonHang: string,
+  ) {
     return this.donHangService.layChiTietDonHang(authorization, maDonHang);
   }
 

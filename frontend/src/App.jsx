@@ -12,11 +12,6 @@ import TrangChuPage from './pages/TrangChuPage'
 import DangNhapNoiBoPage from './pages/DangNhapNoiBoPage'
 import DangNhapPage from './pages/DangNhapPage'
 import ThucDonPage from './pages/ThucDonPage'
-import MangVePage from './pages/MangVePage'
-import MangVeThucDonPage from './pages/MangVeThucDonPage'
-import MangVeGioHangPage from './pages/MangVeGioHangPage'
-import MangVeThanhToanPage from './pages/MangVeThanhToanPage'
-import MangVeTheoDoiDonPage from './pages/MangVeTheoDoiDonPage'
 import BanGoiMonPage from './pages/BanGoiMonPage'
 import HoSoPage from './pages/HoSoPage'
 import DangKyPage from './pages/DangKyPage'
@@ -24,13 +19,14 @@ import DanhGiaPage from './pages/DanhGiaPage'
 import NoiBoDashboardPage from './pages/noiBo/NoiBoDashboardPage'
 import NoiBoDatBanPage from './pages/noiBo/NoiBoDatBanPage'
 import NoiBoDanhGiaPage from './pages/noiBo/NoiBoDanhGiaPage'
-import NoiBoDonMangVePage from './pages/noiBo/NoiBoDonMangVePage'
 import NoiBoQuanLyBanPage from './pages/noiBo/NoiBoQuanLyBanPage'
 import NoiBoSoDoBanPage from './pages/noiBo/NoiBoSoDoBanPage'
 import NoiBoThucDonPage from './pages/noiBo/NoiBoThucDonPage'
 import NoiBoDonHangPage from './pages/noiBo/NoiBoDonHangPage'
 import NoiBoNhanVienPage from './pages/noiBo/NoiBoNhanVienPage'
 import NoiBoThongKePage from './pages/noiBo/NoiBoThongKePage'
+import NoiBoMaGiamGiaPage from './pages/noiBo/NoiBoMaGiamGiaPage'
+import NoiBoKhachHangPage from './pages/noiBo/NoiBoKhachHangPage'
 
 function ChuyenHuongTuDuongDanCu() {
   const location = useLocation()
@@ -54,15 +50,8 @@ function App() {
           <Route path="/danh-gia" element={<DanhGiaPage />} />
           <Route path="/dang-nhap" element={<DangNhapPage />} />
           <Route path="/dang-ky" element={<DangKyPage />} />
-          <Route path="/mang-ve" element={<MangVePage />} />
           <Route path="/ban/:maBan" element={<BanGoiMonPage />} />
           <Route path="/ban/:maBan/goi-mon" element={<BanGoiMonPage />} />
-          <Route path="/mang-ve/thuc-don" element={<MangVeThucDonPage />} />
-          <Route element={<TuyenDuongBaoVe loginPath="/dang-nhap" chiCanDangNhap />}>
-            <Route path="/mang-ve/gio-hang" element={<MangVeGioHangPage />} />
-            <Route path="/mang-ve/thanh-toan" element={<MangVeThanhToanPage />} />
-            <Route path="/mang-ve/don-hang/:id" element={<MangVeTheoDoiDonPage />} />
-          </Route>
         </Route>
 
         <Route path="/dang-nhap-noi-bo" element={<Navigate to="/noi-bo/dang-nhap" replace />} />
@@ -80,7 +69,6 @@ function App() {
           <Route path="dashboard" element={<NoiBoDashboardPage />} />
           <Route path="dat-ban" element={<NoiBoDatBanPage />} />
           <Route path="danh-gia" element={<NoiBoDanhGiaPage />} />
-          <Route path="don-mang-ve" element={<NoiBoDonMangVePage />} />
           <Route path="so-do-ban" element={<NoiBoSoDoBanPage />} />
           <Route path="don-hang" element={<NoiBoDonHangPage />} />
           <Route
@@ -94,8 +82,10 @@ function App() {
           >
             <Route path="quan-ly-ban" element={<NoiBoQuanLyBanPage />} />
             <Route path="thuc-don" element={<NoiBoThucDonPage />} />
+            <Route path="ma-giam-gia" element={<NoiBoMaGiamGiaPage />} />
             <Route path="thong-ke" element={<NoiBoThongKePage />} />
             <Route path="nhan-vien" element={<NoiBoNhanVienPage />} />
+            <Route path="khach-hang" element={<NoiBoKhachHangPage />} />
           </Route>
         </Route>
 

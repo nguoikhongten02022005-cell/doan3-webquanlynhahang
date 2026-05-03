@@ -77,7 +77,7 @@ function DatBanVaDonHang({ bookings, orders, loading = false }) {
       key: 'assignedTables',
       width: 110,
       align: 'center',
-      render: (assignedTables) => assignedTables?.[0]?.code || '--',
+      render: (assignedTables) => assignedTables?.[0]?.code || 'Chưa gán',
     },
     {
       title: 'Trạng thái',

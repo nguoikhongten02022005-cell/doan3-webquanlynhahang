@@ -156,7 +156,7 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaBanAn     VARCHAR(20),
     MaNV        VARCHAR(50),
     MaDatBan    VARCHAR(50),
-    LoaiDon     ENUM('TAI_QUAN','MANG_VE_PICKUP','MANG_VE_GIAO_HANG','TAI_BAN') NOT NULL DEFAULT 'TAI_QUAN',
+    LoaiDon     ENUM('TAI_QUAN','TAI_BAN') NOT NULL DEFAULT 'TAI_QUAN',
     DiaChiGiao  VARCHAR(255),
     GioLayHang  TIME,
     GioGiao     TIME,
@@ -489,8 +489,8 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT004', 'DH001', 'M006', 1, 30000, 30000, NULL, 'Done', NOW());
 
 INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
-('DH002', 'KH002', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '18:30:00', NULL, 0, 140000, 'Ready', 'Online', 'Khach se den lay sau gio tan lam', NOW(), NOW()),
-('DH003', 'KH_TEST_01', NULL, NULL, 'NV002', NULL, 'MANG_VE_GIAO_HANG', '123 Nguyen Hue, Q1, TP.HCM', NULL, '19:15:00', 15000, 180000, 'Pending', 'Online', 'Giao tan noi, goi truoc khi giao', NOW(), NOW());
+('DH002', 'KH002', NULL, NULL, 'NV003', NULL, 'TAI_QUAN', NULL, '18:30:00', NULL, 0, 140000, 'Ready', 'Online', 'Khach se den lay sau gio tan lam', NOW(), NOW()),
+('DH003', 'KH_TEST_01', NULL, NULL, 'NV002', NULL, 'TAI_QUAN', '123 Nguyen Hue, Q1, TP.HCM', NULL, '19:15:00', 15000, 180000, 'Pending', 'Online', 'Giao tan noi, goi truoc khi giao', NOW(), NOW());
 
 INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
 ('CT005', 'DH002', 'M003', 1, 55000, 55000, 'Khong hanh', 'Done', NOW()),
@@ -511,7 +511,7 @@ INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, Tr
 ('TT003', 'HD003', 'MoMo', 143000, 'MOMO_DH003_001', 'Pending', NOW());
 
 INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES
-('LS007', 'DH002', NULL, 'Pending', 'Tao don mang ve pickup', 'System', NOW()),
+('LS007', 'DH002', NULL, 'Pending', 'Tao don tai quan pickup', 'System', NOW()),
 ('LS008', 'DH002', 'Pending', 'Pending', 'Da goi xac nhan khach den lay', 'NV003', NOW()),
 ('LS009', 'DH002', 'Pending', 'Preparing', 'Bep tiep nhan don', 'NV003', NOW()),
 ('LS010', 'DH002', 'Preparing', 'Ready', 'San sang tra khach tai quay', 'NV003', NOW()),
@@ -567,12 +567,128 @@ INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuan
 INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
 ('B012', 'Ban 12', 'Trong nha', 12, 4, 'Tang 1 - Khu D', NULL, 'Available', NOW(), NOW()),
 ('B013', 'Ban 13', 'Quay bar', 13, 2, 'Quay bar', 'Phu hop khach di 2 nguoi', 'Available', NOW(), NOW()),
-('B014', 'Ban 14', 'Tang 2', 14, 6, 'Tang 2 - Phong rieng 2', 'Ban du phong cho booking VIP', 'Available', NOW(), NOW());
+('B014', 'Ban 14', 'Tang 2', 14, 6, 'Tang 2 - Phong rieng 2', 'Ban du phong cho booking VIP', 'Available', NOW(), NOW()),
+
+-- =====================
+-- BAN MOI: TRONG NHA / TANG 2 / TANG 3 (B015-B039)
+-- =====================
+('B015', 'Ban 15', 'Trong nha', 15, 2, 'Tang 1 - Gan cua so', NULL, 'Reserved', NOW(), NOW()),
+('B016', 'Ban 16', 'Trong nha', 16, 4, 'Tang 1 - Khu A', NULL, 'Available', NOW(), NOW()),
+('B017', 'Ban 17', 'Trong nha', 17, 4, 'Tang 1 - Khu A', NULL, 'Occupied', NOW(), NOW()),
+('B018', 'Ban 18', 'Trong nha', 18, 6, 'Tang 1 - Khu B', NULL, 'Available', NOW(), NOW()),
+('B019', 'Ban 19', 'Trong nha', 19, 4, 'Tang 1 - Khu B', NULL, 'Reserved', NOW(), NOW()),
+('B020', 'Ban 20', 'Trong nha', 20, 4, 'Tang 1 - Khu C', NULL, 'Available', NOW(), NOW()),
+('B021', 'Ban 21', 'Trong nha', 21, 6, 'Tang 1 - Khu C', NULL, 'Occupied', NOW(), NOW()),
+('B022', 'Ban 22', 'Trong nha', 22, 2, 'Tang 1 - Khu D', NULL, 'Available', NOW(), NOW()),
+('B023', 'Ban 23', 'Trong nha', 23, 4, 'Tang 1 - Khu D', NULL, 'Maintenance', NOW(), NOW()),
+('B024', 'Ban 24', 'Trong nha', 24, 8, 'Tang 1 - Khu E', NULL, 'Reserved', NOW(), NOW()),
+('B025', 'Tang 2', 25, 4, 'Tang 2 - Phong chinh', NULL, 'Available', NOW(), NOW()),
+('B026', 'Tang 2', 26, 4, 'Tang 2 - Phong chinh', NULL, 'Occupied', NOW(), NOW()),
+('B027', 'Tang 2', 27, 6, 'Tang 2 - Phong chinh', NULL, 'Reserved', NOW(), NOW()),
+('B028', 'Tang 2', 28, 6, 'Tang 2 - View dep', NULL, 'Available', NOW(), NOW()),
+('B029', 'Tang 2', 29, 8, 'Tang 2 - Ban lon', NULL, 'Occupied', NOW(), NOW()),
+('B030', 'Tang 2', 30, 4, 'Tang 2 - Khu truoc', NULL, 'Available', NOW(), NOW()),
+('B031', 'Tang 2', 31, 4, 'Tang 2 - Khu truoc', NULL, 'Reserved', NOW(), NOW()),
+('B032', 'Tang 3', 32, 4, 'Tang 3 - Phong rieng', NULL, 'Available', NOW(), NOW()),
+('B033', 'Tang 3', 33, 6, 'Tang 3 - Phong rieng', NULL, 'Occupied', NOW(), NOW()),
+('B034', 'Tang 3', 34, 8, 'Tang 3 - Phong lon', NULL, 'Available', NOW(), NOW()),
+('B035', 'Tang 3', 35, 10, 'Tang 3 - Phong tiec', NULL, 'Reserved', NOW(), NOW()),
+('B036', 'Tang 3', 36, 4, 'Tang 3 - Khu thanh pho', NULL, 'Available', NOW(), NOW()),
+('B037', 'Tang 3', 37, 6, 'Tang 3 - Khu thanh pho', NULL, 'Maintenance', NOW(), NOW()),
+('B038', 'Tang 3', 38, 2, 'Tang 3 - Ban nho', NULL, 'Available', NOW(), NOW()),
+
+-- =====================
+-- BAN MOI: KHU RIENG / VIP (B039-B048)
+-- =====================
+('B039', 'Ban VIP 1', 'Khu rieng', 39, 8, 'Tang 2 - Phong VIP 1', 'Phong VIP dau tien', 'Occupied', NOW(), NOW()),
+('B040', 'Ban VIP 2', 'Khu rieng', 40, 8, 'Tang 2 - Phong VIP 2', 'Phong VIP thu hai', 'Reserved', NOW(), NOW()),
+('B041', 'Ban VIP 3', 'Khu rieng', 41, 10, 'Tang 3 - Phong VIP 3', 'Phong VIP lon nhat', 'Available', NOW(), NOW()),
+('B042', 'Ban VIP 4', 'Khu rieng', 42, 6, 'Tang 2 - Phong rieng A', NULL, 'Available', NOW(), NOW()),
+('B043', 'Ban VIP 5', 'Khu riêng', 43, 6, 'Tang 2 - Phong rieng B', NULL, 'Occupied', NOW(), NOW()),
+('B044', 'Ban VIP 6', 'Khu riêng', 44, 8, 'Tang 3 - Phong rieng C', NULL, 'Reserved', NOW(), NOW()),
+('B045', 'Ban VIP 7', 'Khu riêng', 45, 4, 'Tang 2 - Phong nho', NULL, 'Available', NOW(), NOW()),
+('B046', 'Ban VIP 8', 'Khu riêng', 46, 8, 'Tang 3 - Tang VIP', 'Danh cho khach VVIP', 'Occupied', NOW(), NOW()),
+('B047', 'Ban VIP 9', 'Khu riêng', 47, 10, 'Tang 3 - Hall VIP', 'Phong hop vuong mac', 'Available', NOW(), NOW()),
+('B048', 'Ban VIP 10', 'Khu riêng', 48, 6, 'Tang 2 - Ban cong VIP', 'Vi tri view dep', 'Reserved', NOW(), NOW()),
+
+-- =====================
+-- BAN MOI: NGOAI TROI (B049-B063)
+-- =====================
+('B049', 'Ban NT 1', 'Ngoai troi', 49, 2, 'Ngoai troi - Khu A', NULL, 'Available', NOW(), NOW()),
+('B050', 'Ban NT 2', 'Ngoai troi', 50, 2, 'Ngoai troi - Khu A', NULL, 'Occupied', NOW(), NOW()),
+('B051', 'Ban NT 3', 'Ngoai troi', 51, 4, 'Ngoai troi - Khu A', NULL, 'Available', NOW(), NOW()),
+('B052', 'Ban NT 4', 'Ngoai troi', 52, 4, 'Ngoai troi - Khu A', NULL, 'Reserved', NOW(), NOW()),
+('B053', 'Ban NT 5', 'Ngoai troi', 53, 4, 'Ngoai troi - Khu B', NULL, 'Available', NOW(), NOW()),
+('B054', 'Ban NT 6', 'Ngoai troi', 54, 6, 'Ngoai troi - Khu B', NULL, 'Occupied', NOW(), NOW()),
+('B055', 'Ban NT 7', 'Ngoai troi', 55, 6, 'Ngoai troi - Khu B', NULL, 'Available', NOW(), NOW()),
+('B056', 'Ban NT 8', 'Ngoai troi', 56, 2, 'Ngoai troi - Khu C', NULL, 'Reserved', NOW(), NOW()),
+('B057', 'Ban NT 9', 'Ngoai troi', 57, 4, 'Ngoai troi - Khu C', NULL, 'Available', NOW(), NOW()),
+('B058', 'Ban NT 10', 'Ngoai troi', 58, 8, 'Ngoai troi - Khu C', NULL, 'Occupied', NOW(), NOW()),
+('B059', 'Ban NT 11', 'Ngoai troi', 59, 4, 'Ngoai troi - Khu D', NULL, 'Available', NOW(), NOW()),
+('B060', 'Ban NT 12', 'Ngoai troi', 60, 6, 'Ngoai troi - Khu D', NULL, 'Reserved', NOW(), NOW()),
+('B061', 'Ban NT 13', 'Ngoai troi', 61, 4, 'Ngoai troi - Khu D', NULL, 'Maintenance', NOW(), NOW()),
+('B062', 'Ban NT 14', 'Ngoai troi', 62, 2, 'Ngoai troi - Khu E', NULL, 'Available', NOW(), NOW()),
+('B063', 'Ban NT 15', 'Ngoai troi', 63, 4, 'Ngoai troi - Khu E', NULL, 'Occupied', NOW(), NOW());
 
 INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan, TrangThai) VALUES
 ('QR012', 'B012', 'http://localhost:5173/ban/B012', '2027-12-31 23:59:59', 'Active'),
 ('QR013', 'B013', 'http://localhost:5173/ban/B013', '2027-12-31 23:59:59', 'Active'),
-('QR014', 'B014', 'http://localhost:5173/ban/B014', '2027-12-31 23:59:59', 'Inactive');
+('QR014', 'B014', 'http://localhost:5173/ban/B014', '2027-12-31 23:59:59', 'Inactive'),
+
+-- QR Trong nha / Tang 2 / Tang 3 (B015-B038)
+('QR015', 'B015', 'http://localhost:5173/ban/B015', '2027-12-31 23:59:59', 'Active'),
+('QR016', 'B016', 'http://localhost:5173/ban/B016', '2027-12-31 23:59:59', 'Active'),
+('QR017', 'B017', 'http://localhost:5173/ban/B017', '2027-12-31 23:59:59', 'Active'),
+('QR018', 'B018', 'http://localhost:5173/ban/B018', '2027-12-31 23:59:59', 'Active'),
+('QR019', 'B019', 'http://localhost:5173/ban/B019', '2027-12-31 23:59:59', 'Active'),
+('QR020', 'B020', 'http://localhost:5173/ban/B020', '2027-12-31 23:59:59', 'Active'),
+('QR021', 'B021', 'http://localhost:5173/ban/B021', '2027-12-31 23:59:59', 'Active'),
+('QR022', 'B022', 'http://localhost:5173/ban/B022', '2027-12-31 23:59:59', 'Active'),
+('QR023', 'B023', 'http://localhost:5173/ban/B023', '2027-12-31 23:59:59', 'Active'),
+('QR024', 'B024', 'http://localhost:5173/ban/B024', '2027-12-31 23:59:59', 'Active'),
+('QR025', 'B025', 'http://localhost:5173/ban/B025', '2027-12-31 23:59:59', 'Active'),
+('QR026', 'B026', 'http://localhost:5173/ban/B026', '2027-12-31 23:59:59', 'Active'),
+('QR027', 'B027', 'http://localhost:5173/ban/B027', '2027-12-31 23:59:59', 'Active'),
+('QR028', 'B028', 'http://localhost:5173/ban/B028', '2027-12-31 23:59:59', 'Active'),
+('QR029', 'B029', 'http://localhost:5173/ban/B029', '2027-12-31 23:59:59', 'Active'),
+('QR030', 'B030', 'http://localhost:5173/ban/B030', '2027-12-31 23:59:59', 'Active'),
+('QR031', 'B031', 'http://localhost:5173/ban/B031', '2027-12-31 23:59:59', 'Active'),
+('QR032', 'B032', 'http://localhost:5173/ban/B032', '2027-12-31 23:59:59', 'Active'),
+('QR033', 'B033', 'http://localhost:5173/ban/B033', '2027-12-31 23:59:59', 'Active'),
+('QR034', 'B034', 'http://localhost:5173/ban/B034', '2027-12-31 23:59:59', 'Active'),
+('QR035', 'B035', 'http://localhost:5173/ban/B035', '2027-12-31 23:59:59', 'Active'),
+('QR036', 'B036', 'http://localhost:5173/ban/B036', '2027-12-31 23:59:59', 'Active'),
+('QR037', 'B037', 'http://localhost:5173/ban/B037', '2027-12-31 23:59:59', 'Active'),
+('QR038', 'B038', 'http://localhost:5173/ban/B038', '2027-12-31 23:59:59', 'Active'),
+
+-- QR Khu rieng / VIP (B039-B048)
+('QR039', 'B039', 'http://localhost:5173/ban/B039', '2027-12-31 23:59:59', 'Active'),
+('QR040', 'B040', 'http://localhost:5173/ban/B040', '2027-12-31 23:59:59', 'Active'),
+('QR041', 'B041', 'http://localhost:5173/ban/B041', '2027-12-31 23:59:59', 'Active'),
+('QR042', 'B042', 'http://localhost:5173/ban/B042', '2027-12-31 23:59:59', 'Active'),
+('QR043', 'B043', 'http://localhost:5173/ban/B043', '2027-12-31 23:59:59', 'Active'),
+('QR044', 'B044', 'http://localhost:5173/ban/B044', '2027-12-31 23:59:59', 'Active'),
+('QR045', 'B045', 'http://localhost:5173/ban/B045', '2027-12-31 23:59:59', 'Active'),
+('QR046', 'B046', 'http://localhost:5173/ban/B046', '2027-12-31 23:59:59', 'Active'),
+('QR047', 'B047', 'http://localhost:5173/ban/B047', '2027-12-31 23:59:59', 'Active'),
+('QR048', 'B048', 'http://localhost:5173/ban/B048', '2027-12-31 23:59:59', 'Active'),
+
+-- QR Ngoai troi (B049-B063)
+('QR049', 'B049', 'http://localhost:5173/ban/B049', '2027-12-31 23:59:59', 'Active'),
+('QR050', 'B050', 'http://localhost:5173/ban/B050', '2027-12-31 23:59:59', 'Active'),
+('QR051', 'B051', 'http://localhost:5173/ban/B051', '2027-12-31 23:59:59', 'Active'),
+('QR052', 'B052', 'http://localhost:5173/ban/B052', '2027-12-31 23:59:59', 'Active'),
+('QR053', 'B053', 'http://localhost:5173/ban/B053', '2027-12-31 23:59:59', 'Active'),
+('QR054', 'B054', 'http://localhost:5173/ban/B054', '2027-12-31 23:59:59', 'Active'),
+('QR055', 'B055', 'http://localhost:5173/ban/B055', '2027-12-31 23:59:59', 'Active'),
+('QR056', 'B056', 'http://localhost:5173/ban/B056', '2027-12-31 23:59:59', 'Active'),
+('QR057', 'B057', 'http://localhost:5173/ban/B057', '2027-12-31 23:59:59', 'Active'),
+('QR058', 'B058', 'http://localhost:5173/ban/B058', '2027-12-31 23:59:59', 'Active'),
+('QR059', 'B059', 'http://localhost:5173/ban/B059', '2027-12-31 23:59:59', 'Active'),
+('QR060', 'B060', 'http://localhost:5173/ban/B060', '2027-12-31 23:59:59', 'Active'),
+('QR061', 'B061', 'http://localhost:5173/ban/B061', '2027-12-31 23:59:59', 'Active'),
+('QR062', 'B062', 'http://localhost:5173/ban/B062', '2027-12-31 23:59:59', 'Active'),
+('QR063', 'B063', 'http://localhost:5173/ban/B063', '2027-12-31 23:59:59', 'Active');
 
 INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai) VALUES
 ('VIP25', 'Uu dai VIP 25%', 25, 'PhanTram', 90000, 250000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 60 DAY), 200, 15, 'Active'),
@@ -616,17 +732,17 @@ INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, D
 ('DH004', 'KH003', 'B003', 'B003', 'NV004', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 110000, 'Preparing', 'QRCode', 'Khach tai ban goi them mon va nuoc.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)),
 ('DH005', 'KH006', 'B009', 'B009', 'NV002', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 351000, 'Ready', 'QRCode', 'Khach yeu cau xuat hoa don tai ban.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 70 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 8 MINUTE)),
 ('DH006', 'KH007', 'B011', 'B011', 'NV005', 'DB005', 'TAI_QUAN', NULL, NULL, NULL, 0, 205000, 'Served', 'DatBan', 'Da phuc vu xong mon chinh, cho danh gia.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 MINUTE)),
-('DH007', 'KH006', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '11:30:00', NULL, 0, 210000, 'Paid', 'Online', 'Khach dat pickup cho buoi trua.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:45:00')),
-('DH008', 'KH008', NULL, NULL, 'NV005', NULL, 'MANG_VE_GIAO_HANG', '12 Nguyen Hue, Quan 1, TP.HCM', NULL, '19:10:00', 15000, 168000, 'Paid', 'Online', 'Giao tan noi trong khung toi.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:40:00')),
-('DH009', 'KH009', NULL, NULL, 'NV007', NULL, 'MANG_VE_GIAO_HANG', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '18:20:00', 15000, 115000, 'Cancelled', 'Online', 'Khach huy don sau khi tai xe chua nhan.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
+('DH007', 'KH006', NULL, NULL, 'NV003', NULL, 'TAI_QUAN', NULL, '11:30:00', NULL, 0, 210000, 'Paid', 'Online', 'Khach dat pickup cho buoi trua.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:45:00')),
+('DH008', 'KH008', NULL, NULL, 'NV005', NULL, 'TAI_QUAN', '12 Nguyen Hue, Quan 1, TP.HCM', NULL, '19:10:00', 15000, 168000, 'Paid', 'Online', 'Giao tan noi trong khung toi.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:40:00')),
+('DH009', 'KH009', NULL, NULL, 'NV007', NULL, 'TAI_QUAN', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '18:20:00', 15000, 115000, 'Cancelled', 'Online', 'Khach huy don sau khi tai xe chua nhan.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
 ('DH010', 'KH002', 'B001', NULL, 'NV003', NULL, 'TAI_QUAN', NULL, NULL, NULL, 0, 147000, 'Paid', 'TaiQuay', 'Khach an tai quan vao gio trua.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:10:00')),
-('DH011', 'KH001', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '18:40:00', NULL, 0, 188000, 'Paid', 'Online', 'Don pickup buoi toi cho gia dinh.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:45:00')),
-('DH012', 'KH006', NULL, NULL, 'NV002', NULL, 'MANG_VE_GIAO_HANG', '45 Le Loi, Quan 1, TP.HCM', NULL, '19:00:00', 20000, 307000, 'Paid', 'Online', 'Don giao hang VIP da ap dung uu dai.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:30:00')),
+('DH011', 'KH001', NULL, NULL, 'NV003', NULL, 'TAI_QUAN', NULL, '18:40:00', NULL, 0, 188000, 'Paid', 'Online', 'Don pickup buoi toi cho gia dinh.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:45:00')),
+('DH012', 'KH006', NULL, NULL, 'NV002', NULL, 'TAI_QUAN', '45 Le Loi, Quan 1, TP.HCM', NULL, '19:00:00', 20000, 307000, 'Paid', 'Online', 'Don giao hang VIP da ap dung uu dai.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:30:00')),
 ('DH013', 'KH001', 'B013', 'B013', 'NV005', 'DB014', 'TAI_BAN', NULL, NULL, NULL, 0, 105000, 'Pending', 'QRCode', 'Order tai quay bar vua tao, dang cho bep tiep nhan.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 MINUTE)),
 ('DH014', 'KH008', 'B012', 'B012', 'NV002', 'DB016', 'TAI_QUAN', NULL, NULL, NULL, 0, 268000, 'Paid', 'DatBan', 'Khach dung bua trua va thanh toan tron ven.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '12:18:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:42:00')),
 ('DH015', 'KH006', 'B005', 'B005', 'NV002', 'DB018', 'TAI_QUAN', NULL, NULL, NULL, 0, 394000, 'Paid', 'DatBan', 'Tiec VIP da phuc vu xong, doanh thu cao.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:10:00')),
-('DH016', 'KH007', NULL, NULL, 'NV003', NULL, 'MANG_VE_PICKUP', NULL, '18:10:00', NULL, 0, 172000, 'Paid', 'Online', 'Khach pickup buoi toi, co mua them trang mieng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
-('DH017', 'KH009', NULL, NULL, 'NV005', NULL, 'MANG_VE_GIAO_HANG', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '19:45:00', 15000, 226000, 'Paid', 'Online', 'Don giao hang buoi toi trong noi thanh.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
+('DH016', 'KH007', NULL, NULL, 'NV003', NULL, 'TAI_QUAN', NULL, '18:10:00', NULL, 0, 172000, 'Paid', 'Online', 'Khach pickup buoi toi, co mua them trang mieng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
+('DH017', 'KH009', NULL, NULL, 'NV005', NULL, 'TAI_QUAN', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '19:45:00', 15000, 226000, 'Paid', 'Online', 'Don giao hang buoi toi trong noi thanh.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
 ('DH018', 'KH001', 'B002', 'B002', 'NV003', 'DB006', 'TAI_QUAN', NULL, NULL, NULL, 0, 184000, 'Pending', 'DatBan', 'Booking trua dang cho bep tiep nhan.', TIMESTAMP(CURRENT_DATE(), '11:35:00'), TIMESTAMP(CURRENT_DATE(), '11:40:00')),
 ('DH019', 'KH008', 'B009', 'B009', 'NV005', 'DB020', 'TAI_QUAN', NULL, NULL, NULL, 0, 312000, 'Paid', 'DatBan', 'Khach toi cuoi ngay da thanh toan ngay sau bua toi.', TIMESTAMP(CURRENT_DATE(), '19:18:00'), TIMESTAMP(CURRENT_DATE(), '20:48:00'));
 
@@ -704,7 +820,7 @@ INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAn
 ('DG002', 'KH006', 'DH007', 4, 'Dong goi can than, den lay hang dung gio.', NULL, NULL, 3, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), 'Pending'),
 ('DG003', 'KH008', 'DH008', 2, 'Mon giao hoi nguoi va nuoc cham bi thieu.', 'Nha hang da lien he xin loi va gui uu dai cho don tiep theo.', NULL, 1, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:20:00'), 'Rejected'),
 ('DG004', 'KH002', 'DH010', 5, 'Com rang vua vi, phuc vu nhanh vao gio cao diem.', NULL, '["/uploads/reviews/dg004-1.jpg"]', 8, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:00:00'), 'Approved'),
-('DG005', 'KH001', 'DH011', 4, 'Combo pickup tien, do an van nong khi mang ve nha.', NULL, NULL, 5, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), 'Approved'),
+('DG005', 'KH001', 'DH011', 4, 'Combo pickup tien, do an van nong.', NULL, NULL, 5, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), 'Approved'),
 ('DG006', 'KH006', 'DH012', 5, 'Giao hang dung gio, tai xe goi truoc rat chuyen nghiep.', 'Cam on quy khach, hen gap lai o don tiep theo.', '["/uploads/reviews/dg006-1.jpg","/uploads/reviews/dg006-2.jpg"]', 15, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 19 DAY), '20:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 19 DAY), '20:40:00'), 'Approved'),
 ('DG007', 'KH008', 'DH014', 5, 'Bua trua rat on, mon nuong va salad can bang, ra mon nhanh.', NULL, NULL, 6, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '15:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '15:00:00'), 'Approved'),
 ('DG008', 'KH006', 'DH015', 5, 'Phong VIP rieng tu, lau len nong va phuc vu chu dao.', 'Cam on quy khach da tin tuong dat tiec nho tai nha hang.', NULL, 11, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '22:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '22:15:00'), 'Approved'),
@@ -867,7 +983,12 @@ SET SoDiemTruoc = 150,
     NgayTao = TIMESTAMP(CURRENT_DATE(), '18:45:00')
 WHERE MaGiaoDichDiem = 'LSD002';
 
-UPDATE Ban SET TrangThai = 'Available' WHERE MaBan IN ('B001', 'B004', 'B006', 'B008', 'B010');
-UPDATE Ban SET TrangThai = 'Reserved' WHERE MaBan IN ('B002', 'B005', 'B009', 'B012', 'B014');
-UPDATE Ban SET TrangThai = 'Occupied' WHERE MaBan IN ('B003', 'B011', 'B013');
-UPDATE Ban SET TrangThai = 'Maintenance' WHERE MaBan = 'B007';
+UPDATE Ban SET TrangThai = 'Available' WHERE MaBan IN ('B001', 'B004', 'B008', 'B010', 'B016', 'B018', 'B020', 'B022', 'B025', 'B028', 'B030', 'B032', 'B034', 'B036', 'B038', 'B041', 'B042', 'B045', 'B047', 'B049', 'B051', 'B053', 'B055', 'B057', 'B059');
+UPDATE Ban SET TrangThai = 'Reserved' WHERE MaBan IN ('B002', 'B005', 'B009', 'B012', 'B014', 'B015', 'B019', 'B024', 'B027', 'B031', 'B035', 'B040', 'B044', 'B048', 'B052', 'B056', 'B060');
+UPDATE Ban SET TrangThai = 'Occupied' WHERE MaBan IN ('B003', 'B011', 'B013', 'B017', 'B021', 'B026', 'B029', 'B033', 'B039', 'B043', 'B046', 'B050', 'B054', 'B058', 'B063');
+UPDATE Ban SET TrangThai = 'Maintenance' WHERE MaBan IN ('B007', 'B023', 'B037', 'B061');
+
+-- ============================================================
+-- ADD ChiTietMonAn column to DatBan for menu items in booking
+-- ============================================================
+ALTER TABLE DatBan ADD COLUMN ChiTietMonAn JSON AFTER KhuVucUuTien;

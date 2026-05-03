@@ -1,4 +1,8 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { AuthService } from '../auth/auth.service';
 import { DonHangPricingService } from './don-hang-pricing.service';
@@ -13,7 +17,11 @@ export class DonHangQueryService {
     private readonly donHangPricingService: DonHangPricingService,
   ) {}
 
-  private taoPhanHoi(duLieu: unknown, thongDiep = 'Thanh cong', meta: unknown = null) {
+  private taoPhanHoi(
+    duLieu: unknown,
+    thongDiep = 'Thanh cong',
+    meta: unknown = null,
+  ) {
     return { success: true, data: duLieu, message: thongDiep, meta };
   }
 
@@ -24,7 +32,10 @@ export class DonHangQueryService {
   }
 
   private async layKhachHangTheoMaNd(maND: string) {
-    const danhSach = await this.mysql.truyVan('SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1', [maND]);
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1',
+      [maND],
+    );
     return danhSach[0] || null;
   }
 
@@ -65,36 +76,46 @@ export class DonHangQueryService {
     }
 
     const chiTiet = await this.layChiTietDonHangTheoMa(maDonHang);
-    const pricingSummary = this.donHangPricingService.taoPricingSummaryTuDuLieuDonHang(donHang, chiTiet);
-    return this.taoPhanHoi({
-      donHang: {
-        maDonHang: donHang.MaDonHang,
-        maKH: donHang.MaKH,
-        maBan: donHang.MaBan || donHang.MaBanAn,
-        maNV: donHang.MaNV,
-        maDatBan: donHang.MaDatBan,
-        tongTien: Number(donHang.TongTien || 0),
-        pricingSummary,
-        voucher: this.donHangPricingService.taoVoucherResponse({}, pricingSummary.giamGia),
-        trangThai: donHang.TrangThai,
-        ghiChu: donHang.GhiChu || '',
-        ngayTao: donHang.NgayTao,
-        loaiDon: donHang.LoaiDon,
-        thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
+    const pricingSummary =
+      this.donHangPricingService.taoPricingSummaryTuDuLieuDonHang(
+        donHang,
+        chiTiet,
+      );
+    return this.taoPhanHoi(
+      {
+        donHang: {
+          maDonHang: donHang.MaDonHang,
+          maKH: donHang.MaKH,
+          maBan: donHang.MaBan || donHang.MaBanAn,
+          maNV: donHang.MaNV,
+          maDatBan: donHang.MaDatBan,
+          tongTien: Number(donHang.TongTien || 0),
+          pricingSummary,
+          voucher: this.donHangPricingService.taoVoucherResponse(
+            {},
+            pricingSummary.giamGia,
+          ),
+          trangThai: donHang.TrangThai,
+          ghiChu: donHang.GhiChu || '',
+          ngayTao: donHang.NgayTao,
           loaiDon: donHang.LoaiDon,
+          thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
+            loaiDon: donHang.LoaiDon,
+            diaChiGiao: donHang.DiaChiGiao || '',
+            gioLayHang: donHang.GioLayHang || '',
+            gioGiao: donHang.GioGiao || '',
+          }),
           diaChiGiao: donHang.DiaChiGiao || '',
-          gioLayHang: donHang.GioLayHang || '',
-          gioGiao: donHang.GioGiao || '',
-        }),
-        diaChiGiao: donHang.DiaChiGiao || '',
-        phiShip: Number(donHang.PhiShip || 0),
-        tenKhachHang: donHang.TenKH || '',
-        soDienThoai: donHang.SDT || '',
-        email: donHang.Email || '',
-        diaChiKhachHang: donHang.DiaChi || '',
+          phiShip: Number(donHang.PhiShip || 0),
+          tenKhachHang: donHang.TenKH || '',
+          soDienThoai: donHang.SDT || '',
+          email: donHang.Email || '',
+          diaChiKhachHang: donHang.DiaChi || '',
+        },
+        chiTiet,
       },
-      chiTiet,
-    }, 'Lay chi tiet don hang thanh cong');
+      'Lay chi tiet don hang thanh cong',
+    );
   }
 
   async layDanhSachDonHang(dauTrang?: string) {
@@ -108,62 +129,82 @@ export class DonHangQueryService {
        ORDER BY dh.NgayTao DESC`,
     );
 
-    const ketQua = await Promise.all(danhSach.map(async (don) => {
-      const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
-      const pricingSummary = this.donHangPricingService.taoPricingSummaryTuDuLieuDonHang(don, chiTiet);
-      return {
-        maDonHang: don.MaDonHang,
-        maKH: don.MaKH,
-        maBan: don.MaBan || don.MaBanAn,
-        maNV: don.MaNV,
-        maDatBan: don.MaDatBan,
-        tongTien: Number(don.TongTien || 0),
-        pricingSummary,
-        voucher: this.donHangPricingService.taoVoucherResponse({}, pricingSummary.giamGia),
-        trangThai: don.TrangThai,
-        ghiChu: don.GhiChu || '',
-        ngayTao: don.NgayTao,
-        loaiDon: don.LoaiDon,
-        thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
+    const ketQua = await Promise.all(
+      danhSach.map(async (don) => {
+        const chiTiet = await this.layChiTietDonHangTheoMa(
+          String(don.MaDonHang),
+        );
+        const pricingSummary =
+          this.donHangPricingService.taoPricingSummaryTuDuLieuDonHang(
+            don,
+            chiTiet,
+          );
+        return {
+          maDonHang: don.MaDonHang,
+          maKH: don.MaKH,
+          maBan: don.MaBan || don.MaBanAn,
+          maNV: don.MaNV,
+          maDatBan: don.MaDatBan,
+          tongTien: Number(don.TongTien || 0),
+          pricingSummary,
+          voucher: this.donHangPricingService.taoVoucherResponse(
+            {},
+            pricingSummary.giamGia,
+          ),
+          trangThai: don.TrangThai,
+          ghiChu: don.GhiChu || '',
+          ngayTao: don.NgayTao,
           loaiDon: don.LoaiDon,
+          thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
+            loaiDon: don.LoaiDon,
+            diaChiGiao: don.DiaChiGiao || '',
+            gioLayHang: don.GioLayHang || '',
+            gioGiao: don.GioGiao || '',
+          }),
           diaChiGiao: don.DiaChiGiao || '',
-          gioLayHang: don.GioLayHang || '',
-          gioGiao: don.GioGiao || '',
-        }),
-        diaChiGiao: don.DiaChiGiao || '',
-        phiShip: Number(don.PhiShip || 0),
-        tenKhachHang: don.TenKH || '',
-        soDienThoai: don.SDT || '',
-        email: don.Email || '',
-        diaChiKhachHang: don.DiaChi || '',
-        chiTiet,
-      };
-    }));
+          phiShip: Number(don.PhiShip || 0),
+          tenKhachHang: don.TenKH || '',
+          soDienThoai: don.SDT || '',
+          email: don.Email || '',
+          diaChiKhachHang: don.DiaChi || '',
+          chiTiet,
+        };
+      }),
+    );
 
     return this.taoPhanHoi(ketQua, 'Lay danh sach don hang thanh cong');
   }
 
   async layDonHangCuaToi(dauTrang?: string) {
     const thongTinToken = this.authService.giaiMaNguoiDung(dauTrang);
-    const khachHang = await this.layKhachHangTheoMaNd(String(thongTinToken.maND));
+    const khachHang = await this.layKhachHangTheoMaNd(
+      String(thongTinToken.maND),
+    );
     if (!khachHang) {
       return this.taoPhanHoi([], 'Khong co don hang');
     }
 
-    const danhSach = await this.mysql.truyVan('SELECT * FROM DonHang WHERE MaKH = ? ORDER BY NgayTao DESC', [khachHang.MaKH]);
-    const ketQua = await Promise.all(danhSach.map(async (don) => ({
-      maDonHang: don.MaDonHang,
-      tongTien: Number(don.TongTien || 0),
-      trangThai: don.TrangThai,
-      ngayTao: don.NgayTao,
-      chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
-    })));
+    const danhSach = await this.mysql.truyVan(
+      'SELECT * FROM DonHang WHERE MaKH = ? ORDER BY NgayTao DESC',
+      [khachHang.MaKH],
+    );
+    const ketQua = await Promise.all(
+      danhSach.map(async (don) => ({
+        maDonHang: don.MaDonHang,
+        tongTien: Number(don.TongTien || 0),
+        trangThai: don.TrangThai,
+        ngayTao: don.NgayTao,
+        chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
+      })),
+    );
     return this.taoPhanHoi(ketQua, 'Lay don hang cua toi thanh cong');
   }
 
   async layDonHangCoTheDanhGia(dauTrang?: string) {
     const thongTinToken = this.authService.giaiMaNguoiDung(dauTrang);
-    const khachHang = await this.layKhachHangTheoMaNd(String(thongTinToken.maND));
+    const khachHang = await this.layKhachHangTheoMaNd(
+      String(thongTinToken.maND),
+    );
     if (!khachHang) {
       return this.taoPhanHoi([], 'Khong co don hang co the danh gia');
     }
@@ -179,13 +220,15 @@ export class DonHangQueryService {
       [khachHang.MaKH],
     );
 
-    const ketQua = await Promise.all(danhSach.map(async (don) => ({
-      maDonHang: don.MaDonHang,
-      tongTien: Number(don.TongTien || 0),
-      trangThai: don.TrangThai,
-      ngayTao: don.NgayTao,
-      chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
-    })));
+    const ketQua = await Promise.all(
+      danhSach.map(async (don) => ({
+        maDonHang: don.MaDonHang,
+        tongTien: Number(don.TongTien || 0),
+        trangThai: don.TrangThai,
+        ngayTao: don.NgayTao,
+        chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
+      })),
+    );
 
     return this.taoPhanHoi(ketQua, 'Lay don hang co the danh gia thanh cong');
   }
@@ -193,16 +236,26 @@ export class DonHangQueryService {
   async layChiTietDonHang(dauTrang: string | undefined, maDonHang: string) {
     const thongTinToken = this.authService.giaiMaNguoiDung(dauTrang);
     const vaiTro = this.chuanHoaVaiTroNoiBo(String(thongTinToken.vaiTro || ''));
-    const [donHang] = await this.mysql.truyVan('SELECT MaKH FROM DonHang WHERE MaDonHang = ? LIMIT 1', [maDonHang]);
+    const [donHang] = await this.mysql.truyVan(
+      'SELECT MaKH FROM DonHang WHERE MaDonHang = ? LIMIT 1',
+      [maDonHang],
+    );
 
     if (!donHang) {
       throw new NotFoundException('Khong tim thay don hang.');
     }
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      const khachHang = await this.layKhachHangTheoMaNd(String(thongTinToken.maND));
-      if (!khachHang || String(khachHang.MaKH || '') !== String(donHang.MaKH || '')) {
-        throw new ForbiddenException('Ban khong co quyen xem chi tiet don hang nay.');
+      const khachHang = await this.layKhachHangTheoMaNd(
+        String(thongTinToken.maND),
+      );
+      if (
+        !khachHang ||
+        String(khachHang.MaKH || '') !== String(donHang.MaKH || '')
+      ) {
+        throw new ForbiddenException(
+          'Ban khong co quyen xem chi tiet don hang nay.',
+        );
       }
     }
 

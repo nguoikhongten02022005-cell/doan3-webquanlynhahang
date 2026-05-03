@@ -82,6 +82,21 @@ const chuanHoaDatBanPayload = (payload = {}) => ({
   ghiChu: payload.ghiChu || payload.notes || '',
   khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
   ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
+  chiTietMonAn: Array.isArray(payload.chiTietMonAn)
+    ? payload.chiTietMonAn.map((mon) => ({
+        id: mon.id,
+        tenMon: mon.tenMon,
+        gia: mon.gia,
+        soLuong: mon.quantity ?? mon.soLuong ?? 1,
+      }))
+    : Array.isArray(payload.selectedMenuItems)
+    ? payload.selectedMenuItems.map((mon) => ({
+        id: mon.id,
+        tenMon: mon.tenMon,
+        gia: mon.gia,
+        soLuong: mon.quantity || 1,
+      }))
+    : null,
 })
 
 export const layDanhSachDatBanApi = async () => {

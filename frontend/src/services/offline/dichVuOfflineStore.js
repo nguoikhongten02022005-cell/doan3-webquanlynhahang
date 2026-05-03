@@ -432,11 +432,9 @@ export const timBanOfflineTheoMa = (maBan) => docDuLieuOffline((state) => state.
 export const timDanhGiaOfflineTheoMa = (maDanhGia) => docDuLieuOffline((state) => state.danhGia.find((review) => String(review.maDanhGia || '') === String(maDanhGia || '')) || null)
 
 export const layLichSuDatBanTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.lichSuDatBanTheoKhachHang?.[String(maKH || '')] || []))
-export const layDonHangHoSoTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.donHangHoSoTheoKhachHang?.[String(maKH || '')] || []))
+
 export const layTongQuanDiemTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.tongQuanDiemTichLuyTheoKhachHang?.[String(maKH || '')] || { maKH, tongDiem: 0, diemCoTheDoi: 0, tiLeQuyDoi: 1000 }))
 export const layLichSuDiemTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.lichSuDiemTichLuyTheoKhachHang?.[String(maKH || '')] || []))
-export const layDanhSachDonMangVeChoNoiBoOffline = () => docDuLieuOffline((state) => taoDanhSachDonMangVeChoNoiBoTuDonHang(state.donHang))
-
 export const taoMaDatBanMoiOffline = () => {
   const danhSach = layDanhSachDatBanOffline()
   const soLonNhat = sapXepSoTangDan(danhSach.map((booking) => String(booking.bookingCode || booking.id || '').match(MA_DON_REGEX)?.[0]))[0] || 1
@@ -483,37 +481,6 @@ export const layThucDonTheoBanOffline = (maBan) => ({
   ban: timBanOfflineTheoMa(maBan),
   data: layDanhSachMonOffline(),
 })
-
-export const taoDanhSachDonMangVeChoNoiBoTuDonHang = (orders) => orders
-  .filter((order) => order.loaiDon === 'MANG_VE_PICKUP' || order.loaiDon === 'MANG_VE_GIAO_HANG')
-  .map((order) => ({
-    maDonHang: order.maDonHang,
-    MaDonHang: order.maDonHang,
-    maKH: order.maKH,
-    MaKH: order.maKH,
-    hoTen: order.customer?.fullName || '',
-    HoTen: order.customer?.fullName || '',
-    soDienThoai: order.customer?.phone || '',
-    SoDienThoai: order.customer?.phone || '',
-    loaiDon: order.loaiDon,
-    LoaiDon: order.loaiDon,
-    gioLayHang: order.thongTinNhanHang?.gioLayHang || '',
-    GioLayHang: order.thongTinNhanHang?.gioLayHang || '',
-    gioGiao: order.thongTinNhanHang?.gioGiao || '',
-    GioGiao: order.thongTinNhanHang?.gioGiao || '',
-    diaChiGiao: order.customer?.address || order.diaChiGiao || '',
-    DiaChiGiao: order.customer?.address || order.diaChiGiao || '',
-    phiShip: Number(order.phiShip || 0),
-    PhiShip: Number(order.phiShip || 0),
-    tongTien: Number(order.tongTien || 0),
-    TongTien: Number(order.tongTien || 0),
-    trangThai: order.trangThai,
-    TrangThai: order.trangThai,
-    ngayTao: order.ngayTao,
-    NgayTao: order.ngayTao,
-    danhSachMon: deepClone(order.danhSachMon || []),
-    DanhSachMon: deepClone(order.danhSachMon || []),
-  }))
 
 export const taoThongTinQrBanOffline = (maBan) => {
   const table = timBanOfflineTheoMa(maBan)
@@ -844,6 +811,16 @@ export const taoHoacCapNhatDatBanOffline = ({ booking, maDatBan }) => {
       NgayCapNhat: new Date().toISOString(),
       source: booking.nguonTao || booking.source || 'web',
       createdBy: booking.createdBy || '',
+      chiTietMonAn: Array.isArray(booking.chiTietMonAn)
+        ? booking.chiTietMonAn
+        : Array.isArray(booking.selectedMenuItems)
+        ? booking.selectedMenuItems
+        : mucHienTai.chiTietMonAn || [],
+      ChiTietMonAn: Array.isArray(booking.chiTietMonAn)
+        ? JSON.stringify(booking.chiTietMonAn)
+        : Array.isArray(booking.selectedMenuItems)
+        ? JSON.stringify(booking.selectedMenuItems)
+        : mucHienTai.ChiTietMonAn || null,
     }
 
     if (index >= 0) {

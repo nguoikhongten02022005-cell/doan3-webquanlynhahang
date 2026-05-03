@@ -23,6 +23,13 @@ export default defineConfig(({ mode }) => {
       host: '0.0.0.0',
       port: congFrontend,
       open: true,
+      proxy: {
+        '/api': {
+          target: 'http://localhost:5011',
+          changeOrigin: true,
+          secure: false,
+        },
+      },
     },
     build: {
       outDir: path.resolve(thuMucGoc, 'dist'),

@@ -3,6 +3,9 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 
 type BanGhi = Record<string, any>;
 
+const TI_LE_QUY_DOI_DIEM = 100;
+const GIA_TRI_QUY_DOI = 10000;
+
 @Injectable()
 export class DonHangPricingService {
   constructor(private readonly mysql: MySqlService) {}
@@ -14,8 +17,13 @@ export class DonHangPricingService {
       tenGiamGia: String(payload.tenGiamGia || payload.tenCode || '').trim(),
       loaiGiam: String(payload.loaiGiam || '').trim(),
       giaTriGiam: Number(payload.giaTriGiam || payload.giaTri || 0),
-      giamToiDa: payload.giamToiDa == null && payload.giaTriToiDa == null ? null : Number(payload.giamToiDa ?? payload.giaTriToiDa),
-      dieuKienToiThieu: Number(payload.dieuKienToiThieu || payload.donHangToiThieu || 0),
+      giamToiDa:
+        payload.giamToiDa == null && payload.giaTriToiDa == null
+          ? null
+          : Number(payload.giamToiDa ?? payload.giaTriToiDa),
+      dieuKienToiThieu: Number(
+        payload.dieuKienToiThieu || payload.donHangToiThieu || 0,
+      ),
       soTienGiamThucTe: Number(soTienGiamThucTe || 0),
       thongDiep: String(payload.thongDiep || payload.moTa || '').trim(),
     };
@@ -31,11 +39,16 @@ export class DonHangPricingService {
   }
 
   tinhPhiDichVuTheoTamTinh(tamTinh: number) {
-    return tamTinh > 0 ? Math.round((Number(tamTinh || 0) * 0.05) / 1000) * 1000 : 0;
+    return tamTinh > 0
+      ? Math.round((Number(tamTinh || 0) * 0.05) / 1000) * 1000
+      : 0;
   }
 
   tinhTongTamTinhTuChiTiet(chiTiet: BanGhi[]) {
-    return chiTiet.reduce((tong, muc) => tong + Number(muc.ThanhTien || muc.thanhTien || 0), 0);
+    return chiTiet.reduce(
+      (tong, muc) => tong + Number(muc.ThanhTien || muc.thanhTien || 0),
+      0,
+    );
   }
 
   taoPricingSummary(tamTinh: number, phiShip = 0, giamGia = 0, phiDichVu = 0) {
@@ -44,7 +57,13 @@ export class DonHangPricingService {
       giamGia: Number(giamGia || 0),
       phiDichVu: Number(phiDichVu || 0),
       phiShip: Number(phiShip || 0),
-      tongTien: Math.max(0, Number(tamTinh || 0) + Number(phiDichVu || 0) + Number(phiShip || 0) - Number(giamGia || 0)),
+      tongTien: Math.max(
+        0,
+        Number(tamTinh || 0) +
+          Number(phiDichVu || 0) +
+          Number(phiShip || 0) -
+          Number(giamGia || 0),
+      ),
     };
   }
 
@@ -64,7 +83,10 @@ export class DonHangPricingService {
       return this.taoVoucherResponse();
     }
 
-    const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    const [ma] = await this.mysql.truyVan(
+      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
+      [maCode],
+    );
     if (!ma) {
       throw new BadRequestException('Ma giam gia khong ton tai.');
     }
@@ -72,24 +94,49 @@ export class DonHangPricingService {
       throw new BadRequestException('Ma giam gia khong con hieu luc.');
     }
     if (tongTien < Number(ma.DonHangToiThieu || 0)) {
-      throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
+      throw new BadRequestException(
+        'Don hang chua du dieu kien ap dung ma giam gia.',
+      );
     }
 
     const laPhanTram = String(ma.LoaiGiam || '').toLowerCase() === 'phantram';
     const giaTriGiam = Number(ma.GiaTri || 0);
     const giamToiDa = ma.GiaTriToiDa == null ? null : Number(ma.GiaTriToiDa);
-    const soTienGiamTamTinh = laPhanTram ? Math.round((tongTien * giaTriGiam) / 100) : giaTriGiam;
-    const soTienGiamThucTe = giamToiDa == null ? soTienGiamTamTinh : Math.min(soTienGiamTamTinh, giamToiDa);
+    const soTienGiamTamTinh = laPhanTram
+      ? Math.round((tongTien * giaTriGiam) / 100)
+      : giaTriGiam;
+    const soTienGiamThucTe =
+      giamToiDa == null
+        ? soTienGiamTamTinh
+        : Math.min(soTienGiamTamTinh, giamToiDa);
 
-    return this.taoVoucherResponse({
-      maGiamGia: ma.MaCode,
-      tenGiamGia: ma.TenCode,
-      loaiGiam: ma.LoaiGiam,
-      giaTriGiam,
-      giamToiDa,
-      dieuKienToiThieu: Number(ma.DonHangToiThieu || 0),
-      thongDiep: '',
-    }, soTienGiamThucTe);
+    return this.taoVoucherResponse(
+      {
+        maGiamGia: ma.MaCode,
+        tenGiamGia: ma.TenCode,
+        loaiGiam: ma.LoaiGiam,
+        giaTriGiam,
+        giamToiDa,
+        dieuKienToiThieu: Number(ma.DonHangToiThieu || 0),
+        thongDiep: '',
+      },
+      soTienGiamThucTe,
+    );
+  }
+
+  tinhSoTienGiamTuDiem(soDiem: number): number {
+    if (!soDiem || soDiem <= 0) return 0;
+    return Math.floor(soDiem / TI_LE_QUY_DOI_DIEM) * GIA_TRI_QUY_DOI;
+  }
+
+  taoDiemResponse(soDiem: number, soTienGiam: number) {
+    return {
+      soDiem: Number(soDiem || 0),
+      soTienGiam: Number(soTienGiam || 0),
+      tiLeQuyDoi: TI_LE_QUY_DOI_DIEM,
+      giaTriQuyDoi: GIA_TRI_QUY_DOI,
+      thongDiep: soDiem > 0 ? `Đổi ${soDiem} điểm = ${soTienGiam.toLocaleString('vi-VN')}đ` : '',
+    };
   }
 
   async recalculateOrderPricing(payload: BanGhi, chiTietDauVao: BanGhi[]) {
@@ -97,7 +144,10 @@ export class DonHangPricingService {
     let tamTinh = 0;
 
     for (const muc of chiTietDauVao) {
-      const [mon] = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon]);
+      const [mon] = await this.mysql.truyVan(
+        'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
+        [muc.maMon],
+      );
       if (!mon) {
         throw new BadRequestException(`Mon ${muc.maMon} khong ton tai.`);
       }
@@ -117,9 +167,23 @@ export class DonHangPricingService {
 
     const phiShip = Number(payload.phiShip || 0);
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
-    const voucher = await this.layThongTinVoucherApDung(payload.maGiamGia, tamTinh + phiDichVu + phiShip);
-    const pricingSummary = this.taoPricingSummary(tamTinh, phiShip, voucher.soTienGiamThucTe, phiDichVu);
+    const voucher = await this.layThongTinVoucherApDung(
+      payload.maGiamGia,
+      tamTinh + phiDichVu + phiShip,
+    );
 
-    return { chiTietDaTinh, pricingSummary, voucher };
+    const soDiem = Number(payload.soDiem || 0);
+    const giamGiaTuDiem = this.tinhSoTienGiamTuDiem(soDiem);
+    const diemApDung = this.taoDiemResponse(soDiem, giamGiaTuDiem);
+
+    const tongGiamGia = voucher.soTienGiamThucTe + giamGiaTuDiem;
+    const pricingSummary = this.taoPricingSummary(
+      tamTinh,
+      phiShip,
+      tongGiamGia,
+      phiDichVu,
+    );
+
+    return { chiTietDaTinh, pricingSummary, voucher, diemApDung };
   }
 }
