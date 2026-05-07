@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Navigate } from 'react-router-dom'
+import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Alert, Col, ConfigProvider, Row } from 'antd'
 import '../theme/dat-ban.css'
 import {
@@ -13,7 +13,7 @@ import {
   SO_NGAY_TOI_DA_NHAN_DAT_BAN,
   SO_PHUT_TOI_THIEU_TRUOC_GIO_DAT_BAN,
   THU_DONG_CUA_DAT_BAN,
-} from '../features/datBan/mocks/duLieuDatBan'
+} from '../features/datBan/constants/duLieuDatBan'
 import { dinhDangNgayGio, layNhanChoNgoi } from '../features/noiBo/dinhDang'
 import { useDatBan } from '../features/datBan/hooks/useDatBan'
 import { useXacThuc } from '../hooks/useXacThuc'
@@ -276,6 +276,9 @@ const mapAreaLabel = (seatingArea) => {
 function DatBanPage() {
   const { nguoiDungHienTai, coTheVaoNoiBo, daDangNhap, dangKhoiTaoXacThuc } = useXacThuc()
   const { layBanNhapTam, luuBanNhapTam, xoaBanNhapTam, layBanPhuHopChoDatBan, taoDatBan, layDanhSachDatBanHost } = useDatBan()
+  const location = useLocation()
+  const navigate = useNavigate()
+  const rebookData = location.state?.rebook
 
   const [tables, setTables] = useState([])
   const [danhSachDatBanHienTai, setDanhSachDatBanHienTai] = useState([])
@@ -298,6 +301,24 @@ function DatBanPage() {
     setFormData(nextFormData)
     setDidBootstrapDraft(true)
   }, [layBanNhapTam, nguoiDungHienTai])
+
+  useEffect(() => {
+    if (!rebookData) return
+    const rebookForm = {
+      guests: rebookData.guests || '',
+      date: rebookData.date || '',
+      time: rebookData.time || '',
+      seatingArea: rebookData.seatingArea || 'KHONG_UU_TIEN',
+      occasion: rebookData.occasion || '',
+      notes: rebookData.notes || '',
+      name: rebookData.name || '',
+      phone: rebookData.phone || '',
+      email: rebookData.email || '',
+    }
+    setFormData(rebookForm)
+    xoaBanNhapTam()
+    navigate('.', { replace: true })
+  }, [rebookData, navigate, xoaBanNhapTam])
 
   useEffect(() => {
     let active = true
@@ -779,9 +800,9 @@ const handleSubmit = async () => {
         booking: {
           ...formData,
           maDatBan: confirmationPayload.bookingCode,
-          maKH: nguoiDungHienTai?.maKH || 'KH001',
+          maKH: nguoiDungHienTai?.maKH || '',
           maBan: maBanDuocChon,
-          maNV: 'NV002',
+          maNV: nguoiDungHienTai?.maND || '',
           ngayDat: formData.date,
           gioDat: formData.time,
           gioKetThuc: null,

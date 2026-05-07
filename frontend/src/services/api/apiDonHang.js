@@ -9,7 +9,7 @@ import {
   layDonHangCoTheDanhGiaOffline,
 } from '../offline/dichVuOfflineStore'
 import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
-import { chuanHoaPricingSummary, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
+import { chuanHoaTongHopGia, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
 
 const layGiaTri = (nguon, ...khoa) => {
   for (const key of khoa) {
@@ -39,7 +39,7 @@ const chuanHoaDonHang = (order) => {
 
   const items = chuanHoaDanhSachChiTiet(order.chiTiet || order.ChiTiet || order.items || order.Items)
 
-  const pricingSummary = chuanHoaPricingSummary(order.pricingSummary || order.PricingSummary || order)
+  const tongHopGia = chuanHoaTongHopGia(order.tongHopGia || order)
   const voucher = chuanHoaKetQuaVoucher(order.voucher || order.Voucher || {})
   const thongTinNhanHang = chuanHoaThongTinNhanHang(order.thongTinNhanHang || order.ThongTinNhanHang || order)
 
@@ -48,12 +48,12 @@ const chuanHoaDonHang = (order) => {
     id: layGiaTri(order, 'maDonHang', 'MaDonHang'),
     orderCode: layGiaTri(order, 'maDonHang', 'MaDonHang') || '',
     orderDate: layGiaTri(order, 'ngayTao', 'NgayTao') || '',
-    total: pricingSummary.tongTien,
-    subtotal: pricingSummary.tamTinh,
-    serviceFee: pricingSummary.phiDichVu,
-    shippingFee: pricingSummary.phiShip,
-    discountAmount: pricingSummary.giamGia,
-    pricingSummary,
+    total: tongHopGia.tongTien,
+    subtotal: tongHopGia.tamTinh,
+    serviceFee: tongHopGia.phiDichVu,
+    shippingFee: tongHopGia.phiShip,
+    discountAmount: tongHopGia.giamGia,
+    tongHopGia,
     voucher,
     thongTinNhanHang,
     paymentMethod: '',
@@ -63,8 +63,6 @@ const chuanHoaDonHang = (order) => {
     items,
   }
 }
-
-const chuanHoaDonHangHoSo = chuanHoaDonHang
 
 const chuanHoaChiTietResponse = (payload) => {
   if (!payload || typeof payload !== 'object') return null
@@ -79,10 +77,6 @@ const tachVaChuanHoa = (phanHoi) => ({
   duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDonHang).filter(Boolean) : chuanHoaDonHang(phanHoi.duLieu),
 })
 
-export const layDonHangCuaToiApi = async () => {
-  return { duLieu: [] }
-}
-
 export const layDonHangCoTheDanhGiaApi = async () => {
   if (!coSuDungMayChu()) {
     const maKH = layNguoiDungHienTai()?.maKH || ''
@@ -91,10 +85,6 @@ export const layDonHangCoTheDanhGiaApi = async () => {
 
   return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.get('/don-hang/co-the-danh-gia')))
 }
-
-export const layDanhSachDonHangHoSoApi = async () => layDonHangCuaToiApi()
-
-export const chuanHoaDonHangHoSoApi = chuanHoaDonHangHoSo
 
 const tachVaChuanHoaChiTiet = (phanHoi) => ({
   ...phanHoi,

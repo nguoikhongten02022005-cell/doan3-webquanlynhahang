@@ -3,7 +3,7 @@ export const SITE_CONTACT = {
   phoneHref: 'tel:02838256789',
   emailDisplay: 'hello@nguyenvi.vn',
   emailHref: 'mailto:hello@nguyenvi.vn',
-  address: '28 Nguyễn Huệ, Q.1, TP. HCM',
+  address: 'Khoái Châu, Hưng Yên',
   hours: [
     {
       label: 'Thứ 2 - Thứ 6',

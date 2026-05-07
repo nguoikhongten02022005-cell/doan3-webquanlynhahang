@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
-import { AuthService } from '../auth/auth.service';
+import { taoPhanHoi } from '../../common/phan-hoi';
 import { CapNhatMonDto } from './dto/cap-nhat-mon.dto';
 import { TaoMonDto } from './dto/tao-mon.dto';
 
@@ -28,16 +28,7 @@ interface ThucDonEntity {
 export class ThucDonService {
   constructor(
     private readonly mysql: MySqlService,
-    private readonly authService: AuthService,
   ) {}
-
-  taoPhanHoi(duLieu: unknown, thongDiep = 'Thanh cong', meta: unknown = null) {
-    return { success: true, data: duLieu, message: thongDiep, meta };
-  }
-
-  yeuCauQuyenQuanTri(authorization: string | undefined) {
-    return this.authService.yeuCauQuyenQuanTri(authorization);
-  }
 
   private chuanHoaChuoiKhongDau(giaTri: string) {
     return String(giaTri || '')
@@ -103,15 +94,13 @@ export class ThucDonService {
       ['Deleted'],
     )) as ThucDonEntity[];
 
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       danhSach.map((mon) => this.chuyenMonSangPhanHoi(mon)),
       'Lay thuc don thanh cong',
     );
   }
 
-  async taoMon(authorization: string | undefined, payload: TaoMonDto) {
-    this.yeuCauQuyenQuanTri(authorization);
-
+  async taoMon(payload: TaoMonDto) {
     const maMon = String(
       payload.maMon || `M_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
     ).trim();
@@ -151,19 +140,16 @@ export class ThucDonService {
       [maMon],
     )) as ThucDonEntity[];
 
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       this.chuyenMonSangPhanHoi(danhSach[0]),
       'Tao mon thanh cong',
     );
   }
 
   async capNhatMon(
-    authorization: string | undefined,
-    maMon: string,
+        maMon: string,
     payload: CapNhatMonDto,
   ) {
-    this.yeuCauQuyenQuanTri(authorization);
-
     const danhSachHienTai = (await this.mysql.truyVan(
       'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
       [maMon],
@@ -230,19 +216,17 @@ export class ThucDonService {
       'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
       [maMon],
     )) as ThucDonEntity[];
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       this.chuyenMonSangPhanHoi(danhSach[0]),
       'Cap nhat mon thanh cong',
     );
   }
 
-  async xoaMon(authorization: string | undefined, maMon: string) {
-    this.yeuCauQuyenQuanTri(authorization);
-
+  async xoaMon(maMon: string) {
     await this.mysql.thucThi(
       'UPDATE ThucDon SET TrangThai = ? WHERE MaMon = ?',
       ['Deleted', maMon],
     );
-    return this.taoPhanHoi({ maMon }, 'Xoa mon thanh cong');
+    return taoPhanHoi({ maMon }, 'Xoa mon thanh cong');
   }
 }

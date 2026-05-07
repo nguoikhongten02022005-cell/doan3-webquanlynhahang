@@ -26,13 +26,13 @@ import { chuanHoaNguoiDungApi } from '../../services/api/apiXacThuc'
 const chuanHoaDonHangNoiBo = (order) => {
   if (!order || typeof order !== 'object') return null
 
-  const pricingSummary = order.pricingSummary || order.PricingSummary || {}
+  const tongHopGia = order.tongHopGia || {}
   const tongTien = Number(
     order.total
     ?? order.tongTien
     ?? order.TongTien
-    ?? pricingSummary.tongTien
-    ?? pricingSummary.TongTien
+    ?? tongHopGia.tongTien
+    ?? tongHopGia.TongTien
     ?? 0,
   )
 

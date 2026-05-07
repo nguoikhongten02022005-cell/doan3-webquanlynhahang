@@ -1,4 +1,4 @@
-import { NHAN_KHU_VUC_DAT_BAN } from '../datBan/mocks/duLieuDatBan'
+import { NHAN_KHU_VUC_DAT_BAN } from '../datBan/constants/duLieuDatBan'
 import { laySacThaiDonHang as laySacThaiDonHangChuan } from '../../utils/donHang'
 
 export const dinhDangNgay = (giaTri) => {

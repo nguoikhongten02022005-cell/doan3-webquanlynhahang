@@ -65,7 +65,7 @@ function MonAnTab({ dishes: danhSachMonNguon, reloadDishes: taiLaiDanhSachMon, c
   const [nganKeoDangMo, datNganKeoDangMo] = useState(false)
   const [cheDoBieuMau, datCheDoBieuMau] = useState('create')
   const [idMonDangSua, datIdMonDangSua] = useState(null)
-  const [giaTriBieuMau, datGiaTriBieuMau] = useState(taoFormMacDinh)
+  const [giaTriBieuMau, datGiaTriBieuMau] = useState(taoFormMacDinh())
   const [loiBieuMau, datLoiBieuMau] = useState('')
   const [danhMucDangLoc, datDanhMucDangLoc] = useState('Tất cả')
   const [tuKhoaTimKiem, datTuKhoaTimKiem] = useState('')

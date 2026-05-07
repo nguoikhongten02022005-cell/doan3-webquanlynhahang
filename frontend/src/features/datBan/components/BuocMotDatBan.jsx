@@ -2,7 +2,7 @@ import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
   CAC_SO_KHACH_DAT_BAN,
   NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN,
-} from '../mocks/duLieuDatBan'
+} from '../constants/duLieuDatBan'
 import { Alert, Button, Card, Col, DatePicker, Row, Space, Tag, Typography } from 'antd'
 import dayjs from 'dayjs'
 
@@ -95,7 +95,7 @@ function BuocMotDatBan({
         <div style={{ marginTop: 16 }}>
           <Text strong>Xem lịch đầy đủ</Text>
           <div style={{ marginTop: 8 }}>
-            <DatePicker value={formData.date ? dayjs(formData.date) : null} format="DD/MM/YYYY" onChange={(value) => onDateInputChange({ target: { value: value ? value.format('YYYY-MM-DD') : '' } })} minDate={dayjs(minDate)} maxDate={dayjs(maxDate)} style={{ width: '100%' }} />
+            <DatePicker value={formData.date ? dayjs(formData.date, 'YYYY-MM-DD') : null} format="DD/MM/YYYY" onChange={(value) => onDateInputChange({ target: { value: value ? value.format('YYYY-MM-DD') : '' } })} minDate={dayjs(minDate, 'YYYY-MM-DD')} maxDate={dayjs(maxDate, 'YYYY-MM-DD')} style={{ width: '100%' }} />
           </div>
           <Text type="secondary">Chỉ nhận đặt bàn trong vòng 30 ngày tới.</Text>
         </div>

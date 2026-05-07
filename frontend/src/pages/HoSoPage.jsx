@@ -3,7 +3,7 @@ import { Tabs } from 'antd'
 import { Navigate, useNavigate } from 'react-router-dom'
 import LichSuDatBanTab from '../features/hoSo/components/LichSuDatBanTab'
 import ThongTinCaNhanTab from '../features/hoSo/components/ThongTinCaNhanTab'
-import { PROFILE_TABS } from '../features/hoSo/mocks/duLieuHoSo'
+import { CAC_TAB_HO_SO } from '../features/hoSo/constants/cacTabHoSo'
 import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useDatBan } from '../features/datBan/hooks/useDatBan'
@@ -60,7 +60,7 @@ function HoSoPage() {
   }, [layLichSuDatBan, nguoiDungHienTai])
 
   const danhSachTabHoSo = useMemo(
-    () => PROFILE_TABS.map((tab) => ({ key: tab.key, label: tab.label })),
+    () => CAC_TAB_HO_SO.map((tab) => ({ key: tab.key, label: tab.label })),
     [],
   )
 
@@ -79,8 +79,13 @@ function HoSoPage() {
     }
   }
 
-  const handleHuyDatBan = async (maDatBan) => {
-    const xacNhan = window.confirm(`Bạn có chắc muốn hủy đặt bàn ${maDatBan}?`)
+  const handleHuyDatBan = async (maDatBan, trangThai) => {
+    const isDaXacNhan = trangThai === 'CONFIRMED' || trangThai === 'DA_XAC_NHAN'
+    const xacNhan = window.confirm(
+      isDaXacNhan
+        ? `Đơn ${maDatBan} đã được xác nhận. Hủy sát giờ có thể mất cọc. Bạn có chắc muốn hủy?`
+        : `Bạn có chắc muốn hủy đặt bàn ${maDatBan}?`
+    )
     if (!xacNhan) return
 
     try {
@@ -112,8 +117,22 @@ function HoSoPage() {
     }
   }
 
-  const handleDatLai = () => {
-    navigate('/dat-ban')
+  const handleDatLai = (booking) => {
+    navigate('/dat-ban', {
+      state: {
+        rebook: {
+          guests: booking.guestCount || booking.guests || '',
+          date: booking.date || booking.ngayDat || '',
+          time: booking.time || booking.gioDat || '',
+          seatingArea: booking.area || booking.seatingArea || 'KHONG_UU_TIEN',
+          occasion: booking.occasion || '',
+          notes: booking.notes || '',
+          name: booking.name || '',
+          phone: booking.phone || '',
+          email: booking.email || '',
+        },
+      },
+    })
   }
 
   const handleDangXuat = async () => {

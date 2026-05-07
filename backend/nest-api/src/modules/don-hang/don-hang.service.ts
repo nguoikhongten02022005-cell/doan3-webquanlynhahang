@@ -1,65 +1,58 @@
 import { Injectable } from '@nestjs/common';
 import { DonHangQueryService } from './don-hang-query.service';
-import { DonHangCommandService } from './don-hang-command.service';
-
-type BanGhi = Record<string, any>;
+import { DonHangCreateOrderService } from './don-hang-create-order.service';
+import { DonHangPaymentStatusService } from './don-hang-payment-status.service';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class DonHangService {
   constructor(
     private readonly donHangQueryService: DonHangQueryService,
-    private readonly donHangCommandService: DonHangCommandService,
+    private readonly donHangCreateOrderService: DonHangCreateOrderService,
+    private readonly donHangPaymentStatusService: DonHangPaymentStatusService,
   ) {}
 
   async layChiTietDonHangTheoMaPublic(maDonHang: string) {
     return this.donHangQueryService.layChiTietDonHangTheoMa(maDonHang);
   }
 
-  layDanhSachDonHang(dauTrang?: string) {
-    return this.donHangQueryService.layDanhSachDonHang(dauTrang);
+  layDanhSachDonHang() {
+    return this.donHangQueryService.layDanhSachDonHang();
   }
 
-  layDonHangCuaToi(dauTrang?: string) {
-    return this.donHangQueryService.layDonHangCuaToi(dauTrang);
+  layDonHangCuaToi(nguoiDung: any) {
+    return this.donHangQueryService.layDonHangCuaToi(nguoiDung);
   }
 
-  layDonHangCoTheDanhGia(dauTrang?: string) {
-    return this.donHangQueryService.layDonHangCoTheDanhGia(dauTrang);
+  layDonHangCoTheDanhGia(nguoiDung: any) {
+    return this.donHangQueryService.layDonHangCoTheDanhGia(nguoiDung);
   }
 
-  layChiTietDonHang(dauTrang: string | undefined, maDonHang: string) {
-    return this.donHangQueryService.layChiTietDonHang(dauTrang, maDonHang);
+  layChiTietDonHang(nguoiDung: any, maDonHang: string) {
+    return this.donHangQueryService.layChiTietDonHang(nguoiDung, maDonHang);
   }
 
   taoDonHang(payload: BanGhi, loaiDon?: string) {
-    return this.donHangCommandService.taoDonHang(payload, loaiDon);
+    return this.donHangCreateOrderService.taoDonHang(payload, loaiDon);
   }
 
   taoOrderTaiBan(maBan: string, payload: BanGhi) {
-    return this.donHangCommandService.taoOrderTaiBan(maBan, payload);
+    return this.donHangCreateOrderService.taoOrderTaiBan(maBan, payload);
   }
 
   layOrderDangMoTaiBan(maBan: string) {
-    return this.donHangCommandService.layOrderDangMoTaiBan(maBan);
+    return this.donHangPaymentStatusService.layOrderDangMoTaiBan(maBan);
   }
 
   yeuCauThanhToanTaiBan(maBan: string) {
-    return this.donHangCommandService.yeuCauThanhToanTaiBan(maBan);
+    return this.donHangPaymentStatusService.yeuCauThanhToanTaiBan(maBan);
   }
 
   xacNhanThanhToanTaiBan(maBan: string) {
-    return this.donHangCommandService.xacNhanThanhToanTaiBan(maBan);
+    return this.donHangPaymentStatusService.xacNhanThanhToanTaiBan(maBan);
   }
 
-  capNhatTrangThaiDonHang(
-    dauTrang: string | undefined,
-    maDonHang: string,
-    trangThai: string,
-  ) {
-    return this.donHangCommandService.capNhatTrangThaiDonHang(
-      dauTrang,
-      maDonHang,
-      trangThai,
-    );
+  capNhatTrangThaiDonHang(maDonHang: string, trangThai: string) {
+    return this.donHangPaymentStatusService.capNhatTrangThaiDonHang(maDonHang, trangThai);
   }
 }

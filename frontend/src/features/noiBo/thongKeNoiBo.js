@@ -1,5 +1,6 @@
 import { DANH_SACH_MON } from '../thucDon/mocks/duLieuThucDon'
 import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../thucDon/constants/danhMucThucDon'
+import { laCungNgayLich } from './boChon'
 
 const chenSo0 = (giaTri) => String(giaTri).padStart(2, '0')
 
@@ -33,12 +34,6 @@ const taoMocBatDauNgayUTC = () => {
   const now = new Date()
   return new Date(Date.UTC(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0))
 }
-
-const laCungNgay = (ngayTrai, ngayPhai) => (
-  ngayTrai.getFullYear() === ngayPhai.getFullYear()
-  && ngayTrai.getMonth() === ngayPhai.getMonth()
-  && ngayTrai.getDate() === ngayPhai.getDate()
-)
 
 // UTC-safe comparison - so sánh theo ngày UTC để tránh lệch timezone
 const laCungNgayUTC = (ngayTrai, ngayPhai) => (

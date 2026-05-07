@@ -2,40 +2,49 @@ import {
   Body,
   Controller,
   Get,
-  Headers,
   Param,
   Patch,
   Post,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { DanhGiaService } from './danh-gia.service';
-
-type BanGhi = Record<string, any>;
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
+import { BanGhi } from '../../common/types';
 
 @ApiTags('danh-gia')
 @Controller('api/danh-gia')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class DanhGiaController {
   constructor(private readonly danhGiaService: DanhGiaService) {}
 
+  @Public()
   @Get()
-  layDanhSachDanhGia(@Headers('authorization') authorization?: string) {
-    return this.danhGiaService.layDanhSachDanhGia(authorization);
+  layDanhSachDanhGiaCongKhai() {
+    return this.danhGiaService.layDanhSachDanhGia(false);
+  }
+
+  @Roles('Admin', 'NhanVien')
+  @Get('noi-bo')
+  layDanhSachDanhGiaNoiBo() {
+    return this.danhGiaService.layDanhSachDanhGia(true);
   }
 
   @Post()
-  taoDanhGia(
-    @Headers('authorization') authorization: string | undefined,
-    @Body() body: BanGhi,
-  ) {
-    return this.danhGiaService.taoDanhGia(authorization, body);
+  taoDanhGia(@CurrentUser() nguoiDung: any, @Body() body: BanGhi) {
+    return this.danhGiaService.taoDanhGia(nguoiDung, body);
   }
 
+  @Roles('Admin')
   @Patch(':maDanhGia/duyet')
   duyetDanhGia(
-    @Headers('authorization') authorization: string | undefined,
     @Param('maDanhGia') maDanhGia: string,
     @Body() body: BanGhi,
   ) {
-    return this.danhGiaService.duyetDanhGia(authorization, maDanhGia, body);
+    return this.danhGiaService.duyetDanhGia(maDanhGia, body);
   }
 }

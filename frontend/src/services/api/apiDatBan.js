@@ -24,17 +24,17 @@ const chuanHoaNgayDat = (giaTri) => {
 const chuanHoaDatBan = (booking) => {
   if (!booking || typeof booking !== 'object') return null
 
-  const assignedTableIds = Array.isArray(booking.assignedTableIds)
-    ? booking.assignedTableIds.map((maBan) => String(maBan || '').trim()).filter(Boolean)
+  const danhSachMaBanDaGan = Array.isArray(booking.danhSachMaBanDaGan)
+    ? booking.danhSachMaBanDaGan.map((maBan) => String(maBan || '').trim()).filter(Boolean)
     : (booking.maBan || booking.MaBan ? [String(booking.maBan || booking.MaBan).trim()] : [])
 
-  const assignedTables = Array.isArray(booking.assignedTables)
-    ? booking.assignedTables.map((ban) => ({
+  const danhSachBanDaGan = Array.isArray(booking.danhSachBanDaGan)
+    ? booking.danhSachBanDaGan.map((ban) => ({
       id: String(ban?.id || ban?.maBan || ban?.MaBan || ban?.code || '').trim(),
       code: String(ban?.code || ban?.maBan || ban?.MaBan || ban?.id || '').trim(),
       name: String(ban?.name || ban?.tenBan || ban?.TenBan || '').trim(),
     })).filter((ban) => ban.id)
-    : assignedTableIds.map((maBan) => ({ id: maBan, code: maBan, name: maBan }))
+    : danhSachMaBanDaGan.map((maBan) => ({ id: maBan, code: maBan, name: maBan }))
 
   return {
     ...booking,
@@ -57,8 +57,8 @@ const chuanHoaDatBan = (booking) => {
     staffCode: booking.maNV || booking.MaNV || '',
     createdAt: booking.ngayTao || booking.NgayTao,
     updatedAt: booking.ngayCapNhat || booking.NgayCapNhat,
-    assignedTableIds,
-    assignedTables,
+    danhSachMaBanDaGan,
+    danhSachBanDaGan,
   }
 }
 

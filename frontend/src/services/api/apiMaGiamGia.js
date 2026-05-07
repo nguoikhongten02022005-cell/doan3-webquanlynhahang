@@ -28,11 +28,6 @@ export const layDanhSachMaGiamGiaApi = async () => {
   }
 }
 
-export const layChiTietMaGiamGiaApi = async (maCode) => {
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/ma-giam-gia/${maCode}`))
-  return { ...phanHoi, duLieu: chuanHoaMaGiamGia(phanHoi.duLieu) }
-}
-
 export const taoMaGiamGiaApi = async (payload) => {
   return tachPhanHoiApi(
     await trinhKhachApi.post('/ma-giam-gia', {

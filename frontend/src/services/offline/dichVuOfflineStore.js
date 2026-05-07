@@ -488,11 +488,13 @@ export const taoThongTinQrBanOffline = (maBan) => {
     throw new Error('Không tìm thấy bàn.')
   }
 
+  const maBanThuc = table.code || table.id || ''
+
   return {
-    maBan: table.code,
+    maBan: maBanThuc,
     tenBan: table.name,
     khuVuc: table.rawAreaText || '',
-    url: `http://localhost:5173/ban/${table.code}`,
+    url: `${window.location.origin}/ban/${encodeURIComponent(maBanThuc)}/goi-mon`,
     qrBase64: '',
   }
 }
@@ -538,7 +540,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
     }
 
     const voucher = orderInput.voucher || mucHienTai.voucher || {}
-    const pricingSummary = orderInput.pricingSummary || mucHienTai.pricingSummary || {
+    const tongHopGia = orderInput.tongHopGia || mucHienTai.tongHopGia || {
       tamTinh: tongTien,
       giamGia: 0,
       phiDichVu: 0,
@@ -560,7 +562,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
       trangThai: orderInput.trangThai || orderInput.TrangThai || orderInput.status || mucHienTai.trangThai || 'Pending',
       tongTien,
       total: tongTien,
-      phiShip: Number(pricingSummary.phiShip || orderInput.phiShip || orderInput.PhiShip || 0),
+      phiShip: Number(tongHopGia.phiShip || orderInput.phiShip || orderInput.PhiShip || 0),
       ngayTao: orderInput.ngayTao || orderInput.NgayTao || orderInput.orderDate || mucHienTai.ngayTao || new Date().toISOString(),
       ghiChu: orderInput.ghiChu || orderInput.GhiChu || orderInput.note || mucHienTai.ghiChu || '',
       customer: {
@@ -570,7 +572,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
         email: orderInput.email || orderInput.Email || orderInput.customer?.email || mucHienTai.customer?.email || '',
         address: thongTinNhanHang.diaChiGiao,
       },
-      pricingSummary: deepClone(pricingSummary),
+      tongHopGia: deepClone(tongHopGia),
       voucher: deepClone(voucher),
       thongTinNhanHang,
       items: chiTietDaChuanHoa.map((item, index) => ({
@@ -742,15 +744,15 @@ export const taoHoacCapNhatDatBanOffline = ({ booking, maDatBan }) => {
     const bookingCode = String(maDatBan || booking.maDatBan || booking.bookingCode || taoMaDatBanMoiOffline()).trim()
     const index = draft.datBan.findIndex((item) => String(item.bookingCode || item.id || '') === bookingCode)
     const mucHienTai = index >= 0 ? draft.datBan[index] : {}
-    const assignedTableIds = Array.isArray(booking.assignedTableIds)
-      ? booking.assignedTableIds.map((item) => String(item || '').trim()).filter(Boolean)
+    const danhSachMaBanDaGan = Array.isArray(booking.danhSachMaBanDaGan)
+      ? booking.danhSachMaBanDaGan.map((item) => String(item || '').trim()).filter(Boolean)
       : (booking.maBan || booking.tableCode
         ? [String(booking.maBan || booking.tableCode).trim()]
-        : Array.isArray(mucHienTai.assignedTableIds)
-          ? mucHienTai.assignedTableIds.map((item) => String(item || '').trim()).filter(Boolean)
+        : Array.isArray(mucHienTai.danhSachMaBanDaGan)
+          ? mucHienTai.danhSachMaBanDaGan.map((item) => String(item || '').trim()).filter(Boolean)
           : [])
 
-    const assignedTables = assignedTableIds
+    const danhSachBanDaGan = danhSachMaBanDaGan
       .map((maBan) => draft.ban.find((table) => String(table.code || table.id) === maBan))
       .filter(Boolean)
       .map((table) => ({ id: table.id, code: table.code, name: table.name }))
@@ -798,11 +800,11 @@ export const taoHoacCapNhatDatBanOffline = ({ booking, maDatBan }) => {
       status: booking.trangThai || booking.status || mucHienTai.trangThai || mucHienTai.status || 'Pending',
       trangThai: booking.trangThai || booking.status || mucHienTai.trangThai || mucHienTai.status || 'Pending',
       TrangThai: booking.trangThai || booking.status || mucHienTai.TrangThai || mucHienTai.trangThai || 'Pending',
-      assignedTableIds,
-      assignedTables,
-      maBan: assignedTableIds[0] || '',
-      MaBan: assignedTableIds[0] || '',
-      tableCode: assignedTableIds[0] || '',
+      danhSachMaBanDaGan,
+      danhSachBanDaGan,
+      maBan: danhSachMaBanDaGan[0] || '',
+      MaBan: danhSachMaBanDaGan[0] || '',
+      tableCode: danhSachMaBanDaGan[0] || '',
       createdAt: booking.ngayTao || booking.createdAt || new Date().toISOString(),
       ngayTao: booking.ngayTao || booking.createdAt || new Date().toISOString(),
       NgayTao: booking.ngayTao || booking.createdAt || new Date().toISOString(),
@@ -868,7 +870,7 @@ export const capNhatTrangThaiDatBanOffline = (maDatBan, trangThai) => taoHoacCap
 
 export const ganBanChoDatBanOffline = (maDatBan, danhSachMaBan = []) => taoHoacCapNhatDatBanOffline({
   booking: {
-    assignedTableIds: danhSachMaBan,
+    danhSachMaBanDaGan: danhSachMaBan,
     maBan: danhSachMaBan[0] || '',
   },
   maDatBan,

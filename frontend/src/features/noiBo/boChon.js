@@ -18,7 +18,7 @@ export const canXacNhanThuCong = (datBan) => laTrangThaiChoXuLy(datBan.status) |
 export const layGhiChuUuTienDatBan = (datBan) => {
   if (laDatBanVip(datBan)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc khu riêng.'
   if (datBan.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
-  if (!Array.isArray(datBan.assignedTableIds) || datBan.assignedTableIds.length === 0) return 'Booking chưa được gán bàn cụ thể.'
+  if (!Array.isArray(datBan.danhSachMaBanDaGan) || datBan.danhSachMaBanDaGan.length === 0) return 'Booking chưa được gán bàn cụ thể.'
   if (datBan.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ban công.'
   return ''
 }
@@ -30,7 +30,7 @@ const CAC_TRANG_THAI_DAT_BAN_KET_THUC = new Set([
   'TU_CHOI_HET_CHO',
 ])
 
-export const daGanBan = (datBan) => Array.isArray(datBan?.assignedTableIds) && datBan.assignedTableIds.length > 0
+export const daGanBan = (datBan) => Array.isArray(datBan?.danhSachMaBanDaGan) && datBan?.danhSachMaBanDaGan.length > 0
 export const laDatBanDaCheckIn = (datBan) => datBan.status === 'DA_CHECK_IN' || datBan.status === 'DA_XEP_BAN'
 export const laTrangThaiDatBanKetThuc = (datBan) => CAC_TRANG_THAI_DAT_BAN_KET_THUC.has(datBan?.status)
 
@@ -48,7 +48,7 @@ export const phanTichNgayGioDatBan = (ngay, gio) => {
   return Number.isNaN(ngayDaPhanTich.getTime()) ? null : ngayDaPhanTich
 }
 
-const laCungNgayLich = (ngayTrai, ngayPhai) => (
+export const laCungNgayLich = (ngayTrai, ngayPhai) => (
   ngayTrai.getFullYear() === ngayPhai.getFullYear()
   && ngayTrai.getMonth() === ngayPhai.getMonth()
   && ngayTrai.getDate() === ngayPhai.getDate()
@@ -208,13 +208,13 @@ export const layDatBanChuaGanBan = (danhSachDatBan) => danhSachDatBan.filter((da
     return false
   }
 
-  return !Array.isArray(datBan.assignedTableIds) || datBan.assignedTableIds.length === 0
+  return !Array.isArray(datBan.danhSachMaBanDaGan) || datBan.danhSachMaBanDaGan.length === 0
 })
 
 export const layDoUuTienDatBan = (datBan, hienTai) => {
   const thoiDiemDatBan = phanTichNgayGioDatBan(datBan.date, datBan.time)
   const chenhLech = thoiDiemDatBan ? thoiDiemDatBan.getTime() - hienTai.getTime() : Number.POSITIVE_INFINITY
-  const datBanDaDuocGan = Array.isArray(datBan.assignedTableIds) && datBan.assignedTableIds.length > 0
+  const datBanDaDuocGan = Array.isArray(datBan.danhSachMaBanDaGan) && datBan.danhSachMaBanDaGan.length > 0
 
   if (canXacNhanThuCong(datBan)) return 0
   if (!datBanDaDuocGan && laTrangThaiDaXacNhan(datBan.status)) return 1

@@ -1,4 +1,4 @@
-import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../datBan/mocks/duLieuDatBan'
+import { HOST_NHAN_TRANG_THAI_DAT_BAN } from '../../datBan/constants/duLieuDatBan'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 import {
   dinhDangNgay,
@@ -103,8 +103,8 @@ function TongQuanTab({
                     <p><span>Khu vực</span><strong>{layNhanChoNgoi(booking.seatingArea)}</strong></p>
                   </div>
                   <p className="noi-bo-board-note">
-                    {booking.assignedTables?.length > 0
-                      ? `Bàn: ${booking.assignedTables.map((table) => table.code).join(', ')}`
+                    {booking.danhSachBanDaGan?.length > 0
+                      ? `Bàn: ${booking.danhSachBanDaGan.map((table) => table.code).join(', ')}`
                       : 'Chưa gán bàn cụ thể.'}
                   </p>
                   {(layGhiChuUuTienDatBan(booking) || booking.notes) && (

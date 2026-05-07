@@ -9,15 +9,24 @@ import {
   Post,
   Put,
   Query,
+  UseGuards,
 } from '@nestjs/common';
-import { ApiTags } from '@nestjs/swagger';
+import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { KhachHangService } from './khach-hang.service';
+import { TaoKhachHangDto } from './dto/tao-khach-hang.dto';
+import { CapNhatKhachHangDto } from './dto/cap-nhat-khach-hang.dto';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
 @ApiTags('khach-hang')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
 @Controller('api/khach-hang')
 export class KhachHangController {
   constructor(private readonly khachHangService: KhachHangService) {}
 
+  @Roles('Admin', 'NhanVien')
   @Get()
   layDanhSach(
     @Query('tuKhoa') tuKhoa?: string,
@@ -37,42 +46,46 @@ export class KhachHangController {
     });
   }
 
+  @Roles('Admin', 'NhanVien')
   @Get(':maKH')
   layChiTiet(@Param('maKH') maKH: string) {
     return this.khachHangService.layChiTiet(maKH);
   }
 
+  @Roles('Admin', 'NhanVien')
   @Get(':maKH/lich-su')
   layLichSu(@Param('maKH') maKH: string) {
     return this.khachHangService.layLichSu(maKH);
   }
 
+  @Roles('Admin', 'NhanVien')
   @Post()
-  tao(@Body() body: Record<string, unknown>) {
-    const tenKH = String(body.tenKH || '').trim();
-    if (!tenKH) throw new BadRequestException('Ten khach hang la bat buoc.');
+  tao(@Body() body: TaoKhachHangDto) {
     return this.khachHangService.tao({
-      tenKH,
-      sdt: body.sdt as string | undefined,
-      diaChi: body.diaChi as string | undefined,
-      diemTichLuy: body.diemTichLuy as number | undefined,
+      tenKH: body.tenKH,
+      sdt: body.sdt,
+      diaChi: body.diaChi,
+      diemTichLuy: body.diemTichLuy,
     });
   }
 
+  @Roles('Admin', 'NhanVien')
   @Put(':maKH')
-  capNhat(@Param('maKH') maKH: string, @Body() body: Record<string, unknown>) {
+  capNhat(@Param('maKH') maKH: string, @Body() body: CapNhatKhachHangDto) {
     return this.khachHangService.capNhat(maKH, {
-      tenKH: body.tenKH as string | undefined,
-      sdt: body.sdt as string | undefined,
-      diaChi: body.diaChi as string | undefined,
+      tenKH: body.tenKH,
+      sdt: body.sdt,
+      diaChi: body.diaChi,
     });
   }
 
+  @Roles('Admin')
   @Delete(':maKH')
   xoa(@Param('maKH') maKH: string) {
     return this.khachHangService.xoa(maKH);
   }
 
+  @Roles('Admin', 'NhanVien')
   @Patch(':maKH/diem')
   capNhatDiem(
     @Param('maKH') maKH: string,

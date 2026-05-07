@@ -35,18 +35,6 @@ export async function layChiTietKhachHang(maKH) {
   return trinhKhachApi.get(`${BASE}/${maKH}`)
 }
 
-export async function taoKhachHang(duLieu) {
-  return trinhKhachApi.post(BASE, duLieu)
-}
-
-export async function capNhatKhachHang(maKH, duLieu) {
-  return trinhKhachApi.put(`${BASE}/${maKH}`, duLieu)
-}
-
-export async function xoaKhachHang(maKH) {
-  return trinhKhachApi.delete(`${BASE}/${maKH}`)
-}
-
 export async function capNhatDiemKhachHang(maKH, { soDiem, moTa }) {
   if (!coSuDungMayChu()) {
     return { data: null }

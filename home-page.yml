@@ -1,0 +1,181 @@
+- generic [ref=e2]:
+  - link "Bỏ qua điều hướng" [ref=e3] [cursor=pointer]:
+    - /url: "#main-content"
+  - banner [ref=e4]:
+    - generic [ref=e5]:
+      - link "NH Nhà Hàng Nguyên Vị" [ref=e6] [cursor=pointer]:
+        - /url: /
+        - generic [ref=e7]: NH
+        - generic [ref=e8]: Nhà Hàng Nguyên Vị
+      - navigation "Điều hướng chính" [ref=e9]:
+        - link "Trang chủ" [ref=e10] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e11]: Trang chủ
+        - link "Thực đơn" [ref=e12] [cursor=pointer]:
+          - /url: /thuc-don
+          - generic [ref=e13]: Thực đơn
+        - link "Đặt bàn" [ref=e14] [cursor=pointer]:
+          - /url: /dat-ban
+          - generic [ref=e15]: Đặt bàn
+        - link "Về chúng tôi" [ref=e16] [cursor=pointer]:
+          - /url: /gioi-thieu
+          - generic [ref=e17]: Về chúng tôi
+        - link "Đánh giá" [ref=e18] [cursor=pointer]:
+          - /url: /danh-gia
+          - generic [ref=e19]: Đánh giá
+      - generic [ref=e20]:
+        - link "Đặt bàn" [ref=e21] [cursor=pointer]:
+          - /url: /dat-ban
+        - link "Đăng nhập" [ref=e23] [cursor=pointer]:
+          - /url: /dang-nhap
+  - main [ref=e24]:
+    - generic [ref=e25]:
+      - generic [ref=e27]:
+        - generic [ref=e29]:
+          - heading "Tinh hoa ẩm thực" [level=1] [ref=e31]
+          - generic [ref=e33]: Thưởng thức những món ăn được chuẩn bị chỉn chu, đậm đà bản sắc và phù hợp cho những buổi gặp gỡ ấm cúng lẫn các dịp đặc biệt.
+          - link "Xem thực đơn" [ref=e35] [cursor=pointer]:
+            - /url: /thuc-don
+            - generic [ref=e36]: Xem thực đơn
+        - figure [ref=e41]:
+          - img "Món ăn chủ đạo của nhà hàng" [ref=e42]
+      - region "Về chúng tôi" [ref=e43]:
+        - generic [ref=e44]:
+          - article [ref=e45]:
+            - heading "Về chúng tôi" [level=2] [ref=e46]
+            - paragraph [ref=e48]: Từ cách chọn nguyên liệu đến cách đón tiếp, chúng tôi giữ một tinh thần phục vụ ấm áp và chỉn chu cho từng bữa ăn.
+            - link "Xem thêm" [ref=e49] [cursor=pointer]:
+              - /url: /gioi-thieu
+          - generic [ref=e50]:
+            - generic: "N"
+          - article [ref=e51]:
+            - heading "Hành trình vị ngon" [level=3] [ref=e52]
+            - paragraph [ref=e54]: Mỗi công thức được hoàn thiện qua nhiều lần cân chỉnh để hương vị lên bàn luôn gọn gàng, rõ nét và đáng nhớ.
+            - link "Xem thực đơn" [ref=e55] [cursor=pointer]:
+              - /url: /thuc-don
+      - generic [ref=e57]:
+        - generic [ref=e58]:
+          - generic [ref=e60]:
+            - paragraph [ref=e61]: Món được chọn nhiều
+            - heading "Món Ngon Phải Thử" [level=3] [ref=e62]
+          - generic [ref=e63]:
+            - generic [ref=e64]:
+              - generic [ref=e66]:
+                - img "Nuoc Ep Cam" [ref=e67]
+                - generic [ref=e69]: Mới
+              - generic [ref=e72]:
+                - strong [ref=e75]: Nuoc Ep Cam
+                - generic [ref=e77]:
+                  - generic [ref=e78]: Nuoc ep cam tuoi, bo sung nang luong.
+                  - strong [ref=e81]: 30.000₫
+            - generic [ref=e82]:
+              - generic [ref=e84]:
+                - img "Combo Van Phong" [ref=e85]
+                - generic [ref=e87]: Mới
+              - generic [ref=e90]:
+                - strong [ref=e93]: Combo Van Phong
+                - generic [ref=e95]:
+                  - generic [ref=e96]: Combo trua gon nhe cho nhan vien van phong.
+                  - strong [ref=e99]: 159.000₫
+            - generic [ref=e100]:
+              - generic [ref=e102]:
+                - img "Banh Tiramisu" [ref=e103]
+                - generic [ref=e105]: Mới
+              - generic [ref=e108]:
+                - strong [ref=e111]: Banh Tiramisu
+                - generic [ref=e113]:
+                  - generic [ref=e114]: Trang mieng vi ca phe nhe.
+                  - strong [ref=e117]: 45.000₫
+            - generic [ref=e118]:
+              - generic [ref=e120]:
+                - img "Tra Vai Hoa Hong" [ref=e121]
+                - generic [ref=e123]: Mới
+              - generic [ref=e126]:
+                - strong [ref=e129]: Tra Vai Hoa Hong
+                - generic [ref=e131]:
+                  - generic [ref=e132]: Do uong theo mua, tam thoi het hang.
+                  - strong [ref=e135]: 42.000₫
+            - generic [ref=e136]:
+              - generic [ref=e138]:
+                - img "Lau Thai Hai San" [ref=e139]
+                - generic [ref=e141]: Mới
+              - generic [ref=e144]:
+                - strong [ref=e147]: Lau Thai Hai San
+                - generic [ref=e149]:
+                  - generic [ref=e150]: Lau thai chua cay nhe cho nhom 2-4 nguoi.
+                  - strong [ref=e153]: 259.000₫
+            - generic [ref=e154]:
+              - generic [ref=e156]:
+                - img "Suon Nuong Mat Ong" [ref=e157]
+                - generic [ref=e159]: Mới
+              - generic [ref=e162]:
+                - strong [ref=e165]: Suon Nuong Mat Ong
+                - generic [ref=e167]:
+                  - generic [ref=e168]: Suon nuong mem, sot mat ong dam vi.
+                  - strong [ref=e171]: 129.000₫
+            - generic [ref=e172]:
+              - generic [ref=e174]:
+                - img "Salad Ca Ngu" [ref=e175]
+                - generic [ref=e177]: Mới
+              - generic [ref=e180]:
+                - strong [ref=e183]: Salad Ca Ngu
+                - generic [ref=e185]:
+                  - generic [ref=e186]: Salad ca ngu sot chanh day thanh mat.
+                  - strong [ref=e189]: 68.000₫
+            - generic [ref=e190]:
+              - generic [ref=e192]:
+                - img "Combo Solo" [ref=e193]
+                - generic [ref=e195]: Mới
+              - generic [ref=e198]:
+                - strong [ref=e201]: Combo Solo
+                - generic [ref=e203]:
+                  - generic [ref=e204]: Combo ca nhan tiet kiem, phuc vu nhanh.
+                  - strong [ref=e207]: 129.000₫
+        - link "Xem toàn bộ thực đơn" [ref=e209] [cursor=pointer]:
+          - /url: /thuc-don
+          - generic [ref=e210]: Xem toàn bộ thực đơn
+      - region "Tìm chúng tôi" [ref=e211]:
+        - generic [ref=e212]:
+          - generic [ref=e213]:
+            - paragraph [ref=e214]: Liên hệ
+            - heading "Tìm chúng tôi" [level=2] [ref=e215]
+            - paragraph [ref=e216]: Khoái Châu, Hưng Yên
+            - generic [ref=e217]:
+              - heading "Giờ Mở Cửa" [level=3] [ref=e218]
+              - paragraph [ref=e219]: "Thứ Hai - Thứ Sáu: 10:00 Sáng - 02:00 Sáng"
+              - paragraph [ref=e220]: "Thứ Bảy - Chủ Nhật: 10:00 Sáng - 03:00 Sáng"
+            - link "Ghé thăm chúng tôi" [ref=e221] [cursor=pointer]:
+              - /url: /dat-ban
+          - figure [ref=e225]:
+            - img "Thức uống đặc trưng của nhà hàng" [ref=e226]
+  - contentinfo [ref=e227]:
+    - generic [ref=e228]:
+      - generic [ref=e229]:
+        - link "NH Nhà Hàng Nguyên Vị" [ref=e230] [cursor=pointer]:
+          - /url: /
+          - generic [ref=e231]: NH
+          - generic [ref=e232]: Nhà Hàng Nguyên Vị
+        - paragraph [ref=e233]: Không gian ấm cúng, món ăn chỉn chu và nhịp phục vụ vừa vặn cho những buổi gặp gỡ đáng nhớ.
+        - generic "Mạng xã hội" [ref=e234]:
+          - link "Theo dõi trên Facebook" [ref=e235] [cursor=pointer]:
+            - /url: "#"
+          - link "Theo dõi trên Instagram" [ref=e236] [cursor=pointer]:
+            - /url: "#"
+      - generic [ref=e237]:
+        - heading "Liên hệ" [level=3] [ref=e238]
+        - list [ref=e239]:
+          - listitem [ref=e240]: Khoái Châu, Hưng Yên
+          - listitem [ref=e241]:
+            - text: "Hotline:"
+            - link "(028) 3825 6789" [ref=e242] [cursor=pointer]:
+              - /url: tel:02838256789
+          - listitem [ref=e243]:
+            - text: "Email:"
+            - link "hello@nguyenvi.vn" [ref=e244] [cursor=pointer]:
+              - /url: mailto:hello@nguyenvi.vn
+      - generic [ref=e245]:
+        - heading "Giờ mở cửa" [level=3] [ref=e246]
+        - list [ref=e247]:
+          - listitem [ref=e248]: "Thứ 2 - Thứ 6: 11:00 - 14:00 · 17:00 - 22:00"
+          - listitem [ref=e249]: "Thứ 7 - Chủ nhật: 11:00 - 22:00"
+          - listitem [ref=e250]: Nhận đơn online đến 21:45

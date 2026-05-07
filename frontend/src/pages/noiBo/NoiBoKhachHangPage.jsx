@@ -17,6 +17,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
+import { message } from 'antd'
 import {
   SearchOutlined,
   TeamOutlined,
@@ -95,7 +96,7 @@ function NoiBoKhachHangPage() {
       setDanhSach(res.data || [])
       setPhanTrang((prev) => ({ ...prev, tong: res.meta?.tongSo || 0 }))
     } catch (e) {
-      console.error('Lỗi tải danh sách khách hàng:', e)
+      message.error('Không thể tải danh sách khách hàng.')
     } finally {
       setDangTai(false)
     }
@@ -119,7 +120,7 @@ function NoiBoKhachHangPage() {
         donHang: ls.data?.donHang || [],
       })
     } catch (e) {
-      console.error('Lỗi tải chi tiết khách hàng:', e)
+      message.error('Không thể tải chi tiết khách hàng.')
     } finally {
       setDangTaiLichSu(false)
     }
@@ -139,7 +140,7 @@ function NoiBoKhachHangPage() {
       const moi = await layChiTietKhachHang(khachHangChiTiet.maKH)
       setKhachHangChiTiet(moi)
     } catch (e) {
-      console.error('Lỗi cập nhật điểm:', e)
+      message.error('Không thể cập nhật điểm khách hàng.')
     } finally {
       setDangLuuDiem(false)
     }

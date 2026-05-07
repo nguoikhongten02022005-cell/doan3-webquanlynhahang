@@ -5,24 +5,12 @@ import {
 } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
-
-type BanGhi = Record<string, any>;
+import { taoMa } from '../../common/tao-ma';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class KhachHangService {
   constructor(private readonly mysql: MySqlService) {}
-
-  private taoMa(prefix: string): string {
-    return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
-  }
-
-  private taoPhanHoi(
-    duLieu: unknown,
-    thongDiep = 'Thanh cong',
-    meta: unknown = null,
-  ) {
-    return taoPhanHoi(duLieu, thongDiep, meta);
-  }
 
   private chuyenKhachHangSangResponse(kh: BanGhi) {
     return {
@@ -83,16 +71,18 @@ export class KhachHangService {
     );
     const tongSo = Number(countResult[0]?.total || 0);
 
-    const offset = (Math.max(1, trang) - 1) * soLuong;
+    const trangVal = Math.max(1, trang);
+    const soLuongVal = Math.max(1, Math.min(100, soLuong));
+    const offset = (trangVal - 1) * soLuongVal;
     const danhSach = await this.mysql.truyVan(
       `SELECT kh.* FROM KhachHang kh WHERE ${whereClause} ORDER BY ${sortCol} ${sortDir} LIMIT ? OFFSET ?`,
-      [...queryParams, soLuong, offset],
+      [...queryParams, soLuongVal, offset],
     );
 
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       danhSach.map((kh) => this.chuyenKhachHangSangResponse(kh)),
       'Lay danh sach khach hang thanh cong',
-      { tongSo, trang, soLuong, soTrang: Math.ceil(tongSo / soLuong) },
+      { tongSo, trang: trangVal, soLuong: soLuongVal, soTrang: Math.ceil(tongSo / soLuongVal) },
     );
   }
 
@@ -102,7 +92,7 @@ export class KhachHangService {
       [maKH],
     );
     if (!danhSach[0]) throw new NotFoundException('Khong tim thay khach hang.');
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       this.chuyenKhachHangSangResponse(danhSach[0]),
       'Lay chi tiet khach hang thanh cong',
     );
@@ -135,7 +125,7 @@ export class KhachHangService {
         throw new BadRequestException('So dien thoai da ton tai.');
     }
 
-    const maKH = this.taoMa('KH');
+    const maKH = taoMa('KH');
     await this.mysql.thucThi(
       'INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES (?, NULL, ?, ?, ?, ?)',
       [maKH, tenKH, sdt || null, diaChi || null, Math.max(0, diemTichLuy)],
@@ -145,7 +135,7 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       this.chuyenKhachHangSangResponse(kh),
       'Tao khach hang thanh cong',
     );
@@ -191,7 +181,7 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       this.chuyenKhachHangSangResponse(kh),
       'Cap nhat khach hang thanh cong',
     );
@@ -223,7 +213,7 @@ export class KhachHangService {
       );
 
     await this.mysql.thucThi('DELETE FROM KhachHang WHERE MaKH = ?', [maKH]);
-    return this.taoPhanHoi(null, 'Xoa khach hang thanh cong');
+    return taoPhanHoi(null, 'Xoa khach hang thanh cong');
   }
 
   async capNhatDiem(maKH: string, body: { soDiem: number; moTa?: string }) {
@@ -239,9 +229,6 @@ export class KhachHangService {
     const diemHienTai = Number(kh.DiemTichLuy || 0);
     const diemSau = Math.max(0, diemHienTai + soDiem);
 
-    if (diemSau < 0)
-      throw new BadRequestException('Diem tich luy khong the am.');
-
     await this.mysql.thucThi(
       'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
       [diemSau, maKH],
@@ -251,7 +238,7 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       {
         maKH: updated.MaKH,
         diemTruoc: diemHienTai,
@@ -285,7 +272,7 @@ export class KhachHangService {
       [maKH],
     );
 
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       {
         khachHang: this.chuyenKhachHangSangResponse(kh),
         datBan: datBanList.map((db: BanGhi) => ({

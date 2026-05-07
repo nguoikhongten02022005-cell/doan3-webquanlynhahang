@@ -2,8 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { BanCrudService } from './ban-crud.service';
 import { BanTrangThaiQrService } from './ban-trang-thai-qr.service';
 import { TaiBanService } from '../tai-ban/tai-ban.service';
-
-type BanGhi = Record<string, any>;
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class BanService {
@@ -17,32 +16,24 @@ export class BanService {
     return this.banCrudService.layDanhSachBan();
   }
 
-  taoBan(authorization: string | undefined, body: BanGhi) {
-    return this.banCrudService.taoBan(authorization, body);
+  taoBan(body: BanGhi) {
+    return this.banCrudService.taoBan(body);
   }
 
-  capNhatBan(authorization: string | undefined, maBan: string, body: BanGhi) {
-    return this.banCrudService.capNhatBan(authorization, maBan, body);
+  capNhatBan(maBan: string, body: BanGhi) {
+    return this.banCrudService.capNhatBan(maBan, body);
   }
 
-  xoaBan(authorization: string | undefined, maBan: string) {
-    return this.banCrudService.xoaBan(authorization, maBan);
+  xoaBan(maBan: string) {
+    return this.banCrudService.xoaBan(maBan);
   }
 
-  capNhatTrangThaiBan(
-    authorization: string | undefined,
-    maBan: string,
-    trangThai: string,
-  ) {
-    return this.banTrangThaiQrService.capNhatTrangThaiBan(
-      authorization,
-      maBan,
-      trangThai,
-    );
+  capNhatTrangThaiBan(maBan: string, trangThai: string) {
+    return this.banTrangThaiQrService.capNhatTrangThaiBan(maBan, trangThai);
   }
 
-  layQrBan(authorization: string | undefined, maBan: string) {
-    return this.banTrangThaiQrService.layQrBan(authorization, maBan);
+  layQrBan(maBan: string) {
+    return this.banTrangThaiQrService.layQrBan(maBan);
   }
 
   layThucDonTheoBan(maBan: string) {

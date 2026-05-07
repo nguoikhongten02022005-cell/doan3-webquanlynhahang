@@ -1,7 +1,7 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
-
-type BanGhi = Record<string, any>;
+import { BanGhi } from '../../common/types';
+import { tinhGiamGia } from '../../common/tinh-giam-gia.helper';
 
 const TI_LE_QUY_DOI_DIEM = 100;
 const GIA_TRI_QUY_DOI = 10000;
@@ -10,7 +10,7 @@ const GIA_TRI_QUY_DOI = 10000;
 export class DonHangPricingService {
   constructor(private readonly mysql: MySqlService) {}
 
-  taoVoucherResponse(payload: BanGhi = {}, soTienGiamThucTe = 0) {
+  taoPhanHoiMaGiam(payload: BanGhi = {}, soTienGiamThucTe = 0) {
     return {
       hopLe: Boolean(payload.maGiamGia || payload.maCode),
       maGiamGia: String(payload.maGiamGia || payload.maCode || '').trim(),
@@ -21,9 +21,7 @@ export class DonHangPricingService {
         payload.giamToiDa == null && payload.giaTriToiDa == null
           ? null
           : Number(payload.giamToiDa ?? payload.giaTriToiDa),
-      dieuKienToiThieu: Number(
-        payload.dieuKienToiThieu || payload.donHangToiThieu || 0,
-      ),
+      dieuKienToiThieu: Number(payload.dieuKienToiThieu || payload.donHangToiThieu || 0),
       soTienGiamThucTe: Number(soTienGiamThucTe || 0),
       thongDiep: String(payload.thongDiep || payload.moTa || '').trim(),
     };
@@ -39,78 +37,56 @@ export class DonHangPricingService {
   }
 
   tinhPhiDichVuTheoTamTinh(tamTinh: number) {
-    return tamTinh > 0
-      ? Math.round((Number(tamTinh || 0) * 0.05) / 1000) * 1000
-      : 0;
+    return tamTinh > 0 ? Math.round((Number(tamTinh || 0) * 0.05) / 1000) * 1000 : 0;
   }
 
   tinhTongTamTinhTuChiTiet(chiTiet: BanGhi[]) {
-    return chiTiet.reduce(
-      (tong, muc) => tong + Number(muc.ThanhTien || muc.thanhTien || 0),
-      0,
-    );
+    return chiTiet.reduce((tong, muc) => tong + Number(muc.ThanhTien || muc.thanhTien || 0), 0);
   }
 
-  taoPricingSummary(tamTinh: number, phiShip = 0, giamGia = 0, phiDichVu = 0) {
+  taoTongHopGia(tamTinh: number, phiShip = 0, giamGia = 0, phiDichVu = 0) {
     return {
       tamTinh: Number(tamTinh || 0),
       giamGia: Number(giamGia || 0),
       phiDichVu: Number(phiDichVu || 0),
       phiShip: Number(phiShip || 0),
-      tongTien: Math.max(
-        0,
-        Number(tamTinh || 0) +
-          Number(phiDichVu || 0) +
-          Number(phiShip || 0) -
-          Number(giamGia || 0),
-      ),
+      tongTien: Math.max(0, Number(tamTinh || 0) + Number(phiDichVu || 0) + Number(phiShip || 0) - Number(giamGia || 0)),
     };
   }
 
-  taoPricingSummaryTuDuLieuDonHang(donHang: BanGhi, chiTiet: BanGhi[]) {
+  taoTongHopGiaTuDuLieuDonHang(donHang: BanGhi, chiTiet: BanGhi[]) {
     const tamTinh = this.tinhTongTamTinhTuChiTiet(chiTiet);
     const phiShip = Number(donHang.PhiShip || donHang.phiShip || 0);
     const tongTienDaLuu = Number(donHang.TongTien || donHang.tongTien || 0);
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
     const tongTruocGiam = tamTinh + phiShip + phiDichVu;
     const giamGia = Math.max(0, tongTruocGiam - tongTienDaLuu);
-    return this.taoPricingSummary(tamTinh, phiShip, giamGia, phiDichVu);
+    return this.taoTongHopGia(tamTinh, phiShip, giamGia, phiDichVu);
   }
 
-  async layThongTinVoucherApDung(maCodeDauVao: unknown, tongTien: number) {
+  async layThongTinMaGiamApDung(maCodeDauVao: unknown, tongTien: number) {
     const maCode = String(maCodeDauVao || '').trim();
     if (!maCode) {
-      return this.taoVoucherResponse();
+      return this.taoPhanHoiMaGiam();
     }
 
-    const [ma] = await this.mysql.truyVan(
-      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
-      [maCode],
-    );
-    if (!ma) {
-      throw new BadRequestException('Ma giam gia khong ton tai.');
-    }
-    if (String(ma.TrangThai || '') !== 'Active') {
-      throw new BadRequestException('Ma giam gia khong con hieu luc.');
-    }
-    if (tongTien < Number(ma.DonHangToiThieu || 0)) {
-      throw new BadRequestException(
-        'Don hang chua du dieu kien ap dung ma giam gia.',
-      );
+    const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (!ma) throw new BadRequestException('Ma giam gia khong ton tai.');
+    if (String(ma.TrangThai || '') !== 'Active') throw new BadRequestException('Ma giam gia khong con hieu luc.');
+
+    const now = new Date();
+    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now) throw new BadRequestException('Ma giam gia chua den thoi gian ap dung.');
+    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now) throw new BadRequestException('Ma giam gia da het han.');
+
+    if (ma.SoLanToiDa != null && Number(ma.SoLanDaDung) >= Number(ma.SoLanToiDa)) {
+      throw new BadRequestException('Ma giam gia da dat gioi han su dung.');
     }
 
-    const laPhanTram = String(ma.LoaiGiam || '').toLowerCase() === 'phantram';
-    const giaTriGiam = Number(ma.GiaTri || 0);
-    const giamToiDa = ma.GiaTriToiDa == null ? null : Number(ma.GiaTriToiDa);
-    const soTienGiamTamTinh = laPhanTram
-      ? Math.round((tongTien * giaTriGiam) / 100)
-      : giaTriGiam;
-    const soTienGiamThucTe =
-      giamToiDa == null
-        ? soTienGiamTamTinh
-        : Math.min(soTienGiamTamTinh, giamToiDa);
+    if (tongTien < Number(ma.DonHangToiThieu || 0)) throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
 
-    return this.taoVoucherResponse(
+    const { giaTriGiam, giamToiDa, soTienGiamThucTe } = tinhGiamGia(tongTien, ma);
+
+    return this.taoPhanHoiMaGiam(
       {
         maGiamGia: ma.MaCode,
         tenGiamGia: ma.TenCode,
@@ -129,7 +105,7 @@ export class DonHangPricingService {
     return Math.floor(soDiem / TI_LE_QUY_DOI_DIEM) * GIA_TRI_QUY_DOI;
   }
 
-  taoDiemResponse(soDiem: number, soTienGiam: number) {
+  taoPhanHoiDiem(soDiem: number, soTienGiam: number) {
     return {
       soDiem: Number(soDiem || 0),
       soTienGiam: Number(soTienGiam || 0),
@@ -139,51 +115,32 @@ export class DonHangPricingService {
     };
   }
 
-  async recalculateOrderPricing(payload: BanGhi, chiTietDauVao: BanGhi[]) {
+  async tinhLaiGiaDonHang(payload: BanGhi, chiTietDauVao: BanGhi[]) {
     const chiTietDaTinh: BanGhi[] = [];
     let tamTinh = 0;
 
     for (const muc of chiTietDauVao) {
-      const [mon] = await this.mysql.truyVan(
-        'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
-        [muc.maMon],
-      );
-      if (!mon) {
-        throw new BadRequestException(`Mon ${muc.maMon} khong ton tai.`);
-      }
+      const [mon] = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon]);
+      if (!mon) throw new BadRequestException(`Mon ${muc.maMon} khong ton tai.`);
 
       const soLuong = Number(muc.soLuong || 0);
       const donGia = Number(mon.Gia || 0);
       const thanhTien = soLuong * donGia;
       tamTinh += thanhTien;
-      chiTietDaTinh.push({
-        ...muc,
-        tenMon: String(mon.TenMon || ''),
-        donGia,
-        soLuong,
-        thanhTien,
-      });
+      chiTietDaTinh.push({ ...muc, tenMon: String(mon.TenMon || ''), donGia, soLuong, thanhTien });
     }
 
     const phiShip = Number(payload.phiShip || 0);
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
-    const voucher = await this.layThongTinVoucherApDung(
-      payload.maGiamGia,
-      tamTinh + phiDichVu + phiShip,
-    );
+    const maGiamGia = await this.layThongTinMaGiamApDung(payload.maGiamGia, tamTinh + phiDichVu + phiShip);
 
     const soDiem = Number(payload.soDiem || 0);
     const giamGiaTuDiem = this.tinhSoTienGiamTuDiem(soDiem);
-    const diemApDung = this.taoDiemResponse(soDiem, giamGiaTuDiem);
+    const diemApDung = this.taoPhanHoiDiem(soDiem, giamGiaTuDiem);
 
-    const tongGiamGia = voucher.soTienGiamThucTe + giamGiaTuDiem;
-    const pricingSummary = this.taoPricingSummary(
-      tamTinh,
-      phiShip,
-      tongGiamGia,
-      phiDichVu,
-    );
+    const tongGiamGia = maGiamGia.soTienGiamThucTe + giamGiaTuDiem;
+    const tongHopGia = this.taoTongHopGia(tamTinh, phiShip, tongGiamGia, phiDichVu);
 
-    return { chiTietDaTinh, pricingSummary, voucher, diemApDung };
+    return { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung };
   }
 }

@@ -34,7 +34,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
-import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../datBan/mocks/duLieuDatBan'
+import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../datBan/constants/duLieuDatBan'
 import {
   dinhDangNgayGio,
   dinhDangSoKhach,
@@ -131,7 +131,7 @@ const getStatusTagColor = (status) => STATUS_TAG_COLORS[laySacThaiTrangThaiDatBa
 
 const layMaDatBan = (booking) => booking.bookingCode || booking.code || `DB-${booking.id}`
 const layNguonDatBan = (booking) => (booking.source === 'internal' ? 'Nội bộ' : 'Web')
-const laBookingChuaGanBan = (booking) => !Array.isArray(booking.assignedTableIds) || booking.assignedTableIds.length === 0
+const laBookingChuaGanBan = (booking) => !Array.isArray(booking.danhSachMaBanDaGan) || booking.danhSachMaBanDaGan.length === 0
 
 function laNgayHomNay(value, homNay) {
   if (!value) return false
@@ -385,7 +385,7 @@ function DatBanFormCard({
 }
 
 function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickStatusChange }) {
-  const banDaGan = booking.assignedTables || []
+  const banDaGan = booking.danhSachBanDaGan || []
   const chuaGanBan = laBookingChuaGanBan(booking)
   const dangChoXacNhan = PENDING_STATUS_SET.has(booking.status)
   const canhBaoUuTien = chuaGanBan || dangChoXacNhan
@@ -561,7 +561,7 @@ function DatBanAssignModal({
   const duSucChua = selectedCapacity >= sucChuaCan
   const tapBanDangChon = useMemo(() => new Set(selectedTableIds), [selectedTableIds])
   const tapBanDangGan = useMemo(
-    () => new Set(Array.isArray(booking?.assignedTableIds) ? booking.assignedTableIds : []),
+    () => new Set(Array.isArray(booking?.danhSachMaBanDaGan) ? booking.danhSachMaBanDaGan : []),
     [booking],
   )
 
@@ -581,7 +581,7 @@ function DatBanAssignModal({
             <Descriptions.Item label="Số khách">{dinhDangSoKhach(booking.guests)}</Descriptions.Item>
             <Descriptions.Item label="Thời gian">{dinhDangNgayGio(booking.date, booking.time)}</Descriptions.Item>
             <Descriptions.Item label="Khu vực ưu tiên">{layNhanChoNgoi(booking.seatingArea)}</Descriptions.Item>
-            <Descriptions.Item label="Bàn hiện tại">{booking.assignedTables?.length ? booking.assignedTables.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
+            <Descriptions.Item label="Bàn hiện tại">{booking.danhSachBanDaGan?.length ? booking.danhSachBanDaGan.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
           </Descriptions>
 
           <Alert
@@ -799,7 +799,7 @@ function DatBanTab({
 
     setAssigningBooking(booking)
     setAssignableTables(danhSachBanPhuHop)
-    setSelectedTableIds(Array.isArray(booking.assignedTableIds) ? booking.assignedTableIds : [])
+    setSelectedTableIds(Array.isArray(booking.danhSachMaBanDaGan) ? booking.danhSachMaBanDaGan : [])
     setAssignModalError('')
     setFormError('')
   }

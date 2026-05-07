@@ -1,13 +1,14 @@
 import { dinhDangTienTe } from './tienTe'
 import { dinhDangNgay } from '../features/noiBo/dinhDang'
 import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from './donHang'
+import { tinhPhiDichVu } from './phiDichVu'
 
 const maHoaHtmlIn = (value) => String(value ?? '')
-  .replaceAll('&', '&amp;')
-  .replaceAll('<', '&lt;')
-  .replaceAll('>', '&gt;')
-  .replaceAll('"', '&quot;')
-  .replaceAll("'", '&#39;')
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&#39;')
 
 const dinhDangNhanBan = (tableNumber) => {
   const normalized = String(tableNumber || '').trim()
@@ -15,8 +16,6 @@ const dinhDangNhanBan = (tableNumber) => {
 }
 
 const dinhDangMaDonHang = (order) => order.orderCode || order.code || `DH-${order.id}`
-
-const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 
 export const taoTongKetTienDonHang = (order) => {
   const items = Array.isArray(order?.items) ? order.items : []

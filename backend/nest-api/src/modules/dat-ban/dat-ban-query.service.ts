@@ -4,75 +4,13 @@ import {
   Injectable,
 } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
-import { AuthService } from '../auth/auth.service';
-
-type BanGhi = Record<string, any>;
+import { taoPhanHoi } from '../../common/phan-hoi';
+import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class DatBanQueryService {
-  constructor(
-    private readonly mysql: MySqlService,
-    private readonly authService: AuthService,
-  ) {}
-
-  private taoPhanHoi(
-    duLieu: unknown,
-    thongDiep = 'Thanh cong',
-    meta: unknown = null,
-  ) {
-    return { success: true, data: duLieu, message: thongDiep, meta };
-  }
-
-  private async layKhachHangTheoMaNd(maND: string) {
-    const danhSach = await this.mysql.truyVan(
-      'SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1',
-      [maND],
-    );
-    return danhSach[0] || null;
-  }
-
-  private yeuCauQuyenNhanVienHoacQuanTri(authorization?: string) {
-    const thongTinToken = this.authService.yeuCauDangNhapNoiBo(authorization);
-    const vaiTro = String(thongTinToken.vaiTro || '');
-
-    if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      throw new ForbiddenException(
-        'Ban khong co quyen thuc hien thao tac noi bo nay.',
-      );
-    }
-
-    return thongTinToken;
-  }
-
-  private async yeuCauKhachHangSoHuuTaiNguyen(
-    authorization: string | undefined,
-    maKh: string,
-  ) {
-    const thongTinToken = this.authService.giaiMaNguoiDung(authorization);
-    const vaiTro = String(thongTinToken.vaiTro || '');
-
-    if (vaiTro === 'Admin' || vaiTro === 'NhanVien') {
-      return {
-        thongTinToken,
-        vaiTro,
-        khachHang: await this.layKhachHangTheoMaNd(String(thongTinToken.maND)),
-      };
-    }
-
-    const khachHang = await this.layKhachHangTheoMaNd(
-      String(thongTinToken.maND),
-    );
-    if (
-      !khachHang ||
-      String(khachHang.MaKH || '') !== String(maKh || '').trim()
-    ) {
-      throw new ForbiddenException(
-        'Ban khong co quyen truy cap du lieu cua khach hang khac.',
-      );
-    }
-
-    return { thongTinToken, vaiTro, khachHang };
-  }
+  constructor(private readonly mysql: MySqlService) {}
 
   private chuanNgayThanhChuoi(ngay: unknown): string {
     if (!ngay) return '';
@@ -88,11 +26,24 @@ export class DatBanQueryService {
     return String(ngay);
   }
 
-  chuyenDatBanSangResponse(datBan: BanGhi) {
+  chuyenDatBanSangPhanHoi(datBan: BanGhi) {
+    let chiTietMonAn = [];
+    try {
+      if (datBan.ChiTietMonAn) {
+        chiTietMonAn = typeof datBan.ChiTietMonAn === 'string'
+          ? JSON.parse(datBan.ChiTietMonAn)
+          : datBan.ChiTietMonAn;
+      }
+    } catch {
+      chiTietMonAn = [];
+    }
+    const maBan = datBan.MaBan || '';
+    const danhSachMaBanDaGan = maBan ? [String(maBan)] : [];
+    
     return {
       maDatBan: datBan.MaDatBan,
       maKH: datBan.MaKH || '',
-      maBan: datBan.MaBan || '',
+      maBan: maBan,
       maNV: datBan.MaNV || '',
       ngayDat: this.chuanNgayThanhChuoi(datBan.NgayDat),
       gioDat: datBan.GioDat,
@@ -107,29 +58,38 @@ export class DatBanQueryService {
       tenKhachDatBan: datBan.TenKhachDatBan || datBan.TenKH || '',
       sdtDatBan: datBan.SDTDatBan || datBan.SDT || '',
       emailDatBan: datBan.EmailDatBan || datBan.Email || '',
+      chiTietMonAn,
+      danhSachMaBanDaGan,
+      danhSachBanDaGan: maBan ? [{ maBan, tenBan: datBan.TenBan || maBan }] : [],
     };
   }
 
-  async layDanhSachDatBan(authorization?: string) {
-    this.yeuCauQuyenNhanVienHoacQuanTri(authorization);
+  async layDanhSachDatBan() {
     const danhSach = await this.mysql.truyVan(
       'SELECT * FROM DatBan ORDER BY NgayTao DESC',
     );
-    return this.taoPhanHoi(
-      danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)),
+    return taoPhanHoi(
+      danhSach.map((datBan) => this.chuyenDatBanSangPhanHoi(datBan)),
       'Lay danh sach dat ban thanh cong',
     );
   }
 
-  async layLichSuDatBan(authorization: string | undefined, maKh: string) {
-    await this.yeuCauKhachHangSoHuuTaiNguyen(authorization, maKh);
+  async layLichSuDatBan(nguoiDung: any, maKh: string) {
+    const vaiTro = String(nguoiDung.vaiTro || '');
+
+    if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
+      const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
+      if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
+        throw new ForbiddenException('Ban khong co quyen truy cap du lieu cua khach hang khac.');
+      }
+    }
 
     const danhSach = await this.mysql.truyVan(
       'SELECT * FROM DatBan WHERE MaKH = ? ORDER BY NgayTao DESC',
       [maKh],
     );
-    return this.taoPhanHoi(
-      danhSach.map((datBan) => this.chuyenDatBanSangResponse(datBan)),
+    return taoPhanHoi(
+      danhSach.map((datBan) => this.chuyenDatBanSangPhanHoi(datBan)),
       'Lay lich su dat ban thanh cong',
     );
   }
@@ -167,52 +127,28 @@ export class DatBanQueryService {
           String(ban.TrangThai || '') !== 'Maintenance',
       )
       .filter((ban) => {
-        if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') {
-          return true;
-        }
+        if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;
 
-        const giaTriKhuVuc = String(
-          ban.KhuVuc || ban.ViTri || '',
-        ).toLowerCase();
+        const giaTriKhuVuc = String(ban.KhuVuc || ban.ViTri || '').toLowerCase();
         if (khuVuc === 'PHONG_VIP')
-          return (
-            giaTriKhuVuc.includes('vip') ||
-            giaTriKhuVuc.includes('riêng') ||
-            giaTriKhuVuc.includes('rieng')
-          );
+          return giaTriKhuVuc.includes('vip') || giaTriKhuVuc.includes('riêng') || giaTriKhuVuc.includes('rieng');
         if (khuVuc === 'BAN_CONG')
-          return (
-            giaTriKhuVuc.includes('ngoài') ||
-            giaTriKhuVuc.includes('ngoai') ||
-            giaTriKhuVuc.includes('ban công') ||
-            giaTriKhuVuc.includes('ban cong')
-          );
+          return giaTriKhuVuc.includes('ngoài') || giaTriKhuVuc.includes('ngoai') || giaTriKhuVuc.includes('ban công') || giaTriKhuVuc.includes('ban cong');
         if (khuVuc === 'SANH_CHINH')
-          return (
-            !giaTriKhuVuc.includes('vip') &&
-            !giaTriKhuVuc.includes('ngoài') &&
-            !giaTriKhuVuc.includes('ngoai') &&
-            !giaTriKhuVuc.includes('ban cong')
-          );
+          return !giaTriKhuVuc.includes('vip') && !giaTriKhuVuc.includes('ngoài') && !giaTriKhuVuc.includes('ngoai') && !giaTriKhuVuc.includes('ban cong');
         return true;
       });
 
     const danhSachBanPhuHop =
       soNguoi > 0
-        ? danhSachBanKhaDung.filter(
-            (ban) => Number(ban.SoChoNgoi || 0) >= soNguoi,
-          )
+        ? danhSachBanKhaDung.filter((ban) => Number(ban.SoChoNgoi || 0) >= soNguoi)
         : danhSachBanKhaDung;
     const tongBanConTrong = danhSachBanKhaDung.length;
     const tongBanPhuHop = danhSachBanPhuHop.length;
     const mucKhaDung =
-      tongBanPhuHop <= 0
-        ? 'FULL'
-        : tongBanPhuHop <= 2
-          ? 'LIMITED'
-          : 'AVAILABLE';
+      tongBanPhuHop <= 0 ? 'FULL' : tongBanPhuHop <= 2 ? 'LIMITED' : 'AVAILABLE';
 
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       {
         ngayDat,
         gioDat,

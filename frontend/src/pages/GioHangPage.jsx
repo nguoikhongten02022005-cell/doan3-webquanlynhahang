@@ -17,7 +17,7 @@ import {
 import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 
-const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
+import { tinhPhiDichVu } from '../utils/phiDichVu'
 
 function GioHangPage() {
   const navigate = useNavigate()
@@ -51,13 +51,11 @@ function GioHangPage() {
   }, [])
 
   useEffect(() => {
-    if (tamTinh > 0 || !phieuGiamGiaDaApDung) {
-      return
+    if (tamTinh === 0 && phieuGiamGiaDaApDung) {
+      setPhieuGiamGiaDaApDung(null)
+      setLoiPhieuGiamGia('')
+      xoaPhieuGiamGiaDaLuu()
     }
-
-    setPhieuGiamGiaDaApDung(null)
-    setLoiPhieuGiamGia('❌ Mã không hợp lệ hoặc đã hết hạn')
-    xoaPhieuGiamGiaDaLuu()
   }, [tamTinh, phieuGiamGiaDaApDung])
 
   const handleDiDenThanhToan = () => {

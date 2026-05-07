@@ -17,7 +17,7 @@ export const LOAI_GIAM_GIA = Object.freeze({
   TIEN_MAT: 'TienMat',
 })
 
-export const TAO_PRICING_SUMMARY_MAC_DINH = () => ({
+export const TAO_TONG_HOP_GIA_MAC_DINH = () => ({
   tamTinh: 0,
   giamGia: 0,
   phiDichVu: 0,
@@ -34,7 +34,7 @@ const layGiaTri = (nguon, ...khoa) => {
   return undefined
 }
 
-export const chuanHoaPricingSummary = (nguon = {}) => ({
+export const chuanHoaTongHopGia = (nguon = {}) => ({
   tamTinh: Number(layGiaTri(nguon, 'tamTinh', 'TamTinh', 'subtotal', 'Subtotal', 'tongTamTinh') || 0),
   giamGia: Number(layGiaTri(nguon, 'giamGia', 'GiamGia', 'discountAmount', 'DiscountAmount') || 0),
   phiDichVu: Number(layGiaTri(nguon, 'phiDichVu', 'PhiDichVu', 'serviceFee', 'ServiceFee') || 0),

@@ -3,12 +3,12 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   Param,
   Post,
   Put,
   UploadedFile,
   UseInterceptors,
+  UseGuards,
 } from '@nestjs/common';
 import {
   ApiBearerAuth,
@@ -23,6 +23,11 @@ import { extname } from 'path';
 import { CapNhatMonDto } from './dto/cap-nhat-mon.dto';
 import { TaoMonDto } from './dto/tao-mon.dto';
 import { ThucDonService } from './thuc-don.service';
+import { taoPhanHoi } from '../../common/phan-hoi';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
 
 const taoTenTapTinAnhMon = (
   _req: unknown,
@@ -52,44 +57,46 @@ const boLocTapTinAnh = (
 export class ThucDonController {
   constructor(private readonly thucDonService: ThucDonService) {}
 
+  @Public()
   @ApiOperation({ summary: 'Lay danh sach mon an cong khai' })
   @Get()
   layThucDon() {
     return this.thucDonService.layThucDon();
   }
 
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   @ApiOperation({ summary: 'Tao mon an moi (Admin)' })
   @Post()
-  taoMon(
-    @Headers('authorization') authorization: string | undefined,
-    @Body() body: TaoMonDto,
-  ) {
-    return this.thucDonService.taoMon(authorization, body);
+  taoMon(@Body() body: TaoMonDto) {
+    return this.thucDonService.taoMon(body);
   }
 
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   @ApiOperation({ summary: 'Cap nhat mon an (Admin)' })
   @Put(':maMon')
   capNhatMon(
-    @Headers('authorization') authorization: string | undefined,
     @Param('maMon') maMon: string,
     @Body() body: CapNhatMonDto,
   ) {
-    return this.thucDonService.capNhatMon(authorization, maMon, body);
+    return this.thucDonService.capNhatMon(maMon, body);
   }
 
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   @ApiOperation({ summary: 'Xoa mon an (Admin)' })
   @Delete(':maMon')
-  xoaMon(
-    @Headers('authorization') authorization: string | undefined,
-    @Param('maMon') maMon: string,
-  ) {
-    return this.thucDonService.xoaMon(authorization, maMon);
+  xoaMon(@Param('maMon') maMon: string) {
+    return this.thucDonService.xoaMon(maMon);
   }
 
-  @ApiBearerAuth('access-token')
+  @ApiBearerAuth()
+  @UseGuards(JwtAuthGuard, RolesGuard)
+  @Roles('Admin')
   @ApiOperation({ summary: 'Upload anh mon an (Admin)' })
   @ApiConsumes('multipart/form-data')
   @ApiBody({
@@ -115,12 +122,9 @@ export class ThucDonController {
     }),
   )
   uploadAnhMon(
-    @Headers('authorization') authorization: string | undefined,
     @UploadedFile() tapTin?: { filename?: string },
   ) {
-    this.thucDonService.yeuCauQuyenQuanTri(authorization);
-
-    return this.thucDonService.taoPhanHoi(
+    return taoPhanHoi(
       {
         url: tapTin?.filename ? `/uploads/mon-an/${tapTin.filename}` : '',
         tenTep: tapTin?.filename || '',
@@ -129,3 +133,5 @@ export class ThucDonController {
     );
   }
 }
+
+

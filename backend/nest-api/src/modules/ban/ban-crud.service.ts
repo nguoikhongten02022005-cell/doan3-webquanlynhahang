@@ -1,33 +1,17 @@
 import { Injectable } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
-import { AuthService } from '../auth/auth.service';
-
-type BanGhi = Record<string, any>;
+import { taoPhanHoi } from '../../common/phan-hoi';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class BanCrudService {
-  constructor(
-    private readonly mysql: MySqlService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly mysql: MySqlService) {}
 
-  private taoPhanHoi(
-    duLieu: unknown,
-    thongDiep = 'Thanh cong',
-    meta: unknown = null,
-  ) {
-    return { success: true, data: duLieu, message: thongDiep, meta };
-  }
-
-  layDanhSachBan() {
-    return this.thucHienLayDanhSachBan();
-  }
-
-  async thucHienLayDanhSachBan() {
+  async layDanhSachBan() {
     const danhSach = await this.mysql.truyVan(
       'SELECT * FROM Ban ORDER BY SoBan ASC, NgayCapNhat DESC',
     );
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       danhSach.map((ban: BanGhi) => ({
         maBan: ban.MaBan,
         tenBan: ban.TenBan,
@@ -42,9 +26,7 @@ export class BanCrudService {
     );
   }
 
-  async taoBan(authorization: string | undefined, body: BanGhi) {
-    this.authService.yeuCauQuyenQuanTri(authorization);
-
+  async taoBan(body: BanGhi) {
     await this.mysql.thucThi(
       'INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [
@@ -58,17 +40,10 @@ export class BanCrudService {
         'Available',
       ],
     );
-
-    return this.taoPhanHoi({ maBan: body.maBan }, 'Tao ban thanh cong');
+    return taoPhanHoi({ maBan: body.maBan }, 'Tao ban thanh cong');
   }
 
-  async capNhatBan(
-    authorization: string | undefined,
-    maBan: string,
-    body: BanGhi,
-  ) {
-    this.authService.yeuCauQuyenQuanTri(authorization);
-
+  async capNhatBan(maBan: string, body: BanGhi) {
     await this.mysql.thucThi(
       'UPDATE Ban SET TenBan = ?, KhuVuc = ?, SoBan = ?, SoChoNgoi = ?, ViTri = ?, GhiChu = ? WHERE MaBan = ?',
       [
@@ -81,14 +56,11 @@ export class BanCrudService {
         maBan,
       ],
     );
-
-    return this.taoPhanHoi({ maBan }, 'Cap nhat ban thanh cong');
+    return taoPhanHoi({ maBan }, 'Cap nhat ban thanh cong');
   }
 
-  async xoaBan(authorization: string | undefined, maBan: string) {
-    this.authService.yeuCauQuyenQuanTri(authorization);
-
+  async xoaBan(maBan: string) {
     await this.mysql.thucThi('DELETE FROM Ban WHERE MaBan = ?', [maBan]);
-    return this.taoPhanHoi(null, 'Xoa ban thanh cong');
+    return taoPhanHoi(null, 'Xoa ban thanh cong');
   }
 }

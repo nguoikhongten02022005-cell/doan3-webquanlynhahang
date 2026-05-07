@@ -1,13 +1,5 @@
-import { NHAN_KHU_VUC_DAT_BAN } from '../mocks/duLieuDatBan.js'
-
-export const dinhDangNgay = (value) => {
-  if (!value) return '--'
-
-  const [year, month, day] = String(value).split('-')
-  if (!year || !month || !day) return '--'
-
-  return `${day}/${month}/${year}`
-}
+import { NHAN_KHU_VUC_DAT_BAN } from '../constants/duLieuDatBan.js'
+import { dinhDangNgay } from '../../noiBo/dinhDang.js'
 
 export const dinhDangMaDatBan = (bookingId) => `DB-${String(bookingId).slice(-6)}`
 
@@ -51,7 +43,7 @@ export const chuanHoaDatBan = (booking) => {
   }
 
   const normalizedStatus = String(booking.status || booking.trangThai || 'Pending').trim() || 'Pending'
-  const assignedTableIds = chuanHoaDanhSachIdBanDaGan(booking.assignedTableIds)
+  const danhSachMaBanDaGan = chuanHoaDanhSachIdBanDaGan(booking.danhSachMaBanDaGan)
 
   return {
     id: normalizedId,
@@ -81,8 +73,8 @@ export const chuanHoaDatBan = (booking) => {
         ? [String(booking.confirmationChannel)]
         : [],
     internalNote: String(booking.internalNote ?? booking.ghiChuNoiBo ?? booking.GhiChuNoiBo ?? '').trim(),
-    assignedTableIds,
-    assignedTables: Array.isArray(booking.assignedTables) ? booking.assignedTables.filter(Boolean) : [],
+    danhSachMaBanDaGan,
+    danhSachBanDaGan: Array.isArray(booking.danhSachBanDaGan) ? booking.danhSachBanDaGan.filter(Boolean) : [],
     checkedInAt: String(booking.checkedInAt ?? '').trim(),
     seatedAt: String(booking.seatedAt ?? '').trim(),
     completedAt: String(booking.completedAt ?? '').trim(),
@@ -127,15 +119,15 @@ export const boSungBanChoDanhSachDatBan = (bookings, tables) => {
   const tableLookup = layBangTraCuuBan(tables)
 
   return bookings.map((booking) => {
-    const assignedTableIds = chuanHoaDanhSachIdBanDaGan(booking.assignedTableIds)
-    const assignedTables = assignedTableIds
+    const danhSachMaBanDaGan = chuanHoaDanhSachIdBanDaGan(booking.danhSachMaBanDaGan)
+    const danhSachBanDaGan = danhSachMaBanDaGan
       .map((tableId) => tableLookup.get(tableId))
       .filter(Boolean)
 
     return {
       ...booking,
-      assignedTableIds,
-      assignedTables,
+      danhSachMaBanDaGan,
+      danhSachBanDaGan,
     }
   })
 }

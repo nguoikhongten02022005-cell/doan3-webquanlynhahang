@@ -266,8 +266,8 @@ export const DANH_SACH_DAT_BAN_MAU = Object.freeze([
     bookingCode: 'DB001',
     maKH: 'KH001',
     maNV: 'NV002',
-    assignedTableIds: Object.freeze(['B004']),
-    assignedTables: Object.freeze([DANH_SACH_BAN_MAU.find((ban) => ban.code === 'B004')]),
+    danhSachMaBanDaGan: Object.freeze(['B004']),
+    danhSachBanDaGan: Object.freeze([DANH_SACH_BAN_MAU.find((ban) => ban.code === 'B004')]),
     guests: '4',
     date: '2026-08-10',
     time: '18:00',
@@ -325,7 +325,7 @@ const DON_HANG_DH001 = Object.freeze({
   shippingFee: 0,
   phiShip: 0,
   discountAmount: 10000,
-  pricingSummary: Object.freeze({
+  tongHopGia: Object.freeze({
     tamTinh: 225000,
     phiDichVu: 0,
     phiShip: 0,
@@ -381,7 +381,7 @@ const DON_HANG_DH002 = Object.freeze({
   shippingFee: 0,
   phiShip: 0,
   discountAmount: 0,
-  pricingSummary: Object.freeze({
+  tongHopGia: Object.freeze({
     tamTinh: 140000,
     phiDichVu: 0,
     phiShip: 0,
@@ -431,7 +431,7 @@ const DON_HANG_DH003 = Object.freeze({
   shippingFee: 15000,
   phiShip: 15000,
   discountAmount: 0,
-  pricingSummary: Object.freeze({
+  tongHopGia: Object.freeze({
     tamTinh: 155000,
     phiDichVu: 10000,
     phiShip: 15000,

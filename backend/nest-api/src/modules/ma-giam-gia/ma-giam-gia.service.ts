@@ -4,61 +4,36 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
-import { AuthService } from '../auth/auth.service';
-
-type BanGhi = Record<string, any>;
+import { taoPhanHoi } from '../../common/phan-hoi';
+import { tinhGiamGia } from '../../common/tinh-giam-gia.helper';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class MaGiamGiaService {
-  constructor(
-    private readonly mysql: MySqlService,
-    private readonly authService: AuthService,
-  ) {}
+  constructor(private readonly mysql: MySqlService) {}
 
-  private taoPhanHoi(
-    duLieu: unknown,
-    thongDiep = 'Thanh cong',
-    meta: unknown = null,
-  ) {
-    return { success: true, data: duLieu, message: thongDiep, meta };
-  }
-
-  yeuCauQuyenQuanTri(authorization: string | undefined) {
-    return this.authService.yeuCauQuyenQuanTri(authorization);
-  }
-
-  kiemTraMaGiamGia(payload: BanGhi) {
-    return this.thucHienKiemTraMaGiamGia(payload);
-  }
-
-  private async thucHienKiemTraMaGiamGia(payload: BanGhi) {
+  async kiemTraMaGiamGia(payload: BanGhi) {
     const maCode = String(payload.maCode || '').trim();
     const tongTien = Number(payload.tongTien || 0);
-    const [ma] = await this.mysql.truyVan(
-      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
-      [maCode],
-    );
-    if (!ma) {
-      throw new NotFoundException('Khong tim thay ma giam gia.');
+    const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (!ma) throw new NotFoundException('Khong tim thay ma giam gia.');
+    if (String(ma.TrangThai || '') !== 'Active') throw new BadRequestException('Ma giam gia khong con hieu luc.');
+
+    const now = new Date();
+    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now) throw new BadRequestException('Ma giam gia chua den thoi gian ap dung.');
+    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now) throw new BadRequestException('Ma giam gia da het han.');
+
+    if (ma.SoLanToiDa != null && Number(ma.SoLanDaDung) >= Number(ma.SoLanToiDa)) {
+      throw new BadRequestException('Ma giam gia da dat gioi han su dung.');
     }
+
     if (tongTien < Number(ma.DonHangToiThieu || 0)) {
-      throw new BadRequestException(
-        'Don hang chua du dieu kien ap dung ma giam gia.',
-      );
+      throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
     }
 
-    const laPhanTram = String(ma.LoaiGiam || '').toLowerCase() === 'phantram';
-    const giaTriGiam = Number(ma.GiaTri || 0);
-    const giamToiDa = ma.GiaTriToiDa == null ? null : Number(ma.GiaTriToiDa);
-    const soTienGiamTamTinh = laPhanTram
-      ? Math.round((tongTien * giaTriGiam) / 100)
-      : giaTriGiam;
-    const soTienGiamThucTe =
-      giamToiDa == null
-        ? soTienGiamTamTinh
-        : Math.min(soTienGiamTamTinh, giamToiDa);
+    const { laPhanTram, giaTriGiam, giamToiDa, soTienGiamThucTe } = tinhGiamGia(tongTien, ma);
 
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       {
         hopLe: true,
         maGiamGia: ma.MaCode,
@@ -87,54 +62,24 @@ export class MaGiamGiaService {
        FROM MaGiamGia
        ORDER BY NgayBatDau DESC`,
     );
-    return this.taoPhanHoi(danhSach, 'Lay danh sach ma giam gia thanh cong');
+    return taoPhanHoi(danhSach, 'Lay danh sach ma giam gia thanh cong');
   }
 
   async layChiTiet(maCode: string) {
-    const [ma] = await this.mysql.truyVan(
-      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
-      [maCode],
-    );
-    if (!ma) {
-      throw new NotFoundException('Khong tim thay ma giam gia.');
-    }
-    return this.taoPhanHoi(ma, 'Lay chi tiet ma giam gia thanh cong');
+    const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (!ma) throw new NotFoundException('Khong tim thay ma giam gia.');
+    return taoPhanHoi(ma, 'Lay chi tiet ma giam gia thanh cong');
   }
 
-  async taoMa(authorization: string | undefined, payload: BanGhi) {
-    this.yeuCauQuyenQuanTri(authorization);
+  async taoMaGiamGia(payload: BanGhi) {
+    const { maCode, tenCode, giaTri, loaiGiam, giaTriToiDa, donHangToiThieu, ngayBatDau, ngayKetThuc, soLanToiDa, trangThai } = payload;
 
-    const {
-      maCode,
-      tenCode,
-      giaTri,
-      loaiGiam,
-      giaTriToiDa,
-      donHangToiThieu,
-      ngayBatDau,
-      ngayKetThuc,
-      soLanToiDa,
-      trangThai,
-    } = payload;
-
-    if (
-      !maCode ||
-      !tenCode ||
-      giaTri == null ||
-      !loaiGiam ||
-      !ngayBatDau ||
-      !ngayKetThuc
-    ) {
+    if (!maCode || !tenCode || giaTri == null || !loaiGiam || !ngayBatDau || !ngayKetThuc) {
       throw new BadRequestException('Thieu thong tin bat buoc.');
     }
 
-    const [tonTai] = await this.mysql.truyVan(
-      'SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
-      [maCode],
-    );
-    if (tonTai) {
-      throw new BadRequestException('Ma code da ton tai.');
-    }
+    const [tonTai] = await this.mysql.truyVan('SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (tonTai) throw new BadRequestException('Ma code da ton tai.');
 
     await this.mysql.thucThi(
       `INSERT INTO MaGiamGia
@@ -142,48 +87,23 @@ export class MaGiamGiaService {
          NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?)`,
       [
-        maCode,
-        tenCode,
-        giaTri,
-        loaiGiam,
+        maCode, tenCode, giaTri, loaiGiam,
         giaTriToiDa == null ? null : giaTriToiDa,
         donHangToiThieu == null ? null : donHangToiThieu,
-        ngayBatDau,
-        ngayKetThuc,
+        ngayBatDau, ngayKetThuc,
         soLanToiDa == null ? null : soLanToiDa,
         trangThai || 'Active',
       ],
     );
 
-    return this.taoPhanHoi({ maCode }, 'Tao ma giam gia thanh cong');
+    return taoPhanHoi({ maCode }, 'Tao ma giam gia thanh cong');
   }
 
-  async capNhatMa(
-    authorization: string | undefined,
-    maCode: string,
-    payload: BanGhi,
-  ) {
-    this.yeuCauQuyenQuanTri(authorization);
+  async capNhatMa(maCode: string, payload: BanGhi) {
+    const [tonTai] = await this.mysql.truyVan('SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (!tonTai) throw new NotFoundException('Khong tim thay ma giam gia.');
 
-    const [tonTai] = await this.mysql.truyVan(
-      'SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
-      [maCode],
-    );
-    if (!tonTai) {
-      throw new NotFoundException('Khong tim thay ma giam gia.');
-    }
-
-    const {
-      tenCode,
-      giaTri,
-      loaiGiam,
-      giaTriToiDa,
-      donHangToiThieu,
-      ngayBatDau,
-      ngayKetThuc,
-      soLanToiDa,
-      trangThai,
-    } = payload;
+    const { tenCode, giaTri, loaiGiam, giaTriToiDa, donHangToiThieu, ngayBatDau, ngayKetThuc, soLanToiDa, trangThai } = payload;
 
     await this.mysql.thucThi(
       `UPDATE MaGiamGia SET
@@ -211,24 +131,14 @@ export class MaGiamGiaService {
       ],
     );
 
-    return this.taoPhanHoi({ maCode }, 'Cap nhat ma giam gia thanh cong');
+    return taoPhanHoi({ maCode }, 'Cap nhat ma giam gia thanh cong');
   }
 
-  async xoaMa(authorization: string | undefined, maCode: string) {
-    this.yeuCauQuyenQuanTri(authorization);
+  async xoaMa(maCode: string) {
+    const [tonTai] = await this.mysql.truyVan('SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
+    if (!tonTai) throw new NotFoundException('Khong tim thay ma giam gia.');
 
-    const [tonTai] = await this.mysql.truyVan(
-      'SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
-      [maCode],
-    );
-    if (!tonTai) {
-      throw new NotFoundException('Khong tim thay ma giam gia.');
-    }
-
-    await this.mysql.thucThi('DELETE FROM MaGiamGia WHERE MaCode = ?', [
-      maCode,
-    ]);
-
-    return this.taoPhanHoi({ maCode }, 'Xoa ma giam gia thanh cong');
+    await this.mysql.thucThi('DELETE FROM MaGiamGia WHERE MaCode = ?', [maCode]);
+    return taoPhanHoi({ maCode }, 'Xoa ma giam gia thanh cong');
   }
 }

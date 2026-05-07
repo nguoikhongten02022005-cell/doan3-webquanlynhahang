@@ -28,16 +28,11 @@ const BO_LOC_SAP_XEP = [
   { value: 'helpful', label: 'Hữu ích nhất' },
 ]
 
-const BO_LOC_ANH = [
-  { value: 'all', label: 'Tất cả' },
-  { value: 'with-image', label: 'Có ảnh' },
-]
-
 const textBoDau = (giaTri) => String(giaTri || '')
   .normalize('NFD')
   .replace(/[\u0300-\u036f]/g, '')
 
-const dinhDangNgay = (giaTri) => {
+const dinhDangNgayTuongDoi = (giaTri) => {
   if (!giaTri) return 'Vừa xong'
   const ngay = new Date(giaTri)
   if (Number.isNaN(ngay.getTime())) return String(giaTri)
@@ -61,26 +56,10 @@ const taoChuCaiDaiDien = (ten) => {
 
 const tinhTyLe = (soLuong, tong) => (tong ? Math.round((soLuong / tong) * 100) : 0)
 
-const docTapTinThanhDataUrl = (tapTin) => new Promise((resolve, reject) => {
-  const boDoc = new FileReader()
-  boDoc.onload = () => resolve(String(boDoc.result || ''))
-  boDoc.onerror = () => reject(new Error('Không thể đọc ảnh.'))
-  boDoc.readAsDataURL(tapTin)
-})
-
 function IconNgoiSao({ active = false }) {
   return (
     <svg viewBox="0 0 24 24" aria-hidden="true" fill={active ? 'currentColor' : 'none'} stroke="currentColor" strokeWidth="1.8">
       <path d="M12 2.75l2.85 5.78 6.38.93-4.62 4.5 1.09 6.35L12 17.3l-5.7 3 1.09-6.35-4.62-4.5 6.38-.93L12 2.75Z" />
-    </svg>
-  )
-}
-
-function IconMayAnh() {
-  return (
-    <svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="1.8">
-      <path d="M4 7.5h3l1.2-2h7.6l1.2 2H20a1.5 1.5 0 0 1 1.5 1.5v8A1.5 1.5 0 0 1 20 18.5H4A1.5 1.5 0 0 1 2.5 17v-8A1.5 1.5 0 0 1 4 7.5Z" />
-      <circle cx="12" cy="13" r="3.5" />
     </svg>
   )
 }
@@ -103,7 +82,6 @@ function DanhGiaPage() {
   const [dangGui, setDangGui] = useState(false)
   const [loi, setLoi] = useState('')
   const [locSao, setLocSao] = useState('all')
-  const [locAnh, setLocAnh] = useState('all')
   const [sapXep, setSapXep] = useState('newest')
   const [mucSaoHover, setMucSaoHover] = useState(0)
   const [maDonHangDangChon, setMaDonHangDangChon] = useState('')
@@ -112,7 +90,6 @@ function DanhGiaPage() {
   const [formDanhGia, setFormDanhGia] = useState({
     soSao: 0,
     noiDung: '',
-    hinhAnh: [],
   })
 
   const taiDanhSach = useCallback(async () => {
@@ -177,9 +154,8 @@ function DanhGiaPage() {
       const soLuong = danhGia.filter((item) => Number(item.soSao || 0) === soSao).length
       return { soSao, soLuong, phanTram: tinhTyLe(soLuong, tong) }
     })
-    const coAnh = danhGia.filter((item) => Array.isArray(item.hinhAnh) && item.hinhAnh.length > 0).length
 
-    return { tong, diemTrungBinh, phanBo, coAnh }
+    return { tong, diemTrungBinh, phanBo }
   }, [danhGia])
 
   const danhGiaHienThi = useMemo(() => {
@@ -187,10 +163,6 @@ function DanhGiaPage() {
 
     if (locSao !== 'all') {
       ketQua = ketQua.filter((item) => Number(item.soSao || 0) === Number(locSao))
-    }
-
-    if (locAnh === 'with-image') {
-      ketQua = ketQua.filter((item) => Array.isArray(item.hinhAnh) && item.hinhAnh.length > 0)
     }
 
     ketQua.sort((a, b) => {
@@ -201,32 +173,24 @@ function DanhGiaPage() {
     })
 
     return ketQua
-  }, [danhGia, locSao, locAnh, sapXep])
+  }, [danhGia, locSao, sapXep])
 
   const donHangDangChon = useMemo(() => donHangCoTheDanhGia.find((item) => item.maDonHang === maDonHangDangChon) || null, [donHangCoTheDanhGia, maDonHangDangChon])
-  const monDangDanhGia = donHangDangChon?.chiTiet?.[0]?.name || donHangDangChon?.chiTiet?.[0]?.tenMon || 'đơn hàng gần nhất'
+  const monDangDanhGia = useMemo(() => {
+    if (!donHangDangChon?.chiTiet?.length) return 'đơn hàng gần nhất'
+    const tenCacMon = donHangDangChon.chiTiet
+      .map((item) => item.name || item.tenMon)
+      .filter(Boolean)
+    if (tenCacMon.length === 0) return 'đơn hàng gần nhất'
+    if (tenCacMon.length === 1) return tenCacMon[0]
+    return `${tenCacMon[0]} và ${tenCacMon.length - 1} món khác`
+  }, [donHangDangChon])
 
   const coDonHangHopLe = Boolean(donHangDangChon)
   const formHopLe = Boolean(nguoiDungHienTai?.maKH && coDonHangHopLe && formDanhGia.soSao > 0 && formDanhGia.noiDung.trim())
 
   const capNhatTruong = (truong, giaTri) => {
     setFormDanhGia((prev) => ({ ...prev, [truong]: giaTri }))
-  }
-
-  const xuLyTaiAnh = async (files) => {
-    const danhSachFile = Array.from(files || []).slice(0, Math.max(0, 5 - formDanhGia.hinhAnh.length))
-    if (!danhSachFile.length) return
-
-    const moi = await Promise.all(danhSachFile.map(async (file) => ({
-      id: `${file.name}-${file.size}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      ten: file.name,
-      url: await docTapTinThanhDataUrl(file),
-    })))
-
-    setFormDanhGia((prev) => ({
-      ...prev,
-      hinhAnh: [...prev.hinhAnh, ...moi].slice(0, 5),
-    }))
   }
 
   const xuLySubmit = async (event) => {
@@ -255,14 +219,13 @@ function DanhGiaPage() {
         maDonHang: maDonHangDangChon,
         soSao: formDanhGia.soSao,
         noiDung: formDanhGia.noiDung.trim(),
-        hinhAnh: formDanhGia.hinhAnh.map((item) => item.url),
       })
 
       const danhSachConLai = await taiDonHangDanhGia()
       await taiDanhSach()
       hienThanhCong('Cảm ơn bạn đã đánh giá!', 'Gửi thành công')
       setHienCamOn(true)
-      setFormDanhGia({ soSao: 0, noiDung: '', hinhAnh: [] })
+      setFormDanhGia({ soSao: 0, noiDung: '' })
       setMucSaoHover(0)
       setMaDonHangDangChon(danhSachConLai[0]?.maDonHang || '')
     } catch (error) {
@@ -285,7 +248,6 @@ function DanhGiaPage() {
             <div className="danh-gia-modern-hero__badges">
               <span className="danh-gia-modern-badge danh-gia-modern-badge--primary">Đã xác thực</span>
               <span className="danh-gia-modern-badge">{reviewStats.tong} lượt đánh giá</span>
-              <span className="danh-gia-modern-badge">{reviewStats.coAnh} đánh giá có ảnh</span>
             </div>
           </div>
 
@@ -332,16 +294,6 @@ function DanhGiaPage() {
             </div>
 
             <div className="danh-gia-modern-toolbar__group">
-              {BO_LOC_ANH.map((muc) => (
-                <button
-                  key={muc.value}
-                  type="button"
-                  className={`danh-gia-modern-chip ${locAnh === muc.value ? 'active' : ''}`}
-                  onClick={() => setLocAnh(muc.value)}
-                >
-                  {muc.label}
-                </button>
-              ))}
               {BO_LOC_SAP_XEP.map((muc) => (
                 <button
                   key={muc.value}
@@ -365,7 +317,6 @@ function DanhGiaPage() {
             <div className="danh-gia-modern-grid">
               {danhGiaHienThi.map((review) => {
                 const avatar = taoChuCaiDaiDien(review.tenKhachHang || review.maKH)
-                const coAnh = Array.isArray(review.hinhAnh) && review.hinhAnh.length > 0
                 const noiDungDayDu = String(review.noiDung || '').trim()
                 const biRutGon = noiDungDayDu.length > 180 && moRongDanhGia !== review.maDanhGia
 
@@ -379,7 +330,7 @@ function DanhGiaPage() {
                             <strong>{review.tenKhachHang || review.maKH || 'Khách hàng'}</strong>
                             <span className="danh-gia-modern-verified">Đã mua hàng ✓</span>
                           </div>
-                          <div className="danh-gia-modern-meta">{dinhDangNgay(review.ngayDanhGia)} · Đơn {review.maDonHang || '—'}</div>
+                          <div className="danh-gia-modern-meta">{dinhDangNgayTuongDoi(review.ngayDanhGia)} · Đơn {review.maDonHang || '—'}</div>
                         </div>
                       </div>
 
@@ -402,23 +353,8 @@ function DanhGiaPage() {
                       </button>
                     ) : null}
 
-                    {coAnh ? (
-                      <div className="danh-gia-modern-image-grid">
-                        {review.hinhAnh.slice(0, 6).map((anh, index) => (
-                          <button
-                            key={`${review.maDanhGia}-img-${index}`}
-                            type="button"
-                            className="danh-gia-modern-image-item"
-                            onClick={() => window.open(anh, '_blank', 'noopener,noreferrer')}
-                          >
-                            <img src={anh} alt={`Ảnh đánh giá ${index + 1}`} />
-                          </button>
-                        ))}
-                      </div>
-                    ) : null}
-
                     <div className="danh-gia-modern-actions">
-                      <button type="button" className="danh-gia-modern-like-btn">
+                      <button type="button" className="danh-gia-modern-like-btn" disabled title="Tính năng đang phát triển">
                         👍 Hữu ích <span>{Number(review.soLuotHuuIch || 0)}</span>
                       </button>
                     </div>
@@ -458,7 +394,7 @@ function DanhGiaPage() {
                   <div className="danh-gia-modern-form-order">
                     <span>Đơn vừa hoàn tất gần nhất</span>
                     <strong>{donHangDangChon?.maDonHang || '—'}</strong>
-                    <small>{dinhDangNgay(donHangDangChon?.ngayTao)} · {donHangDangChon?.chiTiet?.length || 0} món</small>
+                    <small>{dinhDangNgayTuongDoi(donHangDangChon?.ngayTao)} · {donHangDangChon?.chiTiet?.length || 0} món</small>
                   </div>
                 </div>
 
@@ -473,7 +409,7 @@ function DanhGiaPage() {
                       onClick={() => setMaDonHangDangChon(don.maDonHang)}
                     >
                       <strong>{don.maDonHang}</strong>
-                      <span>{dinhDangNgay(don.ngayTao)}</span>
+                      <span>{dinhDangNgayTuongDoi(don.ngayTao)}</span>
                       <small>{don.chiTiet?.length || 0} món · {don.trangThai}</small>
                     </button>
                   )
@@ -513,51 +449,6 @@ function DanhGiaPage() {
                     placeholder="Món ăn, phục vụ, không gian, thời gian ra món..."
                   />
                 </label>
-
-                <div className="danh-gia-modern-upload">
-                  <span>Ảnh đính kèm</span>
-                  <label
-                    className="danh-gia-modern-dropzone"
-                    onDragOver={(event) => event.preventDefault()}
-                    onDrop={async (event) => {
-                      event.preventDefault()
-                      await xuLyTaiAnh(event.dataTransfer.files)
-                    }}
-                  >
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={async (event) => {
-                        await xuLyTaiAnh(event.target.files)
-                        event.target.value = ''
-                      }}
-                    />
-                    <div className="danh-gia-modern-dropzone__icon"><IconMayAnh /></div>
-                    <strong>Kéo thả ảnh hoặc bấm để chọn</strong>
-                    <span>Tối đa 5 ảnh · JPEG, PNG, WEBP</span>
-                  </label>
-
-                  {formDanhGia.hinhAnh.length > 0 ? (
-                    <div className="danh-gia-modern-preview-grid">
-                      {formDanhGia.hinhAnh.map((anh) => (
-                        <div key={anh.id} className="danh-gia-modern-preview-item">
-                          <img src={anh.url} alt={anh.ten} />
-                          <button
-                            type="button"
-                            className="danh-gia-modern-remove-btn"
-                            onClick={() => setFormDanhGia((prev) => ({
-                              ...prev,
-                              hinhAnh: prev.hinhAnh.filter((item) => item.id !== anh.id),
-                            }))}
-                          >
-                            ×
-                          </button>
-                        </div>
-                      ))}
-                    </div>
-                  ) : null}
-                </div>
 
                 <button type="submit" className="btn nut-chinh danh-gia-modern-submit" disabled={!formHopLe || dangGui}>
                   {dangGui ? (

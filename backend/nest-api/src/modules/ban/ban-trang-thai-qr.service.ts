@@ -1,52 +1,48 @@
-import {
-  ForbiddenException,
-  Injectable,
-  NotFoundException,
-} from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
-import { AuthService } from '../auth/auth.service';
 import { ThucDonService } from '../thuc-don/thuc-don.service';
-
-type BanGhi = Record<string, any>;
+import { taoPhanHoi } from '../../common/phan-hoi';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class BanTrangThaiQrService {
   constructor(
     private readonly mysql: MySqlService,
-    private readonly authService: AuthService,
     private readonly thucDonService: ThucDonService,
   ) {}
 
   private readonly urlFrontend = process.env.FRONTEND_ORIGIN?.trim() || '';
 
-  private taoPhanHoi(
-    duLieu: unknown,
-    thongDiep = 'Thanh cong',
-    meta: unknown = null,
-  ) {
-    return { success: true, data: duLieu, message: thongDiep, meta };
-  }
+  /**
+   * Phan giai tham so nguoi dung nhap: SoBan (1,2,3...) hoac MaBan (B001, B002...).
+   * Tra ve MaBan chinh xac hoac null neu khong ton tai.
+   */
+  private async timMaBan(giaTri: string): Promise<string | null> {
+    if (!giaTri) return null;
 
-  private yeuCauQuyenNhanVienHoacQuanTri(authorization?: string) {
-    const thongTinToken = this.authService.yeuCauDangNhapNoiBo(authorization);
-    const vaiTro = String(thongTinToken.vaiTro || '');
+    // Thu tim truc tiep theo MaBan (B001)
+    const [banTheoMa] = await this.mysql.truyVan(
+      'SELECT MaBan FROM Ban WHERE MaBan = ? LIMIT 1',
+      [giaTri],
+    );
+    if (banTheoMa) return banTheoMa.MaBan;
 
-    if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      throw new ForbiddenException(
-        'Ban khong co quyen thuc hien thao tac noi bo nay.',
+    // Neu la so, tim theo SoBan
+    const so = Number(giaTri);
+    if (Number.isFinite(so) && so > 0) {
+      const [banTheoSo] = await this.mysql.truyVan(
+        'SELECT MaBan FROM Ban WHERE SoBan = ? LIMIT 1',
+        [so],
       );
+      if (banTheoSo) return banTheoSo.MaBan;
     }
 
-    return thongTinToken;
+    return null;
   }
 
-  async capNhatTrangThaiBan(
-    authorization: string | undefined,
-    maBan: string,
-    trangThai: string,
-  ) {
-    this.yeuCauQuyenNhanVienHoacQuanTri(authorization);
-
+  async capNhatTrangThaiBan(maBan: string, trangThai: string) {
+    const ma = await this.timMaBan(maBan);
+    if (!ma) throw new NotFoundException('Khong tim thay ban.');
     const map = new Map<string, string>([
       ['TRONG', 'Available'],
       ['CO_KHACH', 'Occupied'],
@@ -58,30 +54,24 @@ export class BanTrangThaiQrService {
 
     await this.mysql.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
       map.get(trangThai) || trangThai,
-      maBan,
+      ma,
     ]);
-    return this.taoPhanHoi(
-      { maBan, trangThai },
-      'Cap nhat trang thai ban thanh cong',
-    );
+    return taoPhanHoi({ maBan: ma, trangThai }, 'Cap nhat trang thai ban thanh cong');
   }
 
-  async layQrBan(authorization: string | undefined, maBan: string) {
-    this.yeuCauQuyenNhanVienHoacQuanTri(authorization);
+  async layQrBan(maBan: string) {
+    const ma = await this.timMaBan(maBan);
+    if (!ma) throw new NotFoundException('Khong tim thay ban.');
 
-    const danhSach = await this.mysql.truyVan(
+    const [ban] = await this.mysql.truyVan(
       'SELECT * FROM Ban WHERE MaBan = ? LIMIT 1',
-      [maBan],
+      [ma],
     );
-    const ban = danhSach[0];
-    if (!ban) {
-      throw new NotFoundException('Khong tim thay ban.');
-    }
 
-    const url = `${this.urlFrontend}/ban/${maBan}/goi-mon`;
-    return this.taoPhanHoi(
+    const url = `${this.urlFrontend}/ban/${ma}/goi-mon`;
+    return taoPhanHoi(
       {
-        maBan,
+        maBan: ma,
         tenBan: ban.TenBan,
         khuVuc: ban.KhuVuc || ban.ViTri || '',
         url,
@@ -92,16 +82,16 @@ export class BanTrangThaiQrService {
   }
 
   async layThucDonTheoBan(maBan: string) {
+    const ma = await this.timMaBan(maBan);
+    if (!ma) throw new NotFoundException('Ban khong ton tai.');
+
     const [ban] = await this.mysql.truyVan(
       'SELECT * FROM Ban WHERE MaBan = ? LIMIT 1',
-      [maBan],
+      [ma],
     );
-    if (!ban) {
-      throw new NotFoundException('Ban khong ton tai.');
-    }
 
     const monAn = (await this.thucDonService.layThucDon()).data;
-    return this.taoPhanHoi(
+    return taoPhanHoi(
       {
         ban: { maBan: ban.MaBan, tenBan: ban.TenBan, soBan: ban.SoBan },
         monAn,

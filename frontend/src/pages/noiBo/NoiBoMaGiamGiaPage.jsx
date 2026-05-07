@@ -17,6 +17,7 @@ import {
 } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
+import { dinhDangNgay } from '../../features/noiBo/dinhDang.js'
 import {
   layDanhSachMaGiamGiaApi,
   taoMaGiamGiaApi,
@@ -52,8 +53,7 @@ function taoFormMacDinh() {
     loaiGiam: 'PhanTram',
     giaTriToiDa: null,
     donHangToiThieu: 0,
-    ngayBatDau: null,
-    ngayKetThuc: null,
+    ngayApDung: null,
     soLanToiDa: null,
     trangThai: 'Active',
   }
@@ -63,22 +63,17 @@ function chuanHoaDuLieuForm(ma) {
   if (!ma) return taoFormMacDinh()
   return {
     ...ma,
-    ngayBatDau: ma.ngayBatDau ? dayjs(ma.ngayBatDau) : null,
-    ngayKetThuc: ma.ngayKetThuc ? dayjs(ma.ngayKetThuc) : null,
+    ngayApDung: ma.ngayBatDau && ma.ngayKetThuc ? [dayjs(ma.ngayBatDau), dayjs(ma.ngayKetThuc)] : null,
   }
 }
 
 function chuanHoaDuLieuGuiDi(giaTri) {
+  const ngayApDung = Array.isArray(giaTri.ngayApDung) ? giaTri.ngayApDung : []
   return {
     ...giaTri,
-    ngayBatDau: giaTri.ngayBatDau ? giaTri.ngayBatDau.format('YYYY-MM-DD') : null,
-    ngayKetThuc: giaTri.ngayKetThuc ? giaTri.ngayKetThuc.format('YYYY-MM-DD') : null,
+    ngayBatDau: ngayApDung[0] ? ngayApDung[0].format('YYYY-MM-DD') : null,
+    ngayKetThuc: ngayApDung[1] ? ngayApDung[1].format('YYYY-MM-DD') : null,
   }
-}
-
-function dinhDangNgay(ngay) {
-  if (!ngay) return '--'
-  return dayjs(ngay).format('DD/MM/YYYY')
 }
 
 function dinhDangGia(giaTri, loaiGiam) {

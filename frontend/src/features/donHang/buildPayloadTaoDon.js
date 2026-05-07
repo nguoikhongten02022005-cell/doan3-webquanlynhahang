@@ -1,7 +1,7 @@
 import { chuanHoaDanhSachMucGioHang } from '../gioHang/cartModel'
-import { LOAI_DON_HANG, TAO_PRICING_SUMMARY_MAC_DINH } from './contracts'
+import { LOAI_DON_HANG, TAO_TONG_HOP_GIA_MAC_DINH } from './contracts'
 
-const sinhMaTam = (tienTo) => `${tienTo}_${Date.now()}`
+const sinhMaTam = (tienTo) => `${tienTo}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`
 
 const chuanHoaDanhSachMonTaoDon = (payload = {}) => {
   if (Array.isArray(payload.items)) {
@@ -39,7 +39,7 @@ const chuanHoaDanhSachMonTaoDon = (payload = {}) => {
 
 export const buildPayloadTaoDon = (payload = {}) => {
   const loaiDon = payload.loaiDon || payload.orderType || payload.loaiNhanHang || LOAI_DON_HANG.TAI_QUAN
-  const pricingSummary = payload.pricingSummary || TAO_PRICING_SUMMARY_MAC_DINH()
+  const tongHopGia = payload.tongHopGia || TAO_TONG_HOP_GIA_MAC_DINH()
   const voucher = payload.voucher || {}
 
   return {
@@ -52,7 +52,7 @@ export const buildPayloadTaoDon = (payload = {}) => {
     nguonTao: payload.nguonTao || payload.source || 'Online',
     ghiChu: payload.ghiChu || payload.note || '',
     maGiamGia: payload.maGiamGia || payload.voucherCode || voucher.maGiamGia || voucher.code || null,
-    phiShip: Number(payload.phiShip || pricingSummary.phiShip || 0),
+    phiShip: Number(payload.phiShip || tongHopGia.phiShip || 0),
     diaChiGiao: payload.diaChiGiao || payload.customer?.address || '',
     gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
     gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
@@ -62,7 +62,7 @@ export const buildPayloadTaoDon = (payload = {}) => {
       gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
       gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
     },
-    pricingSummary,
+    tongHopGia,
     chiTiet: chuanHoaDanhSachMonTaoDon(payload),
   }
 }

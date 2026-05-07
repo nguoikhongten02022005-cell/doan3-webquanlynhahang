@@ -2,48 +2,40 @@ import {
   Body,
   Controller,
   Delete,
-  Get,
-  Headers,
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
 
-@ApiTags('nguoi-dung')
-@ApiBearerAuth('access-token')
+@ApiTags('nguoi-dung-noi-bo')
+@ApiBearerAuth()
+@UseGuards(JwtAuthGuard, RolesGuard)
+@Roles('Admin')
 @Controller('api/nguoi-dung')
 export class NguoiDungController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get()
-  layDanhSachNguoiDung(@Headers('authorization') authorization?: string) {
-    return this.authService.layDanhSachNguoiDung(authorization);
-  }
-
   @Post()
-  taoNguoiDungNoiBo(
-    @Headers('authorization') authorization: string | undefined,
-    @Body() body: Record<string, unknown>,
-  ) {
-    return this.authService.taoNguoiDungNoiBo(authorization, body);
+  taoNguoiDungNoiBo(@Body() body: Record<string, unknown>) {
+    return this.authService.taoNguoiDungNoiBo(body);
   }
 
   @Put(':maND')
   capNhatNguoiDungNoiBo(
-    @Headers('authorization') authorization: string | undefined,
     @Param('maND') maND: string,
     @Body() body: Record<string, unknown>,
   ) {
-    return this.authService.capNhatNguoiDungNoiBo(authorization, maND, body);
+    return this.authService.capNhatNguoiDungNoiBo(maND, body);
   }
 
   @Delete(':maND')
-  xoaNguoiDungNoiBo(
-    @Headers('authorization') authorization: string | undefined,
-    @Param('maND') maND: string,
-  ) {
-    return this.authService.xoaNguoiDungNoiBo(authorization, maND);
+  xoaNguoiDungNoiBo(@Param('maND') maND: string) {
+    return this.authService.xoaNguoiDungNoiBo(maND);
   }
 }

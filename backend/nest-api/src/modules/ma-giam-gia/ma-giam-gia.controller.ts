@@ -3,63 +3,63 @@ import {
   Controller,
   Delete,
   Get,
-  Headers,
   Param,
   Post,
   Put,
+  UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { MaGiamGiaService } from './ma-giam-gia.service';
-
-type BanGhi = Record<string, any>;
+import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
+import { RolesGuard } from '../../common/guards/roles.guard';
+import { Roles } from '../../common/decorators/roles.decorator';
+import { Public } from '../../common/decorators/public.decorator';
+import { BanGhi } from '../../common/types';
 
 @ApiTags('ma-giam-gia')
 @Controller('api/ma-giam-gia')
+@UseGuards(JwtAuthGuard, RolesGuard)
 export class MaGiamGiaController {
   constructor(private readonly maGiamGiaService: MaGiamGiaService) {}
 
+  @Public()
   @Post('validate')
   kiemTraMaGiamGia(@Body() body: BanGhi) {
     return this.maGiamGiaService.kiemTraMaGiamGia(body);
   }
 
   @ApiBearerAuth('access-token')
+  @Roles('Admin', 'NhanVien')
   @Get()
   layDanhSach() {
     return this.maGiamGiaService.layDanhSach();
   }
 
   @ApiBearerAuth('access-token')
+  @Roles('Admin', 'NhanVien')
   @Get(':maCode')
   layChiTiet(@Param('maCode') maCode: string) {
     return this.maGiamGiaService.layChiTiet(maCode);
   }
 
   @ApiBearerAuth('access-token')
+  @Roles('Admin')
   @Post()
-  taoMa(
-    @Headers('authorization') authorization: string | undefined,
-    @Body() body: BanGhi,
-  ) {
-    return this.maGiamGiaService.taoMa(authorization, body);
+  taoMaGiamGia(@Body() body: BanGhi) {
+    return this.maGiamGiaService.taoMaGiamGia(body);
   }
 
   @ApiBearerAuth('access-token')
+  @Roles('Admin')
   @Put(':maCode')
-  capNhatMa(
-    @Headers('authorization') authorization: string | undefined,
-    @Param('maCode') maCode: string,
-    @Body() body: BanGhi,
-  ) {
-    return this.maGiamGiaService.capNhatMa(authorization, maCode, body);
+  capNhatMa(@Param('maCode') maCode: string, @Body() body: BanGhi) {
+    return this.maGiamGiaService.capNhatMa(maCode, body);
   }
 
   @ApiBearerAuth('access-token')
+  @Roles('Admin')
   @Delete(':maCode')
-  xoaMa(
-    @Headers('authorization') authorization: string | undefined,
-    @Param('maCode') maCode: string,
-  ) {
-    return this.maGiamGiaService.xoaMa(authorization, maCode);
+  xoaMa(@Param('maCode') maCode: string) {
+    return this.maGiamGiaService.xoaMa(maCode);
   }
 }

@@ -791,6 +791,8 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
   display: grid;
   place-items: center;
   overflow: hidden;
+  position: relative;
+  cursor: pointer;
 }
 .ho-so-avatar-preview img {
   width: 100%;
@@ -800,6 +802,20 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
 .ho-so-avatar-preview svg {
   width: 48px;
   height: 48px;
+}
+.ho-so-avatar-overlay {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(0, 0, 0, 0.35);
+  color: #fff;
+  opacity: 0;
+  transition: opacity 0.2s;
+  border-radius: 50%;
+}
+.ho-so-avatar-preview:hover .ho-so-avatar-overlay {
+  opacity: 1;
 }
 .ho-so-avatar-input {
   display: none;
@@ -817,6 +833,10 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
 .ho-so-avatar-btn:hover {
   background: #E8664A;
   color: #fff;
+}
+.ho-so-avatar-hint {
+  font-size: 0.75rem;
+  color: var(--text-muted);
 }
 .ho-so-form-grid {
   display: grid;
@@ -952,6 +972,21 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
 .ho-so-doi-diem-input-row .nhom-truong {
   flex: 1;
   min-width: 160px;
+}
+.ho-so-doi-diem-preview {
+  margin: 0;
+  padding: 0.6rem 0.9rem;
+  border-radius: 10px;
+  background: #f0fdf4;
+  color: #166534;
+  font-size: 0.92rem;
+  font-weight: 600;
+  border: 1px solid #bbf7d0;
+}
+.ho-so-doi-diem-preview--exceed {
+  background: #fef2f2;
+  color: #991b1b;
+  border-color: #fecaca;
 }
 .ho-so-doi-diem-btn {
   min-width: 130px;
@@ -1294,6 +1329,23 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
   border-color: #E8664A;
   color: #d95a3f;
 }
+.ho-so-action-btn--rebook {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: #E8664A;
+  color: #fff;
+  font-weight: 700;
+  font-size: 0.92rem;
+  border-radius: 0.9rem;
+  min-height: auto;
+}
+.ho-so-action-btn--rebook:hover {
+  background: #d95a3f;
+  color: #fff;
+}
 .ho-so-action-btn--detail {
   border: 1px solid #E5E0DB;
   background: #FAFAF9;
@@ -1348,10 +1400,13 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
   justify-items: center;
   text-align: center;
   gap: 0.75rem;
-  padding: 2rem 1rem;
+  padding: 2.5rem 1rem;
   border: 1px dashed #E5E0DB;
   border-radius: 1.25rem;
   background: #FFFDFC;
+  margin: 0;
+  width: 100%;
+  box-sizing: border-box;
 }
 .ho-so-empty-state h3 {
   font-size: 1.05rem;
@@ -1436,6 +1491,79 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
 .ho-so-order-item span {
   color: var(--dark);
   font-weight: 700;
+}
+
+.ho-so-booking-tabs {
+  margin-top: 1.5rem;
+}
+
+.ho-so-booking-tabs .ant-tabs-nav {
+  margin: 0 0 1.5rem;
+}
+
+.ho-so-booking-tabs .ant-tabs-nav::before {
+  border-bottom: 1px solid #E5E0DB;
+}
+
+.ho-so-booking-tabs .ant-tabs-tab {
+  padding: 0.55rem 0;
+  margin: 0 1.25rem 0 0;
+  color: var(--text-muted);
+  font-size: 0.92rem;
+  font-weight: 600;
+  transition: color 0.2s;
+}
+
+.ho-so-booking-tabs .ant-tabs-tab:hover {
+  color: var(--text-primary);
+}
+
+.ho-so-booking-tabs .ant-tabs-tab.ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #E8664A;
+  text-shadow: none;
+}
+
+.ho-so-booking-tabs .ant-tabs-ink-bar {
+  background: #E8664A;
+  height: 2.5px;
+}
+
+.ho-so-booking-tabs .ant-tabs-content-holder {
+  padding: 0;
+}
+
+.ho-so-booking-tabs .ant-tabs-nav-operations {
+  display: none;
+}
+
+.ho-so-booking-tabs .ant-tabs-tabpane {
+  padding: 0;
+}
+
+.ho-so-tab-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ho-so-tab-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.4rem;
+  height: 1.4rem;
+  padding: 0 0.35rem;
+  border-radius: 999px;
+  background: #E8664A;
+  color: #fff;
+  font-size: 0.75rem;
+  font-weight: 700;
+  line-height: 1;
+}
+
+.ho-so-tab-badge--muted {
+  background: #D1CBC4;
+  color: #6B6560;
 }
 
 @media (max-width: 900px) {

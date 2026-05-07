@@ -4,20 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { BootstrapService } from './config/bootstrap.service';
-
-function docBienMoiTruongBatBuoc(tenBien: string) {
-  const giaTri = process.env[tenBien]?.trim();
-
-  if (!giaTri) {
-    throw new Error(`Thiếu biến môi trường bắt buộc: ${tenBien}`);
-  }
-
-  return giaTri;
-}
-
-function docBienMoiTruongTuyChon(tenBien: string) {
-  return process.env[tenBien]?.trim() || '';
-}
+import { docBienMoiTruongBatBuoc, docBienMoiTruongTuyChon } from './common/doc-bien-moi-truong';
 
 function tachDanhSachOrigin(giaTri: string) {
   return giaTri
@@ -67,7 +54,6 @@ async function bootstrap() {
         return;
       }
 
-      console.log(`Origin bị từ chối: ${origin}`);
       callback(new Error(`Origin không được phép: ${origin}`), false);
     },
     credentials: true,
@@ -111,7 +97,6 @@ async function bootstrap() {
   await app.listen(congBackend);
 
   console.log(`Backend đang chạy ở môi trường: ${moiTruong}`);
-  console.log('Danh sách origin CORS:', danhSachOriginDuocPhep);
   console.log(`Swagger UI: http://localhost:${congBackend}/swagger`);
 }
 

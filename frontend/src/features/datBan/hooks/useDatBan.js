@@ -1,6 +1,6 @@
 import { useCallback } from 'react'
 import { STORAGE_KEYS } from '../../../constants/khoaLuuTru'
-import { CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST } from '../mocks/duLieuDatBan'
+import { CAC_THAO_TAC_TRANG_THAI_DAT_BAN_HOST } from '../constants/duLieuDatBan'
 import {
   huyDatBanApi,
   taoDatBanApi,
@@ -181,7 +181,10 @@ export const useDatBan = () => {
   }), [])
 
   const layLichSuDatBan = useCallback(async () => {
-    const maKh = nguoiDungHienTai?.maKH || 'KH001'
+    const maKh = nguoiDungHienTai?.maKH
+    if (!maKh) {
+      return []
+    }
     const { duLieu } = await layLichSuDatBanApi(maKh)
 
     if (!Array.isArray(duLieu)) {

@@ -479,7 +479,6 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
   }
 
   const xuLyThanhToanNhanh = async () => {
-    setFormStatus('Paid')
     await guiCapNhatTrangThai('Paid')
   }
 

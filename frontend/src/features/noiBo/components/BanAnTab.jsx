@@ -458,8 +458,7 @@ function BanAnTabPos({
       ),
       children: danhSachBanTheoKhuVuc.length ? (
         <div className="grid gap-3" style={{ gridTemplateColumns: `repeat(${soCotKhuVuc}, minmax(126px, 1fr))` }}>
-          {danhSachBanTheoKhuVuc.map((table) => (
-            (() => {
+          {danhSachBanTheoKhuVuc.map((table) => {
               const lopHinhDangBan = layLopHinhDangBan(table.sucChua)
 
               return (
@@ -521,8 +520,7 @@ function BanAnTabPos({
                   </div>
                 </div>
               )
-            })()
-          ))}
+            })}
         </div>
       ) : (
         <div className="rounded-2xl border border-dashed border-slate-200 bg-slate-50 px-4 py-10">

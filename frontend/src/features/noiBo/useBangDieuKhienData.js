@@ -1,12 +1,7 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { taoDuLieuThongKeDoanhThu } from './thongKeNoiBo'
-
-const laCungNgayLich = (ngayTrai, ngayPhai) => (
-  ngayTrai.getFullYear() === ngayPhai.getFullYear()
-  && ngayTrai.getMonth() === ngayPhai.getMonth()
-  && ngayTrai.getDate() === ngayPhai.getDate()
-)
+import { laCungNgayLich } from './boChon'
 
 const tinhDoanhThuHomNay = (danhSachDonHang = []) => {
   const homNay = new Date()
@@ -82,7 +77,7 @@ export const useBangDieuKhienData = (duLieuNoiBo = {}) => {
         datBan.status,
         datBan.date,
         datBan.time,
-        datBan.assignedTableIds?.length || 0,
+        datBan.danhSachMaBanDaGan?.length || 0,
       ]),
       orders: (duLieuNoiBo?.danhSachDonHangDaSapXep || []).map((donHang) => [
         donHang.id,

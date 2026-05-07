@@ -1,9 +1,11 @@
-import { BadRequestException, Injectable } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
+import type { PoolConnection } from 'mysql2/promise';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { DonHangPricingService } from './don-hang-pricing.service';
 import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
-
-type BanGhi = Record<string, any>;
+import { taoPhanHoi } from '../../common/phan-hoi';
+import { taoMa } from '../../common/tao-ma';
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class DonHangCreateOrderService {
@@ -13,27 +15,20 @@ export class DonHangCreateOrderService {
     private readonly diemTichLuyService: DiemTichLuyService,
   ) {}
 
-  private taoPhanHoi(
-    duLieu: unknown,
-    thongDiep = 'Thanh cong',
-    meta: unknown = null,
-  ) {
-    return { success: true, data: duLieu, message: thongDiep, meta };
+  private async thucThi(sql: string, thamSo: any[], ketNoi: PoolConnection) {
+    await ketNoi.execute(sql, thamSo);
   }
 
-  private taoMa(prefix: string) {
-    return `${prefix}_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
+  private async truyVan(sql: string, thamSo: any[], ketNoi: PoolConnection): Promise<any[]> {
+    const [kq] = await ketNoi.query(sql, thamSo);
+    return kq as any[];
   }
 
   private chuanHoaDanhSachChiTiet(dsDauVao: unknown, tienToMaChiTiet: string) {
     const danhSach = Array.isArray(dsDauVao) ? dsDauVao : [];
     return danhSach
       .map((muc: BanGhi, chiSo: number) => ({
-        maChiTiet: String(
-          muc?.maChiTiet ||
-            muc?.MaChiTiet ||
-            `${tienToMaChiTiet}_${Date.now()}_${chiSo}`,
-        ),
+        maChiTiet: String(muc?.maChiTiet || muc?.MaChiTiet || `${tienToMaChiTiet}_${Date.now()}_${chiSo}`),
         maMon: String(muc?.maMon || muc?.MaMon || ''),
         soLuong: Number(muc?.soLuong || muc?.SoLuong || 0),
         ghiChu: String(muc?.ghiChu || muc?.GhiChu || ''),
@@ -41,8 +36,8 @@ export class DonHangCreateOrderService {
       .filter((muc) => Boolean(muc.maMon));
   }
 
-async taoDonHang(payload: BanGhi, loaiDon?: string) {
-    const maDonHang = String(payload.maDonHang || this.taoMa('DH'));
+  async taoDonHang(payload: BanGhi, loaiDon?: string) {
+    const maDonHang = String(payload.maDonHang || taoMa('DH'));
     const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
@@ -50,60 +45,49 @@ async taoDonHang(payload: BanGhi, loaiDon?: string) {
     const trangThai = payload.trangThai || 'Pending';
     const soDiem = Number(payload.soDiem || 0);
 
-    const { chiTietDaTinh, pricingSummary, voucher, diemApDung } =
-      await this.donHangPricingService.recalculateOrderPricing(payload, chiTiet);
+    const { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung } =
+      await this.donHangPricingService.tinhLaiGiaDonHang(payload, chiTiet);
 
-    let diemDaDoi = null;
-    if (soDiem > 0) {
-      try {
+    const nguoiDung = payload.nguoiDung || { maND: payload.maND };
+
+    return this.mysql.giaoDich(async (ketNoi) => {
+      let diemDaDoi: any = null;
+      if (soDiem > 0) {
         const ketQuaDoiDiem = await this.diemTichLuyService.doiDiem(
-          payload.authorization,
+          nguoiDung,
           { soDiem, moTa: `Doi diem thanh toan don hang ${maDonHang}` },
+          ketNoi,
         );
         diemDaDoi = ketQuaDoiDiem.data || ketQuaDoiDiem;
-      } catch (loiDoiDiem) {
-        throw new BadRequestException(
-          `Khong the doi diem: ${loiDoiDiem.message || 'Khong du diem hoac loi he thong'}`,
-        );
       }
-    }
 
-    try {
-      await this.mysql.thucThi(
-        `INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaBanAn, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      await this.thucThi(
+        `INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           maDonHang,
           payload.maKH || null,
-          maBan,
           maBan,
           payload.maNV || null,
           payload.maDatBan || null,
           loaiDonHang,
           payload.diaChiGiao || null,
-          pricingSummary.phiShip,
-          pricingSummary.tongTien,
+          tongHopGia.phiShip,
+          tongHopGia.tongTien,
           trangThai,
           nguonTao,
           payload.ghiChu || null,
         ],
+        ketNoi,
       );
 
       const chiTietPhanHoi: BanGhi[] = [];
       for (const muc of chiTietDaTinh) {
-        const maChiTiet = muc.maChiTiet || this.taoMa('CT');
-        await this.mysql.thucThi(
+        const maChiTiet = muc.maChiTiet || taoMa('CT');
+        await this.thucThi(
           'INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [
-            maChiTiet,
-            maDonHang,
-            muc.maMon,
-            muc.soLuong,
-            muc.donGia,
-            muc.thanhTien,
-            muc.ghiChu || null,
-            'Pending',
-          ],
+          [maChiTiet, maDonHang, muc.maMon, muc.soLuong, muc.donGia, muc.thanhTien, muc.ghiChu || null, 'Pending'],
+          ketNoi,
         );
         chiTietPhanHoi.push({
           MaChiTiet: maChiTiet,
@@ -118,13 +102,10 @@ async taoDonHang(payload: BanGhi, loaiDon?: string) {
       }
 
       if (maBan) {
-        await this.mysql.thucThi(
-          'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-          ['Occupied', maBan],
-        );
+        await this.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Occupied', maBan], ketNoi);
       }
 
-      return this.taoPhanHoi(
+      return taoPhanHoi(
         {
           donHang: {
             maDonHang,
@@ -132,9 +113,9 @@ async taoDonHang(payload: BanGhi, loaiDon?: string) {
             maBan,
             maNV: payload.maNV || null,
             maDatBan: payload.maDatBan || null,
-            tongTien: pricingSummary.tongTien,
-            pricingSummary,
-            voucher,
+            tongTien: tongHopGia.tongTien,
+            tongHopGia,
+            maGiamGia,
             diemApDung,
             trangThai,
             ghiChu: payload.ghiChu || '',
@@ -143,12 +124,11 @@ async taoDonHang(payload: BanGhi, loaiDon?: string) {
             thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
               loaiDon: loaiDonHang,
               diaChiGiao: payload.diaChiGiao || '',
-              gioLayHang:
-                payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
+              gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
               gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
             }),
             diaChiGiao: payload.diaChiGiao || '',
-            phiShip: pricingSummary.phiShip,
+            phiShip: tongHopGia.phiShip,
             tenKhachHang: payload.hoTen || payload.tenKhachHang || '',
             soDienThoai: payload.soDienThoai || '',
             email: payload.email || '',
@@ -159,40 +139,20 @@ async taoDonHang(payload: BanGhi, loaiDon?: string) {
         },
         'Tao don hang thanh cong',
       );
-    } catch (loiTaoDon) {
-      if (soDiem > 0 && diemDaDoi) {
-        try {
-          await this.diemTichLuyService.congDiemHuyDon(payload.authorization, {
-            maDonHang,
-            soDiem,
-            moTa: `Hoan diem do loi tao don hang ${maDonHang}`,
-          });
-        } catch (loiHoanDiem) {
-          console.error('Loi khi hoan diem:', loiHoanDiem);
-        }
-      }
-      throw loiTaoDon;
-    }
+    });
   }
 
   async taoOrderTaiBan(maBan: string, payload: BanGhi) {
     const chiTiet = this.chuanHoaDanhSachChiTiet(payload.chiTiet, 'CTBAN');
-    const danhSachMon = this.chuanHoaDanhSachChiTiet(
-      payload.danhSachMon,
-      'CTBAN',
-    );
+    const danhSachMon = this.chuanHoaDanhSachChiTiet(payload.danhSachMon, 'CTBAN');
     const items = this.chuanHoaDanhSachChiTiet(payload.items, 'CTBAN');
 
     return this.taoDonHang(
       {
         ...payload,
         maBan,
-        maDonHang: payload.maDonHang || this.taoMa('DH'),
-        chiTiet: chiTiet.length
-          ? chiTiet
-          : danhSachMon.length
-            ? danhSachMon
-            : items,
+        maDonHang: payload.maDonHang || taoMa('DH'),
+        chiTiet: chiTiet.length ? chiTiet : danhSachMon.length ? danhSachMon : items,
         nguonTao: 'QRCode',
         loaiDon: 'TAI_BAN',
       },

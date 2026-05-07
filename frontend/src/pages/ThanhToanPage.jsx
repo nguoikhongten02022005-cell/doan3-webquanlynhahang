@@ -10,11 +10,11 @@ import { xoaPhieuGiamGiaDaApDung, layPhieuGiamGiaDaApDung, tinhSoTienGiamTheoPhi
 import { layTongQuanDiemTichLuyApi } from '../services/api/apiDiemTichLuy'
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 import { taoDuLieuTaoDonHang, layMonKhongHopLeTrongDonHang, TUY_CHON_PHUONG_THUC_THANH_TOAN } from '../utils/donHang'
+import { tinhPhiDichVu } from '../utils/phiDichVu'
 
 const TI_LE_DIEM = 100
 const GIA_TRI_DIEM = 10000
 
-const tinhPhiDichVu = (tamTinh) => (tamTinh > 0 ? Math.round((tamTinh * 0.05) / 1000) * 1000 : 0)
 const tinhSoTienGiamTuDiem = (soDiem) => Math.floor(soDiem / TI_LE_DIEM) * GIA_TRI_DIEM
 
 function ThanhToanPage() {
@@ -95,7 +95,7 @@ function ThanhToanPage() {
   }
 
   const handleDiemChange = (e) => {
-    const giaTri = Number(e.target.value)
+    const giaTri = Number(e.target.value) || 0
     const diemToiDa = thongTinDiem?.tongDiem || 0
     const diemCoTheDung = Math.min(diemToiDa, Math.floor(tongTienXetPhieuGiamGia / GIA_TRI_DIEM) * TI_LE_DIEM)
     setSoDiem(Math.max(0, Math.min(giaTri, diemCoTheDung)))

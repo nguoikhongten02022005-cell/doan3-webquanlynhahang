@@ -1,5 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MySqlService } from '../database/mysql/mysql.service';
+import { docBienMoiTruongBatBuoc } from '../common/doc-bien-moi-truong';
 
 @Injectable()
 export class BootstrapService {
@@ -7,18 +8,8 @@ export class BootstrapService {
 
   constructor(private readonly mysql: MySqlService) {}
 
-  private docBienMoiTruongBatBuoc(tenBien: string) {
-    const giaTri = process.env[tenBien]?.trim();
-
-    if (!giaTri) {
-      throw new Error(`Thiếu biến môi trường bắt buộc: ${tenBien}`);
-    }
-
-    return giaTri;
-  }
-
   async khoiTaoNeuCan() {
-    if (this.docBienMoiTruongBatBuoc('DB_AUTO_INIT').toLowerCase() !== 'true') {
+    if (docBienMoiTruongBatBuoc('DB_AUTO_INIT').toLowerCase() !== 'true') {
       return;
     }
 

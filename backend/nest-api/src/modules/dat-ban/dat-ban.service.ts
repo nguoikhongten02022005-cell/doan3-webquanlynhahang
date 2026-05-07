@@ -1,8 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { DatBanQueryService } from './dat-ban-query.service';
 import { DatBanCommandService } from './dat-ban-command.service';
-
-type BanGhi = Record<string, any>;
+import { BanGhi } from '../../common/types';
 
 @Injectable()
 export class DatBanService {
@@ -11,55 +10,31 @@ export class DatBanService {
     private readonly datBanCommandService: DatBanCommandService,
   ) {}
 
-  layDanhSachDatBan(authorization?: string) {
-    return this.datBanQueryService.layDanhSachDatBan(authorization);
+  layDanhSachDatBan() {
+    return this.datBanQueryService.layDanhSachDatBan();
   }
 
-  layLichSuDatBan(authorization: string | undefined, maKh: string) {
-    return this.datBanQueryService.layLichSuDatBan(authorization, maKh);
+  layLichSuDatBan(nguoiDung: any, maKh: string) {
+    return this.datBanQueryService.layLichSuDatBan(nguoiDung, maKh);
   }
 
   layKhaDungDatBan(query: Record<string, unknown>) {
     return this.datBanQueryService.layKhaDungDatBan(query);
   }
 
-  taoDatBan(authorization: string | undefined, body: BanGhi) {
-    return this.datBanCommandService.taoDatBan(authorization, body);
+  taoDatBan(nguoiDung: any, body: BanGhi) {
+    return this.datBanCommandService.taoDatBan(nguoiDung, body);
   }
 
-  capNhatDatBan(
-    authorization: string | undefined,
-    maDatBan: string,
-    body: BanGhi,
-  ) {
-    return this.datBanCommandService.capNhatDatBan(
-      authorization,
-      maDatBan,
-      body,
-    );
+  capNhatDatBan(maDatBan: string, body: BanGhi) {
+    return this.datBanCommandService.capNhatDatBan(maDatBan, body);
   }
 
-  capNhatTrangThaiDatBan(
-    authorization: string | undefined,
-    maDatBan: string,
-    trangThai: string,
-  ) {
-    return this.datBanCommandService.capNhatTrangThaiDatBan(
-      authorization,
-      maDatBan,
-      trangThai,
-    );
+  capNhatTrangThaiDatBan(maDatBan: string, trangThai: string) {
+    return this.datBanCommandService.capNhatTrangThaiDatBan(maDatBan, trangThai);
   }
 
-  ganBanChoDatBan(
-    authorization: string | undefined,
-    maDatBan: string,
-    body: BanGhi,
-  ) {
-    return this.datBanCommandService.ganBanChoDatBan(
-      authorization,
-      maDatBan,
-      body,
-    );
+  ganBanChoDatBan(maDatBan: string, body: BanGhi) {
+    return this.datBanCommandService.ganBanChoDatBan(maDatBan, body);
   }
 }

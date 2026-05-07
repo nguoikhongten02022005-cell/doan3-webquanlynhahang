@@ -8,6 +8,6 @@ import { NguoiDungController } from './nguoi-dung.controller';
   imports: [CoreModule],
   controllers: [AuthController, NguoiDungController],
   providers: [AuthService],
-  exports: [AuthService],
+  exports: [AuthService, CoreModule],
 })
 export class AuthModule {}

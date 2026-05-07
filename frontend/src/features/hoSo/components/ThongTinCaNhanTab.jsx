@@ -239,20 +239,24 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
           <h2>Thông tin cá nhân</h2>
           <p>Cập nhật hồ sơ cơ bản để việc đặt bàn và thanh toán diễn ra nhanh hơn.</p>
         </div>
-        <Button htmlType="button" className="btn ho-so-logout-btn" onClick={onLogout}>
-          Đăng xuất
-        </Button>
       </div>
 
       <div className="ho-so-avatar-block">
-        <div className="ho-so-avatar-preview" aria-label="Ảnh đại diện">
+        <div className="ho-so-avatar-preview" aria-label="Ảnh đại diện" onClick={() => document.getElementById('ho-so-avatar-input')?.click()}>
           {anhDaiDienHienThi ? <img src={anhDaiDienHienThi} alt="Ảnh đại diện" /> : <BieuTuongAnhDaiDienNguoiDung />}
+          <span className="ho-so-avatar-overlay" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" style={{ width: 28, height: 28 }}>
+              <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+              <circle cx="12" cy="13" r="4" />
+            </svg>
+          </span>
         </div>
         <Upload accept="image/*" showUploadList={false} beforeUpload={handleDoiAnhDaiDien}>
-          <Button htmlType="button" className="btn ho-so-avatar-btn">
+          <Button htmlType="button" className="btn ho-so-avatar-btn" id="ho-so-avatar-input">
             Đổi ảnh
           </Button>
         </Upload>
+        <span className="ho-so-avatar-hint">JPG, PNG. Tối đa 2MB</span>
       </div>
 
       <Form form={formHoSo} layout="vertical" initialValues={duLieuHoSo}>
@@ -372,6 +376,18 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                 Đổi điểm
               </Button>
             </div>
+
+            {soDiemMuonDoi && soDiemMuonDoi > 0 && (
+              soDiemMuonDoi > tongQuanDiem.diemCoTheDoi ? (
+                <p className="ho-so-doi-diem-preview ho-so-doi-diem-preview--exceed">
+                  Vượt quá số điểm hiện có ({dinhDangSo(tongQuanDiem.diemCoTheDoi)} điểm)
+                </p>
+              ) : (
+                <p className="ho-so-doi-diem-preview">
+                  = {dinhDangSo(soDiemMuonDoi * tongQuanDiem.tiLeQuyDoi)}đ giảm giá
+                </p>
+              )
+            )}
 
             {phanHoiDoiDiem && (
               <div className="ho-so-doi-diem-result">
