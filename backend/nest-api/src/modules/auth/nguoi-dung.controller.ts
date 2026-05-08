@@ -2,6 +2,7 @@ import {
   Body,
   Controller,
   Delete,
+  Get,
   Param,
   Post,
   Put,
@@ -20,6 +21,11 @@ import { Roles } from '../../common/decorators/roles.decorator';
 @Controller('api/nguoi-dung')
 export class NguoiDungController {
   constructor(private readonly authService: AuthService) {}
+
+  @Get()
+  layDanhSachNguoiDung() {
+    return this.authService.layDanhSachNguoiDungQuery();
+  }
 
   @Post()
   taoNguoiDungNoiBo(@Body() body: Record<string, unknown>) {
