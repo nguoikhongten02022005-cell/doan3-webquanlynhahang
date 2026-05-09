@@ -27,7 +27,7 @@ import {
 } from 'antd'
 import { dinhDangTienTe } from '../../../utils/tienTe'
 import { dinhDangNgay } from '../dinhDang'
-import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan } from '../../../utils/donHang'
+import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan, NHAN_LOAI_DON_HANG } from '../../../utils/donHang'
 import { taoTongKetTienDonHang, moCuaSoInHoaDon } from '../../../utils/inHoaDon'
 
 const { TextArea } = Input
@@ -75,10 +75,17 @@ const khopBoLocDonHang = (order, filterKey) => {
   return filter ? filter.statuses.includes(order.status) : true
 }
 
-const dinhDangNhanBan = (tableNumber) => {
-  const normalized = String(tableNumber || '').trim()
-  return normalized ? `BÀN ${normalized.toUpperCase()}` : 'BÀN WALK-IN'
+const dinhDangNhanBan = (order) => {
+  const loaiDon = order.loaiDon || order.orderType || ''
+  const tenBan = String(order.tableNumber || '').trim()
+  if (loaiDon === 'TAI_BAN' && tenBan) return `BÀN ${tenBan.toUpperCase()}`
+  if (loaiDon === 'TAI_BAN') return 'TẠI BÀN'
+  return tenBan ? `BÀN ${tenBan.toUpperCase()}` : 'MANG VỀ'
 }
+
+const layNhanLoaiDon = (loaiDon) => NHAN_LOAI_DON_HANG[loaiDon] || 'Tại quầy'
+
+const layMauLoaiDon = (loaiDon) => loaiDon === 'TAI_BAN' ? 'purple' : 'cyan'
 
 const dinhDangMaDonHang = (order) => order.orderCode || order.code || `DH-${order.id}`
 
@@ -171,9 +178,12 @@ function DanhSachTheDonHang({ orders, idDonHangDangChon, onSelectOrder }) {
                 <Space style={{ width: '100%', justifyContent: 'space-between' }}>
                   <div>
                     <Typography.Text type="secondary">#{dinhDangMaDonHang(order)}</Typography.Text>
-                    <div><Typography.Text strong>{dinhDangNhanBan(order.tableNumber)}</Typography.Text></div>
+                    <div><Typography.Text strong>{dinhDangNhanBan(order)}</Typography.Text></div>
                   </div>
-                  <Tag color={mauTag}>{layNhanTrangThaiDonHang(order.status)}</Tag>
+                  <Space size={4}>
+                    <Tag color={layMauLoaiDon(order.loaiDon)}>{layNhanLoaiDon(order.loaiDon)}</Tag>
+                    <Tag color={mauTag}>{layNhanTrangThaiDonHang(order.status)}</Tag>
+                  </Space>
                 </Space>
                 <Descriptions size="small" column={2} bordered>
                   <Descriptions.Item label="Khách">{order.customer?.fullName || 'Khách lẻ'}</Descriptions.Item>
@@ -228,7 +238,7 @@ function BangChiTietDonHang({
       <div className="flex items-start justify-between gap-4">
         <div>
           <p className="mb-1 text-[10px] font-semibold uppercase tracking-[0.18em] text-slate-400">Order detail</p>
-          <h2 className="m-0 text-[1.2rem] font-semibold tracking-[-0.04em] text-slate-900">{dinhDangNhanBan(order.tableNumber)}</h2>
+          <h2 className="m-0 text-[1.2rem] font-semibold tracking-[-0.04em] text-slate-900">{dinhDangNhanBan(order)}</h2>
           <p className="mt-1.5 mb-0 text-xs leading-5 text-slate-500">#{dinhDangMaDonHang(order)} · {kieuThe.hint}</p>
         </div>
 
@@ -258,6 +268,16 @@ function BangChiTietDonHang({
               <span><CreditCardOutlined /> Thanh toán</span>
               <Input size="middle" value={layNhanPhuongThucThanhToan(donHangNguon.paymentMethod)} readOnly />
             </label>
+            <label className="noi-bo-don-hang-detail-field">
+              <span>Loại đơn</span>
+              <Input size="middle" value={`${layNhanLoaiDon(donHangNguon.loaiDon)}${donHangNguon.diaChiGiao ? ' · Giao hàng' : ''}`} readOnly />
+            </label>
+            {donHangNguon.diaChiGiao ? (
+              <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
+                <span>Địa chỉ giao</span>
+                <Input size="middle" value={donHangNguon.diaChiGiao} readOnly />
+              </label>
+            ) : null}
             <div className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
               <span>Tổng kết thanh toán</span>
               <div className="noi-bo-don-hang-money-summary">

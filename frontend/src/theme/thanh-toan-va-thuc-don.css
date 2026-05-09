@@ -2495,6 +2495,7 @@
   color: currentColor;
 }
 
+
 .thuc-don-control-panel--compact {
   grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   align-items: end;

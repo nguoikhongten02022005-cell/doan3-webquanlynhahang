@@ -30,10 +30,7 @@ function ApLucBanAn({ tablePressure, loading = false }) {
         {danhSachKhuVuc.map((khuVuc, index) => {
           const soBanGiuCho = Math.max(Number(khuVuc?.held) || 0, 0)
           const soBanCanDon = Math.max(Number(khuVuc?.dirty) || 0, 0)
-          const soBanDangBan = Math.max(
-            Number(khuVuc?.busyTables) || ((Number(khuVuc?.occupied) || 0) + soBanGiuCho + soBanCanDon),
-            0,
-          )
+          const soBanDangBan = Math.max(Number(khuVuc?.occupied) || 0, 0)
           const soBanTrong = Math.max(Number(khuVuc?.available) || 0, 0)
           const tongSoBan = Math.max(Number(khuVuc?.total) || 0, soBanDangBan + soBanTrong)
           const phanTramTaiNguon = Number(khuVuc?.percent)

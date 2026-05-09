@@ -3,6 +3,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { DonHangQueryService } from './don-hang-query.service';
 import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
+import { resolveMaBan } from '../../common/ban-resolver';
 
 const TRANG_THAI_DON_HANG_HOP_LE = new Set([
   'Pending', 'Confirmed', 'Preparing', 'Ready', 'Served', 'Paid', 'Cancelled',
@@ -16,26 +17,8 @@ export class DonHangPaymentStatusService {
     private readonly diemTichLuyService: DiemTichLuyService,
   ) {}
 
-  /**
-   * Phan giai tham so nguoi dung nhap: SoBan (1,2,3...) hoac MaBan (B001, B002...).
-   * Tra ve MaBan chinh xac hoac null neu khong ton tai.
-   */
   private async timMaBan(giaTri: string): Promise<string | null> {
-    if (!giaTri) return null;
-    const [banTheoMa] = await this.mysql.truyVan(
-      'SELECT MaBan FROM Ban WHERE MaBan = ? LIMIT 1',
-      [giaTri],
-    );
-    if (banTheoMa) return banTheoMa.MaBan;
-    const so = Number(giaTri);
-    if (Number.isFinite(so) && so > 0) {
-      const [banTheoSo] = await this.mysql.truyVan(
-        'SELECT MaBan FROM Ban WHERE SoBan = ? LIMIT 1',
-        [so],
-      );
-      if (banTheoSo) return banTheoSo.MaBan;
-    }
-    return null;
+    return resolveMaBan(this.mysql, giaTri);
   }
 
   async capNhatTrangThaiDonHang(maDonHang: string, trangThai: string) {

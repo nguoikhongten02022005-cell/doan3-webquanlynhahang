@@ -150,6 +150,7 @@ function BanGoiMonPage() {
               <button type="button" className={`thuc-don-tab ${tab === 'cart' ? 'active' : ''}`} onClick={() => setTab('cart')}>
                 <span className="thuc-don-tab-icon" aria-hidden="true">🛒</span>
                 <span className="thuc-don-tab-copy"><strong>Giỏ hàng</strong></span>
+                {gioTam.length > 0 ? <span className="thuc-don-tab-badge">{gioTam.reduce((t, i) => t + i.soLuong, 0)}</span> : null}
               </button>
             </div>
           </div>

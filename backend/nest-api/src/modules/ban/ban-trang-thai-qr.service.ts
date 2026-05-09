@@ -3,6 +3,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { ThucDonService } from '../thuc-don/thuc-don.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { BanGhi } from '../../common/types';
+import { resolveMaBan } from '../../common/ban-resolver';
 
 @Injectable()
 export class BanTrangThaiQrService {
@@ -13,31 +14,8 @@ export class BanTrangThaiQrService {
 
   private readonly urlFrontend = process.env.FRONTEND_ORIGIN?.trim() || '';
 
-  /**
-   * Phan giai tham so nguoi dung nhap: SoBan (1,2,3...) hoac MaBan (B001, B002...).
-   * Tra ve MaBan chinh xac hoac null neu khong ton tai.
-   */
   private async timMaBan(giaTri: string): Promise<string | null> {
-    if (!giaTri) return null;
-
-    // Thu tim truc tiep theo MaBan (B001)
-    const [banTheoMa] = await this.mysql.truyVan(
-      'SELECT MaBan FROM Ban WHERE MaBan = ? LIMIT 1',
-      [giaTri],
-    );
-    if (banTheoMa) return banTheoMa.MaBan;
-
-    // Neu la so, tim theo SoBan
-    const so = Number(giaTri);
-    if (Number.isFinite(so) && so > 0) {
-      const [banTheoSo] = await this.mysql.truyVan(
-        'SELECT MaBan FROM Ban WHERE SoBan = ? LIMIT 1',
-        [so],
-      );
-      if (banTheoSo) return banTheoSo.MaBan;
-    }
-
-    return null;
+    return resolveMaBan(this.mysql, giaTri);
   }
 
   async capNhatTrangThaiBan(maBan: string, trangThai: string) {

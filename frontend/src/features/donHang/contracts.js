@@ -10,6 +10,7 @@ export const TRANG_THAI_DON_HANG = Object.freeze({
 
 export const LOAI_DON_HANG = Object.freeze({
   TAI_QUAN: 'TAI_QUAN',
+  TAI_BAN: 'TAI_BAN',
 })
 
 export const LOAI_GIAM_GIA = Object.freeze({

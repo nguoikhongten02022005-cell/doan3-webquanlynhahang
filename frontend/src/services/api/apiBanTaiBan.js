@@ -67,7 +67,7 @@ export const guiOrderTaiBanApi = async (maBan, danhSachMon) => {
         maDonHang,
         orderCode: maDonHang,
         maKH: '',
-        loaiDon: 'TAI_QUAN',
+        loaiDon: 'TAI_BAN',
         trangThai: 'Preparing',
         tongTien,
         phiShip: 0,

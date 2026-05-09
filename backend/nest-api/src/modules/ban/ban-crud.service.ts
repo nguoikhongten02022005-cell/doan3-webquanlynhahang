@@ -1,7 +1,8 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { BanGhi } from '../../common/types';
+import { resolveMaBan } from '../../common/ban-resolver';
 
 @Injectable()
 export class BanCrudService {
@@ -44,6 +45,8 @@ export class BanCrudService {
   }
 
   async capNhatBan(maBan: string, body: BanGhi) {
+    const ma = await resolveMaBan(this.mysql, maBan);
+    if (!ma) throw new NotFoundException('Khong tim thay ban.');
     await this.mysql.thucThi(
       'UPDATE Ban SET TenBan = ?, KhuVuc = ?, SoBan = ?, SoChoNgoi = ?, ViTri = ?, GhiChu = ? WHERE MaBan = ?',
       [
@@ -53,14 +56,16 @@ export class BanCrudService {
         Number(body.soChoNgoi || 0),
         body.viTri || null,
         body.ghiChu || null,
-        maBan,
+        ma,
       ],
     );
-    return taoPhanHoi({ maBan }, 'Cap nhat ban thanh cong');
+    return taoPhanHoi({ maBan: ma }, 'Cap nhat ban thanh cong');
   }
 
   async xoaBan(maBan: string) {
-    await this.mysql.thucThi('DELETE FROM Ban WHERE MaBan = ?', [maBan]);
+    const ma = await resolveMaBan(this.mysql, maBan);
+    if (!ma) throw new NotFoundException('Khong tim thay ban.');
+    await this.mysql.thucThi('DELETE FROM Ban WHERE MaBan = ?', [ma]);
     return taoPhanHoi(null, 'Xoa ban thanh cong');
   }
 }

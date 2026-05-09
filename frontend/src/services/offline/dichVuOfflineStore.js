@@ -428,7 +428,24 @@ export const timMaGiamGiaOfflineTheoCode = (code) => docDuLieuOffline(
 
 export const timDonHangOfflineTheoMa = (maDonHang) => docDuLieuOffline((state) => state.donHang.find((order) => String(order.maDonHang || order.orderCode) === String(maDonHang || '')) || null)
 export const timDatBanOfflineTheoMa = (maDatBan) => docDuLieuOffline((state) => state.datBan.find((booking) => String(booking.bookingCode || booking.id) === String(maDatBan || '')) || null)
-export const timBanOfflineTheoMa = (maBan) => docDuLieuOffline((state) => state.ban.find((table) => String(table.code || table.id) === String(maBan || '')) || null)
+const normalizeMaBan = (input) => {
+  if (!input) return null
+  const trimmed = String(input).trim()
+  const match = trimmed.match(/^([A-Za-z]+)(\d+)$/)
+  if (!match) return trimmed
+  const prefix = match[1].toUpperCase()
+  const num = match[2].padStart(3, '0')
+  return `${prefix}${num}`
+}
+
+export const timBanOfflineTheoMa = (maBan) => {
+  const giaTri = String(maBan || '').trim()
+  const normalized = normalizeMaBan(giaTri)
+  return docDuLieuOffline((state) => state.ban.find((table) => {
+    const code = String(table.code || table.id || '')
+    return code === giaTri || (normalized && code === normalized)
+  }) || null)
+}
 export const timDanhGiaOfflineTheoMa = (maDanhGia) => docDuLieuOffline((state) => state.danhGia.find((review) => String(review.maDanhGia || '') === String(maDanhGia || '')) || null)
 
 export const layLichSuDatBanTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.lichSuDatBanTheoKhachHang?.[String(maKH || '')] || []))

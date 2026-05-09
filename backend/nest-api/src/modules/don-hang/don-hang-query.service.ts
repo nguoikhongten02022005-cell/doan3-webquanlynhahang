@@ -92,19 +92,40 @@ export class DonHangQueryService {
   }
 
   async layDanhSachDonHang() {
-    const danhSach = await this.mysql.truyVan(
-      `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email
+    const cacDong = await this.mysql.truyVan(
+      `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email,
+              ct.MaChiTiet, ct.MaMon, ct.SoLuong, ct.DonGia, ct.ThanhTien, ct.GhiChu AS CtGhiChu, ct.TrangThai AS CtTrangThai,
+              td.TenMon
        FROM DonHang dh
        LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
        LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
-       ORDER BY dh.NgayTao DESC`,
+       LEFT JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
+       LEFT JOIN ThucDon td ON td.MaMon = ct.MaMon
+       ORDER BY dh.NgayTao DESC, ct.NgayTao ASC`,
     );
 
-    const ketQua = await Promise.all(
-      danhSach.map(async (don) => {
-        const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
-        return this.taoThongTinDonHang(don, chiTiet);
-      }),
+    const banDo = new Map<string, { don: any; chiTiet: any[] }>();
+    for (const dong of cacDong) {
+      const ma = String(dong.MaDonHang);
+      if (!banDo.has(ma)) {
+        banDo.set(ma, { don: dong, chiTiet: [] });
+      }
+      if (dong.MaChiTiet) {
+        banDo.get(ma)!.chiTiet.push({
+          MaChiTiet: dong.MaChiTiet,
+          MaMon: dong.MaMon,
+          TenMon: dong.TenMon,
+          SoLuong: Number(dong.SoLuong || 0),
+          DonGia: Number(dong.DonGia || 0),
+          ThanhTien: Number(dong.ThanhTien || 0),
+          GhiChu: dong.CtGhiChu || '',
+          TrangThai: dong.CtTrangThai,
+        });
+      }
+    }
+
+    const ketQua = Array.from(banDo.values()).map(({ don, chiTiet }) =>
+      this.taoThongTinDonHang(don, chiTiet),
     );
 
     return taoPhanHoi(ketQua, 'Lay danh sach don hang thanh cong');
@@ -121,13 +142,10 @@ export class DonHangQueryService {
       [khachHang.MaKH],
     );
     const ketQua = await Promise.all(
-      danhSach.map(async (don) => ({
-        maDonHang: don.MaDonHang,
-        tongTien: Number(don.TongTien || 0),
-        trangThai: don.TrangThai,
-        ngayTao: don.NgayTao,
-        chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
-      })),
+      danhSach.map(async (don) => {
+        const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
+        return this.taoThongTinDonHang(don, chiTiet);
+      }),
     );
     return taoPhanHoi(ketQua, 'Lay don hang cua toi thanh cong');
   }
@@ -150,13 +168,10 @@ export class DonHangQueryService {
     );
 
     const ketQua = await Promise.all(
-      danhSach.map(async (don) => ({
-        maDonHang: don.MaDonHang,
-        tongTien: Number(don.TongTien || 0),
-        trangThai: don.TrangThai,
-        ngayTao: don.NgayTao,
-        chiTiet: await this.layChiTietDonHangTheoMa(String(don.MaDonHang)),
-      })),
+      danhSach.map(async (don) => {
+        const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
+        return this.taoThongTinDonHang(don, chiTiet);
+      }),
     );
 
     return taoPhanHoi(ketQua, 'Lay don hang co the danh gia thanh cong');

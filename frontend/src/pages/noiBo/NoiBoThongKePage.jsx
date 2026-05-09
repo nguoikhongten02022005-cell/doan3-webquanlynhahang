@@ -7,7 +7,7 @@ import { useOutletContext } from 'react-router-dom'
 
 function NoiBoThongKePage() {
   const { danhSachDonHang, danhSachDatBan } = useOutletContext()
-  const [timeRange, setTimeRange] = useState('today')
+  const [timeRange, setTimeRange] = useState('last7Days')
 
   const revenueStats = useMemo(
     () => taoDuLieuThongKeDoanhThu({ orders: danhSachDonHang, bookings: danhSachDatBan, timeRange }),

@@ -8,8 +8,8 @@ import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 const DANH_SACH_KHU_VUC = ['Trong nhà', 'Ngoài sân', 'Khu riêng', 'Tầng 2']
 const NHAN_TRANG_THAI = {
   TRONG: { label: 'TRỐNG', color: 'green' },
-  CO_KHACH: { label: 'CÓ KHÁCH', color: 'orange' },
-  CHO_THANH_TOAN: { label: 'CHỜ THANH TOÁN', color: 'red' },
+  CO_KHACH: { label: 'CÓ KHÁCH', color: 'red' },
+  CHO_THANH_TOAN: { label: 'CHỜ THANH TOÁN', color: 'orange' },
 }
 
 const trangThaiNoiBo = (trangThai) => {

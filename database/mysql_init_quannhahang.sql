@@ -414,26 +414,26 @@ INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES
 ('KH_TEST_01', 'ND_KH_TEST_01', 'Nguyen Van Test', '0901239999', '123 Nguyen Hue, Q1, TP.HCM', 0);
 
 INSERT INTO DanhMuc (MaDanhMuc, TenDanhMuc, ThuTu) VALUES
-('DM001', 'Khai Vi', 1),
-('DM002', 'Mon Chinh', 2),
-('DM003', 'Trang Mieng', 3),
-('DM004', 'Do Uong', 4),
+('DM001', 'Khai Vị', 1),
+('DM002', 'Món Chính', 2),
+('DM003', 'Tráng Miệng', 3),
+('DM004', 'Đồ Uống', 4),
 ('DM005', 'Combo', 5);
 
 INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai, NgayTao, NgayCapNhat) VALUES
-('M001', 'DM001', 'Goi Cuon Tom Thit', 'Goi cuon tuoi, thanh nhe, an cung nuoc cham dac biet.', 35000, NULL, 10, 'Available', NOW(), NOW()),
-('M002', 'DM001', 'Cha Gio Hai San', 'Cha gio hai san gion rum, nhan day va dam vi.', 45000, NULL, 15, 'Available', NOW(), NOW()),
-('M003', 'DM002', 'Com Rang Duong Chau', 'Com rang duong chau day dan va de an.', 55000, NULL, 20, 'Available', NOW(), NOW()),
-('M004', 'DM002', 'Pho Bo Dac Biet', 'Pho bo dam da, nuoc dung ngot thanh tu nhien.', 75000, NULL, 25, 'Available', NOW(), NOW()),
-('M005', 'DM002', 'Bun Bo Hue', 'Bun bo hue cay nhe, huong vi dac trung.', 65000, NULL, 25, 'Available', NOW(), NOW()),
-('M006', 'DM003', 'Kem Dau Tay', 'Kem mat lanh, vi dau tay thanh mat.', 30000, NULL, 5, 'Available', NOW(), NOW()),
-('M007', 'DM003', 'Banh Flan Caramel', 'Banh flan caramel mem min, ngot nhe.', 25000, NULL, 5, 'Available', NOW(), NOW()),
-('M008', 'DM004', 'Ca Phe Sua Da', 'Ca phe sua da dam vi, dung chat Viet Nam.', 25000, NULL, 5, 'Available', NOW(), NOW()),
-('M009', 'DM004', 'Tra Dao Cam Sa', 'Tra dao cam sa thanh mat, de uong.', 35000, NULL, 5, 'Available', NOW(), NOW()),
-('M010', 'DM004', 'Nuoc Ep Cam', 'Nuoc ep cam tuoi, bo sung nang luong.', 30000, NULL, 5, 'Available', NOW(), NOW()),
-('M011', 'DM005', 'Combo Gia Dinh', 'Combo danh cho 4 nguoi gom mon chinh, khai vi va do uong.', 299000, NULL, 20, 'Available', NOW(), NOW()),
-('M012', 'DM005', 'Combo Couple', 'Combo gon nhe cho 2 nguoi voi mon chinh va do uong.', 199000, NULL, 15, 'Available', NOW(), NOW()),
-('M013', 'DM005', 'Combo Solo', 'Combo ca nhan tiet kiem, phuc vu nhanh.', 129000, NULL, 10, 'Available', NOW(), NOW());
+('M001', 'DM001', 'Gỏi Cuốn Tôm Thịt', 'Gỏi cuốn tươi, thanh nhẹ, ăn cùng nước chấm đặc biệt.', 35000, NULL, 10, 'Available', NOW(), NOW()),
+('M002', 'DM001', 'Chả Giò Hải Sản', 'Chả giò hải sản giòn rụm, nhân đầy và đậm vị.', 45000, NULL, 15, 'Available', NOW(), NOW()),
+('M003', 'DM002', 'Cơm Rang Dương Châu', 'Cơm rang dương châu đầy đặn và dễ ăn.', 55000, NULL, 20, 'Available', NOW(), NOW()),
+('M004', 'DM002', 'Phở Bò Đặc Biệt', 'Phở bò đậm đà, nước dùng ngọt thanh tự nhiên.', 75000, NULL, 25, 'Available', NOW(), NOW()),
+('M005', 'DM002', 'Bún Bò Huế', 'Bún bò Huế cay nhẹ, hương vị đặc trưng.', 65000, NULL, 25, 'Available', NOW(), NOW()),
+('M006', 'DM003', 'Kem Dâu Tây', 'Kem mát lạnh, vị dâu tây thanh mát.', 30000, NULL, 5, 'Available', NOW(), NOW()),
+('M007', 'DM003', 'Bánh Flan Caramel', 'Bánh flan caramel mềm mịn, ngọt nhẹ.', 25000, NULL, 5, 'Available', NOW(), NOW()),
+('M008', 'DM004', 'Cà Phê Sữa Đá', 'Cà phê sữa đá đậm vị, đúng chất Việt Nam.', 25000, NULL, 5, 'Available', NOW(), NOW()),
+('M009', 'DM004', 'Trà Đào Cam Sả', 'Trà đào cam sả thanh mát, dễ uống.', 35000, NULL, 5, 'Available', NOW(), NOW()),
+('M010', 'DM004', 'Nước Ép Cam', 'Nước ép cam tươi, bổ sung năng lượng.', 30000, NULL, 5, 'Available', NOW(), NOW()),
+('M011', 'DM005', 'Combo Gia Đình', 'Combo dành cho 4 người gồm món chính, khai vị và đồ uống.', 299000, NULL, 20, 'Available', NOW(), NOW()),
+('M012', 'DM005', 'Combo Couple', 'Combo gọn nhẹ cho 2 người với món chính và đồ uống.', 199000, NULL, 15, 'Available', NOW(), NOW()),
+('M013', 'DM005', 'Combo Solo', 'Combo cá nhân tiết kiệm, phục vụ nhanh.', 129000, NULL, 10, 'Available', NOW(), NOW());
 
 INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
 ('B001', 'Ban 1', 'Trong nha', 1, 2, 'Tang 1 - Cua so', NULL, 'Available', NOW(), NOW()),
@@ -550,13 +550,13 @@ INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES
 ('KH011', 'ND015', 'Phan Gia Huy', '0908800006', '14 Ho Tung Mau, Quan 1, TP.HCM', 0);
 
 INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai, NgayTao, NgayCapNhat) VALUES
-('M014', 'DM001', 'Salad Ca Ngu', 'Salad ca ngu sot chanh day thanh mat.', 68000, NULL, 12, 'Available', NOW(), NOW()),
-('M015', 'DM002', 'Suon Nuong Mat Ong', 'Suon nuong mem, sot mat ong dam vi.', 129000, NULL, 25, 'Available', NOW(), NOW()),
-('M016', 'DM002', 'Lau Thai Hai San', 'Lau thai chua cay nhe cho nhom 2-4 nguoi.', 259000, NULL, 30, 'Available', NOW(), NOW()),
-('M017', 'DM004', 'Tra Vai Hoa Hong', 'Do uong theo mua, tam thoi het hang.', 42000, NULL, 5, 'Unavailable', NOW(), NOW()),
-('M018', 'DM003', 'Banh Tiramisu', 'Trang mieng vi ca phe nhe.', 45000, NULL, 8, 'Available', NOW(), NOW()),
-('M019', 'DM005', 'Combo Van Phong', 'Combo trua gon nhe cho nhan vien van phong.', 159000, NULL, 15, 'Unavailable', NOW(), NOW()),
-('M020', 'DM002', 'Mi Y Sot Bo Bam', 'Mon tam ngung kinh doanh de cap nhat cong thuc.', 89000, NULL, 18, 'Deleted', NOW(), NOW());
+('M014', 'DM001', 'Salad Cá Ngừ', 'Salad cá ngừ sốt chanh dây thanh mát.', 68000, NULL, 12, 'Available', NOW(), NOW()),
+('M015', 'DM002', 'Sườn Nướng Mật Ong', 'Sườn nướng mềm, sốt mật ong đậm vị.', 129000, NULL, 25, 'Available', NOW(), NOW()),
+('M016', 'DM002', 'Lẩu Thái Hải Sản', 'Lẩu Thái chua cay nhẹ cho nhóm 2-4 người.', 259000, NULL, 30, 'Available', NOW(), NOW()),
+('M017', 'DM004', 'Trà Vải Hoa Hồng', 'Đồ uống theo mùa, tạm thời hết hàng.', 42000, NULL, 5, 'Unavailable', NOW(), NOW()),
+('M018', 'DM003', 'Bánh Tiramisu', 'Tráng miệng vị cà phê nhẹ.', 45000, NULL, 8, 'Available', NOW(), NOW()),
+('M019', 'DM005', 'Combo Văn Phòng', 'Combo trưa gọn nhẹ cho nhân viên văn phòng.', 159000, NULL, 15, 'Unavailable', NOW(), NOW()),
+('M020', 'DM002', 'Mì Ý Sốt Bò Bằm', 'Món tạm ngưng kinh doanh để cập nhật công thức.', 89000, NULL, 18, 'Deleted', NOW(), NOW());
 
 INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai, NgayTao, NgayCapNhat) VALUES
 ('B012', 'Ban 12', 'Trong nha', 12, 4, 'Tang 1 - Khu D', NULL, 'Available', NOW(), NOW()),

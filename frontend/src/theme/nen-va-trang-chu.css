@@ -864,7 +864,7 @@ button:focus-visible,
   padding-block: 2px;
   font-size: 12px;
   font-weight: 500;
-  background: rgba(0, 0, 0, 0.45);
+  background: #e96c4a;
   color: #fff;
 }
 

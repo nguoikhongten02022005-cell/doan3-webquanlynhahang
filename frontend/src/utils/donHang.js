@@ -1,3 +1,12 @@
+import { LOAI_DON_HANG } from '../features/donHang/contracts'
+
+export { LOAI_DON_HANG }
+
+export const NHAN_LOAI_DON_HANG = Object.freeze({
+  [LOAI_DON_HANG.TAI_QUAN]: 'Tại quầy',
+  [LOAI_DON_HANG.TAI_BAN]: 'Tại bàn',
+})
+
 export const NHAN_TRANG_THAI_DON_HANG = Object.freeze({
   Pending: 'Mới tạo',
   Confirmed: 'Đã xác nhận',
