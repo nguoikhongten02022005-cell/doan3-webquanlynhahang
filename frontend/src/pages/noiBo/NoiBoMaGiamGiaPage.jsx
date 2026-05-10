@@ -289,7 +289,7 @@ function NoiBoMaGiamGiaPage() {
         <Alert
           type="info"
           showIcon
-          message="Chua co ma giam gia nao."
+          title="Chua co ma giam gia nao."
           description="Nhan 'Them ma moi' de tao ma giam gia dau tien."
         />
       ) : (

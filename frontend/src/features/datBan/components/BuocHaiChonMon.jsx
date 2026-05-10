@@ -55,7 +55,7 @@ function BuocHaiChonMon({ selectedMenuItems = [], onToggleItem, onClearAll }) {
 
   if (error) {
     return (
-      <Alert type="error" message={error} showIcon />
+      <Alert type="error" title={error} showIcon />
     )
   }
 

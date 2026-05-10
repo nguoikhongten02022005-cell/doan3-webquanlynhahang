@@ -38,7 +38,7 @@ const chuanHoaDanhSachMonTaoDon = (payload = {}) => {
 }
 
 export const buildPayloadTaoDon = (payload = {}) => {
-  const loaiDon = payload.loaiDon || payload.orderType || payload.loaiNhanHang || LOAI_DON_HANG.TAI_QUAN
+  const loaiDon = LOAI_DON_HANG.TAI_BAN
   const tongHopGia = payload.tongHopGia || TAO_TONG_HOP_GIA_MAC_DINH()
   const voucher = payload.voucher || {}
 

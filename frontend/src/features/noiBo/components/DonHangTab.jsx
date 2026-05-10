@@ -5,6 +5,7 @@ import {
   FieldTimeOutlined,
   FileTextOutlined,
   PrinterOutlined,
+  PlusOutlined,
   UserOutlined,
 } from '@ant-design/icons'
 import {
@@ -14,9 +15,13 @@ import {
   Card,
   Descriptions,
   Empty,
+  Form,
   Grid,
   Input,
+  InputNumber,
   List,
+  message,
+  Modal,
   Segmented,
   Select,
   Space,
@@ -29,6 +34,8 @@ import { dinhDangTienTe } from '../../../utils/tienTe'
 import { dinhDangNgay } from '../dinhDang'
 import { layNhanTrangThaiDonHang, layNhanPhuongThucThanhToan, NHAN_LOAI_DON_HANG } from '../../../utils/donHang'
 import { taoTongKetTienDonHang, moCuaSoInHoaDon } from '../../../utils/inHoaDon'
+import { taoDonHangApi } from '../../../services/api/apiDonHang'
+import { layDanhSachMonApi } from '../../../services/api/apiThucDon'
 
 const { TextArea } = Input
 const { useBreakpoint } = Grid
@@ -76,14 +83,12 @@ const khopBoLocDonHang = (order, filterKey) => {
 }
 
 const dinhDangNhanBan = (order) => {
-  const loaiDon = order.loaiDon || order.orderType || ''
   const tenBan = String(order.tableNumber || '').trim()
-  if (loaiDon === 'TAI_BAN' && tenBan) return `BÀN ${tenBan.toUpperCase()}`
-  if (loaiDon === 'TAI_BAN') return 'TẠI BÀN'
-  return tenBan ? `BÀN ${tenBan.toUpperCase()}` : 'MANG VỀ'
+  if (tenBan) return `BÀN ${tenBan.toUpperCase()}`
+  return 'TẠI BÀN'
 }
 
-const layNhanLoaiDon = (loaiDon) => NHAN_LOAI_DON_HANG[loaiDon] || 'Tại quầy'
+const layNhanLoaiDon = (loaiDon) => NHAN_LOAI_DON_HANG[loaiDon] || 'Tại bàn'
 
 const layMauLoaiDon = (loaiDon) => loaiDon === 'TAI_BAN' ? 'purple' : 'cyan'
 
@@ -375,6 +380,13 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
   const [trangThaiDangSua, setFormStatus] = useState('')
   const [dangLuuTrangThai, setSavingStatus] = useState(false)
 
+  // Tạo đơn tại bàn states
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [modalLoading, setModalLoading] = useState(false)
+  const [menuList, setMenuList] = useState([])
+  const [selectedItems, setSelectedItems] = useState([])
+  const [form] = Form.useForm()
+
   const soLuongTheoBoLoc = useMemo(() => tinhSoLuongTheoBoLoc(orders), [orders])
 
   const danhSachDonDaLoc = useMemo(
@@ -500,6 +512,102 @@ function DonHangTab({ orders, tomTatDonHang, donChoXuLy, layChiTietDonHang, onUp
 
   const xuLyThanhToanNhanh = async () => {
     await guiCapNhatTrangThai('Paid')
+  }
+
+  // Tạo đơn tại bàn
+  const moModalTaoDon = async () => {
+    try {
+      setModalLoading(true)
+      const response = await layDanhSachMonApi()
+      const monAn = Array.isArray(response?.data) ? response.data : []
+      setMenuList(monAn)
+      setIsModalOpen(true)
+      form.resetFields()
+      setSelectedItems([])
+    } catch (error) {
+      message.error('Không thể tải thực đơn')
+    } finally {
+      setModalLoading(false)
+    }
+  }
+
+  const dongModalTaoDon = () => {
+    setIsModalOpen(false)
+    form.resetFields()
+    setSelectedItems([])
+  }
+
+  const themMonVaoDon = (mon) => {
+    const daCo = selectedItems.find((item) => item.maMon === mon.MaMon || item.maMon === mon.maMon)
+    if (daCo) {
+      setSelectedItems((current) =>
+        current.map((item) =>
+          item.maMon === mon.MaMon || item.maMon === mon.maMon
+            ? { ...item, soLuong: item.soLuong + 1 }
+            : item
+        )
+      )
+    } else {
+      setSelectedItems((current) => [
+        ...current,
+        {
+          maMon: mon.MaMon || mon.maMon,
+          tenMon: mon.TenMon || mon.tenMon,
+          gia: mon.Gia || mon.gia || 0,
+          soLuong: 1,
+        },
+      ])
+    }
+  }
+
+  const doiSoLuong = (maMon, delta) => {
+    setSelectedItems((current) =>
+      current
+        .map((item) => {
+          if (item.maMon !== maMon) return item
+          const newQty = item.soLuong + delta
+          return newQty > 0 ? { ...item, soLuong: newQty } : null
+        })
+        .filter(Boolean)
+    )
+  }
+
+  const xoaMon = (maMon) => {
+    setSelectedItems((current) => current.filter((item) => item.maMon !== maMon))
+  }
+
+  const xuLyTaoDon = async () => {
+    try {
+      const values = await form.validateFields()
+      if (selectedItems.length === 0) {
+        message.error('Vui lòng chọn ít nhất một món')
+        return
+      }
+
+      const payload = {
+        loaiDon: 'TAI_BAN',
+        maBan: null,
+        maNV: null,
+        maDatBan: null,
+        nguonTao: 'Online',
+        ghiChu: values.note || '',
+        maKH: values.customerCode || null,
+        chiTiet: selectedItems.map((item) => ({
+          maMon: item.maMon,
+          soLuong: item.soLuong,
+          ghiChu: '',
+        })),
+      }
+
+      await taoDonHangApi(payload)
+      message.success('Tạo đơn tại bàn thành công')
+      dongModalTaoDon()
+      // Refresh order list via parent? For now, can't auto refresh without prop
+      // Could trigger a custom event or parent could poll
+    } catch (error) {
+      if (error?.errorFields) return // validation error
+      message.error(error?.message || 'Không thể tạo đơn')
+    }
   }
 
   return (

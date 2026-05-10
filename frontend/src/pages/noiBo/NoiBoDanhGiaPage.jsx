@@ -151,7 +151,7 @@ function NoiBoDanhGiaPage() {
             <Alert
               type="success"
               showIcon
-              message={thongBao}
+              title={thongBao}
               closable
               onClose={() => setThongBao('')}
             />
@@ -160,7 +160,7 @@ function NoiBoDanhGiaPage() {
             <Alert
               type="error"
               showIcon
-              message={loi}
+              title={loi}
               closable
               onClose={() => setLoi('')}
             />

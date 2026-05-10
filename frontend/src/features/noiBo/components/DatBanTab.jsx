@@ -291,7 +291,7 @@ function DatBanFormCard({
     >
       <Space orientation="vertical" size={14} style={{ width: '100%' }}>
         <Form layout="vertical" onSubmitCapture={onSubmit}>
-          <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Liên hệ khách</Divider>
+          <Divider titlePlacement="left" plain className="dat-ban-noi-bo-form-divider">Liên hệ khách</Divider>
           <Row gutter={12}>
             <Col xs={24} md={12}>
               <Form.Item label="Tên khách" style={KIEU_MUC_FORM_GON}>
@@ -310,7 +310,7 @@ function DatBanFormCard({
             </Col>
           </Row>
 
-          <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Chi tiết đặt bàn</Divider>
+          <Divider titlePlacement="left" plain className="dat-ban-noi-bo-form-divider">Chi tiết đặt bàn</Divider>
           <Row gutter={12}>
             <Col xs={24} md={12}>
               <Form.Item label="Ngày" style={KIEU_MUC_FORM_GON}>
@@ -358,7 +358,7 @@ function DatBanFormCard({
             ) : null}
           </Row>
 
-          <Divider orientation="left" plain className="dat-ban-noi-bo-form-divider">Ghi chú</Divider>
+          <Divider titlePlacement="left" plain className="dat-ban-noi-bo-form-divider">Ghi chú</Divider>
           <Row gutter={12}>
             <Col xs={24} md={12}>
               <Form.Item label="Ghi chú khách" style={KIEU_MUC_FORM_GON}>
@@ -424,14 +424,14 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
           </Descriptions>
 
           {ghiChuUuTien ? (
-            <Alert type="warning" showIcon message="Ưu tiên xử lý" description={ghiChuUuTien} />
+            <Alert type="warning" showIcon title="Ưu tiên xử lý" description={ghiChuUuTien} />
           ) : null}
 
           {dangChoXacNhan ? (
             <Alert
               type="info"
               showIcon
-              message="Duyệt nhanh booking"
+              title="Duyệt nhanh booking"
               description={(
                 <Space wrap>
                   <Button type="primary" size="small" icon={<CheckCircleOutlined />} onClick={() => onQuickStatusChange(booking, TRANG_THAI_DAT_BAN.DA_XAC_NHAN)}>
@@ -452,12 +452,12 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
             <Row gutter={[12, 12]}>
               {booking.notes ? (
                 <Col xs={24} md={12}>
-                  <Alert type="info" showIcon message="Ghi chú" description={booking.notes} className="dat-ban-noi-bo-note-alert" />
+                  <Alert type="info" showIcon title="Ghi chú" description={booking.notes} className="dat-ban-noi-bo-note-alert" />
                 </Col>
               ) : null}
               {booking.internalNote ? (
                 <Col xs={24} md={12}>
-                  <Alert type="info" showIcon message="Nội bộ" description={booking.internalNote} className="dat-ban-noi-bo-note-alert dat-ban-noi-bo-note-alert--internal" />
+                  <Alert type="info" showIcon title="Nội bộ" description={booking.internalNote} className="dat-ban-noi-bo-note-alert dat-ban-noi-bo-note-alert--internal" />
                 </Col>
               ) : null}
             </Row>
@@ -587,7 +587,7 @@ function DatBanAssignModal({
           <Alert
             type={duSucChua ? 'success' : 'warning'}
             showIcon
-            message="Tổng sức chứa đang chọn"
+            title="Tổng sức chứa đang chọn"
             description={`${selectedCapacity}/${sucChuaCan} khách`}
           />
 
@@ -655,7 +655,7 @@ function DatBanConfirmModal({ pendingAction, open, onClose, onConfirm }) {
       okButtonProps={{ danger: pendingAction.type === 'noShow' }}
     >
       <Space orientation="vertical" size={12} style={{ width: '100%' }}>
-        <Alert type={pendingAction.type === 'noShow' ? 'warning' : 'info'} showIcon message={copy.message} description={copy.description} />
+        <Alert type={pendingAction.type === 'noShow' ? 'warning' : 'info'} showIcon title={copy.message} description={copy.description} />
         <Typography.Text className="dat-ban-noi-bo-confirm-text">{copy.getMessage(pendingAction.booking)}</Typography.Text>
       </Space>
     </Modal>

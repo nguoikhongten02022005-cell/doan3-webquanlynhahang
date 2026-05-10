@@ -69,7 +69,7 @@ function BuocBaDatBan({ summary, contactSummary, reviewNotice, submitError, isSu
         <Alert
           type="warning"
           showIcon
-          message={
+          title={
             <Space orientation="vertical" size={4}>
               <Text strong>Yêu cầu đặt cọc {dinhDangTien(soTienCoc)}đ</Text>
               <Text type="secondary">Lý do: {liDoCoc.join(' · ')}</Text>

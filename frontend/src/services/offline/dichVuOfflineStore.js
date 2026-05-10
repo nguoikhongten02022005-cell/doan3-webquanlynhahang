@@ -575,7 +575,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
       maBan: orderInput.maBan || orderInput.MaBan || orderInput.tableCode || mucHienTai.maBan || '',
       maNV: orderInput.maNV || orderInput.MaNV || mucHienTai.maNV || '',
       maDatBan: orderInput.maDatBan || orderInput.MaDatBan || mucHienTai.maDatBan || '',
-      loaiDon: orderInput.loaiDon || orderInput.LoaiDon || mucHienTai.loaiDon || 'TAI_QUAN',
+      loaiDon: orderInput.loaiDon || orderInput.LoaiDon || mucHienTai.loaiDon || 'TAI_BAN',
       trangThai: orderInput.trangThai || orderInput.TrangThai || orderInput.status || mucHienTai.trangThai || 'Pending',
       tongTien,
       total: tongTien,

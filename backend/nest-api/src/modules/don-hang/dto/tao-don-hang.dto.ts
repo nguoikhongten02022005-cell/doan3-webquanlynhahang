@@ -20,6 +20,8 @@ export class ChiTietMonDto {
 }
 
 export class TaoDonHangDto {
+  // loaiDon always TAI_BAN - removed TAI_QUAN option
+
   @ApiProperty({ example: 'BAN001' })
   @IsString()
   maBan!: string;

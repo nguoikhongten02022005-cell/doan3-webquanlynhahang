@@ -149,7 +149,7 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaBan       VARCHAR(50),
     MaNV        VARCHAR(50),
     MaDatBan    VARCHAR(50),
-    LoaiDon     ENUM('TAI_QUAN','TAI_BAN') NOT NULL DEFAULT 'TAI_QUAN',
+    LoaiDon     ENUM('TAI_BAN') NOT NULL DEFAULT 'TAI_BAN',
     DiaChiGiao  VARCHAR(255),
     GioLayHang  TIME,
     GioGiao     TIME,
@@ -385,4 +385,4 @@ LEFT JOIN DonHang dh
         LIMIT 1
     );
 
-ALTER TABLE DatBan ADD COLUMN IF NOT EXISTS ChiTietMonAn JSON AFTER KhuVucUuTien;
+ALTER TABLE DatBan ADD COLUMN ChiTietMonAn JSON AFTER KhuVucUuTien;

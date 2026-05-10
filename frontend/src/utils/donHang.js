@@ -3,7 +3,6 @@ import { LOAI_DON_HANG } from '../features/donHang/contracts'
 export { LOAI_DON_HANG }
 
 export const NHAN_LOAI_DON_HANG = Object.freeze({
-  [LOAI_DON_HANG.TAI_QUAN]: 'Tại quầy',
   [LOAI_DON_HANG.TAI_BAN]: 'Tại bàn',
 })
 
@@ -60,7 +59,7 @@ export const TUY_CHON_PHUONG_THUC_THANH_TOAN = Object.freeze([
   {
     value: 'TheNganHang',
     label: 'Thanh toán bằng thẻ',
-    description: 'Dùng thẻ tại quầy hoặc thiết bị hỗ trợ.',
+    description: 'Dùng thẻ tại bàn hoặc thiết bị hỗ trợ.',
   },
 ])
 

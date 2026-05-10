@@ -194,7 +194,7 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
       ),
       children: upcomingBookings.length === 0 ? (
         <EmptyState
-          message="Không có đơn sắp tới"
+          title="Không có đơn sắp tới"
           description="Bạn chưa có đơn đặt bàn nào sắp diễn ra."
         />
       ) : (
@@ -224,7 +224,7 @@ function LichSuDatBanTab({ bookings, onCancelBooking, onRebook }) {
       ),
       children: historyBookings.length === 0 ? (
         <EmptyState
-          message="Bạn chưa có lịch sử đặt bàn"
+          title="Bạn chưa có lịch sử đặt bàn"
           description="Những đơn đã hoàn thành, đã hủy hoặc quá hạn sẽ hiển thị tại đây."
         />
       ) : (

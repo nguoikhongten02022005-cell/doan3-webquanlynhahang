@@ -40,7 +40,7 @@ export class DonHangCreateOrderService {
     const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
-    const loaiDonHang = loaiDon || payload.loaiDon || 'TAI_QUAN';
+    const loaiDonHang = 'TAI_BAN';
     const trangThai = payload.trangThai || 'Pending';
     const soDiem = Number(payload.soDiem || 0);
 

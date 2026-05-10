@@ -178,7 +178,7 @@ const timOrderDangMoTheoBan = (maBan) => {
   }
 
   const candidate = timDonHangOfflineTheoMa(ban.activeOrderCode || '')
-  if (candidate && candidate.loaiDon === 'TAI_QUAN' && candidate.trangThai !== 'Paid' && candidate.trangThai !== 'Cancelled') {
+  if (candidate && candidate.trangThai !== 'Paid' && candidate.trangThai !== 'Cancelled') {
     return candidate
   }
 
