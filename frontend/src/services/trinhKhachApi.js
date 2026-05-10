@@ -1,10 +1,53 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { layMaXacThuc, xoaPhienXacThuc } from './dichVuXacThuc'
+import { layMaXacThuc, xoaPhienXacThuc, layRefreshToken, luuXacThuc } from './dichVuXacThuc'
 import { layMucLuuTru } from './dichVuLuuTru'
 
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
 
 const DANH_SACH_DUONG_DAN_CONG_KHAI = ['/auth/login', '/auth/internal-login', '/auth/register', '/thuc-don', '/ma-giam-gia/validate']
+
+let dangLamMoi = false
+let hangDoiLamMoi = []
+
+const xuLyHangDoi = (loi) => {
+  hangDoiLamMoi.forEach(({ resolve, reject }) => {
+    if (loi) {
+      reject(loi)
+    } else {
+      resolve()
+    }
+  })
+  hangDoiLamMoi = []
+}
+
+const lamMoiPhien = async () => {
+  const refreshToken = layRefreshToken()
+  if (!refreshToken) {
+    throw new Error('Không có refresh token.')
+  }
+
+  const phanHoi = await fetch(`${layUrlGocApi()}/auth/refresh`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ refreshToken }),
+    credentials: 'include',
+  })
+
+  if (!phanHoi.ok) {
+    throw new Error('Không thể làm mới phiên.')
+  }
+
+  const duLieu = await phanHoi.json().catch(() => null)
+  const duLieuPhanHoi = duLieu?.data || duLieu
+  const accessTokenMoi = duLieuPhanHoi?.accessToken
+
+  if (!accessTokenMoi) {
+    throw new Error('Làm mới phiên thất bại — không nhận được access token.')
+  }
+
+  luuXacThuc(accessTokenMoi, duLieuPhanHoi?.refreshToken || refreshToken)
+  return accessTokenMoi
+}
 
 const docCoSuDungMayChuTuEnv = () => {
   const giaTri = String(import.meta.env.VITE_USE_BACKEND ?? '').trim().toLowerCase()
@@ -132,7 +175,37 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
     return duLieu
   }
 
+  // 401 → thử refresh token rồi retry
   if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon) && layMaXacThuc()) {
+    if (!dangLamMoi) {
+      dangLamMoi = true
+      try {
+        await lamMoiPhien()
+        xuLyHangDoi(null)
+      } catch (loi) {
+        xuLyHangDoi(loi)
+        xoaPhienXacThuc()
+        window.location.href = '/dang-nhap'
+        throw taoLoiTuPhanHoiApi(phanHoi, duLieu)
+      } finally {
+        dangLamMoi = false
+      }
+    } else {
+      // Đợi refresh đang chạy
+      await new Promise((resolve, reject) => {
+        hangDoiLamMoi.push({ resolve, reject })
+      })
+    }
+
+    // Retry request gốc với token mới
+    const ketQuaThuLai = await guiYeuCauTho(duongDan, tuyChon)
+    if (ketQuaThuLai.phanHoi.ok) {
+      return ketQuaThuLai.duLieu
+    }
+    throw taoLoiTuPhanHoiApi(ketQuaThuLai.phanHoi, ketQuaThuLai.duLieu)
+  }
+
+  if (phanHoi.status === 401) {
     xoaPhienXacThuc()
   }
 

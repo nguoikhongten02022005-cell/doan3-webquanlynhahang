@@ -1,6 +1,8 @@
 import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { AuthService } from './auth.service';
+import { DangNhapDto } from './dto/dang-nhap.dto';
+import { TaoNguoiDungDto } from './dto/tao-nguoi-dung.dto';
 import { Public } from '../../common/decorators/public.decorator';
 import { CurrentUser } from '../../common/decorators/current-user.decorator';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
@@ -14,26 +16,20 @@ export class AuthController {
 
   @Public()
   @Post('register')
-  dangKy(@Body() body: Record<string, unknown>) {
+  dangKy(@Body() body: TaoNguoiDungDto) {
     return this.authService.dangKy(body);
   }
 
   @Public()
   @Post('login')
-  dangNhap(@Body() body: Record<string, unknown>) {
-    return this.authService.dangNhap(
-      String(body.email || ''),
-      String(body.matKhau || ''),
-    );
+  dangNhap(@Body() body: DangNhapDto) {
+    return this.authService.dangNhap(body.email, body.matKhau);
   }
 
   @Public()
   @Post('internal-login')
-  dangNhapNoiBo(@Body() body: Record<string, unknown>) {
-    return this.authService.dangNhapNoiBo(
-      String(body.email || ''),
-      String(body.matKhau || ''),
-    );
+  dangNhapNoiBo(@Body() body: DangNhapDto) {
+    return this.authService.dangNhapNoiBo(body.email, body.matKhau);
   }
 
   @ApiBearerAuth()
@@ -41,6 +37,12 @@ export class AuthController {
   @Post('logout')
   dangXuat() {
     return this.authService.dangXuat();
+  }
+
+  @Public()
+  @Post('refresh')
+  lamMoiToken(@Body() body: Record<string, unknown>) {
+    return this.authService.lamMoiToken(String(body.refreshToken || ''));
   }
 
   @ApiBearerAuth()

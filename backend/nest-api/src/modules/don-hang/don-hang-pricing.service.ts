@@ -2,9 +2,7 @@ import { BadRequestException, Injectable } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { BanGhi } from '../../common/types';
 import { tinhGiamGia } from '../../common/tinh-giam-gia.helper';
-
-const TI_LE_QUY_DOI_DIEM = 100;
-const GIA_TRI_QUY_DOI = 10000;
+import { GIA_TRI_QUY_DOI, TI_LE_QUY_DOI_DIEM } from '../../common/constants';
 
 @Injectable()
 export class DonHangPricingService {
@@ -71,18 +69,18 @@ export class DonHangPricingService {
     }
 
     const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
-    if (!ma) throw new BadRequestException('Ma giam gia khong ton tai.');
-    if (String(ma.TrangThai || '') !== 'Active') throw new BadRequestException('Ma giam gia khong con hieu luc.');
+    if (!ma) throw new BadRequestException('Mã giảm giá không tồn tại.');
+    if (String(ma.TrangThai || '') !== 'Active') throw new BadRequestException('Mã giảm giá không còn hiệu lực.');
 
     const now = new Date();
-    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now) throw new BadRequestException('Ma giam gia chua den thoi gian ap dung.');
-    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now) throw new BadRequestException('Ma giam gia da het han.');
+    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now) throw new BadRequestException('Mã giảm giá chưa đến thời gian áp dụng.');
+    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now) throw new BadRequestException('Mã giảm giá đã hết hạn.');
 
     if (ma.SoLanToiDa != null && Number(ma.SoLanDaDung) >= Number(ma.SoLanToiDa)) {
-      throw new BadRequestException('Ma giam gia da dat gioi han su dung.');
+      throw new BadRequestException('Mã giảm giá đã đạt giới hạn sử dụng.');
     }
 
-    if (tongTien < Number(ma.DonHangToiThieu || 0)) throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
+    if (tongTien < Number(ma.DonHangToiThieu || 0)) throw new BadRequestException('Đơn hàng chưa đủ điều kiện áp dụng mã giảm giá.');
 
     const { giaTriGiam, giamToiDa, soTienGiamThucTe } = tinhGiamGia(tongTien, ma);
 
@@ -121,7 +119,7 @@ export class DonHangPricingService {
 
     for (const muc of chiTietDauVao) {
       const [mon] = await this.mysql.truyVan('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon]);
-      if (!mon) throw new BadRequestException(`Mon ${muc.maMon} khong ton tai.`);
+      if (!mon) throw new BadRequestException(`Món ${muc.maMon} không tồn tại.`);
 
       const soLuong = Number(muc.soLuong || 0);
       const donGia = Number(mon.Gia || 0);

@@ -19,7 +19,7 @@ export class TaiBanService {
 
   async taoOrderTaiBan(maBan: string, payload: BanGhi) {
     const ma = await this.timMaBan(maBan);
-    if (!ma) throw new NotFoundException('Khong tim thay ban.');
+    if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
     return this.donHangCreateOrderService.taoOrderTaiBan(ma, payload);
   }
 

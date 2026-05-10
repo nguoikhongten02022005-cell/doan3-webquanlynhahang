@@ -23,7 +23,7 @@ export class DatBanCommandService {
 
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
     if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
-      throw new ForbiddenException('Ban khong co quyen truy cap du lieu cua khach hang khac.');
+      throw new ForbiddenException('Bạn không có quyền truy cập dữ liệu của khách hàng khác.');
     }
   }
 
@@ -87,7 +87,7 @@ export class DatBanCommandService {
           TrangThai: 'Pending',
         },
       ),
-      'Tao dat ban thanh cong',
+      'Tạo đặt bàn thành công',
     );
   }
 
@@ -97,7 +97,7 @@ export class DatBanCommandService {
       [maDatBan],
     );
     if (!datBanHienTai) {
-      throw new NotFoundException('Khong tim thay dat ban.');
+      throw new NotFoundException('Không tìm thấy đặt bàn.');
     }
 
     const maKH = body.maKH === undefined ? datBanHienTai.MaKH : body.maKH || null;
@@ -115,9 +115,9 @@ export class DatBanCommandService {
     const ghiChuNoiBo = body.ghiChuNoiBo === undefined ? datBanHienTai.GhiChuNoiBo : body.ghiChuNoiBo ? String(body.ghiChuNoiBo).trim() : null;
     const trangThai = body.trangThai === undefined ? datBanHienTai.TrangThai : String(body.trangThai || '').trim();
 
-    if (!ngayDat) throw new BadRequestException('Ngay dat la bat buoc.');
-    if (!gioDat) throw new BadRequestException('Gio dat la bat buoc.');
-    if (!Number.isFinite(soNguoi) || soNguoi <= 0) throw new BadRequestException('So nguoi phai lon hon 0.');
+    if (!ngayDat) throw new BadRequestException('Ngày đặt là bắt buộc.');
+    if (!gioDat) throw new BadRequestException('Giờ đặt là bắt buộc.');
+    if (!Number.isFinite(soNguoi) || soNguoi <= 0) throw new BadRequestException('Số người phải lớn hơn 0.');
 
     await this.mysql.thucThi(
       `UPDATE DatBan
@@ -132,7 +132,7 @@ export class DatBanCommandService {
     );
     return taoPhanHoi(
       this.datBanQueryService.chuyenDatBanSangPhanHoi(datBanDaCapNhat),
-      'Cap nhat dat ban thanh cong',
+      'Cập nhật đặt bàn thành công',
     );
   }
 
@@ -142,12 +142,12 @@ export class DatBanCommandService {
       [maDatBan],
     );
     if (!datBanHienTai) {
-      throw new NotFoundException('Khong tim thay dat ban.');
+      throw new NotFoundException('Không tìm thấy đặt bàn.');
     }
 
     const trangThaiDaChuanHoa = String(trangThai || '').trim();
     if (!trangThaiDaChuanHoa) {
-      throw new BadRequestException('Trang thai dat ban la bat buoc.');
+      throw new BadRequestException('Trạng thái đặt bàn là bắt buộc.');
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
@@ -177,7 +177,7 @@ export class DatBanCommandService {
     );
     return taoPhanHoi(
       this.datBanQueryService.chuyenDatBanSangPhanHoi(datBan),
-      'Cap nhat dat ban thanh cong',
+      'Cập nhật đặt bàn thành công',
     );
   }
 
@@ -187,7 +187,7 @@ export class DatBanCommandService {
       [maDatBan],
     );
     if (!datBan) {
-      throw new NotFoundException('Khong tim thay dat ban.');
+      throw new NotFoundException('Không tìm thấy đặt bàn.');
     }
 
     const danhSachMaBan = Array.isArray(body.danhSachMaBan)
@@ -195,7 +195,7 @@ export class DatBanCommandService {
       : [];
 
     if (!danhSachMaBan.length) {
-      throw new BadRequestException('Can it nhat mot ban de gan cho booking.');
+      throw new BadRequestException('Cần ít nhất một bàn để gán cho booking.');
     }
 
     const danhSachBanHopLe = await this.mysql.truyVan(
@@ -204,18 +204,18 @@ export class DatBanCommandService {
     );
 
     if (danhSachBanHopLe.length !== danhSachMaBan.length) {
-      throw new BadRequestException('Co ban khong ton tai hoac da bi xoa.');
+      throw new BadRequestException('Có bàn không tồn tại hoặc đã bị xóa.');
     }
 
     const soKhach = Number(datBan.SoNguoi || 0);
     const tongSucChua = danhSachBanHopLe.reduce((tong, ban) => tong + Number(ban.SoChoNgoi || 0), 0);
     if (soKhach > 0 && tongSucChua < soKhach) {
-      throw new BadRequestException('Tong suc chua cua cac ban duoc chon khong du cho booking nay.');
+      throw new BadRequestException('Tổng sức chứa của các bàn được chọn không đủ cho booking này.');
     }
 
     const trangThaiKhongHopLe = danhSachBanHopLe.find((ban) => String(ban.TrangThai || '') === 'Occupied');
     if (trangThaiKhongHopLe) {
-      throw new BadRequestException(`Ban ${trangThaiKhongHopLe.MaBan} dang co khach, khong the gan cho booking.`);
+      throw new BadRequestException(`Bàn ${trangThaiKhongHopLe.MaBan} đang có khách, không thể gán cho booking.`);
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
@@ -249,7 +249,7 @@ export class DatBanCommandService {
           tenBan: String(ban.TenBan || ''),
         })),
       },
-      'Gan ban cho dat ban thanh cong',
+      'Gán bàn cho đặt bàn thành công',
     );
   }
 }

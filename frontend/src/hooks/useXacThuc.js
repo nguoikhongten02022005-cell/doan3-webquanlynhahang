@@ -23,6 +23,7 @@ import {
 
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
+const layRefreshTokenTuDuLieuAuth = (duLieu) => duLieu?.RefreshToken || duLieu?.refreshToken || ''
 const layNguoiDungTheoPhien = () => (layMaXacThuc() ? layNguoiDungHienTai() : null)
 const coCanKhoiTaoXacThuc = () => Boolean(layMaXacThuc())
 const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
@@ -36,6 +37,7 @@ const XacThucContext = createContext(null)
 const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai }) => {
   const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
   const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
+  const refreshToken = layRefreshTokenTuDuLieuAuth(duLieu)
 
   if (!nguoiDung || !accessToken) {
     xoaPhienXacThuc()
@@ -48,6 +50,7 @@ const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai }
   luuPhienXacThuc({
     user: nguoiDung,
     accessToken,
+    refreshToken,
   })
 
   const nguoiDungDaLuu = layNguoiDungHienTai()

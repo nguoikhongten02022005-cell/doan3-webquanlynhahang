@@ -9,12 +9,12 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
+import { TI_LE_TICH_DIEM_MAC_DINH } from '../../common/constants';
 
 @Injectable()
 export class DiemTichLuyService {
   constructor(private readonly mysql: MySqlService) {}
 
-  private readonly TI_LE_TICH_DIEM_MAC_DINH = 10000;
 
   private async thucThi(sql: string, thamSo: any[], ketNoi?: PoolConnection) {
     if (ketNoi) {
@@ -79,10 +79,7 @@ export class DiemTichLuyService {
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
 
     if (!khachHang) {
-      return taoPhanHoi(
-        { tongDiem: 0, diemCoTheDoi: 0, tiLeQuyDoi: this.TI_LE_TICH_DIEM_MAC_DINH },
-        'Khong tim thay thong tin diem tich luy',
-      );
+      throw new NotFoundException('Không tìm thấy thông tin điểm tích lũy.');
     }
 
     return taoPhanHoi(
@@ -90,9 +87,9 @@ export class DiemTichLuyService {
         maKH: khachHang.MaKH,
         tongDiem: Number(khachHang.DiemTichLuy || 0),
         diemCoTheDoi: Number(khachHang.DiemTichLuy || 0),
-        tiLeQuyDoi: this.TI_LE_TICH_DIEM_MAC_DINH,
+        tiLeQuyDoi: TI_LE_TICH_DIEM_MAC_DINH,
       },
-      'Lay tong quan diem tich luy thanh cong',
+      'Lấy tổng quan điểm tích lũy thành công',
     );
   }
 
@@ -100,7 +97,7 @@ export class DiemTichLuyService {
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
 
     if (!khachHang) {
-      return taoPhanHoi([], 'Khong co lich su diem tich luy');
+      return taoPhanHoi([], 'Không có lịch sử điểm tích lũy');
     }
 
     const lichSu = await this.mysql.truyVan(
@@ -109,89 +106,93 @@ export class DiemTichLuyService {
     );
     return taoPhanHoi(
       lichSu.map((giaoDich) => this.chuyenLichSuDiemSangPhanHoi(giaoDich)),
-      'Lay lich su diem tich luy thanh cong',
+      'Lấy lịch sử điểm tích lũy thành công',
     );
   }
 
-  async tinhDiemTuDonHang(maKH: string, maDonHang: string, tongTien: number, moTa?: string) {
-    const khachHang = await this.layKhachHangTheoMaKH(maKH);
-    if (!khachHang) return taoPhanHoi(null, 'Khong tim thay khach hang');
+  async tinhDiemTuDonHang(maKH: string, maDonHang: string, tongTien: number, moTa?: string, ketNoi?: PoolConnection) {
+    const khachHang = await this.layKhachHangTheoMaKH(maKH, ketNoi);
+    if (!khachHang) return taoPhanHoi(null, 'Không tìm thấy khách hàng');
 
     const tongTienSo = Number(tongTien);
-    if (isNaN(tongTienSo) || tongTienSo < 0) return taoPhanHoi(null, 'Tong tien khong hop le');
+    if (isNaN(tongTienSo) || tongTienSo < 0) return taoPhanHoi(null, 'Tổng tiền không hợp lệ');
 
-    const soDiemTichDuoc = Math.floor(tongTienSo / this.TI_LE_TICH_DIEM_MAC_DINH);
+    const soDiemTichDuoc = Math.floor(tongTienSo / TI_LE_TICH_DIEM_MAC_DINH);
     const diemTruoc = Number(khachHang.DiemTichLuy || 0);
     const diemSau = diemTruoc + soDiemTichDuoc;
 
-    await this.mysql.thucThi('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?', [diemSau, khachHang.MaKH]);
+    await this.thucThi('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?', [diemSau, khachHang.MaKH], ketNoi);
 
     const maGiaoDich = await this.ghiLichSuDiem(
       khachHang.MaKH, maDonHang, 'CONG', soDiemTichDuoc, diemTruoc, diemSau,
-      moTa || `Tich diem tu don hang ${maDonHang}`,
+      moTa || `Tích điểm từ đơn hàng ${maDonHang}`,
+      ketNoi,
     );
 
     return taoPhanHoi(
-      { maGiaoDichDiem: maGiaoDich, maKH: khachHang.MaKH, maDonHang, tongTien: tongTienSo, soDiemTichDuoc, diemTruoc, diemSau, tiLeQuyDoi: this.TI_LE_TICH_DIEM_MAC_DINH },
-      'Tich diem tu don hang thanh cong',
+      { maGiaoDichDiem: maGiaoDich, maKH: khachHang.MaKH, maDonHang, tongTien: tongTienSo, soDiemTichDuoc, diemTruoc, diemSau, tiLeQuyDoi: TI_LE_TICH_DIEM_MAC_DINH },
+      'Tích điểm từ đơn hàng thành công',
     );
   }
 
   async tinhDiem(nguoiDung: any, body: { maDonHang: string; tongTien: number; moTa?: string }) {
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
-    if (!khachHang) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!khachHang) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const tongTien = Number(body.tongTien);
-    if (isNaN(tongTien) || tongTien < 0) throw new BadRequestException('Tong tien khong hop le.');
+    if (isNaN(tongTien) || tongTien < 0) throw new BadRequestException('Tổng tiền không hợp lệ.');
 
-    const soDiemTichDuoc = Math.floor(tongTien / this.TI_LE_TICH_DIEM_MAC_DINH);
-    const diemTruoc = Number(khachHang.DiemTichLuy || 0);
-    const diemSau = diemTruoc + soDiemTichDuoc;
+    return this.mysql.giaoDich(async (ketNoi) => {
+      const soDiemTichDuoc = Math.floor(tongTien / TI_LE_TICH_DIEM_MAC_DINH);
+      const diemTruoc = Number(khachHang.DiemTichLuy || 0);
+      const diemSau = diemTruoc + soDiemTichDuoc;
 
-    await this.mysql.thucThi('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?', [diemSau, khachHang.MaKH]);
+      await this.thucThi('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?', [diemSau, khachHang.MaKH], ketNoi);
 
-    const maGiaoDich = await this.ghiLichSuDiem(
-      khachHang.MaKH, body.maDonHang, 'CONG', soDiemTichDuoc, diemTruoc, diemSau,
-      body.moTa || `Tich diem tu don hang ${body.maDonHang}`,
-    );
+      const maGiaoDich = await this.ghiLichSuDiem(
+        khachHang.MaKH, body.maDonHang, 'CONG', soDiemTichDuoc, diemTruoc, diemSau,
+        body.moTa || `Tích điểm từ đơn hàng ${body.maDonHang}`,
+        ketNoi,
+      );
 
-    return taoPhanHoi(
-      { maGiaoDichDiem: maGiaoDich, maKH: khachHang.MaKH, maDonHang: body.maDonHang, tongTien, soDiemTichDuoc, diemTruoc, diemSau, tiLeQuyDoi: this.TI_LE_TICH_DIEM_MAC_DINH },
-      'Tinh diem tich luy thanh cong',
-    );
+      return taoPhanHoi(
+        { maGiaoDichDiem: maGiaoDich, maKH: khachHang.MaKH, maDonHang: body.maDonHang, tongTien, soDiemTichDuoc, diemTruoc, diemSau, tiLeQuyDoi: TI_LE_TICH_DIEM_MAC_DINH },
+        'Tính điểm tích lũy thành công',
+      );
+    });
   }
 
   async doiDiem(nguoiDung: any, body: { soDiem: number; moTa?: string }, ketNoi?: PoolConnection) {
-    const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
-    if (!khachHang) throw new NotFoundException('Khong tim thay khach hang.');
+    const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND), ketNoi);
+    if (!khachHang) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const soDiem = Number(body.soDiem);
-    if (isNaN(soDiem) || soDiem <= 0) throw new BadRequestException('So diem khong hop le.');
+    if (isNaN(soDiem) || soDiem <= 0) throw new BadRequestException('Số điểm không hợp lệ.');
 
     const diemTruoc = Number(khachHang.DiemTichLuy || 0);
     const diemSau = diemTruoc - soDiem;
-    if (diemSau < 0) throw new BadRequestException('Diem tich luy khong du de doi.');
+    if (diemSau < 0) throw new BadRequestException('Điểm tích lũy không đủ để đổi.');
 
     await this.thucThi('UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?', [diemSau, khachHang.MaKH], ketNoi);
 
     const maGiaoDich = await this.ghiLichSuDiem(
       khachHang.MaKH, '', 'TRU', -soDiem, diemTruoc, diemSau,
-      body.moTa || 'Doi diem tich luy lay qua',
+      body.moTa || 'Đổi điểm tích lũy lấy quà',
       ketNoi,
     );
 
     return taoPhanHoi(
       { maGiaoDichDiem: maGiaoDich, maKH: khachHang.MaKH, soDiemDaDoi: soDiem, diemTruoc, diemSau },
-      'Doi diem thanh cong',
+      'Đổi điểm thành công',
     );
   }
 
   async congDiemHuyDon(nguoiDung: any, body: { maDonHang: string; soDiem: number; moTa?: string }, ketNoi?: PoolConnection) {
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
-    if (!khachHang) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!khachHang) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const soDiem = Number(body.soDiem);
-    if (isNaN(soDiem) || soDiem <= 0) throw new BadRequestException('So diem khong hop le.');
+    if (isNaN(soDiem) || soDiem <= 0) throw new BadRequestException('Số điểm không hợp lệ.');
 
     const diemTruoc = Number(khachHang.DiemTichLuy || 0);
     const diemSau = diemTruoc + soDiem;
@@ -200,13 +201,13 @@ export class DiemTichLuyService {
 
     const maGiaoDich = await this.ghiLichSuDiem(
       khachHang.MaKH, body.maDonHang, 'CONG', soDiem, diemTruoc, diemSau,
-      body.moTa || `Hoan diem tu don hang bi huy ${body.maDonHang}`,
+      body.moTa || `Hoàn điểm từ đơn hàng bị hủy ${body.maDonHang}`,
       ketNoi,
     );
 
     return taoPhanHoi(
       { maGiaoDichDiem: maGiaoDich, maKH: khachHang.MaKH, maDonHang: body.maDonHang, soDiemHoan: soDiem, diemTruoc, diemSau },
-      'Hoan diem thanh cong',
+      'Hoàn điểm thành công',
     );
   }
 }

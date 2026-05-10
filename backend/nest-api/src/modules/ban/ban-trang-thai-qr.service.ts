@@ -20,7 +20,7 @@ export class BanTrangThaiQrService {
 
   async capNhatTrangThaiBan(maBan: string, trangThai: string) {
     const ma = await this.timMaBan(maBan);
-    if (!ma) throw new NotFoundException('Khong tim thay ban.');
+    if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
     const map = new Map<string, string>([
       ['TRONG', 'Available'],
       ['CO_KHACH', 'Occupied'],
@@ -39,7 +39,7 @@ export class BanTrangThaiQrService {
 
   async layQrBan(maBan: string) {
     const ma = await this.timMaBan(maBan);
-    if (!ma) throw new NotFoundException('Khong tim thay ban.');
+    if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
 
     const [ban] = await this.mysql.truyVan(
       'SELECT * FROM Ban WHERE MaBan = ? LIMIT 1',
@@ -61,14 +61,14 @@ export class BanTrangThaiQrService {
 
   async layThucDonTheoBan(maBan: string) {
     const ma = await this.timMaBan(maBan);
-    if (!ma) throw new NotFoundException('Ban khong ton tai.');
+    if (!ma) throw new NotFoundException('Bàn không tồn tại.');
 
     const [ban] = await this.mysql.truyVan(
       'SELECT * FROM Ban WHERE MaBan = ? LIMIT 1',
       [ma],
     );
 
-    const monAn = (await this.thucDonService.layThucDon()).data;
+    const monAn = (await this.thucDonService.layThucDon(true)).data;
     return taoPhanHoi(
       {
         ban: { maBan: ban.MaBan, tenBan: ban.TenBan, soBan: ban.SoBan },

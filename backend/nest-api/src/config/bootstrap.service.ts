@@ -15,7 +15,7 @@ export class BootstrapService {
 
     await this.kiemTraKetNoi();
     this.logger.log(
-      'Da bat che do DB_AUTO_INIT, backend chi kiem tra ket noi MySQL va khong tu tao schema.',
+      'Đã bật chế độ DB_AUTO_INIT, backend chỉ kiểm tra kết nối MySQL và không tự tạo schema.',
     );
   }
 

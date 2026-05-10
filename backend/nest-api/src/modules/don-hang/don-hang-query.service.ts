@@ -50,13 +50,13 @@ export class DonHangQueryService {
       [maDonHang],
     );
     if (!donHang) {
-      throw new NotFoundException('Khong tim thay don hang.');
+      throw new NotFoundException('Không tìm thấy đơn hàng.');
     }
 
     const chiTiet = await this.layChiTietDonHangTheoMa(maDonHang);
     return taoPhanHoi(
       { donHang: this.taoThongTinDonHang(donHang, chiTiet) },
-      'Lay chi tiet don hang thanh cong',
+      'Lấy chi tiết đơn hàng thành công',
     );
   }
 
@@ -128,13 +128,13 @@ export class DonHangQueryService {
       this.taoThongTinDonHang(don, chiTiet),
     );
 
-    return taoPhanHoi(ketQua, 'Lay danh sach don hang thanh cong');
+    return taoPhanHoi(ketQua, 'Lấy danh sách đơn hàng thành công');
   }
 
   async layDonHangCuaToi(nguoiDung: any) {
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
     if (!khachHang) {
-      return taoPhanHoi([], 'Khong co don hang');
+      return taoPhanHoi([], 'Không có đơn hàng');
     }
 
     const danhSach = await this.mysql.truyVan(
@@ -147,13 +147,13 @@ export class DonHangQueryService {
         return this.taoThongTinDonHang(don, chiTiet);
       }),
     );
-    return taoPhanHoi(ketQua, 'Lay don hang cua toi thanh cong');
+    return taoPhanHoi(ketQua, 'Lấy đơn hàng của tôi thành công');
   }
 
   async layDonHangCoTheDanhGia(nguoiDung: any) {
     const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
     if (!khachHang) {
-      return taoPhanHoi([], 'Khong co don hang co the danh gia');
+      return taoPhanHoi([], 'Không có đơn hàng có thể đánh giá');
     }
 
     const danhSach = await this.mysql.truyVan(
@@ -174,7 +174,7 @@ export class DonHangQueryService {
       }),
     );
 
-    return taoPhanHoi(ketQua, 'Lay don hang co the danh gia thanh cong');
+    return taoPhanHoi(ketQua, 'Lấy đơn hàng có thể đánh giá thành công');
   }
 
   async layChiTietDonHang(nguoiDung: any, maDonHang: string) {
@@ -185,13 +185,13 @@ export class DonHangQueryService {
     );
 
     if (!donHang) {
-      throw new NotFoundException('Khong tim thay don hang.');
+      throw new NotFoundException('Không tìm thấy đơn hàng.');
     }
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
       const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
       if (!khachHang || String(khachHang.MaKH || '') !== String(donHang.MaKH || '')) {
-        throw new ForbiddenException('Ban khong co quyen xem chi tiet don hang nay.');
+        throw new ForbiddenException('Bạn không có quyền xem chi tiết đơn hàng này.');
       }
     }
 

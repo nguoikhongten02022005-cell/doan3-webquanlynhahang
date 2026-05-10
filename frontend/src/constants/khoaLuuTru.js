@@ -2,6 +2,7 @@ export const STORAGE_KEYS = Object.freeze({
   GIO_HANG: 'restaurant_cart',
   NGUOI_DUNG_HIEN_TAI: 'restaurant_current_user',
   MA_XAC_THUC: 'restaurant_auth_token',
+  REFRESH_TOKEN: 'restaurant_refresh_token',
   DU_LIEU_OFFLINE_HE_THONG: 'restaurant_offline_system_data',
   PHIEN_BAN_DU_LIEU_OFFLINE: 'restaurant_offline_system_revision',
   DANH_SACH_MON: 'restaurant_menu_dishes',

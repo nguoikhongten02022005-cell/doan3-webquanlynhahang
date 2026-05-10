@@ -88,15 +88,19 @@ export class ThucDonService {
     };
   }
 
-  async layThucDon() {
+  async layThucDon(chiMonKhaDung = false) {
+    const dieuKien = chiMonKhaDung
+      ? 'WHERE TrangThai = ?'
+      : 'WHERE TrangThai <> ?';
+    const thamSo = chiMonKhaDung ? ['Available'] : ['Deleted'];
     const danhSach = (await this.mysql.truyVan(
-      'SELECT * FROM ThucDon WHERE TrangThai <> ? ORDER BY NgayCapNhat DESC',
-      ['Deleted'],
+      `SELECT * FROM ThucDon ${dieuKien} ORDER BY NgayCapNhat DESC`,
+      thamSo,
     )) as ThucDonEntity[];
 
     return taoPhanHoi(
       danhSach.map((mon) => this.chuyenMonSangPhanHoi(mon)),
-      'Lay thuc don thanh cong',
+      'Lấy thực đơn thành công',
     );
   }
 
@@ -119,7 +123,7 @@ export class ThucDonService {
       String(payload.trangThai || 'Available').trim() || 'Available';
 
     if (!maDanhMuc) {
-      throw new BadRequestException('Ma danh muc khong hop le.');
+      throw new BadRequestException('Mã danh mục không hợp lệ.');
     }
 
     await this.mysql.thucThi(
@@ -142,7 +146,7 @@ export class ThucDonService {
 
     return taoPhanHoi(
       this.chuyenMonSangPhanHoi(danhSach[0]),
-      'Tao mon thanh cong',
+      'Tạo món thành công',
     );
   }
 
@@ -156,7 +160,7 @@ export class ThucDonService {
     )) as ThucDonEntity[];
     const monHienTai = danhSachHienTai[0];
     if (!monHienTai) {
-      throw new NotFoundException('Khong tim thay mon an.');
+      throw new NotFoundException('Không tìm thấy món ăn.');
     }
 
     const maDanhMuc =
@@ -191,11 +195,11 @@ export class ThucDonService {
       payload.gia == null ? Number(monHienTai.Gia || 0) : Number(payload.gia);
 
     if (!tenMon) {
-      throw new BadRequestException('Ten mon la bat buoc.');
+      throw new BadRequestException('Tên món là bắt buộc.');
     }
 
     if (!maDanhMuc) {
-      throw new BadRequestException('Ma danh muc khong hop le.');
+      throw new BadRequestException('Mã danh mục không hợp lệ.');
     }
 
     await this.mysql.thucThi(
@@ -218,7 +222,7 @@ export class ThucDonService {
     )) as ThucDonEntity[];
     return taoPhanHoi(
       this.chuyenMonSangPhanHoi(danhSach[0]),
-      'Cap nhat mon thanh cong',
+      'Cập nhật món thành công',
     );
   }
 
@@ -227,6 +231,6 @@ export class ThucDonService {
       'UPDATE ThucDon SET TrangThai = ? WHERE MaMon = ?',
       ['Deleted', maMon],
     );
-    return taoPhanHoi({ maMon }, 'Xoa mon thanh cong');
+    return taoPhanHoi({ maMon }, 'Xóa món thành công');
   }
 }

@@ -92,7 +92,7 @@ export class KhachHangController {
     @Body() body: Record<string, unknown>,
   ) {
     const soDiem = Number(body.soDiem);
-    if (isNaN(soDiem)) throw new BadRequestException('So diem khong hop le.');
+    if (isNaN(soDiem)) throw new BadRequestException('Số điểm không hợp lệ.');
     return this.khachHangService.capNhatDiem(maKH, {
       soDiem,
       moTa: body.moTa as string | undefined,

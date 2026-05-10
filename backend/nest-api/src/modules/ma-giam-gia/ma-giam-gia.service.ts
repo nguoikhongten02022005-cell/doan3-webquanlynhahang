@@ -16,19 +16,19 @@ export class MaGiamGiaService {
     const maCode = String(payload.maCode || '').trim();
     const tongTien = Number(payload.tongTien || 0);
     const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
-    if (!ma) throw new NotFoundException('Khong tim thay ma giam gia.');
-    if (String(ma.TrangThai || '') !== 'Active') throw new BadRequestException('Ma giam gia khong con hieu luc.');
+    if (!ma) throw new NotFoundException('Không tìm thấy mã giảm giá.');
+    if (String(ma.TrangThai || '') !== 'Active') throw new BadRequestException('Mã giảm giá không còn hiệu lực.');
 
     const now = new Date();
-    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now) throw new BadRequestException('Ma giam gia chua den thoi gian ap dung.');
-    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now) throw new BadRequestException('Ma giam gia da het han.');
+    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now) throw new BadRequestException('Mã giảm giá chưa đến thời gian áp dụng.');
+    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now) throw new BadRequestException('Mã giảm giá đã hết hạn.');
 
     if (ma.SoLanToiDa != null && Number(ma.SoLanDaDung) >= Number(ma.SoLanToiDa)) {
-      throw new BadRequestException('Ma giam gia da dat gioi han su dung.');
+      throw new BadRequestException('Mã giảm giá đã đạt giới hạn sử dụng.');
     }
 
     if (tongTien < Number(ma.DonHangToiThieu || 0)) {
-      throw new BadRequestException('Don hang chua du dieu kien ap dung ma giam gia.');
+      throw new BadRequestException('Đơn hàng chưa đủ điều kiện áp dụng mã giảm giá.');
     }
 
     const { laPhanTram, giaTriGiam, giamToiDa, soTienGiamThucTe } = tinhGiamGia(tongTien, ma);
@@ -51,7 +51,7 @@ export class MaGiamGiaService {
         donHangToiThieu: Number(ma.DonHangToiThieu || 0),
         moTa: '',
       },
-      'Kiem tra ma giam gia thanh cong',
+      'Kiểm tra mã giảm giá thành công',
     );
   }
 
@@ -62,24 +62,24 @@ export class MaGiamGiaService {
        FROM MaGiamGia
        ORDER BY NgayBatDau DESC`,
     );
-    return taoPhanHoi(danhSach, 'Lay danh sach ma giam gia thanh cong');
+    return taoPhanHoi(danhSach, 'Lấy danh sách mã giảm giá thành công');
   }
 
   async layChiTiet(maCode: string) {
     const [ma] = await this.mysql.truyVan('SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
-    if (!ma) throw new NotFoundException('Khong tim thay ma giam gia.');
-    return taoPhanHoi(ma, 'Lay chi tiet ma giam gia thanh cong');
+    if (!ma) throw new NotFoundException('Không tìm thấy mã giảm giá.');
+    return taoPhanHoi(ma, 'Lấy chi tiết mã giảm giá thành công');
   }
 
   async taoMaGiamGia(payload: BanGhi) {
     const { maCode, tenCode, giaTri, loaiGiam, giaTriToiDa, donHangToiThieu, ngayBatDau, ngayKetThuc, soLanToiDa, trangThai } = payload;
 
     if (!maCode || !tenCode || giaTri == null || !loaiGiam || !ngayBatDau || !ngayKetThuc) {
-      throw new BadRequestException('Thieu thong tin bat buoc.');
+      throw new BadRequestException('Thiếu thông tin bắt buộc.');
     }
 
     const [tonTai] = await this.mysql.truyVan('SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
-    if (tonTai) throw new BadRequestException('Ma code da ton tai.');
+    if (tonTai) throw new BadRequestException('Mã code đã tồn tại.');
 
     await this.mysql.thucThi(
       `INSERT INTO MaGiamGia
@@ -96,12 +96,12 @@ export class MaGiamGiaService {
       ],
     );
 
-    return taoPhanHoi({ maCode }, 'Tao ma giam gia thanh cong');
+    return taoPhanHoi({ maCode }, 'Tạo mã giảm giá thành công');
   }
 
   async capNhatMa(maCode: string, payload: BanGhi) {
     const [tonTai] = await this.mysql.truyVan('SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
-    if (!tonTai) throw new NotFoundException('Khong tim thay ma giam gia.');
+    if (!tonTai) throw new NotFoundException('Không tìm thấy mã giảm giá.');
 
     const { tenCode, giaTri, loaiGiam, giaTriToiDa, donHangToiThieu, ngayBatDau, ngayKetThuc, soLanToiDa, trangThai } = payload;
 
@@ -131,14 +131,14 @@ export class MaGiamGiaService {
       ],
     );
 
-    return taoPhanHoi({ maCode }, 'Cap nhat ma giam gia thanh cong');
+    return taoPhanHoi({ maCode }, 'Cập nhật mã giảm giá thành công');
   }
 
   async xoaMa(maCode: string) {
     const [tonTai] = await this.mysql.truyVan('SELECT MaCode FROM MaGiamGia WHERE MaCode = ? LIMIT 1', [maCode]);
-    if (!tonTai) throw new NotFoundException('Khong tim thay ma giam gia.');
+    if (!tonTai) throw new NotFoundException('Không tìm thấy mã giảm giá.');
 
     await this.mysql.thucThi('DELETE FROM MaGiamGia WHERE MaCode = ?', [maCode]);
-    return taoPhanHoi({ maCode }, 'Xoa ma giam gia thanh cong');
+    return taoPhanHoi({ maCode }, 'Xóa mã giảm giá thành công');
   }
 }

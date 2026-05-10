@@ -13,9 +13,10 @@ export const LOAI_DON_HANG = Object.freeze({
   TAI_BAN: 'TAI_BAN',
 })
 
+// Maps to DB ENUM('percentage','fixed_amount') values
 export const LOAI_GIAM_GIA = Object.freeze({
-  PHAN_TRAM: 'PhanTram',
-  TIEN_MAT: 'TienMat',
+  PHAN_TRAM: 'percentage',
+  TIEN_MAT: 'fixed_amount',
 })
 
 export const TAO_TONG_HOP_GIA_MAC_DINH = () => ({

@@ -1,0 +1,49 @@
+import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
+import { Type } from 'class-transformer';
+import { IsArray, IsNumber, IsOptional, IsString, Min, ValidateNested } from 'class-validator';
+
+export class ChiTietMonDto {
+  @ApiProperty({ example: 'M001' })
+  @IsString()
+  maMon!: string;
+
+  @ApiProperty({ example: 2 })
+  @Type(() => Number)
+  @IsNumber()
+  @Min(1)
+  soLuong!: number;
+
+  @ApiPropertyOptional({ example: 'Ít đường' })
+  @IsOptional()
+  @IsString()
+  ghiChu?: string;
+}
+
+export class TaoDonHangDto {
+  @ApiProperty({ example: 'BAN001' })
+  @IsString()
+  maBan!: string;
+
+  @ApiProperty({ type: [ChiTietMonDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => ChiTietMonDto)
+  monAn!: ChiTietMonDto[];
+
+  @ApiPropertyOptional({ example: 0 })
+  @IsOptional()
+  @Type(() => Number)
+  @IsNumber()
+  @Min(0)
+  soDiem?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  maGiamGia?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  ghiChu?: string;
+}

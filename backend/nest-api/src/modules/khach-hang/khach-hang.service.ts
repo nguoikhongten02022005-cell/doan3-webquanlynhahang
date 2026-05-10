@@ -81,7 +81,7 @@ export class KhachHangService {
 
     return taoPhanHoi(
       danhSach.map((kh) => this.chuyenKhachHangSangResponse(kh)),
-      'Lay danh sach khach hang thanh cong',
+      'Lấy danh sách khách hàng thành công',
       { tongSo, trang: trangVal, soLuong: soLuongVal, soTrang: Math.ceil(tongSo / soLuongVal) },
     );
   }
@@ -91,10 +91,10 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    if (!danhSach[0]) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!danhSach[0]) throw new NotFoundException('Không tìm thấy khách hàng.');
     return taoPhanHoi(
       this.chuyenKhachHangSangResponse(danhSach[0]),
-      'Lay chi tiet khach hang thanh cong',
+      'Lấy chi tiết khách hàng thành công',
     );
   }
 
@@ -109,20 +109,20 @@ export class KhachHangService {
     const diaChi = String(body.diaChi || '').trim();
     const diemTichLuy = Number(body.diemTichLuy ?? 0);
 
-    if (!tenKH) throw new BadRequestException('Ten khach hang la bat buoc.');
+    if (!tenKH) throw new BadRequestException('Tên khách hàng là bắt buộc.');
 
     if (sdt) {
       const sdtRegex = /^0[0-9]{9}$/;
       if (!sdtRegex.test(sdt))
         throw new BadRequestException(
-          'So dien thoai khong hop le (10 so, bat dau tu 0).',
+          'Số điện thoại không hợp lệ (10 số, bắt đầu từ 0).',
         );
       const daTonTai = await this.mysql.truyVan(
         'SELECT MaKH FROM KhachHang WHERE SDT = ? LIMIT 1',
         [sdt],
       );
       if (daTonTai[0])
-        throw new BadRequestException('So dien thoai da ton tai.');
+        throw new BadRequestException('Số điện thoại đã tồn tại.');
     }
 
     const maKH = taoMa('KH');
@@ -137,7 +137,7 @@ export class KhachHangService {
     );
     return taoPhanHoi(
       this.chuyenKhachHangSangResponse(kh),
-      'Tao khach hang thanh cong',
+      'Tạo khách hàng thành công',
     );
   }
 
@@ -149,7 +149,7 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    if (!hienTai) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!hienTai) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const tenKH =
       body.tenKH !== undefined ? String(body.tenKH).trim() : hienTai.TenKH;
@@ -158,18 +158,18 @@ export class KhachHangService {
       body.diaChi !== undefined ? String(body.diaChi).trim() : hienTai.DiaChi;
 
     if (!tenKH)
-      throw new BadRequestException('Ten khach hang khong duoc rong.');
+      throw new BadRequestException('Tên khách hàng không được rỗng.');
 
     if (sdt) {
       const sdtRegex = /^0[0-9]{9}$/;
       if (!sdtRegex.test(sdt))
-        throw new BadRequestException('So dien thoai khong hop le.');
+        throw new BadRequestException('Số điện thoại không hợp lệ.');
       const daTonTai = await this.mysql.truyVan(
         'SELECT MaKH FROM KhachHang WHERE SDT = ? AND MaKH != ? LIMIT 1',
         [sdt, maKH],
       );
       if (daTonTai[0])
-        throw new BadRequestException('So dien thoai da ton tai.');
+        throw new BadRequestException('Số điện thoại đã tồn tại.');
     }
 
     await this.mysql.thucThi(
@@ -183,7 +183,7 @@ export class KhachHangService {
     );
     return taoPhanHoi(
       this.chuyenKhachHangSangResponse(kh),
-      'Cap nhat khach hang thanh cong',
+      'Cập nhật khách hàng thành công',
     );
   }
 
@@ -192,7 +192,7 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    if (!kh) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!kh) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const coDonHang = await this.mysql.truyVan(
       'SELECT MaDonHang FROM DonHang WHERE MaKH = ? LIMIT 1',
@@ -200,7 +200,7 @@ export class KhachHangService {
     );
     if (coDonHang[0])
       throw new BadRequestException(
-        'Khach hang co don hang lien quan, khong the xoa.',
+        'Khách hàng có đơn hàng liên quan, không thể xóa.',
       );
 
     const coDatBan = await this.mysql.truyVan(
@@ -209,11 +209,11 @@ export class KhachHangService {
     );
     if (coDatBan[0])
       throw new BadRequestException(
-        'Khach hang co lich dat ban, khong the xoa.',
+        'Khách hàng có lịch đặt bàn, không thể xóa.',
       );
 
     await this.mysql.thucThi('DELETE FROM KhachHang WHERE MaKH = ?', [maKH]);
-    return taoPhanHoi(null, 'Xoa khach hang thanh cong');
+    return taoPhanHoi(null, 'Xóa khách hàng thành công');
   }
 
   async capNhatDiem(maKH: string, body: { soDiem: number; moTa?: string }) {
@@ -221,10 +221,10 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    if (!kh) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!kh) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const soDiem = Number(body.soDiem);
-    if (isNaN(soDiem)) throw new BadRequestException('So diem khong hop le.');
+    if (isNaN(soDiem)) throw new BadRequestException('Số điểm không hợp lệ.');
 
     const diemHienTai = Number(kh.DiemTichLuy || 0);
     const diemSau = Math.max(0, diemHienTai + soDiem);
@@ -245,7 +245,7 @@ export class KhachHangService {
         soDiemThayDoi: soDiem,
         diemSau: diemSau,
       },
-      'Cap nhat diem tich luy thanh cong',
+      'Cập nhật điểm tích lũy thành công',
     );
   }
 
@@ -254,7 +254,7 @@ export class KhachHangService {
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
     );
-    if (!kh) throw new NotFoundException('Khong tim thay khach hang.');
+    if (!kh) throw new NotFoundException('Không tìm thấy khách hàng.');
 
     const datBanList = await this.mysql.truyVan(
       `SELECT db.MaDatBan, db.NgayDat, db.GioDat, db.SoNguoi, db.TrangThai as TrangThaiDatBan,
@@ -291,7 +291,7 @@ export class KhachHangService {
           trangThai: dh.TrangThaiDonHang,
         })),
       },
-      'Lay lich su khach hang thanh cong',
+      'Lấy lịch sử khách hàng thành công',
     );
   }
 }

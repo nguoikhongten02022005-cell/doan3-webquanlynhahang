@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common';
+import { Logger, ValidationPipe } from '@nestjs/common';
 import { NestFactory } from '@nestjs/core';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
@@ -96,8 +96,9 @@ async function bootstrap() {
   await app.get(BootstrapService).khoiTaoNeuCan();
   await app.listen(congBackend);
 
-  console.log(`Backend đang chạy ở môi trường: ${moiTruong}`);
-  console.log(`Swagger UI: http://localhost:${congBackend}/swagger`);
+  const logger = new Logger('Bootstrap');
+  logger.log(`Backend đang chạy ở môi trường: ${moiTruong}`);
+  logger.log(`Swagger UI: http://localhost:${congBackend}/swagger`);
 }
 
 bootstrap();

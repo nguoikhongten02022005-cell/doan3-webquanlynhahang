@@ -55,4 +55,8 @@ export class DonHangService {
   capNhatTrangThaiDonHang(maDonHang: string, trangThai: string) {
     return this.donHangPaymentStatusService.capNhatTrangThaiDonHang(maDonHang, trangThai);
   }
+
+  capNhatTrangThaiChiTietMon(maDonHang: string, maChiTiet: string, trangThai: string) {
+    return this.donHangPaymentStatusService.capNhatTrangThaiChiTietMon(maDonHang, maChiTiet, trangThai);
+  }
 }

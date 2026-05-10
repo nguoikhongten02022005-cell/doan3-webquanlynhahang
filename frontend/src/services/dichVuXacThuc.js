@@ -96,12 +96,36 @@ export const xoaMaXacThuc = () => {
   xoaMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
 }
 
-export const luuPhienXacThuc = ({ user, accessToken }) => {
+export const luuPhienXacThuc = ({ user, accessToken, refreshToken }) => {
   luuNguoiDungHienTai(user)
-  luuMaXacThuc(accessToken)
+  luuXacThuc(accessToken, refreshToken)
 }
 
 export const xoaPhienXacThuc = () => {
   xoaMaXacThuc()
+  xoaRefreshToken()
   xoaNguoiDungHienTai()
+}
+
+export const layRefreshToken = () => {
+  const refreshToken = layMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
+  return typeof refreshToken === 'string' && refreshToken.trim() ? refreshToken : ''
+}
+
+export const luuRefreshToken = (token) => {
+  if (!token || typeof token !== 'string') {
+    return
+  }
+  datMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN, token)
+}
+
+export const xoaRefreshToken = () => {
+  xoaMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
+}
+
+export const luuXacThuc = (accessToken, refreshToken) => {
+  luuMaXacThuc(accessToken)
+  if (refreshToken) {
+    luuRefreshToken(refreshToken)
+  }
 }

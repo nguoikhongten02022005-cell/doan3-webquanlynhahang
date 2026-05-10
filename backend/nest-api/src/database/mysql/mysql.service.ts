@@ -32,6 +32,7 @@ export class MySqlService {
       connectionLimit: 10,
       queueLimit: 0,
       charset: 'utf8mb4',
+      timezone: '+07:00',
     });
 
     return this.ketNoi;
@@ -78,6 +79,6 @@ export class MySqlService {
 
   private rutGonLoiDb(loi: unknown): string {
     this.logger.error('Lỗi database:', loi);
-    return 'He thong du lieu tam thoi gap su co. Vui long thu lai sau.';
+    return 'Hệ thống dữ liệu tạm thời gặp sự cố. Vui lòng thử lại sau.';
   }
 }

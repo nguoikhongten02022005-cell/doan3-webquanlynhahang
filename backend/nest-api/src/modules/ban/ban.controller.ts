@@ -10,6 +10,7 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { BanService } from './ban.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
@@ -68,7 +69,10 @@ export class BanController {
     return this.banService.layThucDonTheoBan(maBan);
   }
 
+  // Public endpoint — khách quét QR tại bàn để gọi món, không cần đăng nhập.
+  // Rate limit 5 requests/phút để chống spam từ mã QR bị lộ ra ngoài.
   @Public()
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @Post(':maBan/order')
   taoOrderTaiBan(@Param('maBan') maBan: string, @Body() body: BanGhi) {
     return this.banService.taoOrderTaiBan(maBan, body);
@@ -80,7 +84,10 @@ export class BanController {
     return this.banService.layOrderDangMoTaiBan(maBan);
   }
 
+  // Public endpoint — khách yêu cầu thanh toán tại bàn qua QR, không cần đăng nhập.
+  // Rate limit 3 requests/phút để chống spam.
   @Public()
+  @Throttle({ default: { limit: 3, ttl: 60000 } })
   @Post(':maBan/yeu-cau-thanh-toan')
   yeuCauThanhToanTaiBan(@Param('maBan') maBan: string) {
     return this.banService.yeuCauThanhToanTaiBan(maBan);

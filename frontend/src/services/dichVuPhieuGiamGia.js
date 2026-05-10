@@ -14,7 +14,7 @@ const chuanHoaPhieuGiamGia = (phieuGiamGia) => {
   const giamToiDa = phieuGiamGia.maxDiscountAmount ?? phieuGiamGia.giamToiDa ?? null
   const tenGiamGia = String(phieuGiamGia.name || phieuGiamGia.tenGiamGia || '').trim()
   const thongDiep = String(phieuGiamGia.description || phieuGiamGia.thongDiep || '').trim()
-  const laPhanTram = loaiGiam.toLowerCase() === 'phantram'
+  const laPhanTram = loaiGiam.toLowerCase() === 'percentage' || loaiGiam.toLowerCase() === 'phantram'
   const laTienMat = !laPhanTram && Number.isFinite(giaTriGiam) && giaTriGiam > 0
 
   if (!maGiamGia || (!laPhanTram && !laTienMat)) {
@@ -48,7 +48,7 @@ export const tinhSoTienGiamTheoPhieuGiamGia = (phieuGiamGia, tongTienXetPhieuGia
     return 0
   }
 
-  const laGiamPhanTram = String(phieuGiamGiaDaChuanHoa.discountType || '').toLowerCase() === 'phantram'
+  const laGiamPhanTram = String(phieuGiamGiaDaChuanHoa.discountType || '').toLowerCase() === 'percentage' || String(phieuGiamGiaDaChuanHoa.discountType || '').toLowerCase() === 'phantram'
   const soTienGiamTamTinh = laGiamPhanTram
     ? Math.round((tongTienHopLe * Number(phieuGiamGiaDaChuanHoa.discountValue || 0)) / 100)
     : Number(phieuGiamGiaDaChuanHoa.discountValue || 0)

@@ -4,6 +4,7 @@ import {
   NotFoundException,
   UnauthorizedException,
 } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtService } from '@nestjs/jwt';
 import { compare, hash } from 'bcryptjs';
 import { MySqlService } from '../../database/mysql/mysql.service';
@@ -11,6 +12,7 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { chuanHoaVaiTroNoiBo } from '../../common/vai-tro';
 import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
+import { TaoNguoiDungDto } from './dto/tao-nguoi-dung.dto';
 import { BanGhi } from '../../common/types';
 
 @Injectable()
@@ -18,6 +20,7 @@ export class AuthService {
   constructor(
     private readonly mysql: MySqlService,
     private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
   layTokenTuDauTrang(dauTrang?: string) {
@@ -32,13 +35,13 @@ export class AuthService {
   async giaiMaNguoiDung(dauTrang?: string) {
     const token = this.layTokenTuDauTrang(dauTrang);
     if (!token) {
-      throw new UnauthorizedException('Thieu token xac thuc.');
+      throw new UnauthorizedException('Thiếu token xác thực.');
     }
 
     try {
       return await this.jwtService.verifyAsync(token);
     } catch {
-      throw new UnauthorizedException('Token khong hop le hoac da het han.');
+      throw new UnauthorizedException('Token không hợp lệ hoặc đã hết hạn.');
     }
   }
 
@@ -91,31 +94,43 @@ export class AuthService {
     return danhSach[0] || null;
   }
 
+  private xacThucMatKhauManh(matKhau: string) {
+    if (matKhau.length < 8) {
+      throw new BadRequestException('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.');
+    }
+    if (!/[A-Z]/.test(matKhau)) {
+      throw new BadRequestException('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.');
+    }
+    if (!/[0-9]/.test(matKhau)) {
+      throw new BadRequestException('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.');
+    }
+  }
+
   private taoChucVuNoiBo(vaiTro: string) {
     return vaiTro === 'Admin' ? 'QuanLy' : 'NhanVien';
   }
 
-  async dangKy(payload: BanGhi) {
+  async dangKy(payload: TaoNguoiDungDto) {
     const hoTen = String(payload.hoTen || '').trim();
     const email = String(payload.email || '')
       .trim()
       .toLowerCase();
     const matKhau = String(payload.matKhau || '').trim();
-    const xacNhanMatKhau = String(payload.xacNhanMatKhau || '').trim();
-    const soDienThoai = String(payload.soDienThoai || '').trim();
-    const diaChi = String(payload.diaChi || '').trim();
+    const xacNhanMatKhau = String((payload as any).xacNhanMatKhau || '').trim();
+    const soDienThoai = String((payload as any).soDienThoai || '').trim();
+    const diaChi = String((payload as any).diaChi || '').trim();
 
     if (!hoTen || !email || !matKhau) {
-      throw new BadRequestException('Ho ten, email va mat khau la bat buoc.');
+      throw new BadRequestException('Họ tên, email và mật khẩu là bắt buộc.');
     }
 
     if (matKhau !== xacNhanMatKhau) {
-      throw new BadRequestException('Xac nhan mat khau khong khop.');
+      throw new BadRequestException('Xác nhận mật khẩu không khớp.');
     }
 
     const daTonTai = await this.layNguoiDungTheoEmail(email);
     if (daTonTai) {
-      throw new BadRequestException('Email da ton tai.');
+      throw new BadRequestException('Email đã tồn tại.');
     }
 
     const maND = taoMa('ND');
@@ -141,7 +156,7 @@ export class AuthService {
     const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
     const accessToken = this.taoJwt(nguoiDung);
 
-    return taoPhanHoi({ user, accessToken }, 'Dang ky thanh cong');
+    return taoPhanHoi({ user, accessToken }, 'Đăng ký thành công');
   }
 
   async dangNhap(email: string, matKhau: string) {
@@ -151,7 +166,7 @@ export class AuthService {
         .toLowerCase(),
     );
     if (!nguoiDung) {
-      throw new UnauthorizedException('Email hoac mat khau khong dung.');
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng.');
     }
 
     const hopLe = await compare(
@@ -159,14 +174,15 @@ export class AuthService {
       String(nguoiDung.MatKhau || ''),
     );
     if (!hopLe) {
-      throw new UnauthorizedException('Email hoac mat khau khong dung.');
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng.');
     }
 
     const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
     const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
     const accessToken = this.taoJwt(nguoiDung);
+    const refreshToken = this.taoRefreshToken(nguoiDung);
 
-    return taoPhanHoi({ user, accessToken }, 'Dang nhap thanh cong');
+    return taoPhanHoi({ user, accessToken, refreshToken }, 'Đăng nhập thành công');
   }
 
   async dangNhapNoiBo(email: string, matKhau: string) {
@@ -176,7 +192,7 @@ export class AuthService {
         .toLowerCase(),
     );
     if (!nguoiDung) {
-      throw new UnauthorizedException('Email hoac mat khau khong dung.');
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng.');
     }
 
     const hopLe = await compare(
@@ -184,12 +200,12 @@ export class AuthService {
       String(nguoiDung.MatKhau || ''),
     );
     if (!hopLe) {
-      throw new UnauthorizedException('Email hoac mat khau khong dung.');
+      throw new UnauthorizedException('Email hoặc mật khẩu không đúng.');
     }
 
     if (nguoiDung.VaiTro === 'KhachHang') {
       throw new UnauthorizedException(
-        'Tai khoan nay khong co quyen dang nhap noi bo.',
+        'Tài khoản này không có quyền đăng nhập nội bộ.',
       );
     }
 
@@ -197,11 +213,57 @@ export class AuthService {
     const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
     const accessToken = this.taoJwt(nguoiDung);
 
-    return taoPhanHoi({ user, accessToken }, 'Dang nhap thanh cong');
+    return taoPhanHoi({ user, accessToken }, 'Đăng nhập thành công');
   }
 
   dangXuat() {
-    return taoPhanHoi(null, 'Dang xuat thanh cong');
+    return taoPhanHoi(null, 'Đăng xuất thành công');
+  }
+
+  private taoRefreshToken(nguoiDung: BanGhi) {
+    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET');
+    return this.jwtService.sign(
+      {
+        maND: nguoiDung.MaND,
+        email: nguoiDung.Email,
+        vaiTro: nguoiDung.VaiTro,
+        loai: 'refresh',
+      },
+      {
+        secret: refreshSecret,
+        expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') as any) || '7d',
+      },
+    );
+  }
+
+  async lamMoiToken(refreshToken: string) {
+    if (!refreshToken) {
+      throw new UnauthorizedException('Thiếu refresh token.');
+    }
+
+    let giaiMa: any;
+    try {
+      const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET');
+      giaiMa = await this.jwtService.verifyAsync(refreshToken, { secret: refreshSecret });
+    } catch {
+      throw new UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn.');
+    }
+
+    if (giaiMa.loai !== 'refresh') {
+      throw new UnauthorizedException('Token không phải là refresh token.');
+    }
+
+    const nguoiDung = await this.layNguoiDungTheoMaNd(giaiMa.maND);
+    if (!nguoiDung || nguoiDung.TrangThai !== 'Active') {
+      throw new UnauthorizedException('Tài khoản không còn hoạt động.');
+    }
+
+    const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
+    const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
+    const accessToken = this.taoJwt(nguoiDung);
+    const refreshTokenMoi = this.taoRefreshToken(nguoiDung);
+
+    return taoPhanHoi({ user, accessToken, refreshToken: refreshTokenMoi }, 'Làm mới token thành công');
   }
 
   async layThongTinToiTuUser(thongTinToken: any) {
@@ -209,13 +271,13 @@ export class AuthService {
       String(thongTinToken.maND),
     );
     if (!nguoiDung) {
-      throw new NotFoundException('Khong tim thay nguoi dung.');
+      throw new NotFoundException('Không tìm thấy người dùng.');
     }
 
     const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
     return taoPhanHoi(
       this.chuyenNguoiDungSangResponse(nguoiDung, khachHang),
-      'Lay thong tin thanh cong',
+      'Lấy thông tin thành công',
     );
   }
 
@@ -240,7 +302,7 @@ export class AuthService {
         diaChi: nguoiDung.DiaChi || '',
         diemTichLuy: Number(nguoiDung.DiemTichLuy || 0),
       })),
-      'Lay danh sach nguoi dung thanh cong',
+      'Lấy danh sách người dùng thành công',
     );
   }
 
@@ -259,16 +321,16 @@ export class AuthService {
     const chucVu = String(payload.chucVu || this.taoChucVuNoiBo(vaiTro)).trim();
 
     if (!hoTen || !email || !matKhau) {
-      throw new BadRequestException('Ho ten, email va mat khau la bat buoc.');
+      throw new BadRequestException('Họ tên, email và mật khẩu là bắt buộc.');
     }
 
     if (matKhau !== xacNhanMatKhau) {
-      throw new BadRequestException('Xac nhan mat khau khong khop.');
+      throw new BadRequestException('Xác nhận mật khẩu không khớp.');
     }
 
     const daTonTai = await this.layNguoiDungTheoEmail(email);
     if (daTonTai) {
-      throw new BadRequestException('Email da ton tai.');
+      throw new BadRequestException('Email đã tồn tại.');
     }
 
     const maND = taoMa('ND');
@@ -304,7 +366,7 @@ export class AuthService {
         maND: nguoiDung?.MaND || maND,
         maNV: nhanVien?.MaNV || maNV,
       },
-      'Tao nhan vien thanh cong',
+      'Tạo nhân viên thành công',
     );
   }
 
@@ -314,7 +376,7 @@ export class AuthService {
   ) {
     const nguoiDung = await this.layNguoiDungTheoMaNd(maND);
     if (!nguoiDung) {
-      throw new NotFoundException('Khong tim thay nguoi dung.');
+      throw new NotFoundException('Không tìm thấy người dùng.');
     }
 
     const hoTen = String(payload.hoTen || nguoiDung.TenND || '').trim();
@@ -332,7 +394,7 @@ export class AuthService {
 
     const nguoiDungCungEmail = await this.layNguoiDungTheoEmail(email);
     if (nguoiDungCungEmail && String(nguoiDungCungEmail.MaND) !== maND) {
-      throw new BadRequestException('Email da ton tai.');
+      throw new BadRequestException('Email đã tồn tại.');
     }
 
     await this.mysql.thucThi(
@@ -373,11 +435,11 @@ export class AuthService {
       const xacNhanMatKhau = String(payload.xacNhanMatKhau || '').trim();
 
       if (!matKhau) {
-        throw new BadRequestException('Mat khau moi khong hop le.');
+        throw new BadRequestException('Mật khẩu mới không hợp lệ.');
       }
 
       if (matKhau !== xacNhanMatKhau) {
-        throw new BadRequestException('Xac nhan mat khau khong khop.');
+        throw new BadRequestException('Xác nhận mật khẩu không khớp.');
       }
 
       await this.mysql.thucThi(
@@ -386,18 +448,18 @@ export class AuthService {
       );
     }
 
-    return taoPhanHoi({ maND }, 'Cap nhat nhan vien thanh cong');
+    return taoPhanHoi({ maND }, 'Cập nhật nhân viên thành công');
   }
 
   async xoaNguoiDungNoiBo(maND: string) {
     const nguoiDung = await this.layNguoiDungTheoMaNd(maND);
     if (!nguoiDung) {
-      throw new NotFoundException('Khong tim thay nguoi dung.');
+      throw new NotFoundException('Không tìm thấy người dùng.');
     }
 
     if (String(nguoiDung.VaiTro) === 'KhachHang') {
       throw new BadRequestException(
-        'Chi co the xoa tai khoan nhan vien hoac quan ly.',
+        'Chỉ có thể xóa tài khoản nhân viên hoặc quản lý.',
       );
     }
 
@@ -406,7 +468,7 @@ export class AuthService {
       await ketNoi.execute('DELETE FROM NguoiDung WHERE MaND = ?', [maND]);
     });
 
-    return taoPhanHoi(null, 'Xoa nhan vien thanh cong');
+    return taoPhanHoi(null, 'Xóa nhân viên thành công');
   }
 
   async capNhatHoSoTuUser(thongTinToken: any, payload: BanGhi) {
@@ -438,7 +500,7 @@ export class AuthService {
       String(thongTinToken.maND),
     );
     if (!nguoiDung) {
-      throw new NotFoundException('Khong tim thay nguoi dung.');
+      throw new NotFoundException('Không tìm thấy người dùng.');
     }
 
     const matKhauHienTai = String(payload.matKhauHienTai || '');
@@ -446,21 +508,23 @@ export class AuthService {
     const xacNhan = String(payload.xacNhanMatKhauMoi || '');
 
     if (matKhauMoi !== xacNhan) {
-      throw new BadRequestException('Xac nhan mat khau moi khong khop.');
+      throw new BadRequestException('Xác nhận mật khẩu mới không khớp.');
     }
+
+    this.xacThucMatKhauManh(matKhauMoi);
 
     const hopLe = await compare(
       matKhauHienTai,
       String(nguoiDung.MatKhau || ''),
     );
     if (!hopLe) {
-      throw new UnauthorizedException('Mat khau hien tai khong dung.');
+      throw new UnauthorizedException('Mật khẩu hiện tại không đúng.');
     }
 
     await this.mysql.thucThi(
       'UPDATE NguoiDung SET MatKhau = ? WHERE MaND = ?',
       [await hash(matKhauMoi, 10), nguoiDung.MaND],
     );
-    return taoPhanHoi(null, 'Doi mat khau thanh cong');
+    return taoPhanHoi(null, 'Đổi mật khẩu thành công');
   }
 }

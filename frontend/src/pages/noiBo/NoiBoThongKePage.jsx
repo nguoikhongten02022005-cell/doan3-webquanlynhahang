@@ -1,17 +1,88 @@
 import { useMemo, useState } from 'react'
 import { Card, Col, Row, Segmented, Space, Statistic, Table, Typography } from 'antd'
+import { useQuery } from '@tanstack/react-query'
 import BieuDoDoanhThu from '../../features/noiBo/dashboard/BieuDoDoanhThu'
-import { NOI_BO_THONG_KE_KHOANG_THOI_GIAN, taoDuLieuThongKeDoanhThu } from '../../features/noiBo/thongKeNoiBo'
+import { NOI_BO_THONG_KE_KHOANG_THOI_GIAN } from '../../features/noiBo/thongKeNoiBo'
 import { dinhDangTienTe } from '../../utils/tienTe'
-import { useOutletContext } from 'react-router-dom'
+import { layDoanhThuNgayApi, layMonBanChayApi, layDoanhThuThangApi } from '../../services/api/apiThongKe'
+
+const tinhKhoangThoiGian = (timeRange) => {
+  const homNay = new Date()
+  homNay.setHours(0, 0, 0, 0)
+  const denNgay = homNay.toISOString().split('T')[0]
+
+  if (timeRange === 'today') {
+    return { tuNgay: denNgay, denNgay }
+  }
+  if (timeRange === 'last7Days') {
+    const tuNgay = new Date(homNay)
+    tuNgay.setDate(tuNgay.getDate() - 6)
+    return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+  }
+  if (timeRange === 'last30Days') {
+    const tuNgay = new Date(homNay)
+    tuNgay.setDate(tuNgay.getDate() - 29)
+    return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+  }
+  if (timeRange === 'thisMonth') {
+    const tuNgay = new Date(homNay.getFullYear(), homNay.getMonth(), 1)
+    return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+  }
+  return { tuNgay: denNgay, denNgay }
+}
+
+const taoChuoiDoanhThu = (danhSach) => (danhSach || []).map((muc) => ({
+  label: muc.Ngay ? new Date(muc.Ngay).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : '--',
+  revenue: Number(muc.DoanhThu || 0),
+  completedOrders: Number(muc.SoHoaDon || 0),
+}))
 
 function NoiBoThongKePage() {
-  const { danhSachDonHang, danhSachDatBan } = useOutletContext()
   const [timeRange, setTimeRange] = useState('last7Days')
+  const { tuNgay, denNgay } = tinhKhoangThoiGian(timeRange)
 
-  const revenueStats = useMemo(
-    () => taoDuLieuThongKeDoanhThu({ orders: danhSachDonHang, bookings: danhSachDatBan, timeRange }),
-    [danhSachDatBan, danhSachDonHang, timeRange],
+  const { data: duLieuDoanhThu = [], isLoading: dangTaiDoanhThu } = useQuery({
+    queryKey: ['thong-ke-doanh-thu-trang', tuNgay, denNgay],
+    queryFn: async () => {
+      const ketQua = await layDoanhThuNgayApi(tuNgay, denNgay)
+      return ketQua.duLieu || []
+    },
+  })
+
+  const { data: duLieuMonBanChay = [], isLoading: dangTaiMonBanChay } = useQuery({
+    queryKey: ['thong-ke-mon-ban-chay'],
+    queryFn: async () => {
+      const ketQua = await layMonBanChayApi(10)
+      return ketQua.duLieu || []
+    },
+  })
+
+  const revenueSeries = useMemo(() => taoChuoiDoanhThu(duLieuDoanhThu), [duLieuDoanhThu])
+
+  const tongDoanhThu = useMemo(
+    () => duLieuDoanhThu.reduce((tong, muc) => tong + Number(muc.DoanhThu || 0), 0),
+    [duLieuDoanhThu],
+  )
+
+  const soDonHoanThanh = useMemo(
+    () => duLieuDoanhThu.reduce((tong, muc) => tong + Number(muc.SoHoaDon || 0), 0),
+    [duLieuDoanhThu],
+  )
+
+  const giaTriTrungBinh = soDonHoanThanh > 0 ? Math.round(tongDoanhThu / soDonHoanThanh) : 0
+
+  const topDishes = useMemo(
+    () => (duLieuMonBanChay || []).slice(0, 10).map((mon, chiSo) => ({
+      ...mon,
+      rank: chiSo + 1,
+      name: mon.TenMon || mon.tenMon || '',
+      quantity: Number(mon.SoLuongDaBan || mon.soLuongDaBan || 0),
+      revenue: Number(mon.DoanhThu || mon.doanhThu || 0),
+      percent: duLieuMonBanChay.length > 0
+        ? Math.round((Number(mon.DoanhThu || 0) / duLieuMonBanChay.reduce((t, m) => t + Number(m.DoanhThu || 0), 0)) * 100)
+        : 0,
+    })),
+    [duLieuMonBanChay],
   )
 
   const topDishColumns = [
@@ -19,12 +90,6 @@ function NoiBoThongKePage() {
     { title: 'Tên món', dataIndex: 'name', key: 'name' },
     { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', width: 110 },
     { title: 'Doanh thu', dataIndex: 'revenue', key: 'revenue', width: 160, render: (value) => dinhDangTienTe(value) },
-    { title: '% tổng', dataIndex: 'percent', key: 'percent', width: 100, render: (value) => `${value}%` },
-  ]
-
-  const categoryColumns = [
-    { title: 'Danh mục', dataIndex: 'category', key: 'category' },
-    { title: 'Tỷ trọng', dataIndex: 'percent', key: 'percent', width: 120, render: (value) => `${value}%` },
   ]
 
   return (
@@ -34,30 +99,18 @@ function NoiBoThongKePage() {
       </Card>
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng doanh thu kỳ" value={revenueStats.overview.revenue} formatter={(value) => dinhDangTienTe(Number(value) || 0)} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Số đơn hoàn thành" value={revenueStats.overview.completedOrders} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Giá trị đơn trung bình" value={revenueStats.overview.averageOrder} formatter={(value) => dinhDangTienTe(Number(value) || 0)} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking kỳ" value={revenueStats.overview.totalBookings} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng doanh thu kỳ" value={tongDoanhThu} formatter={(value) => dinhDangTienTe(Number(value) || 0)} loading={dangTaiDoanhThu} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Số đơn hoàn thành" value={soDonHoanThanh} loading={dangTaiDoanhThu} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Giá trị đơn trung bình" value={giaTriTrungBinh} formatter={(value) => dinhDangTienTe(Number(value) || 0)} loading={dangTaiDoanhThu} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking kỳ" value="--" loading={dangTaiDoanhThu} /></Card></Col>
       </Row>
 
-      <Row gutter={[16, 16]}>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking" value={revenueStats.bookingStats.total} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Đã hoàn thành" value={revenueStats.bookingStats.completed} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Đã hủy" value={revenueStats.bookingStats.cancelled} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tỉ lệ hủy" value={revenueStats.bookingStats.cancellationRate} suffix="%" /></Card></Col>
-      </Row>
-
-      <BieuDoDoanhThu title="Doanh thu 7 ngày gần nhất" revenue={{ summary: revenueStats.overview, series: revenueStats.revenueSeries }} />
+      <BieuDoDoanhThu title="Doanh thu 7 ngày gần nhất" revenue={{ summary: { revenue: tongDoanhThu }, series: revenueSeries }} loading={dangTaiDoanhThu} />
 
       <Row gutter={[16, 16]}>
-        <Col xs={24} xl={14}>
+        <Col xs={24} xl={24}>
           <Card title="Món bán chạy">
-            <Table rowKey="id" pagination={false} columns={topDishColumns} dataSource={revenueStats.topDishes} scroll={{ x: 640 }} />
-          </Card>
-        </Col>
-        <Col xs={24} xl={10}>
-          <Card title="Phân bổ theo nhóm món">
-            <Table rowKey="category" pagination={false} columns={categoryColumns} dataSource={revenueStats.categoryShares} />
+            <Table rowKey="rank" pagination={false} columns={topDishColumns} dataSource={topDishes} loading={dangTaiMonBanChay} scroll={{ x: 640 }} />
           </Card>
         </Col>
       </Row>

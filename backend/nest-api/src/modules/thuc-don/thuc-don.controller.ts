@@ -20,6 +20,7 @@ import {
 import { FileInterceptor } from '@nestjs/platform-express';
 import { diskStorage } from 'multer';
 import { extname } from 'path';
+import { randomUUID } from 'crypto';
 import { CapNhatMonDto } from './dto/cap-nhat-mon.dto';
 import { TaoMonDto } from './dto/tao-mon.dto';
 import { ThucDonService } from './thuc-don.service';
@@ -34,9 +35,9 @@ const taoTenTapTinAnhMon = (
   tapTin: { originalname?: string },
   callback: (error: Error | null, filename: string) => void,
 ) => {
-  const phanMoRong = extname(tapTin.originalname || '').toLowerCase() || '.png';
-  const tenTapTin = `mon-an-${Date.now()}-${Math.round(Math.random() * 1e9)}${phanMoRong}`;
-  callback(null, tenTapTin);
+  const phanMoRong = extname(tapTin.originalname || '').toLowerCase();
+  const duoiHopLe = ['.png', '.jpg', '.jpeg', '.webp'].includes(phanMoRong) ? phanMoRong : '.png';
+  callback(null, `${randomUUID()}${duoiHopLe}`);
 };
 
 const boLocTapTinAnh = (

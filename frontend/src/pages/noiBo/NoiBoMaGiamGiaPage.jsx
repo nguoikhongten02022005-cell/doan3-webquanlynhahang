@@ -35,8 +35,8 @@ const TRANG_THAI_OPTIONS = [
 ]
 
 const LOAI_GIAM_OPTIONS = [
-  { value: 'PhanTram', label: 'Phần trăm (%)' },
-  { value: 'SoTien', label: 'Số tiền (VNĐ)' },
+  { value: 'percentage', label: 'Phần trăm (%)' },
+  { value: 'fixed_amount', label: 'Số tiền (VNĐ)' },
 ]
 
 const CHON_TRANG_THAI = {
@@ -50,7 +50,7 @@ function taoFormMacDinh() {
     maCode: '',
     tenCode: '',
     giaTri: 0,
-    loaiGiam: 'PhanTram',
+    loaiGiam: 'percentage',
     giaTriToiDa: null,
     donHangToiThieu: 0,
     ngayApDung: null,
@@ -77,7 +77,7 @@ function chuanHoaDuLieuGuiDi(giaTri) {
 }
 
 function dinhDangGia(giaTri, loaiGiam) {
-  if (loaiGiam === 'PhanTram') {
+  if (loaiGiam === 'percentage') {
     return `${Number(giaTri || 0)}%`
   }
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(giaTri || 0))
@@ -212,7 +212,7 @@ function NoiBoMaGiamGiaPage() {
         width: 130,
         align: 'right',
         render: (val, record) =>
-          record.loaiGiam === 'PhanTram' && val != null
+          record.loaiGiam === 'percentage' && val != null
             ? new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(val))
             : '--',
       },

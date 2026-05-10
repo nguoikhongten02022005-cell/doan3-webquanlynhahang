@@ -46,7 +46,7 @@ export class BanCrudService {
 
   async capNhatBan(maBan: string, body: BanGhi) {
     const ma = await resolveMaBan(this.mysql, maBan);
-    if (!ma) throw new NotFoundException('Khong tim thay ban.');
+    if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
     await this.mysql.thucThi(
       'UPDATE Ban SET TenBan = ?, KhuVuc = ?, SoBan = ?, SoChoNgoi = ?, ViTri = ?, GhiChu = ? WHERE MaBan = ?',
       [
@@ -64,7 +64,7 @@ export class BanCrudService {
 
   async xoaBan(maBan: string) {
     const ma = await resolveMaBan(this.mysql, maBan);
-    if (!ma) throw new NotFoundException('Khong tim thay ban.');
+    if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
     await this.mysql.thucThi('DELETE FROM Ban WHERE MaBan = ?', [ma]);
     return taoPhanHoi(null, 'Xoa ban thanh cong');
   }

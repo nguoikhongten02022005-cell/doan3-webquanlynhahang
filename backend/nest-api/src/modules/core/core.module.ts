@@ -11,7 +11,7 @@ import { BootstrapService } from '../../config/bootstrap.service';
       useFactory: async (configService: ConfigService) => ({
         secret: configService.get<string>('JWT_SECRET'),
         signOptions: {
-          expiresIn: '12h' as const,
+          expiresIn: (configService.get<string>('JWT_EXPIRES_IN') as any) || '15m',
           issuer: configService.get<string>('JWT_ISSUER'),
           audience: configService.get<string>('JWT_AUDIENCE'),
         },

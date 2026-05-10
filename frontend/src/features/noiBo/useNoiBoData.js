@@ -1,11 +1,51 @@
 import { useMemo } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useDuLieuBangDieuKhien } from './useDuLieuBangDieuKhien'
-import { taoDuLieuThongKeDoanhThu } from './thongKeNoiBo'
 import { useBangDieuKhienData } from './useBangDieuKhienData'
+import { layTongQuanApi, layDoanhThuNgayApi } from '../../services/api/apiThongKe'
+
+const taoChuoi7Ngay = () => {
+  const homNay = new Date()
+  const denNgay = homNay.toISOString().split('T')[0]
+  const tuNgay = new Date(homNay)
+  tuNgay.setDate(tuNgay.getDate() - 6)
+  return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+}
 
 export const useNoiBoData = () => {
   const duLieuNoiBo = useDuLieuBangDieuKhien()
-  const duLieuBangDieuKhien = useBangDieuKhienData(duLieuNoiBo)
+
+  const { tuNgay, denNgay } = taoChuoi7Ngay()
+  const { data: tongQuan } = useQuery({
+    queryKey: ['thong-ke-tong-quan'],
+    queryFn: async () => {
+      const ketQua = await layTongQuanApi()
+      return ketQua.duLieu
+    },
+    refetchInterval: 30000,
+    initialData: { tongDoanhThu: 0, tongDon: 0, soBanBan: 0, soDonCho: 0 },
+  })
+
+  const { data: doanhThu7Ngay } = useQuery({
+    queryKey: ['thong-ke-doanh-thu', tuNgay, denNgay],
+    queryFn: async () => {
+      const ketQua = await layDoanhThuNgayApi(tuNgay, denNgay)
+      return (ketQua.duLieu || []).map((muc) => ({
+        label: muc.Ngay ? new Date(muc.Ngay).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : '--',
+        revenue: Number(muc.DoanhThu || 0),
+      }))
+    },
+    refetchInterval: 30000,
+    initialData: [],
+  })
+
+  const duLieuNoiBoVoiThongKe = useMemo(() => ({
+    ...duLieuNoiBo,
+    tongQuan,
+    doanhThu7Ngay,
+  }), [duLieuNoiBo, tongQuan, doanhThu7Ngay])
+
+  const duLieuBangDieuKhien = useBangDieuKhienData(duLieuNoiBoVoiThongKe)
 
   const phuHieu = useMemo(() => ({
     bookings: duLieuNoiBo.danhSachDatBanChoXuLy.length,
@@ -13,14 +53,6 @@ export const useNoiBoData = () => {
     reviews: duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
     notifications: duLieuNoiBo.danhSachDatBanChoXuLy.length + duLieuNoiBo.danhSachDonHangDangMo.length + duLieuNoiBo.danhSachDanhGiaChoDuyet.length,
   }), [duLieuNoiBo.danhSachDatBanChoXuLy.length, duLieuNoiBo.danhSachDonHangDangMo.length, duLieuNoiBo.danhSachDanhGiaChoDuyet.length])
-
-  const thongKeDoanhThu = useMemo(
-    () => taoDuLieuThongKeDoanhThu({
-      orders: duLieuNoiBo.danhSachDonHang,
-      bookings: duLieuNoiBo.danhSachDatBan,
-    }),
-    [duLieuNoiBo.danhSachDonHang, duLieuNoiBo.danhSachDatBan],
-  )
 
   const danhSachUuTien = useMemo(
     () => [
@@ -64,7 +96,6 @@ export const useNoiBoData = () => {
   return {
     ...duLieuNoiBo,
     badges: phuHieu,
-    revenueStats: thongKeDoanhThu,
     urgentItems: danhSachUuTien,
     bangDieuKhienData: duLieuBangDieuKhien,
   }

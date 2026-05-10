@@ -55,15 +55,15 @@ export class DanhGiaService {
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
       if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
-        throw new BadRequestException('Ban khong co quyen danh gia don hang nay.');
+        throw new BadRequestException('Bạn không có quyền đánh giá đơn hàng này.');
       }
     }
 
     const [donHang] = await this.mysql.truyVan('SELECT * FROM DonHang WHERE MaDonHang = ? LIMIT 1', [maDonHang]);
-    if (!donHang) throw new NotFoundException('Khong tim thay don hang.');
+    if (!donHang) throw new NotFoundException('Không tìm thấy đơn hàng.');
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien' && String(donHang.MaKH || '') !== String(khachHang?.MaKH || '')) {
-      throw new BadRequestException('Ban khong co quyen danh gia don hang nay.');
+      throw new BadRequestException('Bạn không có quyền đánh giá đơn hàng này.');
     }
 
     return { khachHang, donHang };
@@ -105,7 +105,7 @@ export class DanhGiaService {
     const hinhAnh = this.chuyenHinhAnhDanhGia(payload.hinhAnh);
 
     if (!maKH || !maDonHang) {
-      throw new BadRequestException('Thieu ma khach hang hoac ma don hang de tao danh gia.');
+      throw new BadRequestException('Thiếu mã khách hàng hoặc mã đơn hàng để tạo đánh giá.');
     }
 
     await this.kiemTraQuyenDanhGia(nguoiDung, maKH, maDonHang);
@@ -118,7 +118,7 @@ export class DanhGiaService {
     } catch (loi) {
       const err = loi as { errno?: number; code?: string; message?: string };
       if (err.errno === 1062 || err.code === 'ER_DUP_ENTRY' || String(err.message || '').includes('Duplicate entry')) {
-        throw new ConflictException('Khach hang da danh gia don hang nay roi.');
+        throw new ConflictException('Khách hàng đã đánh giá đơn hàng này rồi.');
       }
       throw loi;
     }
@@ -131,7 +131,7 @@ export class DanhGiaService {
 
   async duyetDanhGia(maDanhGia: string, payload: BanGhi) {
     const [danhGiaHienTai] = await this.mysql.truyVan('SELECT * FROM DanhGia WHERE MaDanhGia = ? LIMIT 1', [maDanhGia]);
-    if (!danhGiaHienTai) throw new NotFoundException('Khong tim thay danh gia.');
+    if (!danhGiaHienTai) throw new NotFoundException('Không tìm thấy đánh giá.');
 
     await this.mysql.thucThi('UPDATE DanhGia SET TrangThai = ?, PhanHoi = ? WHERE MaDanhGia = ?', [
       payload.trangThai,

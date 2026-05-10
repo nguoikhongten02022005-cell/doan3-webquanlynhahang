@@ -1,37 +1,18 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { taoDuLieuThongKeDoanhThu } from './thongKeNoiBo'
+import { layTongQuanApi } from '../../services/api/apiThongKe'
 import { laCungNgayLich } from './boChon'
 
-const tinhDoanhThuHomNay = (danhSachDonHang = []) => {
-  const homNay = new Date()
-
-  return danhSachDonHang.reduce((tong, donHang) => {
-    const ngayTao = new Date(donHang?.orderDate)
-
-    if (Number.isNaN(ngayTao.getTime()) || !laCungNgayLich(ngayTao, homNay)) {
-      return tong
-    }
-
-    return tong + (Number(donHang?.total) || 0)
-  }, 0)
-}
-
 const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
-  const thongKeDoanhThu = taoDuLieuThongKeDoanhThu({
-    orders: duLieuNoiBo.danhSachDonHang || [],
-    bookings: duLieuNoiBo.danhSachDatBan || [],
-  })
-
   return {
     stats: {
-      todayRevenue: tinhDoanhThuHomNay(duLieuNoiBo.danhSachDonHang || []),
+      todayRevenue: duLieuNoiBo.tongQuan?.tongDoanhThu || 0,
       openBookings: duLieuNoiBo.hangDoiDatBan?.length || 0,
       servingTables: duLieuNoiBo.tomTatTonKhoBan?.occupied || 0,
     },
     revenue: {
-      summary: thongKeDoanhThu.overview,
-      series: thongKeDoanhThu.revenueSeries,
+      summary: duLieuNoiBo.tongQuan || {},
+      series: duLieuNoiBo.doanhThu7Ngay || [],
     },
     urgentTasks: [
       {

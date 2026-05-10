@@ -70,7 +70,7 @@ export class DatBanQueryService {
     );
     return taoPhanHoi(
       danhSach.map((datBan) => this.chuyenDatBanSangPhanHoi(datBan)),
-      'Lay danh sach dat ban thanh cong',
+      'Lấy danh sách đặt bàn thành công',
     );
   }
 
@@ -80,7 +80,7 @@ export class DatBanQueryService {
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
       const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
       if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
-        throw new ForbiddenException('Ban khong co quyen truy cap du lieu cua khach hang khac.');
+        throw new ForbiddenException('Bạn không có quyền truy cập dữ liệu của khách hàng khác.');
       }
     }
 
@@ -90,7 +90,7 @@ export class DatBanQueryService {
     );
     return taoPhanHoi(
       danhSach.map((datBan) => this.chuyenDatBanSangPhanHoi(datBan)),
-      'Lay lich su dat ban thanh cong',
+      'Lấy lịch sử đặt bàn thành công',
     );
   }
 
@@ -101,7 +101,7 @@ export class DatBanQueryService {
     const khuVuc = String(query.khuVuc || '').trim();
 
     if (!ngayDat || !gioDat) {
-      throw new BadRequestException('Ngay dat va gio dat la bat buoc.');
+      throw new BadRequestException('Ngày đặt và giờ đặt là bắt buộc.');
     }
 
     const danhSachBan = await this.mysql.truyVan(
@@ -109,7 +109,7 @@ export class DatBanQueryService {
     );
     const danhSachDatBan = await this.mysql.truyVan(
       `SELECT * FROM DatBan
-       WHERE NgayDat = ? AND GioDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed')`,
+       WHERE NgayDat = ? AND GioDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed', 'DA_HUY', 'KHONG_DEN', 'DA_HOAN_THANH', 'TU_CHOI_HET_CHO')`,
       [ngayDat, gioDat],
     );
 
@@ -167,7 +167,7 @@ export class DatBanQueryService {
           trangThai: ban.TrangThai,
         })),
       },
-      'Lay kha dung dat ban thanh cong',
+      'Lấy khả dụng đặt bàn thành công',
     );
   }
 }

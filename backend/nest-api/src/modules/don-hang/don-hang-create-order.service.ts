@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import type { PoolConnection } from 'mysql2/promise';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { DonHangPricingService } from './don-hang-pricing.service';
@@ -37,7 +37,6 @@ export class DonHangCreateOrderService {
   }
 
   async taoDonHang(payload: BanGhi, loaiDon?: string) {
-    const maDonHang = String(payload.maDonHang || taoMa('DH'));
     const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
@@ -45,41 +44,80 @@ export class DonHangCreateOrderService {
     const trangThai = payload.trangThai || 'Pending';
     const soDiem = Number(payload.soDiem || 0);
 
+    const nguoiDung = payload.nguoiDung || { maND: payload.maND };
+
+    if (soDiem > 0 && !nguoiDung.maND) {
+      throw new BadRequestException('Không thể đổi điểm khi chưa xác thực người dùng.');
+    }
+
     const { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung } =
       await this.donHangPricingService.tinhLaiGiaDonHang(payload, chiTiet);
 
-    const nguoiDung = payload.nguoiDung || { maND: payload.maND };
-
     return this.mysql.giaoDich(async (ketNoi) => {
+      // Kiểm tra đơn đang mở cho bàn này — nếu có thì append món, không tạo đơn mới
+      let maDonHang = String(payload.maDonHang || '');
+      let isAppending = false;
+
+      if (maBan && !maDonHang) {
+        const [donDangMo] = await this.truyVan(
+          "SELECT MaDonHang FROM DonHang WHERE MaBan = ? AND TrangThai NOT IN ('Paid','Cancelled') LIMIT 1",
+          [maBan],
+          ketNoi,
+        );
+        if (donDangMo) {
+          maDonHang = donDangMo.MaDonHang;
+          isAppending = true;
+        }
+      }
+
+      if (!maDonHang) {
+        maDonHang = taoMa('DH');
+      }
+
       let diemDaDoi: any = null;
       if (soDiem > 0) {
         const ketQuaDoiDiem = await this.diemTichLuyService.doiDiem(
           nguoiDung,
-          { soDiem, moTa: `Doi diem thanh toan don hang ${maDonHang}` },
+          { soDiem, moTa: `Đổi điểm thanh toán đơn hàng ${maDonHang}` },
           ketNoi,
         );
         diemDaDoi = ketQuaDoiDiem.data || ketQuaDoiDiem;
       }
 
-      await this.thucThi(
-        `INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          maDonHang,
-          payload.maKH || null,
-          maBan,
-          payload.maNV || null,
-          payload.maDatBan || null,
-          loaiDonHang,
-          payload.diaChiGiao || null,
-          tongHopGia.phiShip,
-          tongHopGia.tongTien,
-          trangThai,
-          nguonTao,
-          payload.ghiChu || null,
-        ],
-        ketNoi,
-      );
+      if (!isAppending) {
+        await this.thucThi(
+          `INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            maDonHang,
+            payload.maKH || null,
+            maBan,
+            payload.maNV || null,
+            payload.maDatBan || null,
+            loaiDonHang,
+            payload.diaChiGiao || null,
+            tongHopGia.phiShip,
+            tongHopGia.tongTien,
+            trangThai,
+            nguonTao,
+            payload.ghiChu || null,
+          ],
+          ketNoi,
+        );
+      } else {
+        // Cập nhật tổng tiền cho đơn hiện có
+        const [donHienTai] = await this.truyVan(
+          'SELECT TongTien FROM DonHang WHERE MaDonHang = ? LIMIT 1',
+          [maDonHang],
+          ketNoi,
+        );
+        const tongTienCu = Number(donHienTai?.TongTien || 0);
+        await this.thucThi(
+          'UPDATE DonHang SET TongTien = ? WHERE MaDonHang = ?',
+          [tongTienCu + tongHopGia.tongTien, maDonHang],
+          ketNoi,
+        );
+      }
 
       const chiTietPhanHoi: BanGhi[] = [];
       for (const muc of chiTietDaTinh) {
@@ -103,6 +141,14 @@ export class DonHangCreateOrderService {
 
       if (maBan) {
         await this.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Occupied', maBan], ketNoi);
+      }
+
+      if (maGiamGia.hopLe && maGiamGia.maGiamGia) {
+        await this.thucThi(
+          'UPDATE MaGiamGia SET SoLanDaDung = SoLanDaDung + 1 WHERE MaCode = ?',
+          [maGiamGia.maGiamGia],
+          ketNoi,
+        );
       }
 
       return taoPhanHoi(
@@ -137,7 +183,7 @@ export class DonHangCreateOrderService {
           chiTiet: chiTietPhanHoi,
           diemDaDoi,
         },
-        'Tao don hang thanh cong',
+        isAppending ? 'Thêm món vào đơn hàng hiện tại' : 'Tạo đơn hàng thành công',
       );
     });
   }
@@ -155,6 +201,8 @@ export class DonHangCreateOrderService {
         chiTiet: chiTiet.length ? chiTiet : danhSachMon.length ? danhSachMon : items,
         nguonTao: 'QRCode',
         loaiDon: 'TAI_BAN',
+        soDiem: 0,
+        nguoiDung: {},
       },
       'TAI_BAN',
     );

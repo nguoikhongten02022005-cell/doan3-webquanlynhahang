@@ -14,7 +14,7 @@ import {
   luuPhieuGiamGiaDaApDung as luuPhieuGiamGiaDaLuu,
   tinhSoTienGiamTheoPhieuGiamGia,
 } from '../services/dichVuPhieuGiamGia'
-import { kiemTraPhieuGiamGiaApi } from '../services/api/apiPhieuGiamGia'
+import { kiemTraPhieuGiamGiaApi } from '../services/api/apiMaGiamGia'
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../features/gioHang/constants/phieuGiamGia'
 
 import { tinhPhiDichVu } from '../utils/phiDichVu'
