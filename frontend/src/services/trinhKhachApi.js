@@ -125,10 +125,27 @@ const taoLoiTuPhanHoiApi = (phanHoi, duLieu) => {
   return loi
 }
 
+const taoDuongDanCoThamSo = (duongDan, params) => {
+  if (!params || typeof params !== 'object') return duongDan
+
+  const chuoiThamSo = new URLSearchParams()
+  Object.entries(params).forEach(([khoa, giaTri]) => {
+    if (giaTri !== undefined && giaTri !== null && giaTri !== '') {
+      chuoiThamSo.set(khoa, String(giaTri))
+    }
+  })
+
+  const thamSo = chuoiThamSo.toString()
+  if (!thamSo) return duongDan
+
+  return `${duongDan}${duongDan.includes('?') ? '&' : '?'}${thamSo}`
+}
+
 const guiYeuCauTho = async (duongDan, tuyChon = {}) => {
   const {
     headers: dauTrangTuyChinh = {},
     body,
+    params,
     includeAuthDauTrang = true,
     ...cacTuyChonConLai
   } = tuyChon
@@ -141,7 +158,9 @@ const guiYeuCauTho = async (duongDan, tuyChon = {}) => {
     ...dauTrangTuyChinh,
   }
 
-  const phanHoi = await fetch(`${layUrlGocApi()}${duongDan}`, {
+  const duongDanCoThamSo = taoDuongDanCoThamSo(duongDan, params)
+
+  const phanHoi = await fetch(`${layUrlGocApi()}${duongDanCoThamSo}`, {
     credentials: 'include',
     headers: dauTrang,
     body,

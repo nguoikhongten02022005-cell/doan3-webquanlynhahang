@@ -99,7 +99,7 @@ function NoiBoMaGiamGiaPage() {
       const phanHoi = await layDanhSachMaGiamGiaApi()
       datDanhSach(Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu : [])
     } catch (loi) {
-      messageApi.error(loi?.message || 'Khong the tai danh sach ma giam gia.')
+      messageApi.error(loi?.message || 'Không thể tải danh sách mã giảm giá.')
     } finally {
       datDangTai(false)
     }
@@ -138,36 +138,36 @@ function NoiBoMaGiamGiaPage() {
 
       if (cheDoBieuMau === 'create') {
         await taoMaGiamGiaApi(duLieuGui)
-        messageApi.success('Tao ma giam gia thanh cong.')
+        messageApi.success('Tạo mã giảm giá thành công.')
       } else {
         await capNhatMaGiamGiaApi(maDangSua, duLieuGui)
-        messageApi.success('Cap nhat ma giam gia thanh cong.')
+        messageApi.success('Cập nhật mã giảm giá thành công.')
       }
 
       datLaiBieuMau()
       taiDanhSach()
     } catch (loi) {
       if (loi?.errorFields) return
-      messageApi.error(loi?.message || 'Da xay ra loi khi luu.')
+      messageApi.error(loi?.message || 'Đã xảy ra lỗi khi lưu.')
     } finally {
       datDangXuLy(false)
     }
   }
 
-  const xuLyXoa = (record) => {
+  const xuLyXoá = (record) => {
     Modal.confirm({
-      title: 'Xac nhan xoa',
-      content: `Ban co chan muon xoa ma giam gia "${record.tenCode}" (${record.maCode}) khong?`,
-      okText: 'Xoa',
+      title: 'Xác nhận xoá',
+      content: `Bạn có chắc muốn xoá mã giảm giá "${record.tenCode}" (${record.maCode}) khong?`,
+      okText: 'Xoá',
       okType: 'danger',
       cancelText: 'Huy',
       onOk: async () => {
         try {
           await xoaMaGiamGiaApi(record.maCode)
-          messageApi.success('Xoa ma giam gia thanh cong.')
+          messageApi.success('Xoá mã giảm giá thành công.')
           taiDanhSach()
         } catch (loi) {
-          messageApi.error(loi?.message || 'Da xay ra loi khi xoa.')
+          messageApi.error(loi?.message || 'Đã xảy ra lỗi khi xoá.')
         }
       },
     })
@@ -176,7 +176,7 @@ function NoiBoMaGiamGiaPage() {
   const cotBang = useMemo(
     () => [
       {
-        title: 'Ma code',
+        title: 'Mã',
         dataIndex: 'maCode',
         key: 'maCode',
         width: 140,
@@ -184,21 +184,21 @@ function NoiBoMaGiamGiaPage() {
         render: (val) => <code style={{ fontSize: 12 }}>{val}</code>,
       },
       {
-        title: 'Ten ma',
+        title: 'Tên mã',
         dataIndex: 'tenCode',
         key: 'tenCode',
         width: 200,
         ellipsis: true,
       },
       {
-        title: 'Loai giam',
+        title: 'Loại giảm',
         dataIndex: 'loaiGiam',
         key: 'loaiGiam',
         width: 130,
         render: (val) => LOAI_GIAM_OPTIONS.find((o) => o.value === val)?.label || val,
       },
       {
-        title: 'Gia tri',
+        title: 'Giá trị',
         dataIndex: 'giaTri',
         key: 'giaTri',
         width: 110,
@@ -206,7 +206,7 @@ function NoiBoMaGiamGiaPage() {
         render: (giaTri, record) => dinhDangGia(giaTri, record.loaiGiam),
       },
       {
-        title: 'Giam toi da',
+        title: 'Giảm tối đa',
         dataIndex: 'giaTriToiDa',
         key: 'giaTriToiDa',
         width: 130,
@@ -217,7 +217,7 @@ function NoiBoMaGiamGiaPage() {
             : '--',
       },
       {
-        title: 'Don toi thieu',
+        title: 'Đơn tối thiểu',
         dataIndex: 'donHangToiThieu',
         key: 'donHangToiThieu',
         width: 130,
@@ -228,7 +228,7 @@ function NoiBoMaGiamGiaPage() {
             : '--',
       },
       {
-        title: 'Ngay ap dung',
+        title: 'Ngày áp dụng',
         key: 'ngayApDung',
         width: 160,
         render: (_, record) =>
@@ -237,7 +237,7 @@ function NoiBoMaGiamGiaPage() {
             : '--',
       },
       {
-        title: 'Luot dung',
+        title: 'Lượt dùng',
         key: 'luotDung',
         width: 110,
         align: 'center',
@@ -248,7 +248,7 @@ function NoiBoMaGiamGiaPage() {
         },
       },
       {
-        title: 'Trang thai',
+        title: 'Trạng thái',
         dataIndex: 'trangThai',
         key: 'trangThai',
         width: 110,
@@ -258,14 +258,14 @@ function NoiBoMaGiamGiaPage() {
         },
       },
       {
-        title: 'Thao tac',
+        title: 'Thao tác',
         key: 'thaoTac',
         width: 110,
         fixed: 'right',
         render: (_, record) => (
           <Space size={4}>
             <Button type="text" size="small" icon={<EditOutlined />} onClick={() => moNganKeoSua(record)} />
-            <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => xuLyXoa(record)} />
+            <Button type="text" size="small" danger icon={<DeleteOutlined />} onClick={() => xuLyXoá(record)} />
           </Space>
         ),
       },
@@ -277,10 +277,10 @@ function NoiBoMaGiamGiaPage() {
     <Space orientation="vertical" size={16} style={{ width: '100%' }}>
       {contextHolder}
       <Space style={{ justifyContent: 'space-between', width: '100%' }}>
-        <Title level={4} style={{ margin: 0 }}>Quan ly ma giam gia</Title>
+        <Title level={4} style={{ margin: 0 }}>Quản lý mã giảm giá</Title>
         <Space>
           <Button type="primary" icon={<PlusOutlined />} onClick={moNganKeoTaoMoi}>
-            Them ma moi
+            Thêm mã mới
           </Button>
         </Space>
       </Space>
@@ -289,8 +289,8 @@ function NoiBoMaGiamGiaPage() {
         <Alert
           type="info"
           showIcon
-          title="Chua co ma giam gia nao."
-          description="Nhan 'Them ma moi' de tao ma giam gia dau tien."
+          title="Chưa có mã giảm giá nào."
+          description="Nhấn 'Thêm mã mới' để tạo mã giảm giá đầu tiên."
         />
       ) : (
         <Table
@@ -299,12 +299,12 @@ function NoiBoMaGiamGiaPage() {
           rowKey="maCode"
           loading={dangTai}
           scroll={{ x: 1200 }}
-          pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (tong) => `Tong ${tong} ma` }}
+          pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (tong) => `Tổng ${tong} mã` }}
         />
       )}
 
       <Drawer
-        title={cheDoBieuMau === 'create' ? 'Tao ma giam gia moi' : `Sua ma giam gia: ${maDangSua}`}
+        title={cheDoBieuMau === 'create' ? 'Tạo mã giảm giá mới' : `Sửa mã giảm giá: ${maDangSua}`}
         placement="right"
         size={480}
         open={nganKeoDangMo}
@@ -313,7 +313,7 @@ function NoiBoMaGiamGiaPage() {
           <Space style={{ width: '100%', justifyContent: 'flex-end' }}>
             <Button onClick={datLaiBieuMau}>Huy</Button>
             <Button type="primary" loading={dangXuLy} onClick={xuLyLuu}>
-              {cheDoBieuMau === 'create' ? 'Tao ma' : 'Luu thay doi'}
+              {cheDoBieuMau === 'create' ? 'Tạo mã' : 'Lưu thay đổi'}
             </Button>
           </Space>
         }
@@ -321,8 +321,8 @@ function NoiBoMaGiamGiaPage() {
         <Form form={form} layout="vertical">
           <Form.Item
             name="maCode"
-            label="Ma code"
-            rules={[{ required: true, message: 'Vui long nhap ma code.' }]}
+            label="Mã"
+            rules={[{ required: true, message: 'Vui lòng nhập mã code.' }]}
           >
             <Input
               placeholder="VD: SUMMER2025"
@@ -334,45 +334,45 @@ function NoiBoMaGiamGiaPage() {
 
           <Form.Item
             name="tenCode"
-            label="Ten ma giam gia"
-            rules={[{ required: true, message: 'Vui long nhap ten ma giam gia.' }]}
+            label="Tên mã giảm giá"
+            rules={[{ required: true, message: 'Vui lòng nhập tên mã giảm giá.' }]}
           >
             <Input placeholder="VD: Giam gia mua he 2025" maxLength={100} showCount />
           </Form.Item>
 
-          <Form.Item name="loaiGiam" label="Loai giam" rules={[{ required: true }]}>
+          <Form.Item name="loaiGiam" label="Loại giảm" rules={[{ required: true }]}>
             <Select options={LOAI_GIAM_OPTIONS} />
           </Form.Item>
 
           <Form.Item
             name="giaTri"
-            label="Gia tri giam"
-            rules={[{ required: true, message: 'Vui long nhap gia tri giam.' }]}
+            label="Giá trị giảm"
+            rules={[{ required: true, message: 'Vui lòng nhập giá trị giảm.' }]}
           >
             <InputNumber min={0} style={{ width: '100%' }} placeholder="0" />
           </Form.Item>
 
-          <Form.Item name="giaTriToiDa" label="Giam toi da (VND)">
-            <InputNumber min={0} style={{ width: '100%' }} placeholder="De trong = khong gioi han" />
+          <Form.Item name="giaTriToiDa" label="Giảm tối đa (VND)">
+            <InputNumber min={0} style={{ width: '100%' }} placeholder="Để trống = không giới hạn" />
           </Form.Item>
 
-          <Form.Item name="donHangToiThieu" label="Don hang toi thieu (VND)">
-            <InputNumber min={0} style={{ width: '100%' }} placeholder="0 = khong yeu cau" />
+          <Form.Item name="donHangToiThieu" label="Đơn hàng tối thiểu (VND)">
+            <InputNumber min={0} style={{ width: '100%' }} placeholder="0 = không yêu cầu" />
           </Form.Item>
 
           <Form.Item
             name="ngayApDung"
-            label="Ngay ap dung"
-            rules={[{ required: true, message: 'Vui long chon ngay ap dung.' }]}
+            label="Ngày áp dụng"
+            rules={[{ required: true, message: 'Vui lòng chọn ngày áp dụng.' }]}
           >
             <RangePicker style={{ width: '100%' }} format="DD/MM/YYYY" />
           </Form.Item>
 
-          <Form.Item name="soLanToiDa" label="So lan su dung toi da">
-            <InputNumber min={0} style={{ width: '100%' }} placeholder="De trong = khong gioi han" />
+          <Form.Item name="soLanToiDa" label="Số lần sử dụng tối đa">
+            <InputNumber min={0} style={{ width: '100%' }} placeholder="Để trống = không giới hạn" />
           </Form.Item>
 
-          <Form.Item name="trangThai" label="Trang thai" rules={[{ required: true }]}>
+          <Form.Item name="trangThai" label="Trạng thái" rules={[{ required: true }]}>
             <Select options={TRANG_THAI_OPTIONS} />
           </Form.Item>
         </Form>

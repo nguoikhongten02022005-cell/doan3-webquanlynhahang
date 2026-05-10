@@ -8,8 +8,11 @@ import { layDoanhThuNgayApi, layMonBanChayApi, layDoanhThuThangApi } from '../..
 
 const tinhKhoangThoiGian = (timeRange) => {
   const homNay = new Date()
-  homNay.setHours(0, 0, 0, 0)
-  const denNgay = homNay.toISOString().split('T')[0]
+  const pad = (n) => String(n).padStart(2, '0')
+  const formatNgay = (date) => 
+    `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+  
+  const denNgay = formatNgay(homNay)
 
   if (timeRange === 'today') {
     return { tuNgay: denNgay, denNgay }
@@ -17,16 +20,16 @@ const tinhKhoangThoiGian = (timeRange) => {
   if (timeRange === 'last7Days') {
     const tuNgay = new Date(homNay)
     tuNgay.setDate(tuNgay.getDate() - 6)
-    return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+    return { tuNgay: formatNgay(tuNgay), denNgay }
   }
   if (timeRange === 'last30Days') {
     const tuNgay = new Date(homNay)
     tuNgay.setDate(tuNgay.getDate() - 29)
-    return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+    return { tuNgay: formatNgay(tuNgay), denNgay }
   }
   if (timeRange === 'thisMonth') {
     const tuNgay = new Date(homNay.getFullYear(), homNay.getMonth(), 1)
-    return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+    return { tuNgay: formatNgay(tuNgay), denNgay }
   }
   return { tuNgay: denNgay, denNgay }
 }

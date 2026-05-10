@@ -11,7 +11,10 @@ const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
       servingTables: duLieuNoiBo.tomTatTonKhoBan?.occupied || 0,
     },
     revenue: {
-      summary: duLieuNoiBo.tongQuan || {},
+      summary: {
+        ...(duLieuNoiBo.tongQuan || {}),
+        revenue: Number(duLieuNoiBo.tongQuan?.tongDoanhThu) || 0,
+      },
       series: duLieuNoiBo.doanhThu7Ngay || [],
     },
     urgentTasks: [
@@ -73,8 +76,19 @@ export const useBangDieuKhienData = (duLieuNoiBo = {}) => {
         khuVuc.dirty,
         khuVuc.available,
       ]),
+      revenue: (duLieuNoiBo?.doanhThu7Ngay || []).map((mucDoanhThu) => ({
+        label: mucDoanhThu.label,
+        revenue: mucDoanhThu.revenue,
+      })),
+      summary: duLieuNoiBo?.tongQuan || {},
     }),
-    [duLieuNoiBo?.hangDoiDatBan, duLieuNoiBo?.danhSachDonHangDaSapXep, duLieuNoiBo?.tomTatBan],
+    [
+      duLieuNoiBo?.hangDoiDatBan,
+      duLieuNoiBo?.danhSachDonHangDaSapXep,
+      duLieuNoiBo?.tomTatBan,
+      duLieuNoiBo?.doanhThu7Ngay,
+      duLieuNoiBo?.tongQuan,
+    ],
   )
 
   const { data: duLieuBangDieuKhien } = useQuery({

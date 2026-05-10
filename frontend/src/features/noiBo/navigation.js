@@ -31,7 +31,7 @@ export const NOI_BO_NAVIGATION = Object.freeze([
   },
 {
     key: 'thuc-don',
-    label: 'Thuc don',
+    label: 'Thực đơn',
     path: '/noi-bo/thuc-don',
     group: 'QUAN LY',
     glyph: '◫',
@@ -39,7 +39,7 @@ export const NOI_BO_NAVIGATION = Object.freeze([
   },
   {
     key: 'ma-giam-gia',
-    label: 'Ma giam gia',
+    label: 'Mã giảm giá',
     path: '/noi-bo/ma-giam-gia',
     group: 'QUAN LY',
     glyph: '◪',
@@ -71,7 +71,7 @@ export const NOI_BO_NAVIGATION = Object.freeze([
   },
 {
     key: 'nhan-vien',
-    label: 'Nhan vien',
+    label: 'Nhân viên',
     path: '/noi-bo/nhan-vien',
     group: 'HỆ THỐNG',
     glyph: '◌',
@@ -79,7 +79,7 @@ export const NOI_BO_NAVIGATION = Object.freeze([
   },
   {
     key: 'khach-hang',
-    label: 'Khach hang',
+    label: 'Khách hàng',
     path: '/noi-bo/khach-hang',
     group: 'HỆ THỐNG',
     glyph: '◉',

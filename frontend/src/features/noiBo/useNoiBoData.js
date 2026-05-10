@@ -6,10 +6,18 @@ import { layTongQuanApi, layDoanhThuNgayApi } from '../../services/api/apiThongK
 
 const taoChuoi7Ngay = () => {
   const homNay = new Date()
-  const denNgay = homNay.toISOString().split('T')[0]
+  const pad = (n) => String(n).padStart(2, '0')
+  const formatNgay = (date) => 
+    `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
+  
+  const denNgay = formatNgay(homNay)
   const tuNgay = new Date(homNay)
   tuNgay.setDate(tuNgay.getDate() - 6)
-  return { tuNgay: tuNgay.toISOString().split('T')[0], denNgay }
+  
+  return { 
+    tuNgay: formatNgay(tuNgay), 
+    denNgay 
+  }
 }
 
 export const useNoiBoData = () => {
@@ -23,7 +31,7 @@ export const useNoiBoData = () => {
       return ketQua.duLieu
     },
     refetchInterval: 30000,
-    initialData: { tongDoanhThu: 0, tongDon: 0, soBanBan: 0, soDonCho: 0 },
+    placeholderData: { tongDoanhThu: 0, tongDon: 0, soBanBan: 0, soDonCho: 0 },
   })
 
   const { data: doanhThu7Ngay } = useQuery({
@@ -36,7 +44,7 @@ export const useNoiBoData = () => {
       }))
     },
     refetchInterval: 30000,
-    initialData: [],
+    placeholderData: [],
   })
 
   const duLieuNoiBoVoiThongKe = useMemo(() => ({

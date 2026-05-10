@@ -501,7 +501,7 @@ function DatBanPage() {
   }, [danhSachDatBanHienTai, duLieuKhaDungDatBan, formData.date, tables])
 
   const summaryAreaLabel = mapAreaLabel(formData.seatingArea)
-  const todayIso = new Date().toISOString().slice(0, 10)
+  const todayIso = taoIsoTuNgay(new Date())
   const selectedDateOption = dateOptionMap.get(formData.date)
   const selectedDateLabel = selectedDateOption?.label || (formData.date ? dinhDangNgayGio(formData.date, '').trim() : 'Chưa chọn')
   const selectedDayLabel = selectedDateOption?.dayLabel || ''
@@ -550,7 +550,7 @@ function DatBanPage() {
     if (!formData.date) return 'Vui lòng chọn ngày dùng bữa.'
 
     const selectedDate = taoNgayKhongGio(formData.date)
-    const todayDate = taoNgayKhongGio(new Date().toISOString().slice(0, 10))
+    const todayDate = taoNgayKhongGio(todayIso)
     const maxDate = taoNgayKhongGio(maxDateIso)
 
     if (selectedDate < todayDate) return 'Không thể đặt bàn cho ngày đã qua.'
