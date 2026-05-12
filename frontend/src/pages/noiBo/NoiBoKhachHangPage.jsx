@@ -46,6 +46,7 @@ const TRANG_THAI_DATBAN_MAP = {
   DA_HOAN_THANH: { color: 'green', label: 'Đã hoàn thành' },
   DA_HUY: { color: 'default', label: 'Đã hủy' },
   KHONG_DEN: { color: 'default', label: 'Không đến' },
+  Seated: { color: 'cyan', label: 'Đang ngồi' },
 }
 
 const TRANG_THAI_DONHANG_MAP = {
@@ -56,6 +57,10 @@ const TRANG_THAI_DONHANG_MAP = {
   DANG_PHUC_VU: { color: 'green', label: 'Đang phục vụ' },
   HOAN_THANH: { color: 'default', label: 'Hoàn thành' },
   DA_HUY: { color: 'red', label: 'Đã hủy' },
+  Seated: { color: 'cyan', label: 'Đang ngồi' },
+  Served: { color: 'green', label: 'Đã phục vụ' },
+  Paid: { color: 'blue', label: 'Đã thanh toán' },
+  Cancelled: { color: 'default', label: 'Đã hủy' },
 }
 
 const { Text } = Typography
@@ -114,7 +119,8 @@ function NoiBoKhachHangPage() {
         layChiTietKhachHang(maKH),
         layLichSuKhachHang(maKH),
       ])
-      setKhachHangChiTiet(chiTiet)
+      const duLieuChiTiet = chiTiet?.data || chiTiet
+      setKhachHangChiTiet(duLieuChiTiet || ls.data?.khachHang || null)
       setLichSu({
         datBan: ls.data?.datBan || [],
         donHang: ls.data?.donHang || [],
@@ -179,7 +185,7 @@ function NoiBoKhachHangPage() {
       dataIndex: 'diemTichLuy',
       key: 'diemTichLuy',
       align: 'right',
-      render: (d) => <Text strong className="text-orange-600">{d?.toLocaleString() ?? 0}</Text>,
+      render: (d) => <Text strong className={(Number(d) || 0) > 0 ? 'text-orange-600' : 'text-slate-500'}>{d?.toLocaleString() ?? 0}</Text>,
     },
     {
       title: '',
@@ -300,15 +306,15 @@ function NoiBoKhachHangPage() {
               </Col>
               <Col span={12}>
                 <Text type="secondary">Số điện thoại</Text>
-                <div><Text>{khachHangChiTiet.sdt || '--'}</Text></div>
+                <div><Text>{khachHangChiTiet.sdt || 'Không có'}</Text></div>
               </Col>
               <Col span={12}>
                 <Text type="secondary">Địa chỉ</Text>
-                <div><Text>{khachHangChiTiet.diaChi || '--'}</Text></div>
+                <div><Text>{khachHangChiTiet.diaChi || 'Không có'}</Text></div>
               </Col>
               <Col span={12}>
                 <Text type="secondary">Điểm tích lũy</Text>
-                <div><Text strong style={{ color: '#fa8c16', fontSize: 16 }}>{khachHangChiTiet.diemTichLuy?.toLocaleString() ?? 0}</Text></div>
+                <div><Text strong style={{ color: (Number(khachHangChiTiet.diemTichLuy) || 0) > 0 ? '#fa8c16' : '#64748b', fontSize: 16 }}>{khachHangChiTiet.diemTichLuy?.toLocaleString() ?? 0}</Text></div>
               </Col>
             </Row>
 
@@ -358,7 +364,7 @@ function NoiBoKhachHangPage() {
                   <List.Item style={{ padding: '8px 0' }}>
                     <div style={{ width: '100%' }}>
                       <Space style={{ width: '100%', justifyContent: 'space-between' }}>
-                        <Text>{item.tenBan || 'Bàn'} - {item.tongTien?.toLocaleString()} VND</Text>
+                        <Text>{item.tenBan || 'Không rõ bàn'} - {item.tongTien?.toLocaleString()} VND</Text>
                         <Tag color={TRANG_THAI_DONHANG_MAP[item.trangThai]?.color || 'default'}>
                           {TRANG_THAI_DONHANG_MAP[item.trangThai]?.label || item.trangThai}
                         </Tag>

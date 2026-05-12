@@ -69,16 +69,19 @@ const kieuNutDrawer = {
     background: 'linear-gradient(135deg, #fb923c 0%, #f97316 100%)',
     borderColor: '#f97316',
     boxShadow: '0 12px 24px rgba(249, 115, 22, 0.2)',
+    color: '#fff',
   },
   success: {
-    background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
-    borderColor: '#16a34a',
-    boxShadow: '0 12px 24px rgba(34, 197, 94, 0.18)',
+    background: 'linear-gradient(135deg, #27ae60 0%, #1e8449 100%)',
+    borderColor: '#1e8449',
+    boxShadow: '0 12px 24px rgba(39, 174, 96, 0.18)',
+    color: '#fff',
   },
   danger: {
-    background: 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
-    borderColor: '#ea580c',
-    boxShadow: '0 12px 24px rgba(234, 88, 12, 0.2)',
+    background: 'linear-gradient(135deg, #e74c3c 0%, #c0392b 100%)',
+    borderColor: '#c0392b',
+    boxShadow: '0 12px 24px rgba(192, 57, 43, 0.2)',
+    color: '#fff',
   },
 }
 
