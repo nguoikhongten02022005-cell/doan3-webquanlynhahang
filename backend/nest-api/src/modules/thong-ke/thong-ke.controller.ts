@@ -24,14 +24,27 @@ export class ThongKeController {
 
   @ApiOperation({ summary: 'Lấy danh sách món bán chạy' })
   @Get('mon-ban-chay')
-  layMonBanChay(@Query('limit') limit?: string) {
-    return this.thongKeService.layMonBanChay(Number(limit) || 10);
+  layMonBanChay(
+    @Query('limit') limit?: string,
+    @Query('tuNgay') tuNgay?: string,
+    @Query('denNgay') denNgay?: string,
+  ) {
+    return this.thongKeService.layMonBanChay(Number(limit) || 10, tuNgay, denNgay);
   }
 
   @ApiOperation({ summary: 'Lấy tình trạng bàn' })
   @Get('tinh-trang-ban')
   layTinhTrangBan() {
     return this.thongKeService.layTinhTrangBan();
+  }
+
+  @ApiOperation({ summary: 'Lấy số lượng booking trong kỳ' })
+  @Get('booking-count')
+  layBookingCount(
+    @Query('tuNgay') tuNgay: string,
+    @Query('denNgay') denNgay: string,
+  ) {
+    return this.thongKeService.layBookingCount(tuNgay, denNgay);
   }
 
   @ApiOperation({ summary: 'Lấy tổng quan (doanh thu, đơn, bàn, chờ)' })

@@ -1,10 +1,10 @@
 import { useMemo, useState } from 'react'
-import { Card, Col, Row, Segmented, Space, Statistic, Table, Typography } from 'antd'
+import { Card, Col, Empty, Row, Segmented, Space, Statistic, Table } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import BieuDoDoanhThu from '../../features/noiBo/dashboard/BieuDoDoanhThu'
 import { NOI_BO_THONG_KE_KHOANG_THOI_GIAN } from '../../features/noiBo/thongKeNoiBo'
 import { dinhDangTienTe } from '../../utils/tienTe'
-import { layDoanhThuNgayApi, layMonBanChayApi, layDoanhThuThangApi } from '../../services/api/apiThongKe'
+import { layDoanhThuNgayApi, layMonBanChayApi, layBookingCountApi } from '../../services/api/apiThongKe'
 
 const tinhKhoangThoiGian = (timeRange) => {
   const homNay = new Date()
@@ -53,10 +53,18 @@ function NoiBoThongKePage() {
   })
 
   const { data: duLieuMonBanChay = [], isLoading: dangTaiMonBanChay } = useQuery({
-    queryKey: ['thong-ke-mon-ban-chay'],
+    queryKey: ['thong-ke-mon-ban-chay', tuNgay, denNgay],
     queryFn: async () => {
-      const ketQua = await layMonBanChayApi(10)
+      const ketQua = await layMonBanChayApi(10, tuNgay, denNgay)
       return ketQua.duLieu || []
+    },
+  })
+
+  const { data: duLieuBooking = { tongBooking: 0 }, isLoading: dangTaiBooking } = useQuery({
+    queryKey: ['thong-ke-booking-count', tuNgay, denNgay],
+    queryFn: async () => {
+      const ketQua = await layBookingCountApi(tuNgay, denNgay)
+      return ketQua.duLieu || { tongBooking: 0 }
     },
   })
 
@@ -79,10 +87,10 @@ function NoiBoThongKePage() {
       ...mon,
       rank: chiSo + 1,
       name: mon.TenMon || mon.tenMon || '',
-      quantity: Number(mon.SoLuongDaBan || mon.soLuongDaBan || 0),
-      revenue: Number(mon.DoanhThu || mon.doanhThu || 0),
+      quantity: Number(mon.TongSoLuong || mon.SoLuongDaBan || mon.soLuongDaBan || 0),
+      revenue: Number(mon.TongDoanhThu || mon.DoanhThu || mon.doanhThu || 0),
       percent: duLieuMonBanChay.length > 0
-        ? Math.round((Number(mon.DoanhThu || 0) / duLieuMonBanChay.reduce((t, m) => t + Number(m.DoanhThu || 0), 0)) * 100)
+        ? Math.round((Number(mon.TongDoanhThu || mon.DoanhThu || 0) / duLieuMonBanChay.reduce((t, m) => t + Number(m.TongDoanhThu || m.DoanhThu || 0), 0)) * 100)
         : 0,
     })),
     [duLieuMonBanChay],
@@ -105,15 +113,21 @@ function NoiBoThongKePage() {
         <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng doanh thu kỳ" value={tongDoanhThu} formatter={(value) => dinhDangTienTe(Number(value) || 0)} loading={dangTaiDoanhThu} /></Card></Col>
         <Col xs={24} md={12} xl={6}><Card><Statistic title="Số đơn hoàn thành" value={soDonHoanThanh} loading={dangTaiDoanhThu} /></Card></Col>
         <Col xs={24} md={12} xl={6}><Card><Statistic title="Giá trị đơn trung bình" value={giaTriTrungBinh} formatter={(value) => dinhDangTienTe(Number(value) || 0)} loading={dangTaiDoanhThu} /></Card></Col>
-        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking kỳ" value="--" loading={dangTaiDoanhThu} /></Card></Col>
+        <Col xs={24} md={12} xl={6}><Card><Statistic title="Tổng booking kỳ" value={duLieuBooking.tongBooking} loading={dangTaiBooking || dangTaiDoanhThu} /></Card></Col>
       </Row>
 
-      <BieuDoDoanhThu title="Doanh thu 7 ngày gần nhất" revenue={{ summary: { revenue: tongDoanhThu }, series: revenueSeries }} loading={dangTaiDoanhThu} />
+      <BieuDoDoanhThu title="Doanh thu 7 ngày gần nhất" dateRange={{ tuNgay, denNgay }} revenue={{ summary: { revenue: tongDoanhThu }, series: revenueSeries }} loading={dangTaiDoanhThu} />
 
       <Row gutter={[16, 16]}>
         <Col xs={24} xl={24}>
           <Card title="Món bán chạy">
-            <Table rowKey="rank" pagination={false} columns={topDishColumns} dataSource={topDishes} loading={dangTaiMonBanChay} scroll={{ x: 640 }} />
+            {topDishes?.length > 0 && topDishes.reduce((sum, m) => sum + (m.quantity || 0), 0) > 0 ? (
+              <Table rowKey="rank" pagination={false} columns={topDishColumns} dataSource={topDishes} loading={dangTaiMonBanChay} scroll={{ x: 640 }} />
+            ) : (
+              <div className="py-8">
+                <Empty description="Không có dữ liệu món bán chạy trong kỳ này" />
+              </div>
+            )}
           </Card>
         </Col>
       </Row>

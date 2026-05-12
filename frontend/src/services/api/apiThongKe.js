@@ -3,8 +3,11 @@ import { trinhKhachApi, tachPhanHoiApi } from '../trinhKhachApi';
 export const layDoanhThuNgayApi = (tuNgay, denNgay) =>
   trinhKhachApi.get('/thong-ke/doanh-thu', { params: { tuNgay, denNgay } }).then(tachPhanHoiApi);
 
-export const layMonBanChayApi = (limit = 10) =>
-  trinhKhachApi.get('/thong-ke/mon-ban-chay', { params: { limit } }).then(tachPhanHoiApi);
+export const layMonBanChayApi = (limit = 10, tuNgay, denNgay) =>
+  trinhKhachApi.get('/thong-ke/mon-ban-chay', { params: { limit, tuNgay, denNgay } }).then(tachPhanHoiApi);
+
+export const layBookingCountApi = (tuNgay, denNgay) =>
+  trinhKhachApi.get('/thong-ke/booking-count', { params: { tuNgay, denNgay } }).then(tachPhanHoiApi);
 
 export const layTinhTrangBanApi = () =>
   trinhKhachApi.get('/thong-ke/tinh-trang-ban').then(tachPhanHoiApi);

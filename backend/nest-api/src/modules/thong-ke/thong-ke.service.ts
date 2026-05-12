@@ -17,11 +17,36 @@ export class ThongKeService {
     return taoPhanHoi(danhSach, 'Lấy doanh thu theo ngày thành công');
   }
 
-  async layMonBanChay(limit: number = 10) {
-    const danhSach = await this.mysql.truyVan(
-      'SELECT * FROM V_MonBanChay LIMIT ?',
-      [limit],
-    );
+  async layMonBanChay(limit: number = 10, tuNgay?: string, denNgay?: string) {
+    const params: any[] = [];
+    let dateFilter = '';
+
+    if (tuNgay && denNgay) {
+      dateFilter = 'AND DATE(hd.NgayXuat) BETWEEN ? AND ?';
+      params.push(tuNgay, denNgay);
+    }
+
+    params.push(limit);
+
+    const danhSach = await this.mysql.truyVan(`
+      SELECT
+        td.MaMon,
+        td.TenMon,
+        dm.TenDanhMuc,
+        SUM(ct.SoLuong) AS TongSoLuong,
+        SUM(ct.ThanhTien) AS TongDoanhThu
+      FROM ChiTietDonHang ct
+      JOIN ThucDon td ON td.MaMon = ct.MaMon
+      JOIN DanhMuc dm ON dm.MaDanhMuc = td.MaDanhMuc
+      JOIN DonHang dh ON dh.MaDonHang = ct.MaDonHang
+      JOIN HoaDon hd ON hd.MaDonHang = dh.MaDonHang
+      WHERE dh.TrangThai NOT IN ('Cancelled')
+      ${dateFilter}
+      GROUP BY td.MaMon, td.TenMon, dm.TenDanhMuc
+      ORDER BY TongSoLuong DESC
+      LIMIT ?
+    `, params);
+
     return taoPhanHoi(danhSach, 'Lấy món bán chạy thành công');
   }
 
@@ -79,5 +104,16 @@ export class ThongKeService {
       [nam],
     );
     return taoPhanHoi(danhSach, 'Lấy doanh thu theo tháng thành công');
+  }
+
+  async layBookingCount(tuNgay: string, denNgay: string) {
+    const result = await this.mysql.truyVan(`
+      SELECT COUNT(*) AS tongBooking
+      FROM DatBan
+      WHERE NgayDat BETWEEN ? AND ?
+      AND TrangThai NOT IN ('Cancelled', 'NoShow')
+    `, [tuNgay, denNgay]);
+
+    return taoPhanHoi(result[0], 'Lấy số booking thành công');
   }
 }

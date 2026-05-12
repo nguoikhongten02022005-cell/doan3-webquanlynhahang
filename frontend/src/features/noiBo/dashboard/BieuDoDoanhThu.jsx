@@ -1,3 +1,4 @@
+import { useMemo } from 'react'
 import { Card, Typography } from 'antd'
 import { Column } from '@ant-design/plots'
 import { dinhDangTienTe } from '../../../utils/tienTe'
@@ -54,13 +55,41 @@ const dinhDangTienRutGon = (value) => {
   return `${prefix}${taoChuoiTienRutGon(absolute, unitIndex)}`
 }
 
-function BieuDoDoanhThu({ revenue, title = 'Doanh thu 7 ngày gần nhất', loading = false }) {
-  const duLieuCot = Array.isArray(revenue?.series)
-    ? revenue.series.map((mucDoanhThu) => ({
-        ...mucDoanhThu,
-        revenue: Math.max(Number(mucDoanhThu?.revenue) || 0, 0),
-      }))
-    : []
+function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần nhất', loading = false }) {
+  const fullSeries = useMemo(() => {
+    if (!dateRange?.tuNgay || !dateRange?.denNgay) return [];
+
+    const start = new Date(dateRange.tuNgay);
+    const end = new Date(dateRange.denNgay);
+    const series = [];
+
+    for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
+      const dateStr = d.toISOString().split('T')[0];
+      const label = d.toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' });
+      series.push({ label: label, date: dateStr, revenue: 0, completedOrders: 0 });
+    }
+
+    return series;
+  }, [dateRange]);
+
+  const duLieuCot = useMemo(() => {
+    if (!Array.isArray(revenue?.series)) return fullSeries;
+
+    const map = new Map(fullSeries.map(item => [item.label, { ...item }]));
+
+    revenue.series.forEach(apiItem => {
+      if (map.has(apiItem.label)) {
+        const existing = map.get(apiItem.label);
+        map.set(apiItem.label, {
+          ...existing,
+          revenue: Math.max(Number(apiItem.revenue) || 0, 0),
+          completedOrders: Number(apiItem.completedOrders) || 0,
+        });
+      }
+    });
+
+    return Array.from(map.values());
+  }, [revenue?.series, fullSeries]);
   const tongDoanhThu = Number(revenue?.summary?.revenue) || 0
   const soCotCoDoanhThu = duLieuCot.filter((mucDoanhThu) => mucDoanhThu.revenue > 0).length
   const mucDoanhThuCaoNhat = duLieuCot.reduce(
@@ -108,7 +137,7 @@ function BieuDoDoanhThu({ revenue, title = 'Doanh thu 7 ngày gần nhất', loa
     yField: 'revenue',
     color: ({ revenue: doanhThuNgay }) => (Number(doanhThuNgay) > 0 ? '#E8664A' : '#E9D8CF'),
     columnWidthRatio: soCotCoDoanhThu <= 1 ? 0.28 : 0.5,
-    marginTop: nenHienLabelCot ? 30 : 20,
+    marginTop: nenHienLabelCot ? 40 : 30,
     paddingRight: 10,
     label: nenHienLabelCot
       ? {
@@ -184,7 +213,7 @@ function BieuDoDoanhThu({ revenue, title = 'Doanh thu 7 ngày gần nhất', loa
         </div>
         <div className="noi-bo-dashboard-chart-card__metric">
           <span>Trung bình/ngày có đơn</span>
-          <strong>{dinhDangTienRutGon(doanhThuTrungBinh)}</strong>
+          <strong>{dinhDangTienTe(doanhThuTrungBinh)}</strong>
           <small>{soCotCoDoanhThu === 1 ? 'Chỉ có 1 ngày phát sinh doanh thu' : 'Giữ nhịp quan sát ổn định'}</small>
         </div>
       </div>
