@@ -115,18 +115,19 @@ export class DonHangCreateOrderService {
           ketNoi,
         );
       } else {
-        // Cập nhật tổng tiền cho đơn hiện có
         const [donHienTai] = await this.truyVan(
           'SELECT TongTien FROM DonHang WHERE MaDonHang = ? LIMIT 1',
           [maDonHang],
           ketNoi,
         );
         const tongTienCu = Number(donHienTai?.TongTien || 0);
+        const tongTienMoi = tongTienCu + tongHopGia.tongTien;
         await this.thucThi(
           'UPDATE DonHang SET TongTien = ? WHERE MaDonHang = ?',
-          [tongTienCu + tongHopGia.tongTien, maDonHang],
+          [tongTienMoi, maDonHang],
           ketNoi,
         );
+        tongHopGia.tongTien = tongTienMoi;
       }
 
       const chiTietPhanHoi: BanGhi[] = [];

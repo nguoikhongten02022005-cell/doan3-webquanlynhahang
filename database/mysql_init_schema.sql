@@ -331,6 +331,9 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 -- VIEWS
 -- ============================================================
+-- Luu y: view nay tinh doanh thu theo HoaDon va chi loc ThanhToan = 'Success'.
+-- Neu 1 hoa don co nhieu ThanhToan thanh cong, so lieu co the bi dem trung.
+-- Schema hien tai khong ep UNIQUE(MaHoaDon) trong ThanhToan, nen day la canh bao khi doc KPI.
 CREATE OR REPLACE VIEW V_DoanhThuNgay AS
 SELECT
     DATE(hd.NgayXuat) AS Ngay,
@@ -344,6 +347,8 @@ JOIN ThanhToan tt
    AND tt.TrangThai = 'Success'
 GROUP BY DATE(hd.NgayXuat);
 
+-- Luu y: view nay dem mon ban chay theo don hang khong bi Cancelled.
+-- Day khong phai KPI doanh thu chi tai cac don da Paid/Completed; chi la tong hop luot mua mon cho don con hieu luc.
 CREATE OR REPLACE VIEW V_MonBanChay AS
 SELECT
     td.MaMon,
@@ -385,4 +390,5 @@ LEFT JOIN DonHang dh
         LIMIT 1
     );
 
-ALTER TABLE DatBan ADD COLUMN ChiTietMonAn JSON AFTER KhuVucUuTien;
+ALTER TABLE DatBan
+    ADD COLUMN IF NOT EXISTS ChiTietMonAn JSON AFTER KhuVucUuTien;

@@ -1,7 +1,13 @@
 -- ============================================================
 USE QuanNhaHang;
 
+-- DEV-ONLY: seed local/demo data only.
+-- Khong dung file nay cho production hoac shared env.
 -- DU LIEU MAU
+-- Luu y: app hien tai chi xem TAI_BAN la gia tri hop le cua DonHang.LoaiDon.
+-- Cac truong DiaChiGiao / GioLayHang / GioGiao chi la metadata demo/future cho fulfillment.
+-- Khong xem cac seed ben duoi la support san cho pickup/delivery cho den khi contract backend/frontend duoc mo rong.
+-- DEV-ONLY: credentials below are demo-only hashes for local testing.
 -- Password mac dinh da doi chieu voi DB dang chay:
 -- admin@nhahang.com / Admin@123
 -- an.nv@nhahang.com / Staff@123

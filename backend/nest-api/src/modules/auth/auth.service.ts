@@ -197,7 +197,10 @@ export class AuthService {
   }
 
   taoCookieRefreshToken(refreshToken: string) {
-    return `${TEN_COOKIE_REFRESH_TOKEN}=${encodeURIComponent(refreshToken || '')}; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`;
+    const laMoiTruongSanXuat =
+      this.configService.get<string>('NODE_ENV') === 'production';
+
+    return `${TEN_COOKIE_REFRESH_TOKEN}=${encodeURIComponent(refreshToken || '')}; Path=/api/auth; HttpOnly; SameSite=Lax${laMoiTruongSanXuat ? '; Secure' : ''}; Max-Age=${7 * 24 * 60 * 60}`;
   }
 
   xoaCookieRefreshToken() {
@@ -251,9 +254,11 @@ export class AuthService {
   }
 
   private taoRefreshToken(nguoiDung: BanGhi) {
-    const refreshSecret =
-      this.configService.get<string>('JWT_REFRESH_SECRET') ||
-      this.configService.get<string>('JWT_SECRET');
+    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET');
+
+    if (!refreshSecret) {
+      throw new Error('Thiếu JWT_REFRESH_SECRET trong môi trường.');
+    }
     return this.jwtService.sign(
       {
         maND: nguoiDung.MaND,

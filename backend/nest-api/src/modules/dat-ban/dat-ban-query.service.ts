@@ -110,22 +110,50 @@ export class DatBanQueryService {
     const gioDat = String(query.gioDat || '').trim();
     const soNguoi = Number(query.soNguoi || 0);
     const khuVuc = String(query.khuVuc || '').trim();
+    const thoiLuongMacDinhPhut = 120;
 
     if (!ngayDat || !gioDat) {
       throw new BadRequestException('Ngày đặt và giờ đặt là bắt buộc.');
     }
+
+    const laySoPhutTuGio = (gio: string) => {
+      const match = gio.match(/^(\d{2}):(\d{2})/);
+      if (!match) return null;
+      return Number(match[1]) * 60 + Number(match[2]);
+    };
+
+    const gioBatDauYeuCau = laySoPhutTuGio(gioDat);
+    if (gioBatDauYeuCau === null) {
+      throw new BadRequestException('Giờ đặt không hợp lệ.');
+    }
+
+    const gioKetThucYeuCau = gioBatDauYeuCau + thoiLuongMacDinhPhut;
 
     const danhSachBan = await this.mysql.truyVan(
       'SELECT * FROM Ban ORDER BY SoBan ASC',
     );
     const danhSachDatBan = await this.mysql.truyVan(
       `SELECT * FROM DatBan
-       WHERE NgayDat = ? AND GioDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed', 'DA_HUY', 'KHONG_DEN', 'DA_HOAN_THANH', 'TU_CHOI_HET_CHO')`,
-      [ngayDat, gioDat],
+       WHERE NgayDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed', 'DA_HUY', 'KHONG_DEN', 'DA_HOAN_THANH', 'TU_CHOI_HET_CHO')`,
+      [ngayDat],
     );
 
     const tapBanDaDuocDung = new Set(
       danhSachDatBan
+        .filter((datBan) => {
+          const gioBatDauDatBan = laySoPhutTuGio(String(datBan.GioDat || ''));
+          if (gioBatDauDatBan === null) return false;
+
+          const gioKetThucDatBan = datBan.GioKetThuc
+            ? laySoPhutTuGio(String(datBan.GioKetThuc || ''))
+            : gioBatDauDatBan + thoiLuongMacDinhPhut;
+          if (gioKetThucDatBan === null) return false;
+
+          return (
+            gioBatDauYeuCau < gioKetThucDatBan &&
+            gioKetThucYeuCau > gioBatDauDatBan
+          );
+        })
         .map((datBan) => String(datBan.MaBan || '').trim())
         .filter(Boolean),
     );

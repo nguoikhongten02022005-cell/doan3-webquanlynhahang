@@ -51,55 +51,63 @@ export class DonHangPaymentStatusService {
       );
 
       if (trangThai === 'Paid') {
-        if (don.MaBan) {
-          await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-            'Available',
-            don.MaBan,
-          ]);
-        }
-        if (don.MaKH) {
-          await this.diemTichLuyService.tinhDiemTuDonHang(
-            don.MaKH,
-            maDonHang,
-            Number(don.TongTien || 0),
-            undefined,
-            ketNoi,
-          );
-        }
-
-        const [chiTietRows] = await ketNoi.query(
-          'SELECT * FROM ChiTietDonHang WHERE MaDonHang = ?',
+        const [hoaDonDaCo] = await ketNoi.query(
+          'SELECT MaHoaDon FROM HoaDon WHERE MaDonHang = ? LIMIT 1',
           [maDonHang],
         );
-        const chiTiet = chiTietRows as any[];
-        const tongTienHang = chiTiet.reduce(
-          (sum: number, ct: any) => sum + Number(ct.ThanhTien || 0),
-          0,
-        );
-        const tienGiam =
-          Number(don.TongTien || 0) > 0
-            ? Math.max(0, tongTienHang - Number(don.TongTien || 0))
-            : 0;
-        const thanhToan = Number(don.TongTien || 0);
-        const maHoaDon = taoMa('HD');
+        const maHoaDonDaCo = hoaDonDaCo?.[0]?.MaHoaDon;
 
-        await ketNoi.execute(
-          'INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaNV, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())',
-          [
-            maHoaDon,
-            maDonHang,
-            don.MaNV || null,
-            tongTienHang,
-            tienGiam,
-            thanhToan,
-            '',
-          ],
-        );
+        if (!maHoaDonDaCo) {
+          if (don.MaBan) {
+            await ketNoi.execute(
+              'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+              ['Available', don.MaBan],
+            );
+          }
+          if (don.MaKH) {
+            await this.diemTichLuyService.tinhDiemTuDonHang(
+              don.MaKH,
+              maDonHang,
+              Number(don.TongTien || 0),
+              undefined,
+              ketNoi,
+            );
+          }
 
-        await ketNoi.execute(
-          'INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, TrangThai, ThoiGian) VALUES (?, ?, ?, ?, ?, NOW())',
-          [taoMa('TT'), maHoaDon, 'TienMat', thanhToan, 'Success'],
-        );
+          const [chiTietRows] = await ketNoi.query(
+            'SELECT * FROM ChiTietDonHang WHERE MaDonHang = ?',
+            [maDonHang],
+          );
+          const chiTiet = chiTietRows as any[];
+          const tongTienHang = chiTiet.reduce(
+            (sum: number, ct: any) => sum + Number(ct.ThanhTien || 0),
+            0,
+          );
+          const tienGiam =
+            Number(don.TongTien || 0) > 0
+              ? Math.max(0, tongTienHang - Number(don.TongTien || 0))
+              : 0;
+          const thanhToan = Number(don.TongTien || 0);
+          const maHoaDon = taoMa('HD');
+
+          await ketNoi.execute(
+            'INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaNV, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())',
+            [
+              maHoaDon,
+              maDonHang,
+              don.MaNV || null,
+              tongTienHang,
+              tienGiam,
+              thanhToan,
+              '',
+            ],
+          );
+
+          await ketNoi.execute(
+            'INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, TrangThai, ThoiGian) VALUES (?, ?, ?, ?, ?, NOW())',
+            [taoMa('TT'), maHoaDon, 'TienMat', thanhToan, 'Success'],
+          );
+        }
       }
 
       return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(

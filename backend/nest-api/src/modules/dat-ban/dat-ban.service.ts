@@ -18,7 +18,12 @@ export class DatBanService {
     return this.datBanQueryService.layLichSuDatBan(nguoiDung, maKh);
   }
 
-  layKhaDungDatBan(query: Record<string, unknown>) {
+  layKhaDungDatBan(query: {
+    ngayDat?: string;
+    gioDat?: string;
+    soNguoi?: number;
+    khuVuc?: string;
+  }) {
     return this.datBanQueryService.layKhaDungDatBan(query);
   }
 

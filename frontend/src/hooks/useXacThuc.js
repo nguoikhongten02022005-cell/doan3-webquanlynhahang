@@ -15,7 +15,6 @@ import {
   VAI_TRO_XAC_THUC,
   SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC,
   xoaPhienXacThuc,
-  layMaXacThuc,
   layNguoiDungHienTai,
   luuPhienXacThuc,
   luuNguoiDungHienTai,
@@ -24,8 +23,8 @@ import {
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
 const layRefreshTokenTuDuLieuAuth = (duLieu) => duLieu?.RefreshToken || duLieu?.refreshToken || ''
-const layNguoiDungTheoPhien = () => (layMaXacThuc() ? layNguoiDungHienTai() : null)
-const coCanKhoiTaoXacThuc = () => Boolean(layMaXacThuc())
+const layNguoiDungTheoPhien = () => layNguoiDungHienTai()
+const coCanKhoiTaoXacThuc = () => true
 const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
   ...payload,
   maND: payload.maND || nguoiDung?.maND || nguoiDung?.id || '',
@@ -70,9 +69,8 @@ function useXacThucState() {
     if (typeof window !== 'undefined') {
       const duongDanHienTai = window.location.pathname || '/'
       const laKhuVucCongKhai = duongDanHienTai === '/' || duongDanHienTai === '/thuc-don' || duongDanHienTai === '/gioi-thieu'
-      const maXacThuc = layMaXacThuc()
 
-      if (laKhuVucCongKhai && !maXacThuc) {
+      if (laKhuVucCongKhai) {
         setNguoiDungHienTai(null)
         setIsAuthBootstrapping(false)
         return undefined
@@ -92,13 +90,6 @@ function useXacThucState() {
         return
       }
 
-      const maXacThuc = layMaXacThuc()
-
-      if (!maXacThuc) {
-        setNguoiDungHienTai(null)
-        setIsAuthBootstrapping(false)
-        return
-      }
 
       try {
         const { duLieu } = await layThongTinToiApi()
@@ -120,7 +111,7 @@ function useXacThucState() {
     }
 
     const xuLyStorage = (event) => {
-      if (event.key && event.key !== STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI && event.key !== STORAGE_KEYS.MA_XAC_THUC) {
+      if (event.key && event.key !== STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI) {
         return
       }
 

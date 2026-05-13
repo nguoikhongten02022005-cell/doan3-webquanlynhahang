@@ -8,6 +8,12 @@ import {
   MinLength,
 } from 'class-validator';
 
+const VAI_TRO_CHO_PHEP = {
+  Admin: 'Admin',
+  NhanVien: 'NhanVien',
+  QuanLy: 'QuanLy',
+} as const;
+
 export class TaoNguoiDungDto {
   @ApiProperty({ example: 'user@example.com' })
   @IsEmail()
@@ -25,9 +31,9 @@ export class TaoNguoiDungDto {
 
   @ApiPropertyOptional({
     example: 'NhanVien',
-    enum: ['Admin', 'NhanVien', 'QuanLy'],
+    enum: VAI_TRO_CHO_PHEP,
   })
   @IsOptional()
-  @IsEnum(['Admin', 'NhanVien', 'QuanLy'])
+  @IsEnum(VAI_TRO_CHO_PHEP)
   vaiTro?: string;
 }

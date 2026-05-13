@@ -157,7 +157,7 @@ Backend hiện **không tự tạo schema**. Biến `DB_AUTO_INIT=true` chỉ ph
 
 Vì vậy, trước khi chạy backend với database trống, hãy import script:
 
-- `database/mysql_init_quannhahang.sql`
+- `database/mysql_init_schema.sql`
 
 ## Chạy dự án
 
@@ -243,4 +243,4 @@ Swagger UI mặc định tại:
 - `docs/ma-tran-phan-quyen-api.md`
 - `backend/README.md`
 - `backend/nest-api/README.md`
-- `database/mysql_init_quannhahang.sql`
+- `database/mysql_init_schema.sql`

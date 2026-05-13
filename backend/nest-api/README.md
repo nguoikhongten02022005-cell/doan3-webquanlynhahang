@@ -56,12 +56,12 @@ JWT_EXPIRES_IN=12h
 
 Backend hiện không tự dựng schema. Trước khi chạy với database trống, hãy import script:
 
-- `database/mysql_init_quannhahang.sql`
+- `database/mysql_init_schema.sql`
 
 Lưu ý:
 - `DB_AUTO_INIT=true` hiện chỉ kiểm tra kết nối MySQL khi khởi động
 - biến này **không** tự tạo bảng hoặc seed dữ liệu cho database mới
-- script `database/mysql_init_quannhahang.sql` hiện đã gồm dữ liệu mẫu mở rộng cho các nhóm chức năng chính: tài khoản, bàn, đặt bàn, đơn hàng, mang về, đánh giá, điểm tích lũy, thông báo
+- script `database/mysql_init_schema.sql` hiện đã gồm dữ liệu mẫu mở rộng cho các nhóm chức năng chính: tài khoản, bàn, đặt bàn, đơn hàng, mang về, đánh giá, điểm tích lũy, thông báo
 - khi muốn kiểm tra dữ liệu thật, nên import lại database sạch từ script này để đồng bộ toàn bộ khóa ngoại và trạng thái mẫu
 
 ### Chạy frontend với dữ liệu thật từ backend

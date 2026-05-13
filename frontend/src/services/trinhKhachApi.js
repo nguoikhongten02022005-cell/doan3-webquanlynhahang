@@ -1,6 +1,4 @@
-import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { layMaXacThuc, xoaPhienXacThuc, luuXacThuc } from './dichVuXacThuc'
-import { layMucLuuTru } from './dichVuLuuTru'
+import { xoaPhienXacThuc, luuXacThuc, layMaXacThuc } from './dichVuXacThuc'
 
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
 
@@ -65,7 +63,7 @@ export const layUrlGocApi = () => {
 }
 
 const layDauTrangXacThuc = () => {
-  const maXacThuc = layMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
+  const maXacThuc = layMaXacThuc()
 
   if (!maXacThuc) {
     return {}
@@ -144,9 +142,8 @@ const guiYeuCauTho = async (duongDan, tuyChon = {}) => {
   } = tuyChon
 
   const canDatNoiDungJson = body !== undefined && !(body instanceof FormData)
-  const coMaXacThuc = Boolean(layMucLuuTru(STORAGE_KEYS.MA_XAC_THUC))
   const dauTrang = {
-    ...((includeAuthDauTrang && (coMaXacThuc || !laDuongDanCongKhai(duongDan))) ? layDauTrangXacThuc() : {}),
+    ...((includeAuthDauTrang && (layMaXacThuc() || !laDuongDanCongKhai(duongDan))) ? layDauTrangXacThuc() : {}),
     ...(canDatNoiDungJson ? { 'Content-Type': 'application/json' } : {}),
     ...dauTrangTuyChinh,
   }
@@ -188,7 +185,7 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
   }
 
   // 401 → thử refresh token rồi retry
-  if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon) && layMaXacThuc()) {
+  if (phanHoi.status === 401 && coTheThuLamMoiPhien(duongDan, tuyChon)) {
     if (!dangLamMoi) {
       dangLamMoi = true
       try {

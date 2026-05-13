@@ -1,5 +1,7 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { layMucLuuTru, layJsonLuuTru, xoaMucLuuTru, datMucLuuTru, datJsonLuuTru } from './dichVuLuuTru'
+import { layJsonLuuTru, xoaMucLuuTru, datJsonLuuTru } from './dichVuLuuTru'
+
+let maXacThucTrongBoNho = ''
 
 export const SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC = 'auth:user-changed'
 export const VAI_TRO_XAC_THUC = Object.freeze({
@@ -79,21 +81,19 @@ export const xoaNguoiDungHienTai = () => {
   phatSuKienThayDoiNguoiDung()
 }
 
-export const layMaXacThuc = () => {
-  const maXacThuc = layMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
-  return typeof maXacThuc === 'string' && maXacThuc.trim() ? maXacThuc : ''
-}
+export const layMaXacThuc = () => maXacThucTrongBoNho
 
 export const luuMaXacThuc = (token) => {
   if (!token || typeof token !== 'string') {
+    maXacThucTrongBoNho = ''
     return
   }
 
-  datMucLuuTru(STORAGE_KEYS.MA_XAC_THUC, token)
+  maXacThucTrongBoNho = token.trim()
 }
 
 export const xoaMaXacThuc = () => {
-  xoaMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
+  maXacThucTrongBoNho = ''
 }
 
 export const luuPhienXacThuc = ({ user, accessToken, refreshToken }) => {
@@ -107,19 +107,8 @@ export const xoaPhienXacThuc = () => {
   xoaNguoiDungHienTai()
 }
 
-export const layRefreshToken = () => ''
+export const xoaRefreshToken = () => {}
 
-export const luuRefreshToken = () => {
-  xoaMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
-}
-
-export const xoaRefreshToken = () => {
-  xoaMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
-}
-
-export const luuXacThuc = (accessToken, refreshToken) => {
+export const luuXacThuc = (accessToken) => {
   luuMaXacThuc(accessToken)
-  if (refreshToken) {
-    luuRefreshToken(refreshToken)
-  }
 }

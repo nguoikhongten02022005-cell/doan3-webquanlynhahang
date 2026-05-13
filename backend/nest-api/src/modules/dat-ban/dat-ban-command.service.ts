@@ -298,45 +298,43 @@ export class DatBanCommandService {
       throw new BadRequestException('Cần ít nhất một bàn để gán cho booking.');
     }
 
+    if (danhSachMaBan.length !== 1) {
+      throw new BadRequestException('Chỉ được gán đúng một bàn cho đặt bàn.');
+    }
+
+    const [maBan] = danhSachMaBan;
     const danhSachBanHopLe = await this.mysql.truyVan(
-      `SELECT * FROM Ban WHERE MaBan IN (${danhSachMaBan.map(() => '?').join(', ')})`,
-      danhSachMaBan,
+      'SELECT * FROM Ban WHERE MaBan = ? LIMIT 1',
+      [maBan],
     );
 
-    if (danhSachBanHopLe.length !== danhSachMaBan.length) {
+    if (!danhSachBanHopLe.length) {
       throw new BadRequestException('Có bàn không tồn tại hoặc đã bị xóa.');
     }
 
+    const [banHopLe] = danhSachBanHopLe;
     const soKhach = Number(datBan.SoNguoi || 0);
-    const tongSucChua = danhSachBanHopLe.reduce(
-      (tong, ban) => tong + Number(ban.SoChoNgoi || 0),
-      0,
-    );
+    const tongSucChua = Number(banHopLe.SoChoNgoi || 0);
     if (soKhach > 0 && tongSucChua < soKhach) {
       throw new BadRequestException(
-        'Tổng sức chứa của các bàn được chọn không đủ cho booking này.',
+        'Sức chứa của bàn được chọn không đủ cho booking này.',
       );
     }
 
-    const trangThaiKhongHopLe = danhSachBanHopLe.find(
-      (ban) => String(ban.TrangThai || '') === 'Occupied',
-    );
-    if (trangThaiKhongHopLe) {
+    if (String(banHopLe.TrangThai || '') === 'Occupied') {
       throw new BadRequestException(
-        `Bàn ${trangThaiKhongHopLe.MaBan} đang có khách, không thể gán cho booking.`,
+        `Bàn ${banHopLe.MaBan} đang có khách, không thể gán cho booking.`,
       );
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
-      for (const maBan of danhSachMaBan) {
-        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-          'Reserved',
-          maBan,
-        ]);
-      }
+      await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+        'Reserved',
+        maBan,
+      ]);
       await ketNoi.execute(
         'UPDATE DatBan SET MaBan = ?, TrangThai = ? WHERE MaDatBan = ?',
-        [danhSachMaBan[0], 'DA_XAC_NHAN', maDatBan],
+        [maBan, 'DA_XAC_NHAN', maDatBan],
       );
     });
 
