@@ -1,8 +1,10 @@
 import {
   BadRequestException,
+  ConflictException,
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import type { PoolConnection } from 'mysql2/promise';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
@@ -11,6 +13,35 @@ import { BanGhi } from '../../common/types';
 @Injectable()
 export class KhachHangService {
   constructor(private readonly mysql: MySqlService) {}
+
+  private laLoiTrungKhoa(err: unknown) {
+    return (
+      typeof err === 'object' &&
+      err !== null &&
+      'code' in err &&
+      (err as { code?: string }).code === 'ER_DUP_ENTRY'
+    );
+  }
+
+  private baoLoiSoDienThoaiDaTonTai() {
+    throw new ConflictException('Số điện thoại đã tồn tại.');
+  }
+
+  private async layKhachHangTheoMaKHTrongTxn(
+    maKH: string,
+    ketNoi: PoolConnection,
+  ) {
+    const [rows] = await ketNoi.query(
+      'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE',
+      [maKH],
+    );
+    return (rows as BanGhi[])[0] || null;
+  }
+
+  private async baoLoiNeuTrungKhoa(err: unknown) {
+    if (this.laLoiTrungKhoa(err)) this.baoLoiSoDienThoaiDaTonTai();
+    throw err;
+  }
 
   private chuyenKhachHangSangResponse(kh: BanGhi) {
     return {
@@ -115,35 +146,32 @@ export class KhachHangService {
     const diemTichLuy = Number(body.diemTichLuy ?? 0);
 
     if (!tenKH) throw new BadRequestException('Tên khách hàng là bắt buộc.');
-
     if (sdt) {
       const sdtRegex = /^0[0-9]{9}$/;
       if (!sdtRegex.test(sdt))
         throw new BadRequestException(
           'Số điện thoại không hợp lệ (10 số, bắt đầu từ 0).',
         );
-      const daTonTai = await this.mysql.truyVan(
-        'SELECT MaKH FROM KhachHang WHERE SDT = ? LIMIT 1',
-        [sdt],
-      );
-      if (daTonTai[0])
-        throw new BadRequestException('Số điện thoại đã tồn tại.');
     }
 
-    const maKH = taoMa('KH');
-    await this.mysql.thucThi(
-      'INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES (?, NULL, ?, ?, ?, ?)',
-      [maKH, tenKH, sdt || null, diaChi || null, Math.max(0, diemTichLuy)],
-    );
+    try {
+      const maKH = taoMa('KH');
+      await this.mysql.thucThi(
+        'INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES (?, NULL, ?, ?, ?, ?)',
+        [maKH, tenKH, sdt || null, diaChi || null, Math.max(0, diemTichLuy)],
+      );
 
-    const [kh] = await this.mysql.truyVan(
-      'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
-      [maKH],
-    );
-    return taoPhanHoi(
-      this.chuyenKhachHangSangResponse(kh),
-      'Tạo khách hàng thành công',
-    );
+      const [kh] = await this.mysql.truyVan(
+        'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
+        [maKH],
+      );
+      return taoPhanHoi(
+        this.chuyenKhachHangSangResponse(kh),
+        'Tạo khách hàng thành công',
+      );
+    } catch (err) {
+      await this.baoLoiNeuTrungKhoa(err);
+    }
   }
 
   async capNhat(
@@ -164,61 +192,57 @@ export class KhachHangService {
 
     if (!tenKH)
       throw new BadRequestException('Tên khách hàng không được rỗng.');
-
     if (sdt) {
       const sdtRegex = /^0[0-9]{9}$/;
       if (!sdtRegex.test(sdt))
         throw new BadRequestException('Số điện thoại không hợp lệ.');
-      const daTonTai = await this.mysql.truyVan(
-        'SELECT MaKH FROM KhachHang WHERE SDT = ? AND MaKH != ? LIMIT 1',
-        [sdt, maKH],
-      );
-      if (daTonTai[0])
-        throw new BadRequestException('Số điện thoại đã tồn tại.');
     }
 
-    await this.mysql.thucThi(
-      'UPDATE KhachHang SET TenKH = ?, SDT = ?, DiaChi = ? WHERE MaKH = ?',
-      [tenKH, sdt || null, diaChi || null, maKH],
-    );
+    try {
+      await this.mysql.thucThi(
+        'UPDATE KhachHang SET TenKH = ?, SDT = ?, DiaChi = ? WHERE MaKH = ?',
+        [tenKH, sdt || null, diaChi || null, maKH],
+      );
 
-    const [kh] = await this.mysql.truyVan(
-      'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
-      [maKH],
-    );
-    return taoPhanHoi(
-      this.chuyenKhachHangSangResponse(kh),
-      'Cập nhật khách hàng thành công',
-    );
+      const [kh] = await this.mysql.truyVan(
+        'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
+        [maKH],
+      );
+      return taoPhanHoi(
+        this.chuyenKhachHangSangResponse(kh),
+        'Cập nhật khách hàng thành công',
+      );
+    } catch (err) {
+      await this.baoLoiNeuTrungKhoa(err);
+    }
   }
 
   async xoa(maKH: string) {
-    const [kh] = await this.mysql.truyVan(
-      'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
-      [maKH],
-    );
-    if (!kh) throw new NotFoundException('Không tìm thấy khách hàng.');
+    return this.mysql.giaoDich(async (ketNoi) => {
+      const kh = await this.layKhachHangTheoMaKHTrongTxn(maKH, ketNoi);
+      if (!kh) throw new NotFoundException('Không tìm thấy khách hàng.');
 
-    const coDonHang = await this.mysql.truyVan(
-      'SELECT MaDonHang FROM DonHang WHERE MaKH = ? LIMIT 1',
-      [maKH],
-    );
-    if (coDonHang[0])
-      throw new BadRequestException(
-        'Khách hàng có đơn hàng liên quan, không thể xóa.',
+      const [coDonHang] = await ketNoi.query(
+        'SELECT MaDonHang FROM DonHang WHERE MaKH = ? LIMIT 1',
+        [maKH],
       );
+      if ((coDonHang as BanGhi[])[0])
+        throw new BadRequestException(
+          'Khách hàng có đơn hàng liên quan, không thể xóa.',
+        );
 
-    const coDatBan = await this.mysql.truyVan(
-      'SELECT MaDatBan FROM DatBan WHERE MaKH = ? LIMIT 1',
-      [maKH],
-    );
-    if (coDatBan[0])
-      throw new BadRequestException(
-        'Khách hàng có lịch đặt bàn, không thể xóa.',
+      const [coDatBan] = await ketNoi.query(
+        'SELECT MaDatBan FROM DatBan WHERE MaKH = ? LIMIT 1',
+        [maKH],
       );
+      if ((coDatBan as BanGhi[])[0])
+        throw new BadRequestException(
+          'Khách hàng có lịch đặt bàn, không thể xóa.',
+        );
 
-    await this.mysql.thucThi('DELETE FROM KhachHang WHERE MaKH = ?', [maKH]);
-    return taoPhanHoi(null, 'Xóa khách hàng thành công');
+      await ketNoi.execute('DELETE FROM KhachHang WHERE MaKH = ?', [maKH]);
+      return taoPhanHoi(null, 'Xóa khách hàng thành công');
+    });
   }
 
   async capNhatDiem(maKH: string, body: { soDiem: number; moTa?: string }) {

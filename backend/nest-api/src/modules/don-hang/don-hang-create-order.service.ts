@@ -60,11 +60,14 @@ export class DonHangCreateOrderService {
       );
     }
 
-    const { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung } =
-      await this.donHangPricingService.tinhLaiGiaDonHang(payload, chiTiet);
-
     return this.mysql.giaoDich(async (ketNoi) => {
-      // Kiểm tra đơn đang mở cho bàn này — nếu có thì append món, không tạo đơn mới
+      const { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung } =
+        await this.donHangPricingService.tinhLaiGiaDonHang(
+          payload,
+          chiTiet,
+          ketNoi,
+        );
+
       let maDonHang = String(payload.maDonHang || '');
       let isAppending = false;
 
@@ -80,15 +83,13 @@ export class DonHangCreateOrderService {
         }
       }
 
-      if (!maDonHang) {
-        maDonHang = taoMa('DH');
-      }
+      if (!maDonHang) maDonHang = taoMa('DH');
 
       let diemDaDoi: any = null;
       if (soDiem > 0) {
         const ketQuaDoiDiem = await this.diemTichLuyService.doiDiem(
           nguoiDung,
-          { soDiem, moTa: `Đổi điểm thanh toán đơn hàng ${maDonHang}` },
+          { soDiem, moTa: 'Đổi điểm thanh toán đơn hàng ' + maDonHang },
           ketNoi,
         );
         diemDaDoi = ketQuaDoiDiem.data || ketQuaDoiDiem;
@@ -96,8 +97,7 @@ export class DonHangCreateOrderService {
 
       if (!isAppending) {
         await this.thucThi(
-          `INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          'INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
           [
             maDonHang,
             payload.maKH || null,

@@ -12,12 +12,46 @@ import {
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import { Transform } from 'class-transformer';
+import { IsNumber, IsOptional, Min } from 'class-validator';
 import { KhachHangService } from './khach-hang.service';
 import { TaoKhachHangDto } from './dto/tao-khach-hang.dto';
 import { CapNhatKhachHangDto } from './dto/cap-nhat-khach-hang.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+
+class PhanTrangKhachHangQueryDto {
+  @IsOptional()
+  @Transform(({ value }) =>
+    value === undefined || value === '' ? undefined : Number(value),
+  )
+  @IsNumber()
+  @Min(1)
+  trang?: number;
+
+  @IsOptional()
+  @Transform(({ value }) =>
+    value === undefined || value === '' ? undefined : Number(value),
+  )
+  @IsNumber()
+  @Min(1)
+  soLuong?: number;
+}
+
+class CapNhatDiemKhachHangDto {
+  @Transform(({ value }) =>
+    value === undefined || value === null || value === ''
+      ? value
+      : Number(value),
+  )
+  @IsNumber()
+  soDiem: number;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  moTa?: string;
+}
 
 @ApiTags('khach-hang')
 @ApiBearerAuth()
@@ -29,20 +63,19 @@ export class KhachHangController {
   @Roles('Admin', 'NhanVien')
   @Get()
   layDanhSach(
+    @Query() query: PhanTrangKhachHangQueryDto,
     @Query('tuKhoa') tuKhoa?: string,
     @Query('phanLoai') phanLoai?: string,
     @Query('sapXep') sapXep?: string,
     @Query('thuTu') thuTu?: string,
-    @Query('trang') trang?: string,
-    @Query('soLuong') soLuong?: string,
   ) {
     return this.khachHangService.layDanhSach({
       tuKhoa,
       phanLoai,
       sapXep,
       thuTu,
-      trang: trang ? parseInt(trang, 10) : undefined,
-      soLuong: soLuong ? parseInt(soLuong, 10) : undefined,
+      trang: query.trang,
+      soLuong: query.soLuong,
     });
   }
 
@@ -89,13 +122,13 @@ export class KhachHangController {
   @Patch(':maKH/diem')
   capNhatDiem(
     @Param('maKH') maKH: string,
-    @Body() body: Record<string, unknown>,
+    @Body() body: CapNhatDiemKhachHangDto,
   ) {
-    const soDiem = Number(body.soDiem);
-    if (isNaN(soDiem)) throw new BadRequestException('Số điểm không hợp lệ.');
+    if (Number.isNaN(body.soDiem))
+      throw new BadRequestException('Số điểm không hợp lệ.');
     return this.khachHangService.capNhatDiem(maKH, {
-      soDiem,
-      moTa: body.moTa as string | undefined,
+      soDiem: body.soDiem,
+      moTa: body.moTa,
     });
   }
 }

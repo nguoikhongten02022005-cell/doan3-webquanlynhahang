@@ -8,7 +8,7 @@ export const layKhachHangTheoMaNd = async (
 ) => {
   if (ketNoi) {
     const [kq] = await ketNoi.query(
-      'SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1',
+      'SELECT * FROM KhachHang WHERE MaND = ? LIMIT 1 FOR UPDATE',
       [maND],
     );
     return kq[0] || null;

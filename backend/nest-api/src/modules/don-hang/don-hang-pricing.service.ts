@@ -1,4 +1,5 @@
 import { BadRequestException, Injectable } from '@nestjs/common';
+import type { PoolConnection } from 'mysql2/promise';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { BanGhi } from '../../common/types';
 import { tinhGiamGia } from '../../common/tinh-giam-gia.helper';
@@ -75,14 +76,21 @@ export class DonHangPricingService {
     return this.taoTongHopGia(tamTinh, phiShip, giamGia, phiDichVu);
   }
 
-  async layThongTinMaGiamApDung(maCodeDauVao: unknown, tongTien: number) {
+  async layThongTinMaGiamApDung(
+    maCodeDauVao: unknown,
+    tongTien: number,
+    ketNoi?: import('mysql2/promise').PoolConnection,
+  ) {
     const maCode = String(maCodeDauVao || '').trim();
     if (!maCode) {
       return this.taoPhanHoiMaGiam();
     }
 
-    const [ma] = await this.mysql.truyVan(
-      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
+    const truyVan = ketNoi
+      ? ketNoi.query.bind(ketNoi)
+      : this.mysql.truyVan.bind(this.mysql);
+    const [ma] = await truyVan(
+      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1 FOR UPDATE',
       [maCode],
     );
     if (!ma) throw new BadRequestException('Mã giảm giá không tồn tại.');
@@ -144,15 +152,23 @@ export class DonHangPricingService {
     };
   }
 
-  async tinhLaiGiaDonHang(payload: BanGhi, chiTietDauVao: BanGhi[]) {
+  async tinhLaiGiaDonHang(
+    payload: BanGhi,
+    chiTietDauVao: BanGhi[],
+    ketNoi?: PoolConnection,
+  ) {
     const chiTietDaTinh: BanGhi[] = [];
     let tamTinh = 0;
 
     for (const muc of chiTietDauVao) {
-      const [mon] = await this.mysql.truyVan(
-        'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
-        [muc.maMon],
-      );
+      const [mon] = ketNoi
+        ? await ketNoi
+            .query('SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1', [muc.maMon])
+            .then(([rows]) => rows as any[])
+        : await this.mysql.truyVan(
+            'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
+            [muc.maMon],
+          );
       if (!mon)
         throw new BadRequestException(`Món ${muc.maMon} không tồn tại.`);
 

@@ -14,7 +14,11 @@ import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
 import { Public } from '../../common/decorators/public.decorator';
-import { BanGhi } from '../../common/types';
+import {
+  CapNhatMaGiamGiaDto,
+  KiemTraMaGiamGiaDto,
+  TaoMaGiamGiaDto,
+} from './dto/ma-giam-gia.dto';
 
 @ApiTags('ma-giam-gia')
 @Controller('api/ma-giam-gia')
@@ -24,7 +28,7 @@ export class MaGiamGiaController {
 
   @Public()
   @Post('validate')
-  kiemTraMaGiamGia(@Body() body: BanGhi) {
+  kiemTraMaGiamGia(@Body() body: KiemTraMaGiamGiaDto) {
     return this.maGiamGiaService.kiemTraMaGiamGia(body);
   }
 
@@ -45,14 +49,17 @@ export class MaGiamGiaController {
   @ApiBearerAuth('access-token')
   @Roles('Admin')
   @Post()
-  taoMaGiamGia(@Body() body: BanGhi) {
+  taoMaGiamGia(@Body() body: TaoMaGiamGiaDto) {
     return this.maGiamGiaService.taoMaGiamGia(body);
   }
 
   @ApiBearerAuth('access-token')
   @Roles('Admin')
   @Put(':maCode')
-  capNhatMa(@Param('maCode') maCode: string, @Body() body: BanGhi) {
+  capNhatMa(
+    @Param('maCode') maCode: string,
+    @Body() body: CapNhatMaGiamGiaDto,
+  ) {
     return this.maGiamGiaService.capNhatMa(maCode, body);
   }
 

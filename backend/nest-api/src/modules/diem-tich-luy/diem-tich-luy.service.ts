@@ -36,11 +36,10 @@ export class DiemTichLuyService {
   }
 
   private async layKhachHangTheoMaKH(maKH: string, ketNoi?: PoolConnection) {
-    const danhSach = await this.truyVan(
-      'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
-      [maKH],
-      ketNoi,
-    );
+    const sql = ketNoi
+      ? 'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1 FOR UPDATE'
+      : 'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1';
+    const danhSach = await this.truyVan(sql, [maKH], ketNoi);
     return danhSach[0] || null;
   }
 
