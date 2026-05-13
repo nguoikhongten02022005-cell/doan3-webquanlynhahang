@@ -74,7 +74,6 @@ function NoiBoDatBanPage() {
     danhSachDatBanChoXuLy.length,
     danhSachDatBanChuaGanBan.length,
     danhSachDatBanSapDienRa.length,
-    hangDoiDatBan.length,
     tongDaCheckIn,
   ])
 

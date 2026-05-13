@@ -17,10 +17,7 @@ export class ThongBaoController {
   }
 
   @Patch(':id/doc')
-  danhDauDaDoc(
-    @Param('id') maThongBao: string,
-    @CurrentUser() user: any,
-  ) {
+  danhDauDaDoc(@Param('id') maThongBao: string, @CurrentUser() user: any) {
     return this.thongBaoService.danhDauDaDoc(maThongBao, String(user.maND));
   }
 

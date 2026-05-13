@@ -29,7 +29,11 @@ export class ThongKeController {
     @Query('tuNgay') tuNgay?: string,
     @Query('denNgay') denNgay?: string,
   ) {
-    return this.thongKeService.layMonBanChay(Number(limit) || 10, tuNgay, denNgay);
+    return this.thongKeService.layMonBanChay(
+      Number(limit) || 10,
+      tuNgay,
+      denNgay,
+    );
   }
 
   @ApiOperation({ summary: 'Lấy tình trạng bàn' })
@@ -56,6 +60,8 @@ export class ThongKeController {
   @ApiOperation({ summary: 'Lấy doanh thu theo tháng' })
   @Get('doanh-thu-thang')
   layDoanhThuTheoThang(@Query('nam') nam: string) {
-    return this.thongKeService.layDoanhThuTheoThang(Number(nam) || new Date().getFullYear());
+    return this.thongKeService.layDoanhThuTheoThang(
+      Number(nam) || new Date().getFullYear(),
+    );
   }
 }

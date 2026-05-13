@@ -26,9 +26,7 @@ interface ThucDonEntity {
 
 @Injectable()
 export class ThucDonService {
-  constructor(
-    private readonly mysql: MySqlService,
-  ) {}
+  constructor(private readonly mysql: MySqlService) {}
 
   private chuanHoaChuoiKhongDau(giaTri: string) {
     return String(giaTri || '')
@@ -150,10 +148,7 @@ export class ThucDonService {
     );
   }
 
-  async capNhatMon(
-        maMon: string,
-    payload: CapNhatMonDto,
-  ) {
+  async capNhatMon(maMon: string, payload: CapNhatMonDto) {
     const danhSachHienTai = (await this.mysql.truyVan(
       'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
       [maMon],

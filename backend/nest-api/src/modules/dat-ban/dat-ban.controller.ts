@@ -30,10 +30,7 @@ export class DatBanController {
   }
 
   @Get('khach/:maKh')
-  layLichSuDatBan(
-    @CurrentUser() nguoiDung: any,
-    @Param('maKh') maKh: string,
-  ) {
+  layLichSuDatBan(@CurrentUser() nguoiDung: any, @Param('maKh') maKh: string) {
     return this.datBanService.layLichSuDatBan(nguoiDung, maKh);
   }
 
@@ -50,10 +47,7 @@ export class DatBanController {
 
   @Roles('Admin', 'NhanVien')
   @Patch(':maDatBan')
-  capNhatDatBan(
-    @Param('maDatBan') maDatBan: string,
-    @Body() body: BanGhi,
-  ) {
+  capNhatDatBan(@Param('maDatBan') maDatBan: string, @Body() body: BanGhi) {
     return this.datBanService.capNhatDatBan(maDatBan, body);
   }
 
@@ -63,15 +57,15 @@ export class DatBanController {
     @Param('maDatBan') maDatBan: string,
     @Body() body: BanGhi,
   ) {
-    return this.datBanService.capNhatTrangThaiDatBan(maDatBan, String(body.trangThai || ''));
+    return this.datBanService.capNhatTrangThaiDatBan(
+      maDatBan,
+      String(body.trangThai || ''),
+    );
   }
 
   @Roles('Admin', 'NhanVien')
   @Patch(':maDatBan/assign-tables')
-  ganBanChoDatBan(
-    @Param('maDatBan') maDatBan: string,
-    @Body() body: BanGhi,
-  ) {
+  ganBanChoDatBan(@Param('maDatBan') maDatBan: string, @Body() body: BanGhi) {
     return this.datBanService.ganBanChoDatBan(maDatBan, body);
   }
 }

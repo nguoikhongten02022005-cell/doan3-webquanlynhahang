@@ -19,7 +19,11 @@ export class DonHangCreateOrderService {
     await ketNoi.execute(sql, thamSo);
   }
 
-  private async truyVan(sql: string, thamSo: any[], ketNoi: PoolConnection): Promise<any[]> {
+  private async truyVan(
+    sql: string,
+    thamSo: any[],
+    ketNoi: PoolConnection,
+  ): Promise<any[]> {
     const [kq] = await ketNoi.query(sql, thamSo);
     return kq as any[];
   }
@@ -28,7 +32,11 @@ export class DonHangCreateOrderService {
     const danhSach = Array.isArray(dsDauVao) ? dsDauVao : [];
     return danhSach
       .map((muc: BanGhi, chiSo: number) => ({
-        maChiTiet: String(muc?.maChiTiet || muc?.MaChiTiet || `${tienToMaChiTiet}_${Date.now()}_${chiSo}`),
+        maChiTiet: String(
+          muc?.maChiTiet ||
+            muc?.MaChiTiet ||
+            `${tienToMaChiTiet}_${Date.now()}_${chiSo}`,
+        ),
         maMon: String(muc?.maMon || muc?.MaMon || ''),
         soLuong: Number(muc?.soLuong || muc?.SoLuong || 0),
         ghiChu: String(muc?.ghiChu || muc?.GhiChu || ''),
@@ -40,14 +48,16 @@ export class DonHangCreateOrderService {
     const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
-    const loaiDonHang = 'TAI_BAN';
+    const loaiDonHang = loaiDon || 'TAI_BAN';
     const trangThai = payload.trangThai || 'Pending';
     const soDiem = Number(payload.soDiem || 0);
 
     const nguoiDung = payload.nguoiDung || { maND: payload.maND };
 
     if (soDiem > 0 && !nguoiDung.maND) {
-      throw new BadRequestException('Không thể đổi điểm khi chưa xác thực người dùng.');
+      throw new BadRequestException(
+        'Không thể đổi điểm khi chưa xác thực người dùng.',
+      );
     }
 
     const { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung } =
@@ -124,7 +134,16 @@ export class DonHangCreateOrderService {
         const maChiTiet = muc.maChiTiet || taoMa('CT');
         await this.thucThi(
           'INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-          [maChiTiet, maDonHang, muc.maMon, muc.soLuong, muc.donGia, muc.thanhTien, muc.ghiChu || null, 'Pending'],
+          [
+            maChiTiet,
+            maDonHang,
+            muc.maMon,
+            muc.soLuong,
+            muc.donGia,
+            muc.thanhTien,
+            muc.ghiChu || null,
+            'Pending',
+          ],
           ketNoi,
         );
         chiTietPhanHoi.push({
@@ -140,7 +159,11 @@ export class DonHangCreateOrderService {
       }
 
       if (maBan) {
-        await this.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Occupied', maBan], ketNoi);
+        await this.thucThi(
+          'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+          ['Occupied', maBan],
+          ketNoi,
+        );
       }
 
       if (maGiamGia.hopLe && maGiamGia.maGiamGia) {
@@ -166,12 +189,16 @@ export class DonHangCreateOrderService {
             trangThai,
             ghiChu: payload.ghiChu || '',
             ngayTao: new Date().toISOString(),
-            loaiDon: loaiDonHang,
+            loaiDon: 'TAI_BAN',
             thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
-              loaiDon: loaiDonHang,
+              loaiDon: 'TAI_BAN',
               diaChiGiao: payload.diaChiGiao || '',
-              gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
-              gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
+              gioLayHang:
+                payload.gioLayHang ||
+                payload.thongTinNhanHang?.gioLayHang ||
+                '',
+              gioGiao:
+                payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
             }),
             diaChiGiao: payload.diaChiGiao || '',
             phiShip: tongHopGia.phiShip,
@@ -183,14 +210,19 @@ export class DonHangCreateOrderService {
           chiTiet: chiTietPhanHoi,
           diemDaDoi,
         },
-        isAppending ? 'Thêm món vào đơn hàng hiện tại' : 'Tạo đơn hàng thành công',
+        isAppending
+          ? 'Thêm món vào đơn hàng hiện tại'
+          : 'Tạo đơn hàng thành công',
       );
     });
   }
 
   async taoOrderTaiBan(maBan: string, payload: BanGhi) {
     const chiTiet = this.chuanHoaDanhSachChiTiet(payload.chiTiet, 'CTBAN');
-    const danhSachMon = this.chuanHoaDanhSachChiTiet(payload.danhSachMon, 'CTBAN');
+    const danhSachMon = this.chuanHoaDanhSachChiTiet(
+      payload.danhSachMon,
+      'CTBAN',
+    );
     const items = this.chuanHoaDanhSachChiTiet(payload.items, 'CTBAN');
 
     return this.taoDonHang(
@@ -198,7 +230,11 @@ export class DonHangCreateOrderService {
         ...payload,
         maBan,
         maDonHang: payload.maDonHang || taoMa('DH'),
-        chiTiet: chiTiet.length ? chiTiet : danhSachMon.length ? danhSachMon : items,
+        chiTiet: chiTiet.length
+          ? chiTiet
+          : danhSachMon.length
+            ? danhSachMon
+            : items,
         nguonTao: 'QRCode',
         loaiDon: 'TAI_BAN',
         soDiem: 0,

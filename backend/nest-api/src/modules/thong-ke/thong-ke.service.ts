@@ -28,7 +28,8 @@ export class ThongKeService {
 
     params.push(limit);
 
-    const danhSach = await this.mysql.truyVan(`
+    const danhSach = await this.mysql.truyVan(
+      `
       SELECT
         td.MaMon,
         td.TenMon,
@@ -45,7 +46,9 @@ export class ThongKeService {
       GROUP BY td.MaMon, td.TenMon, dm.TenDanhMuc
       ORDER BY TongSoLuong DESC
       LIMIT ?
-    `, params);
+    `,
+      params,
+    );
 
     return taoPhanHoi(danhSach, 'Lấy món bán chạy thành công');
   }
@@ -107,12 +110,15 @@ export class ThongKeService {
   }
 
   async layBookingCount(tuNgay: string, denNgay: string) {
-    const result = await this.mysql.truyVan(`
+    const result = await this.mysql.truyVan(
+      `
       SELECT COUNT(*) AS tongBooking
       FROM DatBan
       WHERE NgayDat BETWEEN ? AND ?
       AND TrangThai NOT IN ('Cancelled', 'NoShow')
-    `, [tuNgay, denNgay]);
+    `,
+      [tuNgay, denNgay],
+    );
 
     return taoPhanHoi(result[0], 'Lấy số booking thành công');
   }

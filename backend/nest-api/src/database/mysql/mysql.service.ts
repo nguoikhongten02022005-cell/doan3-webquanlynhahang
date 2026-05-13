@@ -1,5 +1,14 @@
-import { Injectable, Logger, ServiceUnavailableException } from '@nestjs/common';
-import { createPool, type Pool, type PoolConnection, type ResultSetHeader } from 'mysql2/promise';
+import {
+  Injectable,
+  Logger,
+  ServiceUnavailableException,
+} from '@nestjs/common';
+import {
+  createPool,
+  type Pool,
+  type PoolConnection,
+  type ResultSetHeader,
+} from 'mysql2/promise';
 import { docBienMoiTruongBatBuoc } from '../../common/doc-bien-moi-truong';
 
 @Injectable()

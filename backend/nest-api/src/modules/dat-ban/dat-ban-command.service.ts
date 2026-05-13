@@ -21,9 +21,17 @@ export class DatBanCommandService {
     const vaiTro = String(nguoiDung.vaiTro || '');
     if (vaiTro === 'Admin' || vaiTro === 'NhanVien') return;
 
-    const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
-    if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
-      throw new ForbiddenException('Bạn không có quyền truy cập dữ liệu của khách hàng khác.');
+    const khachHang = await layKhachHangTheoMaNd(
+      this.mysql,
+      String(nguoiDung.maND),
+    );
+    if (
+      !khachHang ||
+      String(khachHang.MaKH || '') !== String(maKh || '').trim()
+    ) {
+      throw new ForbiddenException(
+        'Bạn không có quyền truy cập dữ liệu của khách hàng khác.',
+      );
     }
   }
 
@@ -100,30 +108,97 @@ export class DatBanCommandService {
       throw new NotFoundException('Không tìm thấy đặt bàn.');
     }
 
-    const maKH = body.maKH === undefined ? datBanHienTai.MaKH : body.maKH || null;
-    const maBan = body.maBan === undefined ? datBanHienTai.MaBan : body.maBan || null;
-    const maNV = body.maNV === undefined ? datBanHienTai.MaNV : body.maNV || null;
-    const tenKhachDatBan = body.tenKhachDatBan === undefined ? datBanHienTai.TenKhachDatBan : body.tenKhachDatBan ? String(body.tenKhachDatBan).trim() : null;
-    const sdtDatBan = body.sdtDatBan === undefined ? datBanHienTai.SDTDatBan : body.sdtDatBan ? String(body.sdtDatBan).trim() : null;
-    const emailDatBan = body.emailDatBan === undefined ? datBanHienTai.EmailDatBan : body.emailDatBan ? String(body.emailDatBan).trim() : null;
-    const ngayDat = body.ngayDat === undefined ? datBanHienTai.NgayDat : String(body.ngayDat || '').trim();
-    const gioDat = body.gioDat === undefined ? datBanHienTai.GioDat : String(body.gioDat || '').trim();
-    const gioKetThuc = body.gioKetThuc === undefined ? datBanHienTai.GioKetThuc : body.gioKetThuc ? String(body.gioKetThuc).trim() : null;
-    const soNguoi = body.soNguoi === undefined ? Number(datBanHienTai.SoNguoi || 0) : Number(body.soNguoi || 0);
-    const ghiChu = body.ghiChu === undefined ? datBanHienTai.GhiChu : body.ghiChu ? String(body.ghiChu).trim() : null;
-    const khuVucUuTien = body.khuVucUuTien === undefined ? datBanHienTai.KhuVucUuTien : body.khuVucUuTien ? String(body.khuVucUuTien).trim() : null;
-    const ghiChuNoiBo = body.ghiChuNoiBo === undefined ? datBanHienTai.GhiChuNoiBo : body.ghiChuNoiBo ? String(body.ghiChuNoiBo).trim() : null;
-    const trangThai = body.trangThai === undefined ? datBanHienTai.TrangThai : String(body.trangThai || '').trim();
+    const maKH =
+      body.maKH === undefined ? datBanHienTai.MaKH : body.maKH || null;
+    const maBan =
+      body.maBan === undefined ? datBanHienTai.MaBan : body.maBan || null;
+    const maNV =
+      body.maNV === undefined ? datBanHienTai.MaNV : body.maNV || null;
+    const tenKhachDatBan =
+      body.tenKhachDatBan === undefined
+        ? datBanHienTai.TenKhachDatBan
+        : body.tenKhachDatBan
+          ? String(body.tenKhachDatBan).trim()
+          : null;
+    const sdtDatBan =
+      body.sdtDatBan === undefined
+        ? datBanHienTai.SDTDatBan
+        : body.sdtDatBan
+          ? String(body.sdtDatBan).trim()
+          : null;
+    const emailDatBan =
+      body.emailDatBan === undefined
+        ? datBanHienTai.EmailDatBan
+        : body.emailDatBan
+          ? String(body.emailDatBan).trim()
+          : null;
+    const ngayDat =
+      body.ngayDat === undefined
+        ? datBanHienTai.NgayDat
+        : String(body.ngayDat || '').trim();
+    const gioDat =
+      body.gioDat === undefined
+        ? datBanHienTai.GioDat
+        : String(body.gioDat || '').trim();
+    const gioKetThuc =
+      body.gioKetThuc === undefined
+        ? datBanHienTai.GioKetThuc
+        : body.gioKetThuc
+          ? String(body.gioKetThuc).trim()
+          : null;
+    const soNguoi =
+      body.soNguoi === undefined
+        ? Number(datBanHienTai.SoNguoi || 0)
+        : Number(body.soNguoi || 0);
+    const ghiChu =
+      body.ghiChu === undefined
+        ? datBanHienTai.GhiChu
+        : body.ghiChu
+          ? String(body.ghiChu).trim()
+          : null;
+    const khuVucUuTien =
+      body.khuVucUuTien === undefined
+        ? datBanHienTai.KhuVucUuTien
+        : body.khuVucUuTien
+          ? String(body.khuVucUuTien).trim()
+          : null;
+    const ghiChuNoiBo =
+      body.ghiChuNoiBo === undefined
+        ? datBanHienTai.GhiChuNoiBo
+        : body.ghiChuNoiBo
+          ? String(body.ghiChuNoiBo).trim()
+          : null;
+    const trangThai =
+      body.trangThai === undefined
+        ? datBanHienTai.TrangThai
+        : String(body.trangThai || '').trim();
 
     if (!ngayDat) throw new BadRequestException('Ngày đặt là bắt buộc.');
     if (!gioDat) throw new BadRequestException('Giờ đặt là bắt buộc.');
-    if (!Number.isFinite(soNguoi) || soNguoi <= 0) throw new BadRequestException('Số người phải lớn hơn 0.');
+    if (!Number.isFinite(soNguoi) || soNguoi <= 0)
+      throw new BadRequestException('Số người phải lớn hơn 0.');
 
     await this.mysql.thucThi(
       `UPDATE DatBan
        SET MaKH = ?, MaBan = ?, MaNV = ?, TenKhachDatBan = ?, SDTDatBan = ?, EmailDatBan = ?, NgayDat = ?, GioDat = ?, GioKetThuc = ?, SoNguoi = ?, GhiChu = ?, KhuVucUuTien = ?, GhiChuNoiBo = ?, TrangThai = ?
        WHERE MaDatBan = ?`,
-      [maKH, maBan, maNV, tenKhachDatBan, sdtDatBan, emailDatBan, ngayDat, gioDat, gioKetThuc, soNguoi, ghiChu, khuVucUuTien, ghiChuNoiBo, trangThai || datBanHienTai.TrangThai, maDatBan],
+      [
+        maKH,
+        maBan,
+        maNV,
+        tenKhachDatBan,
+        sdtDatBan,
+        emailDatBan,
+        ngayDat,
+        gioDat,
+        gioKetThuc,
+        soNguoi,
+        ghiChu,
+        khuVucUuTien,
+        ghiChuNoiBo,
+        trangThai || datBanHienTai.TrangThai,
+        maDatBan,
+      ],
     );
 
     const [datBanDaCapNhat] = await this.mysql.truyVan(
@@ -151,23 +226,46 @@ export class DatBanCommandService {
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
-      await ketNoi.execute('UPDATE DatBan SET TrangThai = ? WHERE MaDatBan = ?', [trangThaiDaChuanHoa, maDatBan]);
+      await ketNoi.execute(
+        'UPDATE DatBan SET TrangThai = ? WHERE MaDatBan = ?',
+        [trangThaiDaChuanHoa, maDatBan],
+      );
 
       const maBan = String(datBanHienTai.MaBan || '').trim();
       if (!maBan) return;
 
-      if (trangThaiDaChuanHoa === 'DA_CHECK_IN' || trangThaiDaChuanHoa === 'DA_XEP_BAN') {
-        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Occupied', maBan]);
+      if (
+        trangThaiDaChuanHoa === 'DA_CHECK_IN' ||
+        trangThaiDaChuanHoa === 'DA_XEP_BAN'
+      ) {
+        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+          'Occupied',
+          maBan,
+        ]);
         return;
       }
 
-      if (['DA_XAC_NHAN', 'DA_GHI_NHAN', 'CAN_GOI_LAI', 'CHO_XAC_NHAN'].includes(trangThaiDaChuanHoa)) {
-        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Reserved', maBan]);
+      if (
+        ['DA_XAC_NHAN', 'DA_GHI_NHAN', 'CAN_GOI_LAI', 'CHO_XAC_NHAN'].includes(
+          trangThaiDaChuanHoa,
+        )
+      ) {
+        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+          'Reserved',
+          maBan,
+        ]);
         return;
       }
 
-      if (['DA_HOAN_THANH', 'KHONG_DEN', 'TU_CHOI_HET_CHO', 'DA_HUY'].includes(trangThaiDaChuanHoa)) {
-        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Available', maBan]);
+      if (
+        ['DA_HOAN_THANH', 'KHONG_DEN', 'TU_CHOI_HET_CHO', 'DA_HUY'].includes(
+          trangThaiDaChuanHoa,
+        )
+      ) {
+        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+          'Available',
+          maBan,
+        ]);
       }
     });
 
@@ -191,7 +289,9 @@ export class DatBanCommandService {
     }
 
     const danhSachMaBan = Array.isArray(body.danhSachMaBan)
-      ? body.danhSachMaBan.map((maBan) => String(maBan || '').trim()).filter(Boolean)
+      ? body.danhSachMaBan
+          .map((maBan) => String(maBan || '').trim())
+          .filter(Boolean)
       : [];
 
     if (!danhSachMaBan.length) {
@@ -208,21 +308,36 @@ export class DatBanCommandService {
     }
 
     const soKhach = Number(datBan.SoNguoi || 0);
-    const tongSucChua = danhSachBanHopLe.reduce((tong, ban) => tong + Number(ban.SoChoNgoi || 0), 0);
+    const tongSucChua = danhSachBanHopLe.reduce(
+      (tong, ban) => tong + Number(ban.SoChoNgoi || 0),
+      0,
+    );
     if (soKhach > 0 && tongSucChua < soKhach) {
-      throw new BadRequestException('Tổng sức chứa của các bàn được chọn không đủ cho booking này.');
+      throw new BadRequestException(
+        'Tổng sức chứa của các bàn được chọn không đủ cho booking này.',
+      );
     }
 
-    const trangThaiKhongHopLe = danhSachBanHopLe.find((ban) => String(ban.TrangThai || '') === 'Occupied');
+    const trangThaiKhongHopLe = danhSachBanHopLe.find(
+      (ban) => String(ban.TrangThai || '') === 'Occupied',
+    );
     if (trangThaiKhongHopLe) {
-      throw new BadRequestException(`Bàn ${trangThaiKhongHopLe.MaBan} đang có khách, không thể gán cho booking.`);
+      throw new BadRequestException(
+        `Bàn ${trangThaiKhongHopLe.MaBan} đang có khách, không thể gán cho booking.`,
+      );
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
       for (const maBan of danhSachMaBan) {
-        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', ['Reserved', maBan]);
+        await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+          'Reserved',
+          maBan,
+        ]);
       }
-      await ketNoi.execute('UPDATE DatBan SET MaBan = ?, TrangThai = ? WHERE MaDatBan = ?', [danhSachMaBan[0], 'DA_XAC_NHAN', maDatBan]);
+      await ketNoi.execute(
+        'UPDATE DatBan SET MaBan = ?, TrangThai = ? WHERE MaDatBan = ?',
+        [danhSachMaBan[0], 'DA_XAC_NHAN', maDatBan],
+      );
     });
 
     const [datBanDaCapNhat] = await this.mysql.truyVan(

@@ -50,11 +50,11 @@ export class BanController {
 
   @Roles('Admin', 'NhanVien')
   @Patch(':maBan/status')
-  capNhatTrangThaiBan(
-    @Param('maBan') maBan: string,
-    @Body() body: BanGhi,
-  ) {
-    return this.banService.capNhatTrangThaiBan(maBan, String(body.trangThai || ''));
+  capNhatTrangThaiBan(@Param('maBan') maBan: string, @Body() body: BanGhi) {
+    return this.banService.capNhatTrangThaiBan(
+      maBan,
+      String(body.trangThai || ''),
+    );
   }
 
   @Roles('Admin', 'NhanVien')

@@ -26,10 +26,12 @@ const tapTinMoiTruong = `.env.${moiTruong}`;
       isGlobal: true,
       envFilePath: [tapTinMoiTruong, '.env'],
     }),
-    ThrottlerModule.forRoot([{
-      ttl: 60000,
-      limit: 10,
-    }]),
+    ThrottlerModule.forRoot([
+      {
+        ttl: 60000,
+        limit: 10,
+      },
+    ]),
     ServeStaticModule.forRoot({
       rootPath: join(process.cwd(), 'uploads'),
       serveRoot: '/uploads',
@@ -47,8 +49,6 @@ const tapTinMoiTruong = `.env.${moiTruong}`;
     ThongBaoModule,
     ThongKeModule,
   ],
-  providers: [
-    { provide: APP_GUARD, useClass: ThrottlerGuard },
-  ],
+  providers: [{ provide: APP_GUARD, useClass: ThrottlerGuard }],
 })
 export class AppModule {}

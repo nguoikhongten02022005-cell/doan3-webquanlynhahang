@@ -101,7 +101,7 @@ npm --prefix backend/nest-api install
 
 ### 1) Frontend: `frontend/.env`
 
-Frontend đọc biến môi trường Vite từ thư mục `frontend/`.
+Frontend chỉ đọc biến môi trường Vite từ thư mục `frontend/`.
 
 ```env
 VITE_USE_BACKEND=true
@@ -116,7 +116,7 @@ Tạo file từ mẫu:
 cp backend/nest-api/.env.example backend/nest-api/.env
 ```
 
-Ví dụ các biến quan trọng:
+Biến quan trọng:
 
 ```env
 PORT=5011
@@ -133,9 +133,17 @@ JWT_AUDIENCE=quan-ly-nha-hang-frontend
 JWT_EXPIRES_IN=12h
 ```
 
+`FRONTEND_ORIGIN` phải khớp URL frontend triển khai ở production.
+
+Nếu frontend chạy qua proxy Vite trong dev, có thể thêm:
+
+```env
+VITE_API_PROXY_TARGET=http://localhost:5011
+```
+
 ### 3) Root `.env` cho script smoke test
 
-File `.env` ở root không dùng cho Vite runtime. Nó chủ yếu hữu ích cho script như `npm run smoke:api`.
+File `.env` ở root không dùng cho Vite runtime. Chỉ script như `npm run smoke:api` dùng nó.
 
 Ví dụ:
 

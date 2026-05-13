@@ -1,6 +1,5 @@
 import { DANH_SACH_MON } from '../thucDon/mocks/duLieuThucDon'
 import { CAC_DANH_MUC_CHUAN_THUC_DON } from '../thucDon/constants/danhMucThucDon'
-import { laCungNgayLich } from './boChon'
 
 const chenSo0 = (giaTri) => String(giaTri).padStart(2, '0')
 
@@ -21,12 +20,6 @@ const suyRaDanhMucTuTenMon = (tenMon = '') => {
   if (doanTenThuoc(tenMon, ['kem', 'banh', 'flan', 'tiramisu', 'panna cotta'])) return 'Tráng Miệng'
   if (doanTenThuoc(tenMon, ['goi', 'cha gio', 'salad', 'sup', 'súp', 'khoai'])) return 'Khai Vị'
   return 'Món Chính'
-}
-
-const taoMocBatDauNgay = (ngay) => {
-  const ngaySaoChep = new Date(ngay)
-  ngaySaoChep.setHours(0, 0, 0, 0)
-  return ngaySaoChep
 }
 
 // UTC-safe date comparison (không bị ảnh hưởng bởi timezone browser)

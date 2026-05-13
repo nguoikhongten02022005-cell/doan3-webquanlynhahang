@@ -15,6 +15,8 @@ import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { TaoNguoiDungDto } from './dto/tao-nguoi-dung.dto';
 import { BanGhi } from '../../common/types';
 
+const TEN_COOKIE_REFRESH_TOKEN = 'refreshToken';
+
 @Injectable()
 export class AuthService {
   constructor(
@@ -96,13 +98,19 @@ export class AuthService {
 
   private xacThucMatKhauManh(matKhau: string) {
     if (matKhau.length < 8) {
-      throw new BadRequestException('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.');
+      throw new BadRequestException(
+        'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.',
+      );
     }
     if (!/[A-Z]/.test(matKhau)) {
-      throw new BadRequestException('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.');
+      throw new BadRequestException(
+        'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.',
+      );
     }
     if (!/[0-9]/.test(matKhau)) {
-      throw new BadRequestException('Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.');
+      throw new BadRequestException(
+        'Mật khẩu phải có ít nhất 8 ký tự, 1 chữ hoa và 1 số.',
+      );
     }
   }
 
@@ -182,7 +190,29 @@ export class AuthService {
     const accessToken = this.taoJwt(nguoiDung);
     const refreshToken = this.taoRefreshToken(nguoiDung);
 
-    return taoPhanHoi({ user, accessToken, refreshToken }, 'Đăng nhập thành công');
+    return taoPhanHoi(
+      { user, accessToken, refreshToken },
+      'Đăng nhập thành công',
+    );
+  }
+
+  taoCookieRefreshToken(refreshToken: string) {
+    return `${TEN_COOKIE_REFRESH_TOKEN}=${encodeURIComponent(refreshToken || '')}; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=${7 * 24 * 60 * 60}`;
+  }
+
+  xoaCookieRefreshToken() {
+    return `${TEN_COOKIE_REFRESH_TOKEN}=; Path=/api/auth; HttpOnly; SameSite=Lax; Max-Age=0`;
+  }
+
+  private layRefreshTokenTuCookie(cookieHeader?: string) {
+    if (!cookieHeader) return '';
+    const cacCookie = cookieHeader.split(';').map((item) => item.trim());
+    const cookie = cacCookie.find((item) =>
+      item.startsWith(`${TEN_COOKIE_REFRESH_TOKEN}=`),
+    );
+    return cookie
+      ? decodeURIComponent(cookie.slice(TEN_COOKIE_REFRESH_TOKEN.length + 1))
+      : '';
   }
 
   async dangNhapNoiBo(email: string, matKhau: string) {
@@ -221,7 +251,9 @@ export class AuthService {
   }
 
   private taoRefreshToken(nguoiDung: BanGhi) {
-    const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET');
+    const refreshSecret =
+      this.configService.get<string>('JWT_REFRESH_SECRET') ||
+      this.configService.get<string>('JWT_SECRET');
     return this.jwtService.sign(
       {
         maND: nguoiDung.MaND,
@@ -231,22 +263,31 @@ export class AuthService {
       },
       {
         secret: refreshSecret,
-        expiresIn: (this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') as any) || '7d',
+        expiresIn:
+          (this.configService.get<string>('JWT_REFRESH_EXPIRES_IN') as any) ||
+          '7d',
       },
     );
   }
 
-  async lamMoiToken(refreshToken: string) {
+  async lamMoiTokenTuCookie(cookieHeader?: string) {
+    const refreshToken = this.layRefreshTokenTuCookie(cookieHeader);
     if (!refreshToken) {
       throw new UnauthorizedException('Thiếu refresh token.');
     }
 
     let giaiMa: any;
     try {
-      const refreshSecret = this.configService.get<string>('JWT_REFRESH_SECRET') || this.configService.get<string>('JWT_SECRET');
-      giaiMa = await this.jwtService.verifyAsync(refreshToken, { secret: refreshSecret });
+      const refreshSecret =
+        this.configService.get<string>('JWT_REFRESH_SECRET') ||
+        this.configService.get<string>('JWT_SECRET');
+      giaiMa = await this.jwtService.verifyAsync(refreshToken, {
+        secret: refreshSecret,
+      });
     } catch {
-      throw new UnauthorizedException('Refresh token không hợp lệ hoặc đã hết hạn.');
+      throw new UnauthorizedException(
+        'Refresh token không hợp lệ hoặc đã hết hạn.',
+      );
     }
 
     if (giaiMa.loai !== 'refresh') {
@@ -263,7 +304,10 @@ export class AuthService {
     const accessToken = this.taoJwt(nguoiDung);
     const refreshTokenMoi = this.taoRefreshToken(nguoiDung);
 
-    return taoPhanHoi({ user, accessToken, refreshToken: refreshTokenMoi }, 'Làm mới token thành công');
+    return taoPhanHoi(
+      { user, accessToken, refreshToken: refreshTokenMoi },
+      'Làm mới token thành công',
+    );
   }
 
   async layThongTinToiTuUser(thongTinToken: any) {
@@ -370,10 +414,7 @@ export class AuthService {
     );
   }
 
-  async capNhatNguoiDungNoiBo(
-    maND: string,
-    payload: BanGhi,
-  ) {
+  async capNhatNguoiDungNoiBo(maND: string, payload: BanGhi) {
     const nguoiDung = await this.layNguoiDungTheoMaNd(maND);
     if (!nguoiDung) {
       throw new NotFoundException('Không tìm thấy người dùng.');
@@ -472,7 +513,6 @@ export class AuthService {
   }
 
   async capNhatHoSoTuUser(thongTinToken: any, payload: BanGhi) {
-
     const maND = String(thongTinToken.maND);
     const hoTen = String(payload.hoTen || '').trim();
     const email = String(payload.email || '')

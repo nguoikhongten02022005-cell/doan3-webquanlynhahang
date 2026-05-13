@@ -8,6 +8,7 @@
     "dev": "vite --port 5173 --strictPort",
     "build": "vite build",
     "lint": "eslint .",
+    "test": "node -e \"console.log('No frontend tests configured')\"",
     "preview": "vite preview"
   },
   "dependencies": {

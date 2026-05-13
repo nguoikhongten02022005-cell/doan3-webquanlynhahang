@@ -107,16 +107,10 @@ export const xoaPhienXacThuc = () => {
   xoaNguoiDungHienTai()
 }
 
-export const layRefreshToken = () => {
-  const refreshToken = layMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
-  return typeof refreshToken === 'string' && refreshToken.trim() ? refreshToken : ''
-}
+export const layRefreshToken = () => ''
 
-export const luuRefreshToken = (token) => {
-  if (!token || typeof token !== 'string') {
-    return
-  }
-  datMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN, token)
+export const luuRefreshToken = () => {
+  xoaMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
 }
 
 export const xoaRefreshToken = () => {

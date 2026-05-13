@@ -56,7 +56,10 @@ export class DonHangController {
     @Param('maDonHang') maDonHang: string,
     @Body() body: { trangThai: string },
   ) {
-    return this.donHangService.capNhatTrangThaiDonHang(maDonHang, String(body.trangThai || ''));
+    return this.donHangService.capNhatTrangThaiDonHang(
+      maDonHang,
+      String(body.trangThai || ''),
+    );
   }
 
   @Roles('Admin', 'NhanVien', 'QuanLy')

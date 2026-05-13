@@ -1,5 +1,15 @@
-import { Body, Controller, Get, Post, Put, UseGuards } from '@nestjs/common';
+import {
+  Body,
+  Controller,
+  Get,
+  Post,
+  Put,
+  Req,
+  Res,
+  UseGuards,
+} from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
+import type { Request, Response } from 'express';
 import { AuthService } from './auth.service';
 import { DangNhapDto } from './dto/dang-nhap.dto';
 import { TaoNguoiDungDto } from './dto/tao-nguoi-dung.dto';
@@ -22,27 +32,63 @@ export class AuthController {
 
   @Public()
   @Post('login')
-  dangNhap(@Body() body: DangNhapDto) {
-    return this.authService.dangNhap(body.email, body.matKhau);
+  async dangNhap(
+    @Body() body: DangNhapDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const phanHoi = await this.authService.dangNhap(body.email, body.matKhau);
+    res.setHeader(
+      'Set-Cookie',
+      this.authService.taoCookieRefreshToken(
+        String((phanHoi.data as any)?.refreshToken || ''),
+      ),
+    );
+    return phanHoi;
   }
 
   @Public()
   @Post('internal-login')
-  dangNhapNoiBo(@Body() body: DangNhapDto) {
-    return this.authService.dangNhapNoiBo(body.email, body.matKhau);
+  async dangNhapNoiBo(
+    @Body() body: DangNhapDto,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const phanHoi = await this.authService.dangNhapNoiBo(
+      body.email,
+      body.matKhau,
+    );
+    res.setHeader(
+      'Set-Cookie',
+      this.authService.taoCookieRefreshToken(
+        String((phanHoi.data as any)?.refreshToken || ''),
+      ),
+    );
+    return phanHoi;
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Post('logout')
-  dangXuat() {
+  dangXuat(@Res({ passthrough: true }) res: Response) {
+    res.setHeader('Set-Cookie', this.authService.xoaCookieRefreshToken());
     return this.authService.dangXuat();
   }
 
   @Public()
   @Post('refresh')
-  lamMoiToken(@Body() body: Record<string, unknown>) {
-    return this.authService.lamMoiToken(String(body.refreshToken || ''));
+  async lamMoiToken(
+    @Req() req: Request,
+    @Res({ passthrough: true }) res: Response,
+  ) {
+    const phanHoi = await this.authService.lamMoiTokenTuCookie(
+      req.headers.cookie || '',
+    );
+    res.setHeader(
+      'Set-Cookie',
+      this.authService.taoCookieRefreshToken(
+        String((phanHoi.data as any)?.refreshToken || ''),
+      ),
+    );
+    return phanHoi;
   }
 
   @ApiBearerAuth()
@@ -63,20 +109,14 @@ export class AuthController {
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put('profile')
-  capNhatHoSo(
-    @CurrentUser() user: any,
-    @Body() body: Record<string, unknown>,
-  ) {
+  capNhatHoSo(@CurrentUser() user: any, @Body() body: Record<string, unknown>) {
     return this.authService.capNhatHoSoTuUser(user, body);
   }
 
   @ApiBearerAuth()
   @UseGuards(JwtAuthGuard)
   @Put('doi-mat-khau')
-  doiMatKhau(
-    @CurrentUser() user: any,
-    @Body() body: Record<string, unknown>,
-  ) {
+  doiMatKhau(@CurrentUser() user: any, @Body() body: Record<string, unknown>) {
     return this.authService.doiMatKhauTuUser(user, body);
   }
 }

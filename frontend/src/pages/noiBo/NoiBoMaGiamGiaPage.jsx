@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import {
   Alert,
   Button,
@@ -93,7 +93,7 @@ function NoiBoMaGiamGiaPage() {
   const [form] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
 
-  const taiDanhSach = async () => {
+  const taiDanhSach = useCallback(async () => {
     datDangTai(true)
     try {
       const phanHoi = await layDanhSachMaGiamGiaApi()
@@ -103,11 +103,11 @@ function NoiBoMaGiamGiaPage() {
     } finally {
       datDangTai(false)
     }
-  }
+  }, [messageApi])
 
   useEffect(() => {
     taiDanhSach()
-  }, [])
+  }, [taiDanhSach])
 
   const datLaiBieuMau = () => {
     datCheDoBieuMau('create')
@@ -122,13 +122,13 @@ function NoiBoMaGiamGiaPage() {
     datNganKeoDangMo(true)
   }
 
-  const moNganKeoSua = (record) => {
+  const moNganKeoSua = useCallback((record) => {
     datCheDoBieuMau('edit')
     datMaDangSua(record.maCode)
     const duLieu = chuanHoaDuLieuForm(record)
     form.setFieldsValue(duLieu)
     datNganKeoDangMo(true)
-  }
+  }, [form])
 
   const xuLyLuu = async () => {
     try {
@@ -154,7 +154,7 @@ function NoiBoMaGiamGiaPage() {
     }
   }
 
-  const xuLyXoá = (record) => {
+  const xuLyXoá = useCallback((record) => {
     Modal.confirm({
       title: 'Xác nhận xoá',
       content: `Bạn có chắc muốn xoá mã giảm giá "${record.tenCode}" (${record.maCode}) khong?`,
@@ -171,7 +171,7 @@ function NoiBoMaGiamGiaPage() {
         }
       },
     })
-  }
+  }, [messageApi, taiDanhSach])
 
   const cotBang = useMemo(
     () => [
@@ -270,7 +270,7 @@ function NoiBoMaGiamGiaPage() {
         ),
       },
     ],
-    [],
+    [moNganKeoSua, xuLyXoá],
   )
 
   return (

@@ -6,18 +6,19 @@ import react from '@vitejs/plugin-react-swc'
 const duongDanTapTin = fileURLToPath(import.meta.url)
 const thuMucFrontend = path.dirname(duongDanTapTin)
 const thuMucGoc = path.resolve(thuMucFrontend, '..')
+const thuMucEnv = thuMucFrontend
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
-  const bienMoiTruong = loadEnv(mode, thuMucGoc, '')
+  const bienMoiTruong = loadEnv(mode, thuMucEnv, '')
   const congFrontend = Number(bienMoiTruong.VITE_PORT)
 
   if (!Number.isInteger(congFrontend) || congFrontend <= 0) {
-    throw new Error('Thiếu hoặc sai VITE_PORT trong file .env')
+    throw new Error('Thiếu hoặc sai VITE_PORT trong frontend/.env')
   }
 
   return {
-    envDir: thuMucGoc,
+    envDir: thuMucEnv,
     plugins: [react()],
     server: {
       host: '0.0.0.0',
@@ -25,7 +26,7 @@ export default defineConfig(({ mode }) => {
       open: true,
       proxy: {
         '/api': {
-          target: 'http://localhost:5011',
+          target: bienMoiTruong.VITE_API_PROXY_TARGET || 'http://localhost:5011',
           changeOrigin: true,
           secure: false,
         },

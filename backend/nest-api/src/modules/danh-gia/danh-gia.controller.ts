@@ -41,10 +41,7 @@ export class DanhGiaController {
 
   @Roles('Admin')
   @Patch(':maDanhGia/duyet')
-  duyetDanhGia(
-    @Param('maDanhGia') maDanhGia: string,
-    @Body() body: BanGhi,
-  ) {
+  duyetDanhGia(@Param('maDanhGia') maDanhGia: string, @Body() body: BanGhi) {
     return this.danhGiaService.duyetDanhGia(maDanhGia, body);
   }
 }

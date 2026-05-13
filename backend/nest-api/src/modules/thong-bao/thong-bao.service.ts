@@ -26,7 +26,10 @@ export class ThongBaoService {
       'UPDATE ThongBao SET DaDoc = 1 WHERE MaThongBao = ?',
       [maThongBao],
     );
-    return taoPhanHoi({ maThongBao, daDoc: true }, 'Đánh dấu đã đọc thành công');
+    return taoPhanHoi(
+      { maThongBao, daDoc: true },
+      'Đánh dấu đã đọc thành công',
+    );
   }
 
   async demChuaDoc(maND: string) {
@@ -34,6 +37,9 @@ export class ThongBaoService {
       'SELECT COUNT(*) AS tong FROM ThongBao WHERE MaND = ? AND DaDoc = 0',
       [maND],
     );
-    return taoPhanHoi({ soChuaDoc: Number(ketQua?.tong || 0) }, 'Lấy số thông báo chưa đọc thành công');
+    return taoPhanHoi(
+      { soChuaDoc: Number(ketQua?.tong || 0) },
+      'Lấy số thông báo chưa đọc thành công',
+    );
   }
 }

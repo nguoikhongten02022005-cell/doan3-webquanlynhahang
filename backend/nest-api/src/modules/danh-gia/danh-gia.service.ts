@@ -16,14 +16,17 @@ export class DanhGiaService {
 
   private chuyenDuLieuHinhAnhDanhGia(giaTri: unknown) {
     if (!giaTri) return [];
-    if (Array.isArray(giaTri)) return giaTri.filter(Boolean).map((item) => String(item));
+    if (Array.isArray(giaTri))
+      return giaTri.filter(Boolean).map((item) => String(item));
 
     const chuoi = String(giaTri).trim();
     if (!chuoi) return [];
 
     try {
       const phanTich = JSON.parse(chuoi);
-      return Array.isArray(phanTich) ? phanTich.filter(Boolean).map((item) => String(item)) : [chuoi];
+      return Array.isArray(phanTich)
+        ? phanTich.filter(Boolean).map((item) => String(item))
+        : [chuoi];
     } catch {
       return [chuoi];
     }
@@ -49,21 +52,42 @@ export class DanhGiaService {
     }
   }
 
-  private async kiemTraQuyenDanhGia(nguoiDung: any, maKh: string, maDonHang: string) {
+  private async kiemTraQuyenDanhGia(
+    nguoiDung: any,
+    maKh: string,
+    maDonHang: string,
+  ) {
     const vaiTro = String(nguoiDung.vaiTro || '');
-    const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
+    const khachHang = await layKhachHangTheoMaNd(
+      this.mysql,
+      String(nguoiDung.maND),
+    );
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      if (!khachHang || String(khachHang.MaKH || '') !== String(maKh || '').trim()) {
-        throw new BadRequestException('Bạn không có quyền đánh giá đơn hàng này.');
+      if (
+        !khachHang ||
+        String(khachHang.MaKH || '') !== String(maKh || '').trim()
+      ) {
+        throw new BadRequestException(
+          'Bạn không có quyền đánh giá đơn hàng này.',
+        );
       }
     }
 
-    const [donHang] = await this.mysql.truyVan('SELECT * FROM DonHang WHERE MaDonHang = ? LIMIT 1', [maDonHang]);
+    const [donHang] = await this.mysql.truyVan(
+      'SELECT * FROM DonHang WHERE MaDonHang = ? LIMIT 1',
+      [maDonHang],
+    );
     if (!donHang) throw new NotFoundException('Không tìm thấy đơn hàng.');
 
-    if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien' && String(donHang.MaKH || '') !== String(khachHang?.MaKH || '')) {
-      throw new BadRequestException('Bạn không có quyền đánh giá đơn hàng này.');
+    if (
+      vaiTro !== 'Admin' &&
+      vaiTro !== 'NhanVien' &&
+      String(donHang.MaKH || '') !== String(khachHang?.MaKH || '')
+    ) {
+      throw new BadRequestException(
+        'Bạn không có quyền đánh giá đơn hàng này.',
+      );
     }
 
     return { khachHang, donHang };
@@ -105,7 +129,9 @@ export class DanhGiaService {
     const hinhAnh = this.chuyenHinhAnhDanhGia(payload.hinhAnh);
 
     if (!maKH || !maDonHang) {
-      throw new BadRequestException('Thiếu mã khách hàng hoặc mã đơn hàng để tạo đánh giá.');
+      throw new BadRequestException(
+        'Thiếu mã khách hàng hoặc mã đơn hàng để tạo đánh giá.',
+      );
     }
 
     await this.kiemTraQuyenDanhGia(nguoiDung, maKH, maDonHang);
@@ -113,11 +139,24 @@ export class DanhGiaService {
     try {
       await this.mysql.thucThi(
         'INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-        [maDanhGia, maKH, maDonHang, Number(payload.soSao || 0), payload.noiDung || null, null, hinhAnh, 'Pending'],
+        [
+          maDanhGia,
+          maKH,
+          maDonHang,
+          Number(payload.soSao || 0),
+          payload.noiDung || null,
+          null,
+          hinhAnh,
+          'Pending',
+        ],
       );
     } catch (loi) {
       const err = loi as { errno?: number; code?: string; message?: string };
-      if (err.errno === 1062 || err.code === 'ER_DUP_ENTRY' || String(err.message || '').includes('Duplicate entry')) {
+      if (
+        err.errno === 1062 ||
+        err.code === 'ER_DUP_ENTRY' ||
+        String(err.message || '').includes('Duplicate entry')
+      ) {
         throw new ConflictException('Khách hàng đã đánh giá đơn hàng này rồi.');
       }
       throw loi;
@@ -130,15 +169,21 @@ export class DanhGiaService {
   }
 
   async duyetDanhGia(maDanhGia: string, payload: BanGhi) {
-    const [danhGiaHienTai] = await this.mysql.truyVan('SELECT * FROM DanhGia WHERE MaDanhGia = ? LIMIT 1', [maDanhGia]);
-    if (!danhGiaHienTai) throw new NotFoundException('Không tìm thấy đánh giá.');
+    const [danhGiaHienTai] = await this.mysql.truyVan(
+      'SELECT * FROM DanhGia WHERE MaDanhGia = ? LIMIT 1',
+      [maDanhGia],
+    );
+    if (!danhGiaHienTai)
+      throw new NotFoundException('Không tìm thấy đánh giá.');
 
-    await this.mysql.thucThi('UPDATE DanhGia SET TrangThai = ?, PhanHoi = ? WHERE MaDanhGia = ?', [
-      payload.trangThai,
-      payload.phanHoi || null,
-      maDanhGia,
-    ]);
-    const [danhGia] = await this.mysql.truyVan('SELECT * FROM DanhGia WHERE MaDanhGia = ? LIMIT 1', [maDanhGia]);
+    await this.mysql.thucThi(
+      'UPDATE DanhGia SET TrangThai = ?, PhanHoi = ? WHERE MaDanhGia = ?',
+      [payload.trangThai, payload.phanHoi || null, maDanhGia],
+    );
+    const [danhGia] = await this.mysql.truyVan(
+      'SELECT * FROM DanhGia WHERE MaDanhGia = ? LIMIT 1',
+      [maDanhGia],
+    );
 
     return taoPhanHoi(
       {

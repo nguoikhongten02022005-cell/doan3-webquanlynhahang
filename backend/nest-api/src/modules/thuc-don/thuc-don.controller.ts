@@ -36,7 +36,9 @@ const taoTenTapTinAnhMon = (
   callback: (error: Error | null, filename: string) => void,
 ) => {
   const phanMoRong = extname(tapTin.originalname || '').toLowerCase();
-  const duoiHopLe = ['.png', '.jpg', '.jpeg', '.webp'].includes(phanMoRong) ? phanMoRong : '.png';
+  const duoiHopLe = ['.png', '.jpg', '.jpeg', '.webp'].includes(phanMoRong)
+    ? phanMoRong
+    : '.png';
   callback(null, `${randomUUID()}${duoiHopLe}`);
 };
 
@@ -79,10 +81,7 @@ export class ThucDonController {
   @Roles('Admin')
   @ApiOperation({ summary: 'Cap nhat mon an (Admin)' })
   @Put(':maMon')
-  capNhatMon(
-    @Param('maMon') maMon: string,
-    @Body() body: CapNhatMonDto,
-  ) {
+  capNhatMon(@Param('maMon') maMon: string, @Body() body: CapNhatMonDto) {
     return this.thucDonService.capNhatMon(maMon, body);
   }
 
@@ -122,9 +121,7 @@ export class ThucDonController {
       },
     }),
   )
-  uploadAnhMon(
-    @UploadedFile() tapTin?: { filename?: string },
-  ) {
+  uploadAnhMon(@UploadedFile() tapTin?: { filename?: string }) {
     return taoPhanHoi(
       {
         url: tapTin?.filename ? `/uploads/mon-an/${tapTin.filename}` : '',
@@ -134,5 +131,3 @@ export class ThucDonController {
     );
   }
 }
-
-

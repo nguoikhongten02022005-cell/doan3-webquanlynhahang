@@ -61,7 +61,10 @@ export class DonHangQueryService {
   }
 
   private taoThongTinDonHang(don: BanGhi, chiTiet: BanGhi[]) {
-    const tongHopGia = this.donHangPricingService.taoTongHopGiaTuDuLieuDonHang(don, chiTiet);
+    const tongHopGia = this.donHangPricingService.taoTongHopGiaTuDuLieuDonHang(
+      don,
+      chiTiet,
+    );
     return {
       maDonHang: don.MaDonHang,
       maKH: don.MaKH,
@@ -70,7 +73,10 @@ export class DonHangQueryService {
       maDatBan: don.MaDatBan,
       tongTien: Number(don.TongTien || 0),
       tongHopGia,
-      maGiamGia: this.donHangPricingService.taoPhanHoiMaGiam({}, tongHopGia.giamGia),
+      maGiamGia: this.donHangPricingService.taoPhanHoiMaGiam(
+        {},
+        tongHopGia.giamGia,
+      ),
       trangThai: don.TrangThai,
       ghiChu: don.GhiChu || '',
       ngayTao: don.NgayTao,
@@ -132,7 +138,10 @@ export class DonHangQueryService {
   }
 
   async layDonHangCuaToi(nguoiDung: any) {
-    const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
+    const khachHang = await layKhachHangTheoMaNd(
+      this.mysql,
+      String(nguoiDung.maND),
+    );
     if (!khachHang) {
       return taoPhanHoi([], 'Không có đơn hàng');
     }
@@ -143,7 +152,9 @@ export class DonHangQueryService {
     );
     const ketQua = await Promise.all(
       danhSach.map(async (don) => {
-        const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
+        const chiTiet = await this.layChiTietDonHangTheoMa(
+          String(don.MaDonHang),
+        );
         return this.taoThongTinDonHang(don, chiTiet);
       }),
     );
@@ -151,7 +162,10 @@ export class DonHangQueryService {
   }
 
   async layDonHangCoTheDanhGia(nguoiDung: any) {
-    const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
+    const khachHang = await layKhachHangTheoMaNd(
+      this.mysql,
+      String(nguoiDung.maND),
+    );
     if (!khachHang) {
       return taoPhanHoi([], 'Không có đơn hàng có thể đánh giá');
     }
@@ -169,7 +183,9 @@ export class DonHangQueryService {
 
     const ketQua = await Promise.all(
       danhSach.map(async (don) => {
-        const chiTiet = await this.layChiTietDonHangTheoMa(String(don.MaDonHang));
+        const chiTiet = await this.layChiTietDonHangTheoMa(
+          String(don.MaDonHang),
+        );
         return this.taoThongTinDonHang(don, chiTiet);
       }),
     );
@@ -189,9 +205,17 @@ export class DonHangQueryService {
     }
 
     if (vaiTro !== 'Admin' && vaiTro !== 'NhanVien') {
-      const khachHang = await layKhachHangTheoMaNd(this.mysql, String(nguoiDung.maND));
-      if (!khachHang || String(khachHang.MaKH || '') !== String(donHang.MaKH || '')) {
-        throw new ForbiddenException('Bạn không có quyền xem chi tiết đơn hàng này.');
+      const khachHang = await layKhachHangTheoMaNd(
+        this.mysql,
+        String(nguoiDung.maND),
+      );
+      if (
+        !khachHang ||
+        String(khachHang.MaKH || '') !== String(donHang.MaKH || '')
+      ) {
+        throw new ForbiddenException(
+          'Bạn không có quyền xem chi tiết đơn hàng này.',
+        );
       }
     }
 

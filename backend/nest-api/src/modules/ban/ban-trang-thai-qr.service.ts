@@ -2,7 +2,6 @@ import { Injectable, NotFoundException } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { ThucDonService } from '../thuc-don/thuc-don.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
-import { BanGhi } from '../../common/types';
 import { resolveMaBan } from '../../common/ban-resolver';
 
 @Injectable()
@@ -34,7 +33,10 @@ export class BanTrangThaiQrService {
       map.get(trangThai) || trangThai,
       ma,
     ]);
-    return taoPhanHoi({ maBan: ma, trangThai }, 'Cap nhat trang thai ban thanh cong');
+    return taoPhanHoi(
+      { maBan: ma, trangThai },
+      'Cap nhat trang thai ban thanh cong',
+    );
   }
 
   async layQrBan(maBan: string) {

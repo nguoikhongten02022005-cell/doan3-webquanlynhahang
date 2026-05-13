@@ -4,7 +4,10 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { BootstrapService } from './config/bootstrap.service';
-import { docBienMoiTruongBatBuoc, docBienMoiTruongTuyChon } from './common/doc-bien-moi-truong';
+import {
+  docBienMoiTruongBatBuoc,
+  docBienMoiTruongTuyChon,
+} from './common/doc-bien-moi-truong';
 
 function tachDanhSachOrigin(giaTri: string) {
   return giaTri
@@ -27,11 +30,21 @@ function layOriginMacDinhTheoMoiTruong(moiTruong: string) {
 }
 
 function taoDanhSachOriginDuocPhep(moiTruong: string) {
-  const originMacDinh = layOriginMacDinhTheoMoiTruong(moiTruong);
   const originOverride = tachDanhSachOrigin(
     docBienMoiTruongTuyChon('FRONTEND_ORIGIN'),
   );
 
+  if (moiTruong === 'production') {
+    if (!originOverride.length) {
+      throw new Error(
+        'Thiếu hoặc sai FRONTEND_ORIGIN trong môi trường production.',
+      );
+    }
+
+    return originOverride;
+  }
+
+  const originMacDinh = layOriginMacDinhTheoMoiTruong(moiTruong);
   return Array.from(new Set([...originMacDinh, ...originOverride]));
 }
 

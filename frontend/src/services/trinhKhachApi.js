@@ -1,5 +1,5 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
-import { layMaXacThuc, xoaPhienXacThuc, layRefreshToken, luuXacThuc } from './dichVuXacThuc'
+import { layMaXacThuc, xoaPhienXacThuc, luuXacThuc } from './dichVuXacThuc'
 import { layMucLuuTru } from './dichVuLuuTru'
 
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
@@ -21,15 +21,8 @@ const xuLyHangDoi = (loi) => {
 }
 
 const lamMoiPhien = async () => {
-  const refreshToken = layRefreshToken()
-  if (!refreshToken) {
-    throw new Error('Không có refresh token.')
-  }
-
   const phanHoi = await fetch(`${layUrlGocApi()}/auth/refresh`, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ refreshToken }),
     credentials: 'include',
   })
 
@@ -45,7 +38,7 @@ const lamMoiPhien = async () => {
     throw new Error('Làm mới phiên thất bại — không nhận được access token.')
   }
 
-  luuXacThuc(accessTokenMoi, duLieuPhanHoi?.refreshToken || refreshToken)
+  luuXacThuc(accessTokenMoi, duLieuPhanHoi?.refreshToken)
   return accessTokenMoi
 }
 

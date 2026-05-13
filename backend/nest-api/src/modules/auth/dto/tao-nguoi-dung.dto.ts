@@ -1,5 +1,12 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsEmail, IsEnum, IsNotEmpty, IsOptional, IsString, MinLength } from 'class-validator';
+import {
+  IsEmail,
+  IsEnum,
+  IsNotEmpty,
+  IsOptional,
+  IsString,
+  MinLength,
+} from 'class-validator';
 
 export class TaoNguoiDungDto {
   @ApiProperty({ example: 'user@example.com' })
@@ -16,7 +23,10 @@ export class TaoNguoiDungDto {
   @IsNotEmpty()
   hoTen!: string;
 
-  @ApiPropertyOptional({ example: 'NhanVien', enum: ['Admin', 'NhanVien', 'QuanLy'] })
+  @ApiPropertyOptional({
+    example: 'NhanVien',
+    enum: ['Admin', 'NhanVien', 'QuanLy'],
+  })
   @IsOptional()
   @IsEnum(['Admin', 'NhanVien', 'QuanLy'])
   vaiTro?: string;

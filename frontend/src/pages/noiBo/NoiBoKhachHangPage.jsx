@@ -100,7 +100,7 @@ function NoiBoKhachHangPage() {
       })
       setDanhSach(res.data || [])
       setPhanTrang((prev) => ({ ...prev, tong: res.meta?.tongSo || 0 }))
-    } catch (e) {
+    } catch {
       message.error('Không thể tải danh sách khách hàng.')
     } finally {
       setDangTai(false)
@@ -125,7 +125,7 @@ function NoiBoKhachHangPage() {
         datBan: ls.data?.datBan || [],
         donHang: ls.data?.donHang || [],
       })
-    } catch (e) {
+    } catch {
       message.error('Không thể tải chi tiết khách hàng.')
     } finally {
       setDangTaiLichSu(false)
@@ -145,7 +145,7 @@ function NoiBoKhachHangPage() {
       await loadDanhSach()
       const moi = await layChiTietKhachHang(khachHangChiTiet.maKH)
       setKhachHangChiTiet(moi)
-    } catch (e) {
+    } catch {
       message.error('Không thể cập nhật điểm khách hàng.')
     } finally {
       setDangLuuDiem(false)
@@ -202,7 +202,7 @@ function NoiBoKhachHangPage() {
         </Space>
       ),
     },
-  ], [loadDanhSach])
+  ], [])
 
   return (
     <div className="space-y-4">

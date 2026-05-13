@@ -2,10 +2,6 @@ import { trinhKhachApi, coSuDungMayChu } from '../trinhKhachApi'
 
 const BASE = '/khach-hang'
 
-async function goiAPI(hienThi) {
-  return trinhKhachApi.get(BASE + hienThi)
-}
-
 export async function layDanhSachKhachHang({
   tuKhoa = '',
   phanLoai = 'tat-ca',

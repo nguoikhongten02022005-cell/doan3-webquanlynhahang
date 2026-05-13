@@ -31,7 +31,10 @@ export class DatBanService {
   }
 
   capNhatTrangThaiDatBan(maDatBan: string, trangThai: string) {
-    return this.datBanCommandService.capNhatTrangThaiDatBan(maDatBan, trangThai);
+    return this.datBanCommandService.capNhatTrangThaiDatBan(
+      maDatBan,
+      trangThai,
+    );
   }
 
   ganBanChoDatBan(maDatBan: string, body: BanGhi) {

@@ -82,7 +82,12 @@ export class KhachHangService {
     return taoPhanHoi(
       danhSach.map((kh) => this.chuyenKhachHangSangResponse(kh)),
       'Lấy danh sách khách hàng thành công',
-      { tongSo, trang: trangVal, soLuong: soLuongVal, soTrang: Math.ceil(tongSo / soLuongVal) },
+      {
+        tongSo,
+        trang: trangVal,
+        soLuong: soLuongVal,
+        soTrang: Math.ceil(tongSo / soLuongVal),
+      },
     );
   }
 

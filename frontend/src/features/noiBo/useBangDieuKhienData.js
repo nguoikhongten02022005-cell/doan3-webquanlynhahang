@@ -1,7 +1,5 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
-import { layTongQuanApi } from '../../services/api/apiThongKe'
-import { laCungNgayLich } from './boChon'
 
 const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
   return {

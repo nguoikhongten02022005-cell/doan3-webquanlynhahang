@@ -1,4 +1,9 @@
-import { CanActivate, ExecutionContext, Injectable, ForbiddenException } from '@nestjs/common';
+import {
+  CanActivate,
+  ExecutionContext,
+  Injectable,
+  ForbiddenException,
+} from '@nestjs/common';
 import { Reflector } from '@nestjs/core';
 import { chuanHoaVaiTroNoiBo } from '../vai-tro';
 
@@ -19,15 +24,15 @@ export class RolesGuard implements CanActivate {
     const { user } = context.switchToHttp().getRequest();
 
     if (!user) {
-        return false;
+      return false;
     }
-    
+
     const vaiTro = chuanHoaVaiTroNoiBo(String(user.vaiTro || ''));
 
     if (requiredRoles.some((role) => role === vaiTro)) {
-        return true;
+      return true;
     }
-    
+
     throw new ForbiddenException('Bạn không có quyền thực hiện thao tác này.');
   }
 }
