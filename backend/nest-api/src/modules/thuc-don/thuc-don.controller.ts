@@ -1,4 +1,5 @@
 import {
+  BadRequestException,
   Body,
   Controller,
   Delete,
@@ -122,10 +123,16 @@ export class ThucDonController {
     }),
   )
   uploadAnhMon(@UploadedFile() tapTin?: { filename?: string }) {
+    if (!tapTin?.filename) {
+      throw new BadRequestException(
+        'Vui lòng chọn file hình ảnh trước khi upload.',
+      );
+    }
+
     return taoPhanHoi(
       {
-        url: tapTin?.filename ? `/uploads/mon-an/${tapTin.filename}` : '',
-        tenTep: tapTin?.filename || '',
+        url: `/uploads/mon-an/${tapTin.filename}`,
+        tenTep: tapTin.filename,
       },
       'Upload anh mon thanh cong',
     );

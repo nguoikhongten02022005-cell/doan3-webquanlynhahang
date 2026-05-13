@@ -3,6 +3,7 @@ import {
   Injectable,
   NotFoundException,
 } from '@nestjs/common';
+import { randomUUID } from 'crypto';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { CapNhatMonDto } from './dto/cap-nhat-mon.dto';
@@ -103,9 +104,7 @@ export class ThucDonService {
   }
 
   async taoMon(payload: TaoMonDto) {
-    const maMon = String(
-      payload.maMon || `M_${Date.now()}_${Math.floor(Math.random() * 1000)}`,
-    ).trim();
+    const maMon = String(payload.maMon || `M_${randomUUID()}`).trim();
     const maDanhMuc = await this.timMaDanhMucHopLe(payload.maDanhMuc);
     const tenMon = String(payload.tenMon || '').trim();
     const moTa =
@@ -124,23 +123,34 @@ export class ThucDonService {
       throw new BadRequestException('Mã danh mục không hợp lệ.');
     }
 
-    await this.mysql.thucThi(
-      'INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-      [
-        maMon,
-        maDanhMuc,
-        tenMon,
-        moTa,
-        Number(payload.gia || 0),
-        hinhAnh,
-        thoiGianChuanBi,
-        trangThai,
-      ],
-    );
+    try {
+      await this.mysql.thucThi(
+        'INSERT INTO ThucDon (MaMon, MaDanhMuc, TenMon, MoTa, Gia, HinhAnh, ThoiGianChuanBi, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+        [
+          maMon,
+          maDanhMuc,
+          tenMon,
+          moTa,
+          Number(payload.gia || 0),
+          hinhAnh,
+          thoiGianChuanBi,
+          trangThai,
+        ],
+      );
+    } catch (loi) {
+      if (loi instanceof Error && /Duplicate entry/i.test(loi.message)) {
+        throw new BadRequestException('Mã món đã tồn tại.');
+      }
+      throw loi;
+    }
+
     const danhSach = (await this.mysql.truyVan(
       'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
       [maMon],
     )) as ThucDonEntity[];
+    if (!danhSach[0]) {
+      throw new BadRequestException('Không thể tạo món ăn.');
+    }
 
     return taoPhanHoi(
       this.chuyenMonSangPhanHoi(danhSach[0]),
@@ -197,7 +207,7 @@ export class ThucDonService {
       throw new BadRequestException('Mã danh mục không hợp lệ.');
     }
 
-    await this.mysql.thucThi(
+    const ketQua = await this.mysql.thucThi(
       'UPDATE ThucDon SET MaDanhMuc = ?, TenMon = ?, MoTa = ?, Gia = ?, HinhAnh = ?, ThoiGianChuanBi = ?, TrangThai = ? WHERE MaMon = ?',
       [
         maDanhMuc,
@@ -211,10 +221,17 @@ export class ThucDonService {
       ],
     );
 
+    if (ketQua.affectedRows === 0) {
+      throw new NotFoundException('Không tìm thấy món ăn.');
+    }
+
     const danhSach = (await this.mysql.truyVan(
       'SELECT * FROM ThucDon WHERE MaMon = ? LIMIT 1',
       [maMon],
     )) as ThucDonEntity[];
+    if (!danhSach[0]) {
+      throw new BadRequestException('Không thể cập nhật món ăn.');
+    }
     return taoPhanHoi(
       this.chuyenMonSangPhanHoi(danhSach[0]),
       'Cập nhật món thành công',
@@ -222,10 +239,15 @@ export class ThucDonService {
   }
 
   async xoaMon(maMon: string) {
-    await this.mysql.thucThi(
+    const ketQua = await this.mysql.thucThi(
       'UPDATE ThucDon SET TrangThai = ? WHERE MaMon = ?',
       ['Deleted', maMon],
     );
+
+    if (ketQua.affectedRows === 0) {
+      throw new NotFoundException('Không tìm thấy món ăn.');
+    }
+
     return taoPhanHoi({ maMon }, 'Xóa món thành công');
   }
 }
