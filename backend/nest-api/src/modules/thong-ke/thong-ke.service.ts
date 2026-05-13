@@ -7,13 +7,10 @@ export class ThongKeService {
   constructor(private readonly mysql: MySqlService) {}
 
   async layDoanhThuNgay(tuNgay: string, denNgay: string) {
-    console.log('🔄 layDoanhThuNgay params:', { tuNgay, denNgay });
     const danhSach = await this.mysql.truyVan(
       'SELECT * FROM V_DoanhThuNgay WHERE Ngay BETWEEN ? AND ? ORDER BY Ngay ASC',
       [tuNgay, denNgay],
     );
-    console.log('✅ result count:', danhSach.length);
-    console.log('📊 result:', JSON.stringify(danhSach, null, 2));
     return taoPhanHoi(danhSach, 'Lấy doanh thu theo ngày thành công');
   }
 
@@ -59,7 +56,9 @@ export class ThongKeService {
   }
 
   async layTongQuan() {
-    const homNay = new Date().toISOString().split('T')[0];
+    const homNay = new Date().toLocaleDateString('sv-SE', {
+      timeZone: 'Asia/Ho_Chi_Minh',
+    });
 
     const [[doanhThuRow], [donRow], [banRow], [choRow]] = await Promise.all([
       this.mysql.truyVan(
