@@ -4,6 +4,7 @@ import { ThongKeService } from './thong-ke.service';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { ThongKeQueryDto } from './dto/thong-ke.query.dto';
 
 @ApiTags('thong-ke')
 @ApiBearerAuth()
@@ -15,24 +16,17 @@ export class ThongKeController {
 
   @ApiOperation({ summary: 'Lấy doanh thu theo ngày' })
   @Get('doanh-thu')
-  layDoanhThuNgay(
-    @Query('tuNgay') tuNgay: string,
-    @Query('denNgay') denNgay: string,
-  ) {
-    return this.thongKeService.layDoanhThuNgay(tuNgay, denNgay);
+  layDoanhThuNgay(@Query() query: ThongKeQueryDto) {
+    return this.thongKeService.layDoanhThuNgay(query.tuNgay!, query.denNgay!);
   }
 
   @ApiOperation({ summary: 'Lấy danh sách món bán chạy' })
   @Get('mon-ban-chay')
-  layMonBanChay(
-    @Query('limit') limit?: string,
-    @Query('tuNgay') tuNgay?: string,
-    @Query('denNgay') denNgay?: string,
-  ) {
+  layMonBanChay(@Query() query: ThongKeQueryDto) {
     return this.thongKeService.layMonBanChay(
-      Number(limit) || 10,
-      tuNgay,
-      denNgay,
+      query.limit ?? 10,
+      query.tuNgay,
+      query.denNgay,
     );
   }
 
@@ -44,11 +38,8 @@ export class ThongKeController {
 
   @ApiOperation({ summary: 'Lấy số lượng booking trong kỳ' })
   @Get('booking-count')
-  layBookingCount(
-    @Query('tuNgay') tuNgay: string,
-    @Query('denNgay') denNgay: string,
-  ) {
-    return this.thongKeService.layBookingCount(tuNgay, denNgay);
+  layBookingCount(@Query() query: ThongKeQueryDto) {
+    return this.thongKeService.layBookingCount(query.tuNgay!, query.denNgay!);
   }
 
   @ApiOperation({ summary: 'Lấy tổng quan (doanh thu, đơn, bàn, chờ)' })
@@ -59,9 +50,9 @@ export class ThongKeController {
 
   @ApiOperation({ summary: 'Lấy doanh thu theo tháng' })
   @Get('doanh-thu-thang')
-  layDoanhThuTheoThang(@Query('nam') nam: string) {
+  layDoanhThuTheoThang(@Query() query: ThongKeQueryDto) {
     return this.thongKeService.layDoanhThuTheoThang(
-      Number(nam) || new Date().getFullYear(),
+      query.nam ?? new Date().getFullYear(),
     );
   }
 }

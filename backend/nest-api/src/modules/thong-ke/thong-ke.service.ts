@@ -2,6 +2,22 @@ import { Injectable } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 
+function layNgayVN(ngay: Date) {
+  return ngay.toLocaleDateString('sv-SE', {
+    timeZone: 'Asia/Ho_Chi_Minh',
+  });
+}
+
+function layDauNgayVN(ngay: string) {
+  return `${ngay} 00:00:00`;
+}
+
+function layDauNgayTiepTheoVN(ngay: string) {
+  const [nam, thang, ngaySo] = ngay.split('-').map(Number);
+  const thoiGian = new Date(Date.UTC(nam, thang - 1, ngaySo + 1));
+  return layNgayVN(thoiGian) + ' 00:00:00';
+}
+
 @Injectable()
 export class ThongKeService {
   constructor(private readonly mysql: MySqlService) {}
@@ -19,8 +35,8 @@ export class ThongKeService {
     let dateFilter = '';
 
     if (tuNgay && denNgay) {
-      dateFilter = 'AND DATE(hd.NgayXuat) BETWEEN ? AND ?';
-      params.push(tuNgay, denNgay);
+      dateFilter = 'AND hd.NgayXuat >= ? AND hd.NgayXuat < ?';
+      params.push(layDauNgayVN(tuNgay), layDauNgayTiepTheoVN(denNgay));
     }
 
     params.push(limit);
@@ -56,22 +72,22 @@ export class ThongKeService {
   }
 
   async layTongQuan() {
-    const homNay = new Date().toLocaleDateString('sv-SE', {
-      timeZone: 'Asia/Ho_Chi_Minh',
-    });
+    const homNay = layNgayVN(new Date());
+    const homNayBatDau = layDauNgayVN(homNay);
+    const homNayKetThuc = layDauNgayTiepTheoVN(homNay);
 
     const [[doanhThuRow], [donRow], [banRow], [choRow]] = await Promise.all([
       this.mysql.truyVan(
         `SELECT COALESCE(SUM(TongTien), 0) AS tongDoanhThu
          FROM HoaDon
-         WHERE DATE(NgayXuat) = ?`,
-        [homNay],
+         WHERE NgayXuat >= ? AND NgayXuat < ?`,
+        [homNayBatDau, homNayKetThuc],
       ),
       this.mysql.truyVan(
         `SELECT COUNT(*) AS tongDon
          FROM HoaDon
-         WHERE DATE(NgayXuat) = ?`,
-        [homNay],
+         WHERE NgayXuat >= ? AND NgayXuat < ?`,
+        [homNayBatDau, homNayKetThuc],
       ),
       this.mysql.truyVan(
         `SELECT COUNT(*) AS soBanBan
@@ -113,10 +129,10 @@ export class ThongKeService {
       `
       SELECT COUNT(*) AS tongBooking
       FROM DatBan
-      WHERE NgayDat BETWEEN ? AND ?
+      WHERE NgayDat >= ? AND NgayDat < ?
       AND TrangThai NOT IN ('Cancelled', 'NoShow')
     `,
-      [tuNgay, denNgay],
+      [layDauNgayVN(tuNgay), layDauNgayTiepTheoVN(denNgay)],
     );
 
     return taoPhanHoi(result[0], 'Lấy số booking thành công');
