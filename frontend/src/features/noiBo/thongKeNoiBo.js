@@ -41,8 +41,28 @@ const phanTichGiaTriNgay = (giaTri) => {
   return Number.isNaN(ngayDaPhanTich.getTime()) ? null : ngayDaPhanTich
 }
 
+export const CAC_TRANG_THAI_DAT_BAN_DANG_MO = new Set([
+  'CHO_XAC_NHAN',
+  'DA_XAC_NHAN',
+  'DA_GAN_BAN',
+  'KHACH_SAP_DEN',
+  'DA_CHECK_IN',
+  'DA_XEP_BAN',
+  'DA_GHI_NHAN',
+])
+
+export const laDatBanSapGanBan = (datBan, hienTai = new Date()) => {
+  if (!CAC_TRANG_THAI_DAT_BAN_DANG_MO.has(datBan?.status)) return false
+  if (Array.isArray(datBan?.danhSachMaBanDaGan) && datBan.danhSachMaBanDaGan.length > 0) return false
+
+  const thoiDiemDatBan = new Date(`${datBan?.date || ''}T${datBan?.time || '00:00:00'}`)
+  if (Number.isNaN(thoiDiemDatBan.getTime())) return false
+
+  const chenhlech = thoiDiemDatBan.getTime() - hienTai.getTime()
+  return chenhlech >= 0 && chenhlech <= 2 * 60 * 60 * 1000
+}
+
 const laDatBanDaHuy = (datBan) => ['DA_HUY', 'Cancelled', 'KHONG_DEN', 'NoShow'].includes(datBan?.status)
-const laDatBanHoanThanh = (datBan) => ['DA_HOAN_THANH', 'DA_CHECK_IN', 'Completed', 'CheckedIn'].includes(datBan?.status)
 const laDonHangHoanThanh = (donHang) => ['Paid', 'DA_HOAN_THANH', 'Completed', 'Served'].includes(donHang?.status)
 
 const locDonHangTheoKhoangThoiGian = (danhSachDonHang, khoangThoiGian) => {
@@ -99,6 +119,14 @@ const locDatBanTheoKhoangThoiGian = (danhSachDatBan, khoangThoiGian) => {
 
     return false
   })
+}
+
+export const taoChuoiDoanhThu7Ngay = (danhSachDoanhThu = []) => {
+  return (Array.isArray(danhSachDoanhThu) ? danhSachDoanhThu : []).map((muc) => ({
+    label: muc?.Ngay ? new Date(muc.Ngay).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : '--',
+    revenue: Number(muc?.DoanhThu || 0),
+    completedOrders: Number(muc?.SoHoaDon || 0),
+  }))
 }
 
 const taoChuoiDoanhThu = (danhSachDonHang = []) => {

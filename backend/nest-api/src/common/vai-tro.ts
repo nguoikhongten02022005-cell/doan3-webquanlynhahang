@@ -1,5 +1,7 @@
 export const chuanHoaVaiTroNoiBo = (vaiTro: string) => {
-  if (vaiTro === 'Admin') return 'Admin';
-  if (vaiTro === 'NhanVien') return 'NhanVien';
+  const giaTri = String(vaiTro || '').trim().toLowerCase();
+
+  if (giaTri === 'admin' || giaTri === 'quantri' || giaTri === 'quan tri') return 'Admin';
+  if (giaTri === 'nhanvien' || giaTri === 'nhan vien' || giaTri === 'staff') return 'NhanVien';
   return 'KhachHang';
 };

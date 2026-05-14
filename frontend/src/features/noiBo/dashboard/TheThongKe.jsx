@@ -6,9 +6,9 @@ const dinhDangSoNguyen = (value) => (Number(value) || 0).toLocaleString('vi-VN')
 function TheThongKe({ stats, loading = false }) {
   const danhSachTheThongKe = [
     {
-      key: 'today-revenue',
-      title: 'Doanh thu hôm nay',
-      value: stats?.todayRevenue || 0,
+      key: 'week-revenue',
+      title: 'Doanh thu 7 ngày',
+      value: stats?.weekRevenue || 0,
       tone: 'revenue',
       formatter: (value) => dinhDangTienTe(Number(value) || 0),
     },

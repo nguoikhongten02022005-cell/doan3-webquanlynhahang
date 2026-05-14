@@ -1,7 +1,8 @@
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import { layJsonLuuTru, xoaMucLuuTru, datJsonLuuTru } from './dichVuLuuTru'
 
-let maXacThucTrongBoNho = ''
+let maXacThucTrongBoNho = layJsonLuuTru(STORAGE_KEYS.MA_XAC_THUC, '') || ''
+let refreshTokenTrongBoNho = layJsonLuuTru(STORAGE_KEYS.REFRESH_TOKEN, '') || ''
 
 export const SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC = 'auth:user-changed'
 export const VAI_TRO_XAC_THUC = Object.freeze({
@@ -11,11 +12,9 @@ export const VAI_TRO_XAC_THUC = Object.freeze({
 })
 
 const phatSuKienThayDoiNguoiDung = () => {
-  if (typeof window === 'undefined') {
-    return
+  if (typeof window !== 'undefined') {
+    window.dispatchEvent(new CustomEvent(SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC))
   }
-
-  window.dispatchEvent(new CustomEvent(SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC))
 }
 
 const chuanHoaVaiTro = (vaiTro) => {
@@ -28,9 +27,7 @@ const chuanHoaVaiTro = (vaiTro) => {
 }
 
 const chuanHoaNguoiDung = (nguoiDung) => {
-  if (!nguoiDung || typeof nguoiDung !== 'object') {
-    return null
-  }
+  if (!nguoiDung || typeof nguoiDung !== 'object') return null
 
   return {
     ...nguoiDung,
@@ -45,34 +42,27 @@ const chuanHoaNguoiDung = (nguoiDung) => {
 }
 
 const chuanHoaNguoiDungHienTai = (nguoiDung) => {
-  const nguoiDungDaChuanHoa = chuanHoaNguoiDung(nguoiDung)
-
-  if (!nguoiDungDaChuanHoa) {
-    return null
-  }
+  const daChuanHoa = chuanHoaNguoiDung(nguoiDung)
+  if (!daChuanHoa) return null
 
   return {
-    fullName: nguoiDungDaChuanHoa.fullName,
-    id: nguoiDungDaChuanHoa.id ?? nguoiDungDaChuanHoa.maND ?? null,
-    maND: nguoiDungDaChuanHoa.maND ?? '',
-    maKH: nguoiDungDaChuanHoa.maKH ?? '',
-    username: nguoiDungDaChuanHoa.username,
-    email: nguoiDungDaChuanHoa.email,
-    phone: nguoiDungDaChuanHoa.phone,
-    role: nguoiDungDaChuanHoa.role,
+    fullName: daChuanHoa.fullName,
+    id: daChuanHoa.id ?? daChuanHoa.maND ?? null,
+    maND: daChuanHoa.maND ?? '',
+    maKH: daChuanHoa.maKH ?? '',
+    username: daChuanHoa.username,
+    email: daChuanHoa.email,
+    phone: daChuanHoa.phone,
+    role: daChuanHoa.role,
   }
 }
 
 export const layNguoiDungHienTai = () => chuanHoaNguoiDungHienTai(layJsonLuuTru(STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI, null))
 
 export const luuNguoiDungHienTai = (nguoiDung) => {
-  const nguoiDungHienTai = chuanHoaNguoiDungHienTai(nguoiDung)
-
-  if (!nguoiDungHienTai) {
-    return
-  }
-
-  datJsonLuuTru(STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI, nguoiDungHienTai)
+  const hienTai = chuanHoaNguoiDungHienTai(nguoiDung)
+  if (!hienTai) return
+  datJsonLuuTru(STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI, hienTai)
   phatSuKienThayDoiNguoiDung()
 }
 
@@ -81,19 +71,44 @@ export const xoaNguoiDungHienTai = () => {
   phatSuKienThayDoiNguoiDung()
 }
 
-export const layMaXacThuc = () => maXacThucTrongBoNho
+export const layMaXacThuc = () => maXacThucTrongBoNho || layJsonLuuTru(STORAGE_KEYS.MA_XAC_THUC, '') || ''
+export const layRefreshToken = () => refreshTokenTrongBoNho || layJsonLuuTru(STORAGE_KEYS.REFRESH_TOKEN, '') || ''
 
 export const luuMaXacThuc = (token) => {
   if (!token || typeof token !== 'string') {
     maXacThucTrongBoNho = ''
+    xoaMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
     return
   }
 
   maXacThucTrongBoNho = token.trim()
+  datJsonLuuTru(STORAGE_KEYS.MA_XAC_THUC, maXacThucTrongBoNho)
+}
+
+export const luuRefreshToken = (token) => {
+  if (!token || typeof token !== 'string') {
+    refreshTokenTrongBoNho = ''
+    xoaMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
+    return
+  }
+
+  refreshTokenTrongBoNho = token.trim()
+  datJsonLuuTru(STORAGE_KEYS.REFRESH_TOKEN, refreshTokenTrongBoNho)
 }
 
 export const xoaMaXacThuc = () => {
   maXacThucTrongBoNho = ''
+  xoaMucLuuTru(STORAGE_KEYS.MA_XAC_THUC)
+}
+
+export const xoaRefreshToken = () => {
+  refreshTokenTrongBoNho = ''
+  xoaMucLuuTru(STORAGE_KEYS.REFRESH_TOKEN)
+}
+
+export const luuXacThuc = (accessToken, refreshToken) => {
+  luuMaXacThuc(accessToken)
+  luuRefreshToken(refreshToken)
 }
 
 export const luuPhienXacThuc = ({ user, accessToken, refreshToken }) => {
@@ -105,10 +120,4 @@ export const xoaPhienXacThuc = () => {
   xoaMaXacThuc()
   xoaRefreshToken()
   xoaNguoiDungHienTai()
-}
-
-export const xoaRefreshToken = () => {}
-
-export const luuXacThuc = (accessToken) => {
-  luuMaXacThuc(accessToken)
 }

@@ -37,6 +37,14 @@ class PhanTrangKhachHangQueryDto {
   @IsNumber()
   @Min(1)
   soLuong?: number;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  sapXep?: string;
+
+  @IsOptional()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  thuTu?: string;
 }
 
 class CapNhatDiemKhachHangDto {

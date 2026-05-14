@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { useDanhSachMonAn } from '../thucDon/hooks/useDanhSachMonAn'
 import { SU_KIEN_THAY_DOI_DU_LIEU_DAT_BAN, useDatBan } from '../datBan/hooks/useDatBan'
 import { useXacThuc } from '../../hooks/useXacThuc'
@@ -6,8 +6,12 @@ import { layDanhSachNguoiDungApi, taoNguoiDungNoiBoApi, capNhatNguoiDungNoiBoApi
 import { layDanhSachDanhGiaApi, duyetDanhGiaApi } from '../../services/api/apiDanhGia'
 import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
+import { layDanhSachDatBanApi } from '../../services/api/apiDatBan'
+import { trinhKhachApi } from '../../services/trinhKhachApi'
 import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN } from './hangSo'
+import { CAC_TRANG_THAI_DAT_BAN_DANG_MO } from './thongKeNoiBo'
+const TRANG_THAI_LICH_SU = new Set(['DA_HUY', 'CANCELLED', 'KHONG_DEN', 'NO_SHOW', 'NoShow', 'Completed', 'DA_HOAN_THANH'])
 import {
   layTomTatTaiKhoan,
   layTomTatDonHang,
@@ -67,6 +71,7 @@ export const useDuLieuBangDieuKhien = () => {
   const [dangTaiDuLieu, setDangTaiDuLieu] = useState(false)
   const [daTaiDuLieuLanDau, setDaTaiDuLieuLanDau] = useState(false)
   const [loiTaiDuLieu, setLoiTaiDuLieu] = useState('')
+  const daKhoiTaoLanDauRef = useRef(false)
 
   const taiLaiDuLieu = useCallback(async () => {
     try {
@@ -74,7 +79,7 @@ export const useDuLieuBangDieuKhien = () => {
       setLoiTaiDuLieu('')
 
       const [ketQuaDatBan, ketQuaDonHang, ketQuaTaiKhoan, ketQuaBan, ketQuaDanhGia] = await Promise.allSettled([
-        layDanhSachDatBanHost(),
+        layDanhSachDatBanApi(),
         layDanhSachDonHangApi(),
         laQuanLy ? layDanhSachNguoiDungApi() : Promise.resolve({ duLieu: [] }),
         layDanhSachBanApi(),
@@ -118,6 +123,11 @@ export const useDuLieuBangDieuKhien = () => {
   }, [laQuanLy, layDanhSachDatBanHost])
 
   useEffect(() => {
+    if (daKhoiTaoLanDauRef.current) {
+      return undefined
+    }
+    daKhoiTaoLanDauRef.current = true
+
     taiLaiDuLieu()
 
     const xuLyLuuTru = () => {
@@ -134,11 +144,15 @@ export const useDuLieuBangDieuKhien = () => {
   }, [taiLaiDuLieu])
 
   const hangDoiDatBan = useMemo(
-    () => sapXepDatBanChoVanHanh(danhSachDatBan, new Date()),
+    () => sapXepDatBanChoVanHanh(danhSachDatBan.filter((booking) => !TRANG_THAI_LICH_SU.has(String(booking.status || '').toUpperCase())), new Date()),
     [danhSachDatBan],
   )
   const danhSachDatBanDangHoatDong = useMemo(
     () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(booking.status)),
+    [hangDoiDatBan],
+  )
+  const danhSachDatBanDangMo = useMemo(
+    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_MO.has(booking.status)),
     [hangDoiDatBan],
   )
   const danhSachDatBanDaXacNhan = useMemo(
@@ -270,6 +284,7 @@ export const useDuLieuBangDieuKhien = () => {
   return {
     tomTatTaiKhoan,
     danhSachDatBanDangHoatDong,
+    danhSachDatBanDangMo,
     hangDoiDatBan,
     soLuongDatBanDaCheckIn,
     danhSachDatBanDaXacNhan,

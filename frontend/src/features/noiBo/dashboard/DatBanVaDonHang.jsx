@@ -103,7 +103,7 @@ function DatBanVaDonHang({ bookings, orders, loading = false }) {
         <div className="noi-bo-dashboard-list-item">
           <Typography.Text strong>{order.orderCode || order.id} · {order.customer?.fullName || 'Khách lẻ'}</Typography.Text>
           <div className="noi-bo-dashboard-list-meta">
-            <span><InboxOutlined /> {order.customer?.phone || 'Phục vụ tại bàn'}</span>
+            <span><InboxOutlined /> {order.tableNumber ? `Bàn ${order.tableNumber}` : 'Chưa gán bàn'}</span>
           </div>
         </div>
       ),

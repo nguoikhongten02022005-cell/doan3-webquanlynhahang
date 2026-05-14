@@ -56,11 +56,13 @@ const dinhDangTienRutGon = (value) => {
 }
 
 function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần nhất', loading = false }) {
-  const fullSeries = useMemo(() => {
-    if (!dateRange?.tuNgay || !dateRange?.denNgay) return [];
+  const khoangThoiGian = dateRange || revenue?.dateRange
 
-    const start = new Date(dateRange.tuNgay);
-    const end = new Date(dateRange.denNgay);
+  const fullSeries = useMemo(() => {
+    if (!khoangThoiGian?.tuNgay || !khoangThoiGian?.denNgay) return []
+
+    const start = new Date(khoangThoiGian.tuNgay)
+    const end = new Date(khoangThoiGian.denNgay)
     const series = [];
 
     for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
@@ -70,7 +72,7 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
     }
 
     return series;
-  }, [dateRange]);
+  }, [khoangThoiGian]);
 
   const duLieuCot = useMemo(() => {
     if (!Array.isArray(revenue?.series)) return fullSeries;
@@ -98,10 +100,16 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
   )
   const doanhThuTrungBinh = soCotCoDoanhThu > 0 ? Math.round(tongDoanhThu / soCotCoDoanhThu) : 0
   const doanhThuCaoNhat = mucDoanhThuCaoNhat.revenue
-  const coDuLieuBieuDo = duLieuCot.length > 0 && doanhThuCaoNhat > 0
+  const coDuLieuBieuDo = duLieuCot.length > 0
   const nenHienLabelCot = soCotCoDoanhThu > 0 && soCotCoDoanhThu <= 4
+  const lamTronMocTrucY = (giaTri) => {
+    if (giaTri <= 0) return 1
+    const buoc = giaTri < 1000000 ? 100000 : 500000
+    return Math.ceil(giaTri / buoc) * buoc
+  }
+
   const gioiHanTrucY = doanhThuCaoNhat > 0
-    ? Math.max(doanhThuCaoNhat * (nenHienLabelCot ? 1.28 : 1.15), doanhThuCaoNhat + 1)
+    ? lamTronMocTrucY(doanhThuCaoNhat * 1.15)
     : 1
 
   const extra = (
@@ -136,26 +144,49 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
     xField: 'label',
     yField: 'revenue',
     color: ({ revenue: doanhThuNgay }) => (Number(doanhThuNgay) > 0 ? '#E8664A' : '#E9D8CF'),
-    columnWidthRatio: soCotCoDoanhThu <= 1 ? 0.28 : 0.5,
-    marginTop: nenHienLabelCot ? 40 : 30,
-    paddingRight: 10,
-    label: nenHienLabelCot
-      ? {
-          position: 'top',
-          text: (datum) => (Number(datum.revenue) > 0 ? dinhDangTienRutGon(datum.revenue) : ''),
-          dy: -4,
-          style: {
-            fill: '#57534E',
-            fontSize: 11,
-            fontWeight: 700,
-            textAlign: 'center',
-          },
-        }
-      : false,
+    columnWidthRatio: soCotCoDoanhThu <= 1 ? 0.36 : 0.6,
+    marginTop: 20,
+    paddingRight: 12,
+    label: {
+      position: 'top',
+      text: (datum) => (Number(datum.revenue) > 0 ? dinhDangTienRutGon(datum.revenue) : ''),
+      dy: -10,
+      style: {
+        fill: '#44403C',
+        fontSize: 12,
+        fontWeight: 700,
+        textAlign: 'center',
+        lineWidth: 2,
+        stroke: '#FFFFFF',
+      },
+    },
+    state: {
+      active: { style: { fill: '#D84F33' } },
+    },
+    interaction: {
+      tooltip: {
+        style: {
+          backgroundColor: '#FFFFFF',
+          border: '1px solid #E7E5E4',
+          boxShadow: '0 8px 24px rgba(0, 0, 0, 0.12)',
+          borderRadius: 12,
+        },
+      },
+    },
+    theme: {
+      axis: {
+        labelFill: '#57534E',
+        labelFontSize: 12,
+        lineLineWidth: 1,
+        lineStroke: '#D6D3D1',
+        gridLineDash: [4, 4],
+        gridStroke: '#E7E5E4',
+      },
+    },
     axis: {
       x: {
         labelFontSize: 12,
-        labelFill: '#78716C',
+        labelFill: '#57534E',
         line: false,
         tick: false,
         transform: [
@@ -168,8 +199,8 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
       },
       y: {
         labelFormatter: (value) => dinhDangTienRutGon(Number(value)),
-        labelFontSize: 12,
-        labelFill: '#78716C',
+        labelFontSize: 13,
+        labelFill: '#57534E',
         tickCount: 4,
         grid: true,
       },
@@ -188,7 +219,11 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
           name: 'Doanh thu',
           value: dinhDangTienTe(datum.revenue),
         }),
-      ],
+        (datum) => (datum.completedOrders !== undefined ? {
+          name: 'Số đơn',
+          value: Number(datum.completedOrders) || 0,
+        } : null),
+      ].filter(Boolean),
     },
     style: {
       radiusTopLeft: 12,
@@ -199,7 +234,7 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
 
   return (
     <Card className="noi-bo-dashboard-card noi-bo-dashboard-chart-card" title={title} extra={extra} styles={{ body: { padding: '16px 16px 14px' } }}>
-      <Column {...cauHinhBieuDo} height={220} />
+      <Column {...cauHinhBieuDo} height={290} />
       <div className="noi-bo-dashboard-chart-card__footer">
         <div className="noi-bo-dashboard-chart-card__metric">
           <span>Ngày cao nhất</span>

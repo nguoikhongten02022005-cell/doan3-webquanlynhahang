@@ -1,19 +1,33 @@
 import { useMemo } from 'react'
 import { useQuery } from '@tanstack/react-query'
+import { CAC_TRANG_THAI_DAT_BAN_DANG_MO, laDatBanSapGanBan } from './thongKeNoiBo'
 
 const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
+  const coDuLieuDoanhThu = Array.isArray(duLieuNoiBo.doanhThu7Ngay) && duLieuNoiBo.doanhThu7Ngay.length > 0
+  const tuNgayMacDinh = duLieuNoiBo.dateRange?.tuNgay || (() => {
+    const homNay = new Date()
+    homNay.setDate(homNay.getDate() - 6)
+    return homNay.toISOString().split('T')[0]
+  })()
+  const denNgayMacDinh = duLieuNoiBo.dateRange?.denNgay || new Date().toISOString().split('T')[0]
+
   return {
     stats: {
-      todayRevenue: duLieuNoiBo.tongQuan?.tongDoanhThu || 0,
-      openBookings: duLieuNoiBo.hangDoiDatBan?.length || 0,
-      servingTables: duLieuNoiBo.tomTatTonKhoBan?.occupied || 0,
+      todayRevenue: Number(duLieuNoiBo.tongQuan?.tongDoanhThu) || 0,
+      weekRevenue: (Array.isArray(duLieuNoiBo.doanhThu7Ngay) ? duLieuNoiBo.doanhThu7Ngay : []).reduce((tong, muc) => tong + (Number(muc?.revenue) || 0), 0),
+      openBookings: (duLieuNoiBo.hangDoiDatBan || []).filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_MO.has(booking.status)).length,
+      servingTables: Number(duLieuNoiBo.tongQuan?.soBanBan) || duLieuNoiBo.tomTatTonKhoBan?.occupied || 0,
     },
     revenue: {
       summary: {
         ...(duLieuNoiBo.tongQuan || {}),
         revenue: Number(duLieuNoiBo.tongQuan?.tongDoanhThu) || 0,
       },
-      series: duLieuNoiBo.doanhThu7Ngay || [],
+      series: coDuLieuDoanhThu ? duLieuNoiBo.doanhThu7Ngay : [],
+      dateRange: {
+        tuNgay: tuNgayMacDinh,
+        denNgay: denNgayMacDinh,
+      },
     },
     urgentTasks: [
       {
@@ -25,7 +39,7 @@ const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
       {
         key: 'unassigned-bookings',
         title: 'Chưa gán bàn',
-        value: duLieuNoiBo.danhSachDatBanChuaGanBan?.length || 0,
+        value: (duLieuNoiBo.danhSachDatBanChuaGanBan || []).filter((booking) => laDatBanSapGanBan(booking)).length,
         tone: 'danger',
       },
       {
@@ -46,7 +60,7 @@ const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
     tablePressure: (duLieuNoiBo.tomTatBan || []).map((khuVuc) => ({
       ...khuVuc,
       percent: Math.round((khuVuc.occupancyRate || 0) * 100),
-      busyTables: khuVuc.occupied + khuVuc.held + khuVuc.dirty,
+      busyTables: Number(khuVuc.occupied) + Number(khuVuc.held) + Number(khuVuc.dirty),
     })),
   }
 }

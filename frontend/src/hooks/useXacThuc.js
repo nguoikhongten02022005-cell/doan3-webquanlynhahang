@@ -1,4 +1,4 @@
-import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useState } from 'react'
+import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
 import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import {
   layThongTinToiApi,
@@ -64,8 +64,14 @@ const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai }
 function useXacThucState() {
   const [nguoiDungHienTai, setNguoiDungHienTai] = useState(layNguoiDungTheoPhien)
   const [dangKhoiTaoXacThuc, setIsAuthBootstrapping] = useState(coCanKhoiTaoXacThuc)
+  const daKhoiTaoXacThucRef = useRef(false)
 
   useEffect(() => {
+    if (daKhoiTaoXacThucRef.current) {
+      return undefined
+    }
+    daKhoiTaoXacThucRef.current = true
+
     if (typeof window !== 'undefined') {
       const duongDanHienTai = window.location.pathname || '/'
       const laKhuVucCongKhai = duongDanHienTai === '/' || duongDanHienTai === '/thuc-don' || duongDanHienTai === '/gioi-thieu'
@@ -90,6 +96,12 @@ function useXacThucState() {
         return
       }
 
+      if (!layNguoiDungTheoPhien()?.maND) {
+        xoaPhienXacThuc()
+        setNguoiDungHienTai(null)
+        setIsAuthBootstrapping(false)
+        return
+      }
 
       try {
         const { duLieu } = await layThongTinToiApi()

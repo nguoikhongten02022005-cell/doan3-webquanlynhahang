@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS KhachHang (
     TenKH       VARCHAR(100) NOT NULL,
     SDT         VARCHAR(20) UNIQUE,
     DiaChi      VARCHAR(255),
-    DiemTichLuy INT NOT NULL DEFAULT 0,
+    ĐiểmTíchLũy INT NOT NULL DEFAULT 0,
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_KhachHang_NguoiDung
         FOREIGN KEY (MaND) REFERENCES NguoiDung(MaND) ON DELETE SET NULL
@@ -112,14 +112,14 @@ CREATE TABLE IF NOT EXISTS MaGiamGia (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 9. DAT BAN
+-- 9. ĐẶT BÀN
 -- ============================================================
 CREATE TABLE IF NOT EXISTS DatBan (
     MaDatBan       VARCHAR(50) PRIMARY KEY,
     MaKH           VARCHAR(50),
     MaBan          VARCHAR(50),
     MaNV           VARCHAR(50),
-    TenKhachDatBan VARCHAR(100),
+    TenKháchDatBan VARCHAR(100),
     SDTDatBan      VARCHAR(20),
     EmailDatBan    VARCHAR(100),
     NgayDat        DATE NOT NULL,
@@ -132,16 +132,16 @@ CREATE TABLE IF NOT EXISTS DatBan (
     TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT FK_DatBan_KhachHang
-        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_DatBan_KháchHang
+        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE SET NULL,
     CONSTRAINT FK_DatBan_Ban
         FOREIGN KEY (MaBan) REFERENCES Ban(MaBan) ON DELETE SET NULL,
-    CONSTRAINT FK_DatBan_NhanVien
-        FOREIGN KEY (MaNV) REFERENCES NhanVien(MaNV) ON DELETE SET NULL
+    CONSTRAINT FK_DatBan_NhânViên
+        FOREIGN KEY (MaNV) REFERENCES NhânViên(MaNV) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 10. DON HANG
+-- 10. ĐƠN HÀNG
 -- ============================================================
 CREATE TABLE IF NOT EXISTS DonHang (
     MaDonHang   VARCHAR(50) PRIMARY KEY,
@@ -160,18 +160,18 @@ CREATE TABLE IF NOT EXISTS DonHang (
     GhiChu      VARCHAR(500),
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT FK_DonHang_KhachHang
-        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_DonHang_KháchHang
+        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE SET NULL,
     CONSTRAINT FK_DonHang_Ban
         FOREIGN KEY (MaBan) REFERENCES Ban(MaBan) ON DELETE SET NULL,
-    CONSTRAINT FK_DonHang_NhanVien
-        FOREIGN KEY (MaNV) REFERENCES NhanVien(MaNV) ON DELETE SET NULL,
+    CONSTRAINT FK_DonHang_NhânViên
+        FOREIGN KEY (MaNV) REFERENCES NhânViên(MaNV) ON DELETE SET NULL,
     CONSTRAINT FK_DonHang_DatBan
         FOREIGN KEY (MaDatBan) REFERENCES DatBan(MaDatBan) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 11. CHI TIET DON HANG
+-- 11. CHI TIẾT ĐƠN HÀNG
 -- ============================================================
 CREATE TABLE IF NOT EXISTS ChiTietDonHang (
     MaChiTiet   VARCHAR(50) PRIMARY KEY,
@@ -190,7 +190,7 @@ CREATE TABLE IF NOT EXISTS ChiTietDonHang (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 12. HOA DON
+-- 12. HÓA ĐƠN
 -- ============================================================
 CREATE TABLE IF NOT EXISTS HoaDon (
     MaHoaDon    VARCHAR(50) PRIMARY KEY,
@@ -206,14 +206,14 @@ CREATE TABLE IF NOT EXISTS HoaDon (
     NgayXuat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_HoaDon_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE CASCADE,
-    CONSTRAINT FK_HoaDon_KhachHang
-        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_HoaDon_KháchHang
+        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE SET NULL,
     CONSTRAINT FK_HoaDon_MaGiamGia
         FOREIGN KEY (MaCode) REFERENCES MaGiamGia(MaCode) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 13. THANH TOAN
+-- 13. THANH TOÁN
 -- ============================================================
 CREATE TABLE IF NOT EXISTS ThanhToan (
     MaThanhToan VARCHAR(50) PRIMARY KEY,
@@ -228,7 +228,7 @@ CREATE TABLE IF NOT EXISTS ThanhToan (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 14. DANH GIA
+-- 14. ĐÁNH GIÁ
 -- ============================================================
 CREATE TABLE IF NOT EXISTS DanhGia (
     MaDanhGia    VARCHAR(50) PRIMARY KEY,
@@ -242,15 +242,15 @@ CREATE TABLE IF NOT EXISTS DanhGia (
     NgayDanhGia  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat  DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     TrangThai    ENUM('Pending','Approved','Rejected') NOT NULL DEFAULT 'Pending',
-    CONSTRAINT FK_DanhGia_KhachHang
-        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE CASCADE,
+    CONSTRAINT FK_DanhGia_KháchHang
+        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE CASCADE,
     CONSTRAINT FK_DanhGia_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE CASCADE,
     CONSTRAINT UQ_DanhGia_MaKH_MaDonHang UNIQUE (MaKH, MaDonHang)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 15. LICH SU DON HANG
+-- 15. LỊCH SỬ ĐƠN HÀNG
 -- ============================================================
 CREATE TABLE IF NOT EXISTS LichSuDonHang (
     MaLichSu      VARCHAR(50) PRIMARY KEY,
@@ -267,7 +267,7 @@ CREATE TABLE IF NOT EXISTS LichSuDonHang (
 -- ============================================================
 -- 16. LICH SU DIEM TICH LUY
 -- ============================================================
-CREATE TABLE IF NOT EXISTS LichSuDiemTichLuy (
+CREATE TABLE IF NOT EXISTS LichSuĐiểmTíchLũy (
     MaGiaoDichDiem VARCHAR(50) PRIMARY KEY,
     MaKH           VARCHAR(50) NOT NULL,
     MaDonHang      VARCHAR(50),
@@ -277,14 +277,14 @@ CREATE TABLE IF NOT EXISTS LichSuDiemTichLuy (
     SoDiemSau      INT NOT NULL DEFAULT 0,
     MoTa           VARCHAR(255),
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT FK_LichSuDiemTichLuy_KhachHang
-        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE CASCADE,
-    CONSTRAINT FK_LichSuDiemTichLuy_DonHang
+    CONSTRAINT FK_LichSuĐiểmTíchLũy_KháchHang
+        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE CASCADE,
+    CONSTRAINT FK_LichSuĐiểmTíchLũy_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
--- 17. THONG BAO
+-- 17. THÔNG BÁO
 -- ============================================================
 CREATE TABLE IF NOT EXISTS ThongBao (
     MaThongBao   VARCHAR(50) PRIMARY KEY,
@@ -318,9 +318,9 @@ CREATE INDEX IDX_ThanhToan_HoaDon ON ThanhToan(MaHoaDon);
 CREATE INDEX IDX_ThanhToan_TrangThai ON ThanhToan(TrangThai);
 CREATE INDEX IDX_DanhGia_TrangThai ON DanhGia(TrangThai);
 CREATE INDEX IDX_LichSu_DonHang ON LichSuDonHang(MaDonHang);
-CREATE INDEX IDX_LichSuDiemTichLuy_MaKH ON LichSuDiemTichLuy(MaKH);
-CREATE INDEX IDX_LichSuDiemTichLuy_NgayTao ON LichSuDiemTichLuy(NgayTao);
-CREATE INDEX IDX_LichSuDiemTichLuy_Loai ON LichSuDiemTichLuy(LoaiBienDong);
+CREATE INDEX IDX_LichSuĐiểmTíchLũy_MaKH ON LichSuĐiểmTíchLũy(MaKH);
+CREATE INDEX IDX_LichSuĐiểmTíchLũy_NgayTao ON LichSuĐiểmTíchLũy(NgayTao);
+CREATE INDEX IDX_LichSuĐiểmTíchLũy_Loai ON LichSuĐiểmTíchLũy(LoaiBienDong);
 CREATE INDEX IDX_HoaDon_NgayXuat ON HoaDon(NgayXuat);
 CREATE INDEX IDX_Ban_KhuVuc_SoChoNgoi ON Ban(KhuVuc, SoChoNgoi);
 CREATE INDEX IDX_ThongBao_MaND ON ThongBao(MaND);
@@ -331,9 +331,9 @@ SET FOREIGN_KEY_CHECKS = 1;
 -- ============================================================
 -- VIEWS
 -- ============================================================
--- Luu y: view nay tinh doanh thu theo HoaDon va chi loc ThanhToan = 'Success'.
--- Neu 1 hoa don co nhieu ThanhToan thanh cong, so lieu co the bi dem trung.
--- Schema hien tai khong ep UNIQUE(MaHoaDon) trong ThanhToan, nen day la canh bao khi doc KPI.
+-- Lưu ý: view nay tinh doanh thu theo HoaDon va chỉ lọc ThanhToan = 'Success'.
+-- Nếu 1 hóa đơn có nhiều ThanhToan thành công, số liệu có thể bị đếm trùng.
+-- Schema hien tai không ep UNIQUE(MaHoaDon) trong ThanhToan, nen day la canh bao khi doc KPI.
 CREATE OR REPLACE VIEW V_DoanhThuNgay AS
 SELECT
     DATE(hd.NgayXuat) AS Ngay,
@@ -347,8 +347,8 @@ JOIN ThanhToan tt
    AND tt.TrangThai = 'Success'
 GROUP BY DATE(hd.NgayXuat);
 
--- Luu y: view nay dem mon ban chay theo don hang khong bi Cancelled.
--- Day khong phai KPI doanh thu chi tai cac don da Paid/Completed; chi la tong hop luot mua mon cho don con hieu luc.
+-- Lưu ý: view này đếm món bán chạy theo đơn hàng không bị Cancelled.
+-- Day không phai KPI doanh thu chi tai cac don da Paid/Completed; chi la tong hop luot mua mon cho don con hieu luc.
 CREATE OR REPLACE VIEW V_MonBanChay AS
 SELECT
     td.MaMon,

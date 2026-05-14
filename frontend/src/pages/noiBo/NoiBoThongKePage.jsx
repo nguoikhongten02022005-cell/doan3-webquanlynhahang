@@ -3,6 +3,25 @@ import { Card, Col, Empty, Row, Segmented, Space, Statistic, Table } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import BieuDoDoanhThu from '../../features/noiBo/dashboard/BieuDoDoanhThu'
 import { NOI_BO_THONG_KE_KHOANG_THOI_GIAN } from '../../features/noiBo/thongKeNoiBo'
+
+const taoKhoangThoiGian7Ngay = () => {
+  const homNay = new Date()
+  const pad = (n) => String(n).padStart(2, '0')
+  const formatNgay = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+
+  const denNgay = formatNgay(homNay)
+  const tuNgay = new Date(homNay)
+  tuNgay.setDate(tuNgay.getDate() - 6)
+
+  return { tuNgay: formatNgay(tuNgay), denNgay }
+}
+
+const dinhDangNgayBaoCao = (giaTri) => {
+  if (!giaTri) return '--'
+  const date = new Date(giaTri)
+  if (Number.isNaN(date.getTime())) return '--'
+  return `${String(date.getDate()).padStart(2, '0')}/${String(date.getMonth() + 1).padStart(2, '0')}`
+}
 import { dinhDangTienTe } from '../../utils/tienTe'
 import { layDoanhThuNgayApi, layMonBanChayApi, layBookingCountApi } from '../../services/api/apiThongKe'
 
@@ -99,8 +118,8 @@ function NoiBoThongKePage() {
   const topDishColumns = [
     { title: 'STT', dataIndex: 'rank', key: 'rank', width: 70 },
     { title: 'Tên món', dataIndex: 'name', key: 'name' },
-    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', width: 110 },
-    { title: 'Doanh thu', dataIndex: 'revenue', key: 'revenue', width: 160, render: (value) => dinhDangTienTe(value) },
+    { title: 'Số lượng', dataIndex: 'quantity', key: 'quantity', width: 110, align: 'right' },
+    { title: 'Doanh thu', dataIndex: 'revenue', key: 'revenue', width: 160, align: 'right', render: (value) => dinhDangTienTe(value) },
   ]
 
   return (

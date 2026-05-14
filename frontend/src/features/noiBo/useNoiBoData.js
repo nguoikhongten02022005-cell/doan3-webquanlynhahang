@@ -3,27 +3,24 @@ import { useQuery } from '@tanstack/react-query'
 import { useDuLieuBangDieuKhien } from './useDuLieuBangDieuKhien'
 import { useBangDieuKhienData } from './useBangDieuKhienData'
 import { layTongQuanApi, layDoanhThuNgayApi } from '../../services/api/apiThongKe'
-
-const taoChuoi7Ngay = () => {
+import { taoChuoiDoanhThu7Ngay } from './thongKeNoiBo'
+const taoKhoangThoiGian7Ngay = () => {
   const homNay = new Date()
   const pad = (n) => String(n).padStart(2, '0')
-  const formatNgay = (date) => 
-    `${date.getFullYear()}-${pad(date.getMonth()+1)}-${pad(date.getDate())}`
-  
+  const formatNgay = (date) => `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}`
+
   const denNgay = formatNgay(homNay)
   const tuNgay = new Date(homNay)
   tuNgay.setDate(tuNgay.getDate() - 6)
-  
-  return { 
-    tuNgay: formatNgay(tuNgay), 
-    denNgay 
-  }
+
+  return { tuNgay: formatNgay(tuNgay), denNgay }
 }
+
 
 export const useNoiBoData = () => {
   const duLieuNoiBo = useDuLieuBangDieuKhien()
 
-  const { tuNgay, denNgay } = taoChuoi7Ngay()
+  const { tuNgay, denNgay } = taoKhoangThoiGian7Ngay()
   const { data: tongQuan } = useQuery({
     queryKey: ['thong-ke-tong-quan'],
     queryFn: async () => {
@@ -38,10 +35,7 @@ export const useNoiBoData = () => {
     queryKey: ['thong-ke-doanh-thu', tuNgay, denNgay],
     queryFn: async () => {
       const ketQua = await layDoanhThuNgayApi(tuNgay, denNgay)
-      return (ketQua.duLieu || []).map((muc) => ({
-        label: muc.Ngay ? new Date(muc.Ngay).toLocaleDateString('vi-VN', { day: '2-digit', month: '2-digit' }) : '--',
-        revenue: Number(muc.DoanhThu || 0),
-      }))
+      return taoChuoiDoanhThu7Ngay(ketQua.duLieu || [])
     },
     refetchInterval: 30000,
     placeholderData: [],
@@ -51,7 +45,8 @@ export const useNoiBoData = () => {
     ...duLieuNoiBo,
     tongQuan,
     doanhThu7Ngay,
-  }), [duLieuNoiBo, tongQuan, doanhThu7Ngay])
+    dateRange: { tuNgay, denNgay },
+  }), [duLieuNoiBo, tongQuan, doanhThu7Ngay, tuNgay, denNgay])
 
   const duLieuBangDieuKhien = useBangDieuKhienData(duLieuNoiBoVoiThongKe)
 
