@@ -181,7 +181,7 @@ CREATE TABLE IF NOT EXISTS ChiTietDonHang (
     DonGia      DECIMAL(15,2) NOT NULL,
     ThanhTien   DECIMAL(15,2) NOT NULL,
     GhiChu      VARCHAR(255),
-    TrangThai   ENUM('Pending','Preparing','Done','Cancelled') NOT NULL DEFAULT 'Pending',
+    TrangThai   ENUM('Pending','Preparing','Ready','Served','Done','Cancelled') NOT NULL DEFAULT 'Pending',
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_ChiTietDonHang_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE CASCADE,
