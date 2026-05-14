@@ -102,11 +102,12 @@ export class TaoDonHangDto {
   @IsString()
   ghiChu?: string;
 
-  @ApiProperty({ type: [ChiTietMonDto] })
+  @ApiPropertyOptional({ type: [ChiTietMonDto] })
+  @IsOptional()
   @IsArray()
   @ValidateNested({ each: true })
   @Type(() => ChiTietMonDto)
-  monAn!: ChiTietMonDto[];
+  monAn?: ChiTietMonDto[];
 
   @ApiProperty({ type: [ChiTietMonDto], required: false })
   @IsOptional()
