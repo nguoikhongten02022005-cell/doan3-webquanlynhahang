@@ -41,7 +41,7 @@ CREATE TABLE IF NOT EXISTS KhachHang (
     TenKH       VARCHAR(100) NOT NULL,
     SDT         VARCHAR(20) UNIQUE,
     DiaChi      VARCHAR(255),
-    ĐiểmTíchLũy INT NOT NULL DEFAULT 0,
+    DiemTichLuy INT NOT NULL DEFAULT 0,
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_KhachHang_NguoiDung
         FOREIGN KEY (MaND) REFERENCES NguoiDung(MaND) ON DELETE SET NULL
@@ -119,7 +119,7 @@ CREATE TABLE IF NOT EXISTS DatBan (
     MaKH           VARCHAR(50),
     MaBan          VARCHAR(50),
     MaNV           VARCHAR(50),
-    TenKháchDatBan VARCHAR(100),
+    TenKhachDatBan VARCHAR(100),
     SDTDatBan      VARCHAR(20),
     EmailDatBan    VARCHAR(100),
     NgayDat        DATE NOT NULL,
@@ -132,12 +132,12 @@ CREATE TABLE IF NOT EXISTS DatBan (
     TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT FK_DatBan_KháchHang
-        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_DatBan_KhachHang
+        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
     CONSTRAINT FK_DatBan_Ban
         FOREIGN KEY (MaBan) REFERENCES Ban(MaBan) ON DELETE SET NULL,
-    CONSTRAINT FK_DatBan_NhânViên
-        FOREIGN KEY (MaNV) REFERENCES NhânViên(MaNV) ON DELETE SET NULL
+    CONSTRAINT FK_DatBan_NhanVien
+        FOREIGN KEY (MaNV) REFERENCES NhanVien(MaNV) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
@@ -160,12 +160,12 @@ CREATE TABLE IF NOT EXISTS DonHang (
     GhiChu      VARCHAR(500),
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    CONSTRAINT FK_DonHang_KháchHang
-        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_DonHang_KhachHang
+        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
     CONSTRAINT FK_DonHang_Ban
         FOREIGN KEY (MaBan) REFERENCES Ban(MaBan) ON DELETE SET NULL,
-    CONSTRAINT FK_DonHang_NhânViên
-        FOREIGN KEY (MaNV) REFERENCES NhânViên(MaNV) ON DELETE SET NULL,
+    CONSTRAINT FK_DonHang_NhanVien
+        FOREIGN KEY (MaNV) REFERENCES NhanVien(MaNV) ON DELETE SET NULL,
     CONSTRAINT FK_DonHang_DatBan
         FOREIGN KEY (MaDatBan) REFERENCES DatBan(MaDatBan) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -196,6 +196,7 @@ CREATE TABLE IF NOT EXISTS HoaDon (
     MaHoaDon    VARCHAR(50) PRIMARY KEY,
     MaDonHang   VARCHAR(50) NOT NULL UNIQUE,
     MaKH        VARCHAR(50),
+    MaNV        VARCHAR(50),
     MaCode      VARCHAR(50),
     TongTien    DECIMAL(15,2) NOT NULL,
     GiamGia     DECIMAL(15,2) NOT NULL DEFAULT 0,
@@ -206,8 +207,10 @@ CREATE TABLE IF NOT EXISTS HoaDon (
     NgayXuat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_HoaDon_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE CASCADE,
-    CONSTRAINT FK_HoaDon_KháchHang
-        FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_HoaDon_KhachHang
+        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL,
+    CONSTRAINT FK_HoaDon_NhanVien
+        FOREIGN KEY (MaNV) REFERENCES NhanVien(MaNV) ON DELETE SET NULL,
     CONSTRAINT FK_HoaDon_MaGiamGia
         FOREIGN KEY (MaCode) REFERENCES MaGiamGia(MaCode) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -267,7 +270,7 @@ CREATE TABLE IF NOT EXISTS LichSuDonHang (
 -- ============================================================
 -- 16. LICH SU DIEM TICH LUY
 -- ============================================================
-CREATE TABLE IF NOT EXISTS LichSuĐiểmTíchLũy (
+CREATE TABLE IF NOT EXISTS LichSuDiemTichLuy (
     MaGiaoDichDiem VARCHAR(50) PRIMARY KEY,
     MaKH           VARCHAR(50) NOT NULL,
     MaDonHang      VARCHAR(50),
@@ -277,9 +280,9 @@ CREATE TABLE IF NOT EXISTS LichSuĐiểmTíchLũy (
     SoDiemSau      INT NOT NULL DEFAULT 0,
     MoTa           VARCHAR(255),
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    CONSTRAINT FK_LichSuĐiểmTíchLũy_KháchHang
+    CONSTRAINT FK_LichSuDiemTichLuy_KháchHang
         FOREIGN KEY (MaKH) REFERENCES KháchHang(MaKH) ON DELETE CASCADE,
-    CONSTRAINT FK_LichSuĐiểmTíchLũy_DonHang
+    CONSTRAINT FK_LichSuDiemTichLuy_DonHang
         FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
@@ -318,10 +321,11 @@ CREATE INDEX IDX_ThanhToan_HoaDon ON ThanhToan(MaHoaDon);
 CREATE INDEX IDX_ThanhToan_TrangThai ON ThanhToan(TrangThai);
 CREATE INDEX IDX_DanhGia_TrangThai ON DanhGia(TrangThai);
 CREATE INDEX IDX_LichSu_DonHang ON LichSuDonHang(MaDonHang);
-CREATE INDEX IDX_LichSuĐiểmTíchLũy_MaKH ON LichSuĐiểmTíchLũy(MaKH);
-CREATE INDEX IDX_LichSuĐiểmTíchLũy_NgayTao ON LichSuĐiểmTíchLũy(NgayTao);
-CREATE INDEX IDX_LichSuĐiểmTíchLũy_Loai ON LichSuĐiểmTíchLũy(LoaiBienDong);
+CREATE INDEX IDX_LichSuDiemTichLuy_MaKH ON LichSuDiemTichLuy(MaKH);
+CREATE INDEX IDX_LichSuDiemTichLuy_NgayTao ON LichSuDiemTichLuy(NgayTao);
+CREATE INDEX IDX_LichSuDiemTichLuy_Loai ON LichSuDiemTichLuy(LoaiBienDong);
 CREATE INDEX IDX_HoaDon_NgayXuat ON HoaDon(NgayXuat);
+CREATE INDEX IDX_HoaDon_MaNV ON HoaDon(MaNV);
 CREATE INDEX IDX_Ban_KhuVuc_SoChoNgoi ON Ban(KhuVuc, SoChoNgoi);
 CREATE INDEX IDX_ThongBao_MaND ON ThongBao(MaND);
 CREATE INDEX IDX_ThongBao_DaDoc ON ThongBao(DaDoc);

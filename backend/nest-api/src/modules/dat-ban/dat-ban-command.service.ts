@@ -7,6 +7,7 @@ import {
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { DatBanQueryService } from './dat-ban-query.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
+import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
 
@@ -51,11 +52,13 @@ export class DatBanCommandService {
         )
       : [null];
 
+    const maDatBan = String(body.maDatBan || '').trim() || taoMa('DB');
+
     await this.mysql.thucThi(
       `INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai, KhuVucUuTien, ChiTietMonAn)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
-        body.maDatBan,
+        maDatBan,
         body.maKH || null,
         body.maBan || null,
         body.maNV || null,
@@ -80,7 +83,7 @@ export class DatBanCommandService {
        LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
        WHERE db.MaDatBan = ?
        LIMIT 1`,
-      [body.maDatBan],
+      [maDatBan],
     );
 
     return taoPhanHoi(

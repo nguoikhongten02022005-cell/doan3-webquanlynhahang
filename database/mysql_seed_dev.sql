@@ -18,18 +18,18 @@ USE QuanNhaHang;
 -- ============================================================
 INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro, TrangThai) VALUES
 ('ND001', 'Admin System', 'admin@nhahang.com', '$2b$10$QQjUYOP2RIOusra.a.Sig.dnEWuKOnYCqQoMEqhJPX/T/XJ.dMEiW', 'Admin', 'Active'),
-('ND002', 'Nguyễn Văn An', 'an.nv@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhânViên', 'Active'),
-('ND003', 'Lê Thị Bích', 'bich.lt@nhahang.com', '$2b$10$cU0ttRiu8gphooM1j9SuVuJ8l7M0GLj8G/ZzReu9xFxDyY/5YFi4W', 'NhânViên', 'Active'),
-('ND004', 'Tran Van Khách', 'khách1@gmail.com', '$2b$10$NltKkLKz8pXuOifZY5bUOuBG4oImqzWxHiSoBvvMPn7POBle3hgKS', 'KháchHàng', 'Active'),
-('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2b$10$NltKkLKz8pXuOifZY5bUOuBG4oImqzWxHiSoBvvMPn7POBle3hgKS', 'KháchHàng', 'Active'),
-('ND_KH_TEST_01', 'Nguyen Van Test', 'kháchtest01@gmail.com', '$2a$11$dtmZV4AJS/fB16ymIqO4AuCZuj21tj08dUYpY3uons9iJor0n1omW', 'KháchHàng', 'Active');
+('ND002', 'Nguyễn Văn An', 'an.nv@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
+('ND003', 'Lê Thị Bích', 'bich.lt@nhahang.com', '$2b$10$cU0ttRiu8gphooM1j9SuVuJ8l7M0GLj8G/ZzReu9xFxDyY/5YFi4W', 'NhanVien', 'Active'),
+('ND004', 'Tran Van Khách', 'khách1@gmail.com', '$2b$10$NltKkLKz8pXuOifZY5bUOuBG4oImqzWxHiSoBvvMPn7POBle3hgKS', 'KhachHang', 'Active'),
+('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2b$10$NltKkLKz8pXuOifZY5bUOuBG4oImqzWxHiSoBvvMPn7POBle3hgKS', 'KhachHang', 'Active'),
+('ND_KH_TEST_01', 'Nguyen Van Test', 'kháchtest01@gmail.com', '$2a$11$dtmZV4AJS/fB16ymIqO4AuCZuj21tj08dUYpY3uons9iJor0n1omW', 'KhachHang', 'Active');
 
-INSERT INTO NhânViên (MaNV, MaND, HoTen, GioiTinh, SDT, ChucVu, NgayVaoLam) VALUES
+INSERT INTO NhanVien (MaNV, MaND, HoTen, GioiTinh, SDT, ChucVu, NgayVaoLam) VALUES
 ('NV001', 'ND001', 'Admin System', 'Nam', '0901111111', 'Admin', '2024-01-01'),
 ('NV002', 'ND002', 'Nguyen Van An', 'Nam', '0901234567', 'QuảnLý', '2024-06-01'),
 ('NV003', 'ND003', 'Le Thi Bich', 'Nu', '0907654321', 'ThuNgân', '2025-01-15');
 
-INSERT INTO KháchHàng (MaKH, MaND, TenKH, SDT, DiaChi, ĐiểmTíchLũy) VALUES
+INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES
 ('KH001', 'ND004', 'Trần Văn Khách', '0912345678', NULL, 150),
 ('KH002', 'ND005', 'Phạm Thị Mai', '0987654321', NULL, 80),
 ('KH003', NULL, 'Khách Vãng Lai', NULL, NULL, 0),
@@ -89,7 +89,7 @@ INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangTo
 ('GIAM50K', 'Giảm thẳng 50k', 50000, 'fixed_amount', NULL, 300000, '2026-01-01', '2026-12-31', 500, 0, 'Active');
 
 INSERT INTO DatBan (
-    MaDatBan, MaKH, MaBan, MaNV, TenKháchDatBan, SDTDatBan, EmailDatBan,
+    MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
     NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
     TrangThai, NgayTao, NgayCapNhat
 ) VALUES
@@ -116,10 +116,10 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT009', 'DH003', 'M008', 2, 25000, 50000, 'Bot duong', 'Preparing', NOW()),
 ('CT010', 'DH003', 'M010', 1, 30000, 30000, NULL, 'Pending', NOW());
 
-INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
-('HD001', 'DH001', 'KH001', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW()),
-('HD002', 'DH002', 'KH002', NULL, 140000, 0, 10, 14000, 154000, 'Khách đến lấy tại quầy', NOW()),
-('HD003', 'DH003', 'KH_TEST_01', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Đơn giao hàng khu vực trung tâm', NOW());
+INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaNV, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
+('HD001', 'DH001', 'KH001', 'NV002', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW()),
+('HD002', 'DH002', 'KH002', 'NV003', NULL, 140000, 0, 10, 14000, 154000, 'Khách đến lấy tại quầy', NOW()),
+('HD003', 'DH003', 'KH_TEST_01', 'NV002', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Đơn giao hàng khu vực trung tâm', NOW());
 
 INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
 ('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW()),
@@ -144,24 +144,24 @@ INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, So
 -- Các tài khoản khách hàng bổ sung dùng mật khẩu: Khách@123
 -- ============================================================
 INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro, TrangThai) VALUES
-('ND006', 'Phạm Hoàng Long', 'long.host@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhânViên', 'Active'),
-('ND007', 'Trần Thu Hà', 'ha.phucvu@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhânViên', 'Active'),
-('ND008', 'Võ Gia Bảo', 'bao.thungan@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhânViên', 'Inactive'),
+('ND006', 'Phạm Hoàng Long', 'long.host@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
+('ND007', 'Trần Thu Hà', 'ha.phucvu@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
+('ND008', 'Võ Gia Bảo', 'bao.thungan@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Inactive'),
 ('ND009', 'Nguyễn Thị Quyên', 'quyen.admin@nhahang.com', '$2b$10$QQjUYOP2RIOusra.a.Sig.dnEWuKOnYCqQoMEqhJPX/T/XJ.dMEiW', 'Admin', 'Active'),
-('ND010', 'Lê Minh Châu', 'chau.lm@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KháchHàng', 'Active'),
-('ND011', 'Hoàng Anh Thư', 'thu.ha@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KháchHàng', 'Active'),
-('ND012', 'Bùi Quốc Đạt', 'dat.bq@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KháchHàng', 'Active'),
-('ND013', 'Nguyễn Bảo Ngọc', 'ngoc.nb@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KháchHàng', 'Active'),
-('ND014', 'Do Khanh Linh', 'linh.dk@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KháchHàng', 'Inactive'),
-('ND015', 'Phan Gia Huy', 'huy.pg@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KháchHàng', 'Banned');
+('ND010', 'Lê Minh Châu', 'chau.lm@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND011', 'Hoàng Anh Thư', 'thu.ha@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND012', 'Bùi Quốc Đạt', 'dat.bq@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND013', 'Nguyễn Bảo Ngọc', 'ngoc.nb@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Active'),
+('ND014', 'Do Khanh Linh', 'linh.dk@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Inactive'),
+('ND015', 'Phan Gia Huy', 'huy.pg@gmail.com', '$2b$12$nQJNiPj3O1iNDm624ZlBd.qrwnPSBrsxz7KV6JJp1ZBVAJloTQa8K', 'KhachHang', 'Banned');
 
-INSERT INTO NhânViên (MaNV, MaND, HoTen, GioiTinh, SDT, DiaChi, ChucVu, LuongCoBan, NgayVaoLam, TinhTrang) VALUES
+INSERT INTO NhanVien (MaNV, MaND, HoTen, GioiTinh, SDT, DiaChi, ChucVu, LuongCoBan, NgayVaoLam, TinhTrang) VALUES
 ('NV004', 'ND006', 'Pham Hoang Long', 'Nam', '0901112222', 'Quan 1, TP.HCM', 'Host', 8500000, '2025-06-10', 'Active'),
 ('NV005', 'ND007', 'Tran Thu Ha', 'Nu', '0901113333', 'Quan 3, TP.HCM', 'PhụcVụ', 7800000, '2025-08-01', 'Active'),
 ('NV006', 'ND008', 'Vo Gia Bao', 'Nam', '0901114444', 'Quan 7, TP.HCM', 'ThuNgân', 9200000, '2025-03-01', 'Inactive'),
 ('NV007', 'ND009', 'Nguyen Thi Quyen', 'Nu', '0901115555', 'Thu Duc, TP.HCM', 'QuảnLýCa', 13500000, '2024-09-15', 'Active');
 
-INSERT INTO KháchHàng (MaKH, MaND, TenKH, SDT, DiaChi, ĐiểmTíchLũy) VALUES
+INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES
 ('KH004', NULL, 'Khách Lẻ Công Ty', NULL, 'Văn phòng công ty tại Quận 1', 0),
 ('KH005', NULL, 'Khách Bàn Tiệc', NULL, 'Khách doan dat tiec cuoi tu su kien', 0),
 ('KH006', 'ND010', 'Lê Minh Châu', '0908800001', '45 Le Loi, Quan 1, TP.HCM', 320),
@@ -314,7 +314,7 @@ INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangTo
 ('FLASH30', 'Flash sale 30%', 30, 'percentage', 60000, 150000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), 50, 50, 'HetHan');
 
 INSERT INTO DatBan (
-    MaDatBan, MaKH, MaBan, MaNV, TenKháchDatBan, SDTDatBan, EmailDatBan,
+    MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
     NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
     TrangThai, NgayTao, NgayCapNhat
 ) VALUES
@@ -334,7 +334,7 @@ INSERT INTO DatBan (
 ('DB015', 'KH006', 'B010', 'NV004', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '18:30:00', '20:00:00', 2, 'Booking cũ khách không đến.', 'BAN_CONG', 'Khách báo trễ nhưng không đến.', 'NoShow', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '09:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '19:00:00'));
 
 INSERT INTO DatBan (
-    MaDatBan, MaKH, MaBan, MaNV, TenKháchDatBan, SDTDatBan, EmailDatBan,
+    MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
     NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
     TrangThai, NgayTao, NgayCapNhat
 ) VALUES
@@ -405,18 +405,18 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT050', 'DH019', 'M009', 1, 35000, 35000, NULL, 'Done', TIMESTAMP(CURRENT_DATE(), '19:21:00')),
 ('CT051', 'DH019', 'M018', 1, 45000, 45000, 'Tang kem sau bữa tối', 'Done', TIMESTAMP(CURRENT_DATE(), '19:22:00'));
 
-INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
-('HD004', 'DH007', 'KH006', 'LOYAL25K', 210000, 25000, 10, 21000, 231000, 'Đơn pickup tri ân thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:46:00')),
-('HD005', 'DH008', 'KH008', 'GIAM20K', 168000, 20000, 10, 16800, 184800, 'Hỗ trợ phí ship cho đơn giao hàng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:42:00')),
-('HD006', 'DH009', 'KH009', NULL, 115000, 0, 10, 11500, 126500, 'Thanh toán thất bại trước khi khách hủy đơn.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:08:00')),
-('HD007', 'DH010', 'KH002', NULL, 147000, 0, 10, 14700, 161700, 'Hóa đơn tại quầy giờ trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:12:00')),
-('HD008', 'DH011', 'KH001', NULL, 188000, 0, 8, 15040, 203040, 'Hóa đơn pickup buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:46:00')),
-('HD009', 'DH012', 'KH006', 'VIP25', 307000, 90000, 8, 24560, 331560, 'Đơn giao hàng VIP có áp dụng mã giảm giá.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:32:00')),
-('HD010', 'DH014', 'KH008', NULL, 268000, 0, 10, 26800, 294800, 'Đơn tại quán buổi trưa có thêm tráng miệng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:40:00')),
-('HD011', 'DH015', 'KH006', 'VIP25', 394000, 90000, 10, 39400, 343400, 'Đơn tiệc VIP đã áp dụng ưu đãi thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:08:00')),
-('HD012', 'DH016', 'KH007', NULL, 172000, 0, 8, 13760, 185760, 'Đơn pickup sau giờ tan làm.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:18:00')),
-('HD013', 'DH017', 'KH009', 'GIAM20K', 226000, 20000, 8, 18080, 224080, 'Đơn giao hàng nội thành buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:48:00')),
-('HD014', 'DH019', 'KH008', NULL, 312000, 0, 10, 31200, 343200, 'Đơn bữa tối cao điểm trong nhà hàng.', TIMESTAMP(CURRENT_DATE(), '20:46:00'));
+INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaNV, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
+('HD004', 'DH007', 'KH006', 'NV003', 'LOYAL25K', 210000, 25000, 10, 21000, 231000, 'Đơn pickup tri ân thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:46:00')),
+('HD005', 'DH008', 'KH008', 'NV005', 'GIAM20K', 168000, 20000, 10, 16800, 184800, 'Hỗ trợ phí ship cho đơn giao hàng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:42:00')),
+('HD006', 'DH009', 'KH009', 'NV007', NULL, 115000, 0, 10, 11500, 126500, 'Thanh toán thất bại trước khi khách hủy đơn.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:08:00')),
+('HD007', 'DH010', 'KH002', 'NV003', NULL, 147000, 0, 10, 14700, 161700, 'Hóa đơn tại quầy giờ trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:12:00')),
+('HD008', 'DH011', 'KH001', 'NV003', NULL, 188000, 0, 8, 15040, 203040, 'Hóa đơn pickup buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:46:00')),
+('HD009', 'DH012', 'KH006', 'NV002', 'VIP25', 307000, 90000, 8, 24560, 331560, 'Đơn giao hàng VIP có áp dụng mã giảm giá.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:32:00')),
+('HD010', 'DH014', 'KH008', 'NV002', NULL, 268000, 0, 10, 26800, 294800, 'Đơn tại quán buổi trưa có thêm tráng miệng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:40:00')),
+('HD011', 'DH015', 'KH006', 'NV002', 'VIP25', 394000, 90000, 10, 39400, 343400, 'Đơn tiệc VIP đã áp dụng ưu đãi thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:08:00')),
+('HD012', 'DH016', 'KH007', 'NV003', NULL, 172000, 0, 8, 13760, 185760, 'Đơn pickup sau giờ tan làm.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:18:00')),
+('HD013', 'DH017', 'KH009', 'NV005', 'GIAM20K', 226000, 20000, 8, 18080, 224080, 'Đơn giao hàng nội thành buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:48:00')),
+('HD014', 'DH019', 'KH008', 'NV005', NULL, 312000, 0, 10, 31200, 343200, 'Đơn bữa tối cao điểm trong nhà hàng.', TIMESTAMP(CURRENT_DATE(), '20:46:00'));
 
 INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
 ('TT004', 'HD004', 'ChuyenKhoan', 231000, 'CK_DH007_001', 'Success', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:48:00')),
@@ -526,8 +526,8 @@ INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, So
 ('LSD015', 'KH009', 'DH017', 'CONG', 160, 12, 172, 'Cộng điểm từ đơn giao hàng DH017', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:55:00')),
 ('LSD016', 'KH008', 'DH019', 'CONG', 210, 275, 485, 'Cộng điểm từ đơn bữa tối cao điểm DH019', TIMESTAMP(CURRENT_DATE(), '20:55:00'));
 
-UPDATE KháchHàng
-SET ĐiểmTíchLũy = CASE MaKH
+UPDATE KhachHang
+SET DiemTichLuy = CASE MaKH
     WHEN 'KH001' THEN 235
     WHEN 'KH002' THEN 165
     WHEN 'KH006' THEN 570
@@ -535,7 +535,7 @@ SET ĐiểmTíchLũy = CASE MaKH
     WHEN 'KH008' THEN 485
     WHEN 'KH009' THEN 172
     WHEN 'KH_TEST_01' THEN 14
-    ELSE ĐiểmTíchLũy
+    ELSE DiemTichLuy
 END
 WHERE MaKH IN ('KH001', 'KH002', 'KH006', 'KH007', 'KH008', 'KH009', 'KH_TEST_01');
 
@@ -595,7 +595,7 @@ UPDATE ThanhToan
 SET ThoiGian = TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:12:00')
 WHERE MaThanhToan = 'TT001';
 
-UPDATE LichSuĐiểmTíchLũy
+UPDATE LichSuDiemTichLuy
 SET SoDiemTruoc = 150,
     SoDiemSau = 165,
     MoTa = 'Cộng điểm từ đơn hàng pickup DH002',

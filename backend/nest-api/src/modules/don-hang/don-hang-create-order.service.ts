@@ -45,7 +45,11 @@ export class DonHangCreateOrderService {
   }
 
   async taoDonHang(payload: BanGhi, loaiDon?: string) {
-    const chiTiet = Array.isArray(payload.chiTiet) ? payload.chiTiet : [];
+    const chiTiet = Array.isArray(payload.chiTiet)
+      ? payload.chiTiet
+      : Array.isArray(payload.monAn)
+        ? payload.monAn
+        : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
     const loaiDonHang = loaiDon || 'TAI_BAN';

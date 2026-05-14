@@ -91,11 +91,10 @@ export class DonHangPaymentStatusService {
           const maHoaDon = taoMa('HD');
 
           await ketNoi.execute(
-            'INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaNV, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())',
+            'INSERT INTO HoaDon (MaHoaDon, MaDonHang, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, NOW())',
             [
               maHoaDon,
               maDonHang,
-              don.MaNV || null,
               tongTienHang,
               tienGiam,
               thanhToan,
@@ -190,11 +189,10 @@ export class DonHangPaymentStatusService {
       const maHoaDon = taoMa('HD');
 
       await ketNoi.execute(
-        'INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaNV, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, ?, NOW())',
+        'INSERT INTO HoaDon (MaHoaDon, MaDonHang, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, NOW())',
         [
           maHoaDon,
           donHang.MaDonHang,
-          donHang.MaNV || null,
           tongTienHang,
           tienGiam,
           thanhToan,
