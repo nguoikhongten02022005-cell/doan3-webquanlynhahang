@@ -32,8 +32,8 @@ export class DonHangService {
     return this.donHangQueryService.layChiTietDonHang(nguoiDung, maDonHang);
   }
 
-  taoDonHang(payload: BanGhi, loaiDon?: string) {
-    return this.donHangCreateOrderService.taoDonHang(payload, loaiDon);
+  taoDonHang(payload: BanGhi) {
+    return this.donHangCreateOrderService.taoDonHang(payload);
   }
 
   taoOrderTaiBan(maBan: string, payload: BanGhi) {

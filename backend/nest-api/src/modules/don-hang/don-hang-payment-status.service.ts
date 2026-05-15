@@ -92,14 +92,7 @@ export class DonHangPaymentStatusService {
 
           await ketNoi.execute(
             'INSERT INTO HoaDon (MaHoaDon, MaDonHang, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-            [
-              maHoaDon,
-              maDonHang,
-              tongTienHang,
-              tienGiam,
-              thanhToan,
-              '',
-            ],
+            [maHoaDon, maDonHang, tongTienHang, tienGiam, thanhToan, ''],
           );
 
           await ketNoi.execute(
@@ -190,14 +183,7 @@ export class DonHangPaymentStatusService {
 
       await ketNoi.execute(
         'INSERT INTO HoaDon (MaHoaDon, MaDonHang, TongTien, GiamGia, ThanhTien, GhiChu, NgayXuat) VALUES (?, ?, ?, ?, ?, ?, NOW())',
-        [
-          maHoaDon,
-          donHang.MaDonHang,
-          tongTienHang,
-          tienGiam,
-          thanhToan,
-          '',
-        ],
+        [maHoaDon, donHang.MaDonHang, tongTienHang, tienGiam, thanhToan, ''],
       );
 
       await ketNoi.execute(

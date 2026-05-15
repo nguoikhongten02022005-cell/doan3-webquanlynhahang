@@ -505,7 +505,7 @@ export const DANH_SACH_HOA_DON_MAU = Object.freeze([
     thueSuat: 10,
     tienThue: 13000,
     thanhTien: 143000,
-    ghiChu: 'Don giao hang khu vuc trung tam',
+    ghiChu: 'Don goi mon tai ban khu vuc trung tam',
     ngayXuat: '2026-08-10T19:30:00',
   }),
 ])
@@ -586,7 +586,7 @@ export const LICH_SU_DIEM_TICH_LUY_MAU_THEO_KHACH_HANG = Object.freeze({
       soDiem: 14,
       soDiemTruoc: 0,
       soDiemSau: 14,
-      moTa: 'Tam cong diem cho don giao hang DH003',
+      moTa: 'Tam cong diem cho don goi mon tai ban DH003',
       ngayTao: '2026-08-10T19:40:00',
     }),
   ]),

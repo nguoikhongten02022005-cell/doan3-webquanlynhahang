@@ -44,7 +44,7 @@ export class DonHangCreateOrderService {
       .filter((muc) => Boolean(muc.maMon));
   }
 
-  async taoDonHang(payload: BanGhi, loaiDon?: string) {
+  async taoDonHang(payload: BanGhi) {
     const chiTiet = Array.isArray(payload.chiTiet)
       ? payload.chiTiet
       : Array.isArray(payload.monAn)
@@ -216,22 +216,19 @@ export class DonHangCreateOrderService {
     );
     const items = this.chuanHoaDanhSachChiTiet(payload.items, 'CTBAN');
 
-    return this.taoDonHang(
-      {
-        ...payload,
-        maBan,
-        maDonHang: payload.maDonHang || taoMa('DH'),
-        chiTiet: chiTiet.length
-          ? chiTiet
-          : danhSachMon.length
-            ? danhSachMon
-            : items,
-        nguonTao: 'QRCode',
-        loaiDon: 'TAI_BAN',
-        soDiem: 0,
-        nguoiDung: {},
-      },
-      'TAI_BAN',
-    );
+    return this.taoDonHang({
+      ...payload,
+      maBan,
+      maDonHang: payload.maDonHang || taoMa('DH'),
+      chiTiet: chiTiet.length
+        ? chiTiet
+        : danhSachMon.length
+          ? danhSachMon
+          : items,
+      nguonTao: 'QRCode',
+      loaiDon: 'TAI_BAN',
+      soDiem: 0,
+      nguoiDung: {},
+    });
   }
 }

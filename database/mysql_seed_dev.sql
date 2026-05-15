@@ -5,7 +5,7 @@ USE QuanNhaHang;
 -- Không dung file nay cho production hoac shared env.
 -- DỮ LIỆU MẪU
 -- Lưu ý: app hien tai chi xem TAI_BAN la gia tri hop le cua DonHang.LoaiDon.
--- Du lieu don hang mau la don goi mon tai ban; khong co nghiep vu mang ve.
+-- Du lieu don hang mau la don goi mon tai ban.
 -- DEV-ONLY: credentials below are demo-only hashes for local testing.
 -- Password mac dinh da doi chieu voi DB dang chay:
 -- admin@nhahang.com / Admin@123
