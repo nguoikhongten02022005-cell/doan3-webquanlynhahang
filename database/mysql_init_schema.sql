@@ -391,4 +391,4 @@ LEFT JOIN DonHang dh
     );
 
 ALTER TABLE DatBan
-    ADD COLUMN IF NOT EXISTS ChiTietMonAn JSON AFTER KhuVucUuTien;
+    ADD COLUMN ChiTietMonAn JSON AFTER KhuVucUuTien;
