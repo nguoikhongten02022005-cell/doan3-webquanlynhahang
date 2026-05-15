@@ -454,7 +454,7 @@ export const taoMaDatBanMoiOffline = () => {
   return `DB${String(soLonNhat + 1).padStart(3, '0')}`
 }
 
-export const taoMaDonHangMoiOffline = (loaiDon = 'DH') => {
+export const taoMaDonHangMoiOffline = () => {
   const danhSach = layDanhSachDonHangOffline()
   const soLonNhat = sapXepSoTangDan(danhSach.map((order) => String(order.maDonHang || '').match(MA_DON_REGEX)?.[0]))[0] || 3
   return `DH${String(soLonNhat + 1).padStart(3, '0')}`
@@ -516,7 +516,7 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
   let ketQua = null
 
   capNhatHeThongOffline((draft) => {
-    const maDonHang = String(options.maDonHang || orderInput.maDonHang || orderInput.orderCode || taoMaDonHangMoiOffline(orderInput.loaiDon || orderInput.LoaiDon || 'DH')).trim()
+    const maDonHang = String(options.maDonHang || orderInput.maDonHang || orderInput.orderCode || taoMaDonHangMoiOffline()).trim()
     const index = draft.donHang.findIndex((order) => String(order.maDonHang || order.orderCode || '') === maDonHang)
     const mucHienTai = index >= 0 ? draft.donHang[index] : {}
     const chiTiet = Array.isArray(orderInput.chiTiet || orderInput.ChiTiet || orderInput.items)
@@ -574,7 +574,6 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
         fullName: orderInput.tenKhachHang || orderInput.TenKhachHang || orderInput.customer?.fullName || mucHienTai.customer?.fullName || '',
         phone: orderInput.soDienThoai || orderInput.SoDienThoai || orderInput.customer?.phone || mucHienTai.customer?.phone || '',
         email: orderInput.email || orderInput.Email || orderInput.customer?.email || mucHienTai.customer?.email || '',
-        address: orderInput.customer?.address || mucHienTai.customer?.address || '',
       },
       tongHopGia: deepClone(tongHopGia),
       voucher: deepClone(voucher),

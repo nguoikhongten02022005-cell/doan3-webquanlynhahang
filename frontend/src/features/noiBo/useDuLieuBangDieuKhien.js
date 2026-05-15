@@ -7,7 +7,6 @@ import { layDanhSachDanhGiaApi, duyetDanhGiaApi } from '../../services/api/apiDa
 import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
 import { layDanhSachDatBanApi } from '../../services/api/apiDatBan'
-import { trinhKhachApi } from '../../services/trinhKhachApi'
 import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN } from './hangSo'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_MO } from './thongKeNoiBo'
@@ -55,7 +54,6 @@ export const useDuLieuBangDieuKhien = () => {
     ganBanChoDatBan,
     taoDatBanNoiBo,
     layBanPhuHopChoDatBan,
-    layDanhSachDatBanHost,
     capNhatTrangThaiDatBan,
     danhDauDaCheckIn,
     danhDauHoanThanh,
@@ -120,7 +118,7 @@ export const useDuLieuBangDieuKhien = () => {
       setDangTaiDuLieu(false)
       setDaTaiDuLieuLanDau(true)
     }
-  }, [laQuanLy, layDanhSachDatBanHost])
+  }, [laQuanLy])
 
   useEffect(() => {
     if (daKhoiTaoLanDauRef.current) {

@@ -224,7 +224,7 @@ export const guiOrderTaiBanApi = async (maBan, danhSachMon) => {
       }) : []
 
       const tongTien = danhSachChiTiet.reduce((sum, item) => sum + Number(item.thanhTien || 0), 0)
-      const maDonHang = ban.activeOrderCode || taoMaDonHangMoiOffline('DH')
+      const maDonHang = ban.activeOrderCode || taoMaDonHangMoiOffline()
       const donHang = {
         maDonHang,
         orderCode: maDonHang,

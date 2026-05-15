@@ -122,26 +122,29 @@ function ThanhToanPage() {
     }
 
     try {
-        const payloadTaoDonHang = taoDuLieuTaoDonHang({
-          cartItems,
-          voucherCode: phieuGiamGiaDaApDung?.code,
-          soDiem: soDiem > 0 ? soDiem : undefined,
-          customer: {
-            customerCode: nguoiDungHienTai?.maKH ?? '',
-            fullName: duLieuForm.fullName,
-            phone: duLieuForm.phone,
-            email: nguoiDungHienTai?.email ?? '',
-            address: duLieuForm.address,
-          },
-        note: duLieuForm.note,
+      const ghiChuDonHang = [duLieuForm.address && `Vị trí phục vụ: ${duLieuForm.address}`, duLieuForm.note]
+        .filter(Boolean)
+        .join('\n')
+
+      const payloadTaoDonHang = taoDuLieuTaoDonHang({
+        cartItems,
+        voucherCode: phieuGiamGiaDaApDung?.code,
+        soDiem: soDiem > 0 ? soDiem : undefined,
+        customer: {
+          customerCode: nguoiDungHienTai?.maKH ?? '',
+          fullName: duLieuForm.fullName,
+          phone: duLieuForm.phone,
+          email: nguoiDungHienTai?.email ?? '',
+        },
+        note: ghiChuDonHang,
         tableNumber: duLieuForm.tableNumber,
         paymentMethod: duLieuForm.paymentMethod,
       })
 
-        await taoDonHangApi(payloadTaoDonHang)
+      await taoDonHangApi(payloadTaoDonHang)
 
-        xoaPhieuGiamGiaDaApDung()
-        xoaBanNhapTamThanhToan()
+      xoaPhieuGiamGiaDaApDung()
+      xoaBanNhapTamThanhToan()
 
       if (typeof xoaToanBoGio === 'function') {
         xoaToanBoGio()

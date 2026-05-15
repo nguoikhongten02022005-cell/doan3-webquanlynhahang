@@ -101,7 +101,6 @@ function BieuDoDoanhThu({ revenue, dateRange, title = 'Doanh thu 7 ngày gần n
   const doanhThuTrungBinh = soCotCoDoanhThu > 0 ? Math.round(tongDoanhThu / soCotCoDoanhThu) : 0
   const doanhThuCaoNhat = mucDoanhThuCaoNhat.revenue
   const coDuLieuBieuDo = duLieuCot.length > 0
-  const nenHienLabelCot = soCotCoDoanhThu > 0 && soCotCoDoanhThu <= 4
   const lamTronMocTrucY = (giaTri) => {
     if (giaTri <= 0) return 1
     const buoc = giaTri < 1000000 ? 100000 : 500000

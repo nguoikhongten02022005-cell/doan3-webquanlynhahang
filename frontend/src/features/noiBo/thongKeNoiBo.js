@@ -63,6 +63,7 @@ export const laDatBanSapGanBan = (datBan, hienTai = new Date()) => {
 }
 
 const laDatBanDaHuy = (datBan) => ['DA_HUY', 'Cancelled', 'KHONG_DEN', 'NoShow'].includes(datBan?.status)
+const laDatBanHoanThanh = (datBan) => ['DA_HOAN_THANH', 'Completed'].includes(datBan?.status)
 const laDonHangHoanThanh = (donHang) => ['Paid', 'DA_HOAN_THANH', 'Completed', 'Served'].includes(donHang?.status)
 
 const locDonHangTheoKhoangThoiGian = (danhSachDonHang, khoangThoiGian) => {
