@@ -59,7 +59,7 @@ const KIEU_THE_TRANG_THAI = {
   Pending: { tone: 'pending', badge: 'badge-pending', hint: 'Cần xác nhận và ưu tiên điều phối bếp.' },
   Confirmed: { tone: 'pending', badge: 'badge-pending', hint: 'Đơn đã chốt, chờ bếp nhận lệnh.' },
   Preparing: { tone: 'preparing', badge: 'badge-preparing', hint: 'Bếp đang xử lý, ưu tiên theo dõi thời gian ra món.' },
-  Ready: { tone: 'served', badge: 'badge-served', hint: 'Đơn đã sẵn sàng, chờ phục vụ hoặc giao cho khách.' },
+  Ready: { tone: 'served', badge: 'badge-served', hint: 'Đơn đã sẵn sàng, chờ phục vụ tại bàn.' },
   Served: { tone: 'served', badge: 'badge-served', hint: 'Đơn đang phục vụ tại bàn, sẵn sàng chốt thanh toán.' },
   Paid: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã thanh toán và chốt doanh thu.' },
   Cancelled: { tone: 'cancelled', badge: 'badge-cancelled', hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.' },
@@ -86,7 +86,7 @@ const dinhDangNhanBan = (order) => {
 
 const layNhanLoaiDon = (loaiDon) => NHAN_LOAI_DON_HANG[loaiDon] || 'Tại bàn'
 
-const layMauLoaiDon = (loaiDon) => loaiDon === 'TAI_BAN' ? 'purple' : 'cyan'
+const layMauLoaiDon = () => 'purple'
 
 const dinhDangMaDonHang = (order) => order.orderCode || order.code || `DH-${order.id}`
 
@@ -270,14 +270,8 @@ function BangChiTietDonHang({
             </label>
             <label className="noi-bo-don-hang-detail-field">
               <span>Loại đơn</span>
-              <Input size="middle" value={`${layNhanLoaiDon(donHangNguon.loaiDon)}${donHangNguon.diaChiGiao ? ' · Giao hàng' : ''}`} readOnly />
+              <Input size="middle" value={layNhanLoaiDon(donHangNguon.loaiDon)} readOnly />
             </label>
-            {donHangNguon.diaChiGiao ? (
-              <label className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
-                <span>Địa chỉ giao</span>
-                <Input size="middle" value={donHangNguon.diaChiGiao} readOnly />
-              </label>
-            ) : null}
             <div className="noi-bo-don-hang-detail-field noi-bo-don-hang-detail-field--wide">
               <span>Tổng kết thanh toán</span>
               <div className="noi-bo-don-hang-money-summary">

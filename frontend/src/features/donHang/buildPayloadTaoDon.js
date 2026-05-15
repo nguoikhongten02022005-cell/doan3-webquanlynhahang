@@ -52,16 +52,6 @@ export const buildPayloadTaoDon = (payload = {}) => {
     nguonTao: payload.nguonTao || payload.source || 'Online',
     ghiChu: payload.ghiChu || payload.note || '',
     maGiamGia: payload.maGiamGia || payload.voucherCode || voucher.maGiamGia || voucher.code || null,
-    phiShip: Number(payload.phiShip || tongHopGia.phiShip || 0),
-    diaChiGiao: payload.diaChiGiao || payload.customer?.address || '',
-    gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
-    gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
-    thongTinNhanHang: {
-      loaiDon,
-      diaChiGiao: payload.diaChiGiao || payload.customer?.address || '',
-      gioLayHang: payload.gioLayHang || payload.thongTinNhanHang?.gioLayHang || '',
-      gioGiao: payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
-    },
     tongHopGia,
     chiTiet: chuanHoaDanhSachMonTaoDon(payload),
   }

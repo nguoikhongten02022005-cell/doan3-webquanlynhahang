@@ -44,10 +44,6 @@ export interface DonHangRecord {
   MaNV: string | null;
   MaDatBan: string | null;
   LoaiDon: string;
-  DiaChiGiao: string | null;
-  GioLayHang: string | null;
-  GioGiao: string | null;
-  PhiShip: number;
   TongTien: number;
   TrangThai: string;
   NguonTao: string;

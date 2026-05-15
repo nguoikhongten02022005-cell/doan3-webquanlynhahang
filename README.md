@@ -33,11 +33,10 @@ screenshots/     # Ảnh giao diện minh họa
 - Trang chủ, giới thiệu, thực đơn
 - Đăng ký / đăng nhập
 - Đặt bàn
-- Giỏ hàng và thanh toán
+- Giỏ hàng và thanh toán đơn gọi món tại bàn
 - Hồ sơ cá nhân, lịch sử đơn hàng, lịch sử đặt bàn
 - Đánh giá sau đơn hàng
 - Gọi món tại bàn qua QR
-- Đơn mang về
 
 ### Nội bộ
 
@@ -45,7 +44,7 @@ screenshots/     # Ảnh giao diện minh họa
 - Dashboard vận hành
 - Quản lý bàn và sơ đồ bàn
 - Quản lý đặt bàn
-- Quản lý đơn hàng tại chỗ và mang về
+- Quản lý đơn hàng gọi món tại bàn
 - Quản lý món ăn
 - Quản lý tài khoản nhân viên / quản trị
 - Duyệt đánh giá
@@ -158,7 +157,6 @@ npm run smoke:api
 - `/api/don-hang`
 - `/api/ma-giam-gia/validate`
 - `/api/danh-gia`
-- `/api/mang-ve`
 - `/api/diem-tich-luy`
 - `/api/thong-ke`
 

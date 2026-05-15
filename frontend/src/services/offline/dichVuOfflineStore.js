@@ -129,10 +129,6 @@ const taoDanhSachDonHangKhoiTao = () => {
         MaNV: order.maNV || null,
         MaDatBan: order.maDatBan || null,
         LoaiDon: order.loaiDon,
-        DiaChiGiao: order.customer?.address || order.diaChiGiao || '',
-        GioLayHang: order.thongTinNhanHang?.gioLayHang || order.gioLayHang || '',
-        GioGiao: order.thongTinNhanHang?.gioGiao || order.gioGiao || '',
-        PhiShip: Number(order.phiShip || 0),
         TongTien: Number(order.tongTien || 0),
         TrangThai: order.trangThai,
         GhiChu: order.ghiChu || '',
@@ -461,7 +457,7 @@ export const taoMaDatBanMoiOffline = () => {
 export const taoMaDonHangMoiOffline = (loaiDon = 'DH') => {
   const danhSach = layDanhSachDonHangOffline()
   const soLonNhat = sapXepSoTangDan(danhSach.map((order) => String(order.maDonHang || '').match(MA_DON_REGEX)?.[0]))[0] || 3
-  return `${String(loaiDon || 'DH').startsWith('DHMV') ? 'DHMV' : 'DH'}${String(soLonNhat + 1).padStart(3, '0')}`
+  return `DH${String(soLonNhat + 1).padStart(3, '0')}`
 }
 
 export const taoMaDanhGiaMoiOffline = () => {
@@ -549,19 +545,11 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
     })
 
     const tongTien = Number(orderInput.tongTien || orderInput.TongTien || orderInput.total || chiTietDaChuanHoa.reduce((sum, item) => sum + Number(item.thanhTien || 0), 0) || mucHienTai.tongTien || 0)
-    const thongTinNhanHang = {
-      loaiDon: orderInput.loaiDon || orderInput.LoaiDon || mucHienTai.loaiDon || '',
-      diaChiGiao: orderInput.diaChiGiao || orderInput.DiaChiGiao || orderInput.customer?.address || mucHienTai.customer?.address || '',
-      gioLayHang: orderInput.gioLayHang || orderInput.GioLayHang || orderInput.thongTinNhanHang?.gioLayHang || mucHienTai.thongTinNhanHang?.gioLayHang || '',
-      gioGiao: orderInput.gioGiao || orderInput.GioGiao || orderInput.thongTinNhanHang?.gioGiao || mucHienTai.thongTinNhanHang?.gioGiao || '',
-    }
-
     const voucher = orderInput.voucher || mucHienTai.voucher || {}
     const tongHopGia = orderInput.tongHopGia || mucHienTai.tongHopGia || {
       tamTinh: tongTien,
       giamGia: 0,
       phiDichVu: 0,
-      phiShip: Number(orderInput.phiShip || orderInput.PhiShip || 0),
       tongTien,
     }
 
@@ -579,7 +567,6 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
       trangThai: orderInput.trangThai || orderInput.TrangThai || orderInput.status || mucHienTai.trangThai || 'Pending',
       tongTien,
       total: tongTien,
-      phiShip: Number(tongHopGia.phiShip || orderInput.phiShip || orderInput.PhiShip || 0),
       ngayTao: orderInput.ngayTao || orderInput.NgayTao || orderInput.orderDate || mucHienTai.ngayTao || new Date().toISOString(),
       ghiChu: orderInput.ghiChu || orderInput.GhiChu || orderInput.note || mucHienTai.ghiChu || '',
       customer: {
@@ -587,11 +574,10 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
         fullName: orderInput.tenKhachHang || orderInput.TenKhachHang || orderInput.customer?.fullName || mucHienTai.customer?.fullName || '',
         phone: orderInput.soDienThoai || orderInput.SoDienThoai || orderInput.customer?.phone || mucHienTai.customer?.phone || '',
         email: orderInput.email || orderInput.Email || orderInput.customer?.email || mucHienTai.customer?.email || '',
-        address: thongTinNhanHang.diaChiGiao,
+        address: orderInput.customer?.address || mucHienTai.customer?.address || '',
       },
       tongHopGia: deepClone(tongHopGia),
       voucher: deepClone(voucher),
-      thongTinNhanHang,
       items: chiTietDaChuanHoa.map((item, index) => ({
         id: item.id || item.maChiTiet || item.MaChiTiet || `CT_${index + 1}`,
         maChiTiet: item.maChiTiet || item.MaChiTiet || item.id || `CT_${index + 1}`,
@@ -633,10 +619,6 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
       MaNV: baseOrder.maNV || null,
       MaDatBan: baseOrder.maDatBan || null,
       LoaiDon: baseOrder.loaiDon,
-      DiaChiGiao: thongTinNhanHang.diaChiGiao,
-      GioLayHang: thongTinNhanHang.gioLayHang,
-      GioGiao: thongTinNhanHang.gioGiao,
-      PhiShip: Number(baseOrder.phiShip || 0),
       TongTien: Number(baseOrder.tongTien || 0),
       TrangThai: baseOrder.trangThai,
       GhiChu: baseOrder.ghiChu || '',
@@ -656,10 +638,6 @@ export const taoHoacCapNhatDonHangOffline = (orderInput, options = {}) => {
         loaiDon: baseOrder.loaiDon,
         trangThai: baseOrder.trangThai,
         tongTien: Number(baseOrder.tongTien || 0),
-        phiShip: Number(baseOrder.phiShip || 0),
-        diaChiGiao: baseOrder.customer?.address || '',
-        gioLayHang: thongTinNhanHang.gioLayHang,
-        gioGiao: thongTinNhanHang.gioGiao,
         ngayTao: baseOrder.ngayTao,
         danhSachMon: deepClone(baseOrder.danhSachMon || []),
       }

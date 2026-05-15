@@ -28,15 +28,6 @@ export class DonHangPricingService {
     };
   }
 
-  taoThongTinNhanHang(donHang: BanGhi) {
-    return {
-      loaiDon: String(donHang.loaiDon || donHang.LoaiDon || '').trim(),
-      diaChiGiao: String(donHang.diaChiGiao || donHang.DiaChiGiao || '').trim(),
-      gioLayHang: String(donHang.gioLayHang || donHang.GioLayHang || '').trim(),
-      gioGiao: String(donHang.gioGiao || donHang.GioGiao || '').trim(),
-    };
-  }
-
   tinhPhiDichVuTheoTamTinh(tamTinh: number) {
     return tamTinh > 0
       ? Math.round((Number(tamTinh || 0) * 0.05) / 1000) * 1000
@@ -50,30 +41,25 @@ export class DonHangPricingService {
     );
   }
 
-  taoTongHopGia(tamTinh: number, phiShip = 0, giamGia = 0, phiDichVu = 0) {
+  taoTongHopGia(tamTinh: number, giamGia = 0, phiDichVu = 0) {
     return {
       tamTinh: Number(tamTinh || 0),
       giamGia: Number(giamGia || 0),
       phiDichVu: Number(phiDichVu || 0),
-      phiShip: Number(phiShip || 0),
       tongTien: Math.max(
         0,
-        Number(tamTinh || 0) +
-          Number(phiDichVu || 0) +
-          Number(phiShip || 0) -
-          Number(giamGia || 0),
+        Number(tamTinh || 0) + Number(phiDichVu || 0) - Number(giamGia || 0),
       ),
     };
   }
 
   taoTongHopGiaTuDuLieuDonHang(donHang: BanGhi, chiTiet: BanGhi[]) {
     const tamTinh = this.tinhTongTamTinhTuChiTiet(chiTiet);
-    const phiShip = Number(donHang.PhiShip || donHang.phiShip || 0);
     const tongTienDaLuu = Number(donHang.TongTien || donHang.tongTien || 0);
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
-    const tongTruocGiam = tamTinh + phiShip + phiDichVu;
+    const tongTruocGiam = tamTinh + phiDichVu;
     const giamGia = Math.max(0, tongTruocGiam - tongTienDaLuu);
-    return this.taoTongHopGia(tamTinh, phiShip, giamGia, phiDichVu);
+    return this.taoTongHopGia(tamTinh, giamGia, phiDichVu);
   }
 
   async layThongTinMaGiamApDung(
@@ -185,11 +171,10 @@ export class DonHangPricingService {
       });
     }
 
-    const phiShip = Number(payload.phiShip || 0);
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
     const maGiamGia = await this.layThongTinMaGiamApDung(
       payload.maGiamGia,
-      tamTinh + phiDichVu + phiShip,
+      tamTinh + phiDichVu,
     );
 
     const soDiem = Number(payload.soDiem || 0);
@@ -197,12 +182,7 @@ export class DonHangPricingService {
     const diemApDung = this.taoPhanHoiDiem(soDiem, giamGiaTuDiem);
 
     const tongGiamGia = maGiamGia.soTienGiamThucTe + giamGiaTuDiem;
-    const tongHopGia = this.taoTongHopGia(
-      tamTinh,
-      phiShip,
-      tongGiamGia,
-      phiDichVu,
-    );
+    const tongHopGia = this.taoTongHopGia(tamTinh, tongGiamGia, phiDichVu);
 
     return { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung };
   }

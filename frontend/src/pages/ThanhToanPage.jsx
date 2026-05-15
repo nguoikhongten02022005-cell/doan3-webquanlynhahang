@@ -201,14 +201,14 @@ function ThanhToanPage() {
 
               <div className="nhom-truong full">
                 <label className="nhan-truong" htmlFor="address">
-                  Địa chỉ
+                  Vị trí phục vụ tại bàn
                 </label>
                 <input
                   id="address"
                   name="address"
                   type="text"
                   className="truong-nhap"
-                  placeholder="Nhập địa chỉ nếu cần giao hoặc xác nhận vị trí phục vụ"
+                  placeholder="Ví dụ: Bàn B001, khu vực trong nhà, ghi chú vị trí phục vụ"
                   value={duLieuForm.address}
                   onChange={handleDoiTruong}
                 />

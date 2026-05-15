@@ -40,7 +40,6 @@ Hệ thống hiện có các luồng chính cho khách hàng:
 - xem lịch sử đơn hàng
 - xem lịch sử đặt bàn
 - gửi đánh giá cho đơn hàng đủ điều kiện
-- đặt món mang về và theo dõi đơn mang về
 - gọi món tại bàn qua mã QR theo `maBan`
 
 ### 3.2 Nhân viên / nội bộ
@@ -52,8 +51,7 @@ Khu vực nội bộ hiện có:
 - quản lý danh sách booking
 - theo dõi sơ đồ bàn
 - quản lý bàn
-- theo dõi và cập nhật trạng thái đơn hàng
-- theo dõi đơn mang về
+- theo dõi và cập nhật trạng thái đơn hàng gọi món tại bàn
 - xem và xử lý đánh giá
 
 ### 3.3 Quản trị
@@ -79,11 +77,6 @@ Tài khoản quản trị hiện có thêm các nhóm chức năng:
 - `/danh-gia`
 - `/dang-nhap`
 - `/dang-ky`
-- `/mang-ve`
-- `/mang-ve/thuc-don`
-- `/mang-ve/gio-hang`
-- `/mang-ve/thanh-toan`
-- `/mang-ve/don-hang/:id`
 - `/ban/:maBan`
 - `/ban/:maBan/goi-mon`
 
@@ -96,7 +89,6 @@ Tài khoản quản trị hiện có thêm các nhóm chức năng:
 - `/noi-bo/quan-ly-ban`
 - `/noi-bo/thuc-don`
 - `/noi-bo/don-hang`
-- `/noi-bo/don-mang-ve`
 - `/noi-bo/danh-gia`
 - `/noi-bo/thong-ke`
 - `/noi-bo/nhan-vien`
@@ -125,7 +117,6 @@ Các nhóm controller chính:
 - `don-hang`
 - `voucher`
 - `danh-gia`
-- `mang-ve`
 - `diem-tich-luy`
 
 ## 6. Các điểm nghiệp vụ đã nối frontend - backend
@@ -136,8 +127,7 @@ Hiện frontend và backend đã nối thật ở các mảng:
 - thực đơn
 - bàn ăn
 - đặt bàn
-- đơn hàng
-- đơn mang về
+- đơn hàng gọi món tại bàn
 - đánh giá
 - tài khoản nội bộ
 
@@ -174,5 +164,5 @@ Cách hiểu đúng repo hiện tại:
 - frontend chính: `frontend/`
 - backend chính: `backend/nest-api/`
 - contract API nguồn sự thật: controller và service trong `backend/nest-api/src/modules/**`
-- trọng tâm đã làm tốt: auth, menu, table, booking, order, voucher, review, mang về, dashboard nội bộ
+- trọng tâm đã làm tốt: auth, menu, table, booking, order tại bàn, voucher, review, dashboard nội bộ
 - trọng tâm cần mô tả trung thực: báo cáo nâng cao và các mảng mở rộng chưa phải phần hoàn thiện end-to-end

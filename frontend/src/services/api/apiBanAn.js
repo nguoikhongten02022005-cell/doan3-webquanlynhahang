@@ -232,7 +232,6 @@ export const guiOrderTaiBanApi = async (maBan, danhSachMon) => {
         loaiDon: 'TAI_BAN',
         trangThai: 'Preparing',
         tongTien,
-        phiShip: 0,
         ngayTao: new Date().toISOString(),
         customer: { fullName: '', phone: '', email: '', address: '' },
         items: danhSachChiTiet.map((item) => ({

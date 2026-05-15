@@ -5,8 +5,7 @@ USE QuanNhaHang;
 -- Không dung file nay cho production hoac shared env.
 -- DỮ LIỆU MẪU
 -- Lưu ý: app hien tai chi xem TAI_BAN la gia tri hop le cua DonHang.LoaiDon.
--- Cac truong DiaChiGiao / GioLayHang / GioGiao chi la metadata demo/future cho fulfillment.
--- Không xem cac seed ben duoi la support san cho pickup/delivery cho den khi contract backend/frontend duoc mo rong.
+-- Du lieu don hang mau la don goi mon tai ban; khong co nghiep vu mang ve.
 -- DEV-ONLY: credentials below are demo-only hashes for local testing.
 -- Password mac dinh da doi chieu voi DB dang chay:
 -- admin@nhahang.com / Admin@123
@@ -95,8 +94,8 @@ INSERT INTO DatBan (
 ) VALUES
 ('DB001', 'KH001', 'B004', 'NV002', 'Tran Van Khách', '0912345678', 'khách1@gmail.com', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhật, cần bánh kem', 'PHONG_VIP', 'Cần sắp xếp bàn đẹp và ưu tiên check-in đúng giờ.', 'Pending', NOW(), NOW());
 
-INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
-('DH001', 'KH001', 'B004', 'NV002', 'DB001', 'TAI_BAN', NULL, NULL, NULL, 0, 215000, 'Paid', 'DatBan', NULL, NOW(), NOW());
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH001', 'KH001', 'B004', 'NV002', 'DB001', 'TAI_BAN', 215000, 'Paid', 'DatBan', NULL, NOW(), NOW());
 
 INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
 ('CT001', 'DH001', 'M001', 2, 35000, 70000, NULL, 'Done', NOW()),
@@ -104,9 +103,9 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT003', 'DH001', 'M008', 2, 25000, 50000, NULL, 'Done', NOW()),
 ('CT004', 'DH001', 'M006', 1, 30000, 30000, NULL, 'Done', NOW());
 
-INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
-('DH002', 'KH002', NULL, 'NV003', NULL, 'TAI_BAN', NULL, '18:30:00', NULL, 0, 140000, 'Ready', 'Online', 'Khách sẽ đến lấy sau giờ tan làm', NOW(), NOW()),
-('DH003', 'KH_TEST_01', NULL, 'NV002', NULL, 'TAI_BAN', '123 Nguyen Hue, Q1, TP.HCM', NULL, '19:15:00', 15000, 180000, 'Pending', 'Online', 'Giao tận nơi, gọi trước khi giao', NOW(), NOW());
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH002', 'KH002', 'B001', 'NV003', NULL, 'TAI_BAN', 140000, 'Ready', 'TaiQuay', 'Khách gọi món tại bàn sau giờ làm', NOW(), NOW()),
+('DH003', 'KH_TEST_01', 'B002', 'NV002', NULL, 'TAI_BAN', 180000, 'Pending', 'TaiQuay', 'Khách gọi món tại bàn, báo nhân viên trước khi phục vụ', NOW(), NOW());
 
 INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
 ('CT005', 'DH002', 'M003', 1, 55000, 55000, 'Không hanh', 'Done', NOW()),
@@ -118,8 +117,8 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 
 INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaNV, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
 ('HD001', 'DH001', 'KH001', 'NV002', 'WELCOME10', 215000, 21500, 10, 19350, 212850, NULL, NOW()),
-('HD002', 'DH002', 'KH002', 'NV003', NULL, 140000, 0, 10, 14000, 154000, 'Khách đến lấy tại quầy', NOW()),
-('HD003', 'DH003', 'KH_TEST_01', 'NV002', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Đơn giao hàng khu vực trung tâm', NOW());
+('HD002', 'DH002', 'KH002', 'NV003', NULL, 140000, 0, 10, 14000, 154000, 'Khách thanh toán tại bàn', NOW()),
+('HD003', 'DH003', 'KH_TEST_01', 'NV002', 'GIAM50K', 180000, 50000, 10, 13000, 143000, 'Đơn gọi món tại bàn đã áp dụng ưu đãi', NOW());
 
 INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
 ('TT001', 'HD001', 'ChuyenKhoan', 212850, NULL, 'Success', NOW()),
@@ -127,16 +126,16 @@ INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, Tr
 ('TT003', 'HD003', 'MoMo', 143000, 'MOMO_DH003_001', 'Pending', NOW());
 
 INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiChu, NguoiThucHien, ThoiGian) VALUES
-('LS007', 'DH002', NULL, 'Pending', 'Tạo đơn tại quán pickup', 'System', NOW()),
-('LS008', 'DH002', 'Pending', 'Pending', 'Đã gọi xác nhận khách đến lấy', 'NV003', NOW()),
+('LS007', 'DH002', NULL, 'Pending', 'Tạo đơn gọi món tại bàn', 'System', NOW()),
+('LS008', 'DH002', 'Pending', 'Pending', 'Nhân viên xác nhận món với khách tại bàn', 'NV003', NOW()),
 ('LS009', 'DH002', 'Pending', 'Preparing', 'Bếp tiếp nhận đơn', 'NV003', NOW()),
 ('LS010', 'DH002', 'Preparing', 'Ready', 'Sẵn sàng trả khách tại quầy', 'NV003', NOW()),
-('LS011', 'DH003', NULL, 'Pending', 'Tạo đơn giao hàng', 'System', NOW()),
-('LS012', 'DH003', 'Pending', 'Pending', 'Xác nhận địa chỉ giao hàng', 'NV002', NOW());
+('LS011', 'DH003', NULL, 'Pending', 'Tạo đơn gọi món tại bàn', 'System', NOW()),
+('LS012', 'DH003', 'Pending', 'Pending', 'Xác nhận món với khách tại bàn', 'NV002', NOW());
 
 INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, SoDiem, SoDiemTruoc, SoDiemSau, MoTa, NgayTao) VALUES
-('LSD002', 'KH002', 'DH002', 'CONG', 15, 65, 80, 'Cộng điểm từ đơn hàng pickup DH002', NOW()),
-('LSD003', 'KH_TEST_01', 'DH003', 'CONG', 14, 0, 14, 'Tạm cộng điểm cho đơn giao hàng DH003', NOW());
+('LSD002', 'KH002', 'DH002', 'CONG', 15, 65, 80, 'Cộng điểm từ đơn gọi món tại bàn DH002', NOW()),
+('LSD003', 'KH_TEST_01', 'DH003', 'CONG', 14, 0, 14, 'Tạm cộng điểm cho đơn gọi món tại bàn DH003', NOW());
 
 -- ============================================================
 -- MO RONG DỮ LIỆU MẪU DE KIEM TRA END-TO-END VOI BACKEND THAT
@@ -344,23 +343,23 @@ INSERT INTO DatBan (
 ('DB019', 'KH004', NULL, 'NV004', 'Khách Lẻ Công Ty', '0907772003', 'company.booking2@demo.local', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '18:45:00', '20:30:00', 10, 'Cần xác nhận lại số lượng khách và yêu cầu hóa đơn.', 'SANH_CHINH', 'Booking doanh nghiệp mới từ website.', 'Pending', TIMESTAMP(CURRENT_DATE(), '16:10:00'), TIMESTAMP(CURRENT_DATE(), '16:10:00')),
 ('DB020', 'KH008', 'B009', 'NV005', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', CURRENT_DATE(), '19:15:00', '20:45:00', 4, 'Đặt bàn tối cuối ngày sau giờ làm.', 'BAN_CONG', 'Khách đã xác nhận, ưu tiên phục vụ nhanh trong ca cao điểm.', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '17:10:00'), TIMESTAMP(CURRENT_DATE(), '17:20:00'));
 
-INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, GioLayHang, GioGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
-('DH004', 'KH003', 'B003', 'NV004', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 110000, 'Preparing', 'QRCode', 'Khách tai ban goi them mon va nuoc.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)),
-('DH005', 'KH006', 'B009', 'NV002', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 351000, 'Ready', 'QRCode', 'Khách yêu cầu xuất hóa đơn tại bàn.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 70 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 8 MINUTE)),
-('DH006', 'KH007', 'B011', 'NV005', 'DB005', 'TAI_BAN', NULL, NULL, NULL, 0, 205000, 'Served', 'DatBan', 'Da phục vụ xong mon chinh, cho danh gia.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 MINUTE)),
-('DH007', 'KH006', NULL, 'NV003', NULL, 'TAI_BAN', NULL, '11:30:00', NULL, 0, 210000, 'Paid', 'Online', 'Khách đặt pickup cho buổi trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:45:00')),
-('DH008', 'KH008', NULL, 'NV005', NULL, 'TAI_BAN', '12 Nguyen Hue, Quan 1, TP.HCM', NULL, '19:10:00', 15000, 168000, 'Paid', 'Online', 'Giao tận nơi trong khung tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:40:00')),
-('DH009', 'KH009', NULL, 'NV007', NULL, 'TAI_BAN', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '18:20:00', 15000, 115000, 'Cancelled', 'Online', 'Khách hủy đơn sau khi tài xế chưa nhận.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
-('DH010', 'KH002', 'B001', 'NV003', NULL, 'TAI_BAN', NULL, NULL, NULL, 0, 147000, 'Paid', 'TaiQuay', 'Khách ăn tại quán vào giờ trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:10:00')),
-('DH011', 'KH001', NULL, 'NV003', NULL, 'TAI_BAN', NULL, '18:40:00', NULL, 0, 188000, 'Paid', 'Online', 'Đơn pickup buổi tối cho gia đình.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:45:00')),
-('DH012', 'KH006', NULL, 'NV002', NULL, 'TAI_BAN', '45 Le Loi, Quan 1, TP.HCM', NULL, '19:00:00', 20000, 307000, 'Paid', 'Online', 'Đơn giao hàng VIP đã áp dụng ưu đãi.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:30:00')),
-('DH013', 'KH001', 'B013', 'NV005', 'DB014', 'TAI_BAN', NULL, NULL, NULL, 0, 105000, 'Pending', 'QRCode', 'Order tại quầy bar vừa tạo, đang chờ bếp tiếp nhận.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 MINUTE)),
-('DH014', 'KH008', 'B012', 'NV002', 'DB016', 'TAI_BAN', NULL, NULL, NULL, 0, 268000, 'Paid', 'DatBan', 'Khách dùng bữa trưa và thanh toán trọn vẹn.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '12:18:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:42:00')),
-('DH015', 'KH006', 'B005', 'NV002', 'DB018', 'TAI_BAN', NULL, NULL, NULL, 0, 394000, 'Paid', 'DatBan', 'Tiệc VIP đã phục vụ xong, doanh thu cao.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:10:00')),
-('DH016', 'KH007', NULL, 'NV003', NULL, 'TAI_BAN', NULL, '18:10:00', NULL, 0, 172000, 'Paid', 'Online', 'Khách pickup buổi tối, có mua thêm tráng miệng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
-('DH017', 'KH009', NULL, 'NV005', NULL, 'TAI_BAN', '67 Dien Bien Phu, Binh Thanh, TP.HCM', NULL, '19:45:00', 15000, 226000, 'Paid', 'Online', 'Đơn giao hàng buổi tối trong nội thành.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
-('DH018', 'KH001', 'B002', 'NV003', 'DB006', 'TAI_BAN', NULL, NULL, NULL, 0, 184000, 'Pending', 'DatBan', 'Booking trưa đang chờ bếp tiếp nhận.', TIMESTAMP(CURRENT_DATE(), '11:35:00'), TIMESTAMP(CURRENT_DATE(), '11:40:00')),
-('DH019', 'KH008', 'B009', 'NV005', 'DB020', 'TAI_BAN', NULL, NULL, NULL, 0, 312000, 'Paid', 'DatBan', 'Khách tới cuối ngày đã thanh toán ngay sau bữa tối.', TIMESTAMP(CURRENT_DATE(), '19:18:00'), TIMESTAMP(CURRENT_DATE(), '20:48:00'));
+INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
+('DH004', 'KH003', 'B003', 'NV004', NULL, 'TAI_BAN', 110000, 'Preparing', 'QRCode', 'Khách tai ban goi them mon va nuoc.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)),
+('DH005', 'KH006', 'B009', 'NV002', NULL, 'TAI_BAN', 351000, 'Ready', 'QRCode', 'Khách yêu cầu xuất hóa đơn tại bàn.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 70 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 8 MINUTE)),
+('DH006', 'KH007', 'B011', 'NV005', 'DB005', 'TAI_BAN', 205000, 'Served', 'DatBan', 'Da phục vụ xong mon chinh, cho danh gia.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 MINUTE)),
+('DH007', 'KH006', 'B006', 'NV003', NULL, 'TAI_BAN', 210000, 'Paid', 'TaiQuay', 'Khách gọi món tại bàn cho buổi trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:45:00')),
+('DH008', 'KH008', 'B007', 'NV005', NULL, 'TAI_BAN', 168000, 'Paid', 'TaiQuay', 'Khách dùng bữa tại bàn trong khung tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:40:00')),
+('DH009', 'KH009', 'B008', 'NV007', NULL, 'TAI_BAN', 115000, 'Cancelled', 'TaiQuay', 'Khách hủy đơn tại bàn trước khi bếp nhận.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
+('DH010', 'KH002', 'B001', 'NV003', NULL, 'TAI_BAN', 147000, 'Paid', 'TaiQuay', 'Khách ăn tại quán vào giờ trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:10:00')),
+('DH011', 'KH001', 'B010', 'NV003', NULL, 'TAI_BAN', 188000, 'Paid', 'TaiQuay', 'Khách gọi món tại bàn buổi tối cho gia đình.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:45:00')),
+('DH012', 'KH006', 'B011', 'NV002', NULL, 'TAI_BAN', 307000, 'Paid', 'TaiQuay', 'Đơn gọi món tại bàn VIP đã áp dụng ưu đãi.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:30:00')),
+('DH013', 'KH001', 'B013', 'NV005', 'DB014', 'TAI_BAN', 105000, 'Pending', 'QRCode', 'Order tại quầy bar vừa tạo, đang chờ bếp tiếp nhận.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 MINUTE)),
+('DH014', 'KH008', 'B012', 'NV002', 'DB016', 'TAI_BAN', 268000, 'Paid', 'DatBan', 'Khách dùng bữa trưa và thanh toán trọn vẹn.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '12:18:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:42:00')),
+('DH015', 'KH006', 'B005', 'NV002', 'DB018', 'TAI_BAN', 394000, 'Paid', 'DatBan', 'Tiệc VIP đã phục vụ xong, doanh thu cao.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:20:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:10:00')),
+('DH016', 'KH007', 'B003', 'NV003', NULL, 'TAI_BAN', 172000, 'Paid', 'TaiQuay', 'Khách gọi món tại bàn buổi tối, có mua thêm tráng miệng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
+('DH017', 'KH009', 'B004', 'NV005', NULL, 'TAI_BAN', 226000, 'Paid', 'TaiQuay', 'Đơn gọi món tại bàn buổi tối trong nhà hàng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
+('DH018', 'KH001', 'B002', 'NV003', 'DB006', 'TAI_BAN', 184000, 'Pending', 'DatBan', 'Booking trưa đang chờ bếp tiếp nhận.', TIMESTAMP(CURRENT_DATE(), '11:35:00'), TIMESTAMP(CURRENT_DATE(), '11:40:00')),
+('DH019', 'KH008', 'B009', 'NV005', 'DB020', 'TAI_BAN', 312000, 'Paid', 'DatBan', 'Khách tới cuối ngày đã thanh toán ngay sau bữa tối.', TIMESTAMP(CURRENT_DATE(), '19:18:00'), TIMESTAMP(CURRENT_DATE(), '20:48:00'));
 
 INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
 ('CT011', 'DH004', 'M002', 1, 45000, 45000, 'Lam gion ky', 'Preparing', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 34 MINUTE)),
@@ -406,16 +405,16 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT051', 'DH019', 'M018', 1, 45000, 45000, 'Tang kem sau bữa tối', 'Done', TIMESTAMP(CURRENT_DATE(), '19:22:00'));
 
 INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaNV, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
-('HD004', 'DH007', 'KH006', 'NV003', 'LOYAL25K', 210000, 25000, 10, 21000, 231000, 'Đơn pickup tri ân thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:46:00')),
-('HD005', 'DH008', 'KH008', 'NV005', 'GIAM20K', 168000, 20000, 10, 16800, 184800, 'Hỗ trợ phí ship cho đơn giao hàng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:42:00')),
+('HD004', 'DH007', 'KH006', 'NV003', 'LOYAL25K', 210000, 25000, 10, 21000, 231000, 'Đơn gọi món tại bàn tri ân thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:46:00')),
+('HD005', 'DH008', 'KH008', 'NV005', 'GIAM20K', 168000, 20000, 10, 16800, 184800, 'Ưu đãi cho đơn gọi món tại bàn.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:42:00')),
 ('HD006', 'DH009', 'KH009', 'NV007', NULL, 115000, 0, 10, 11500, 126500, 'Thanh toán thất bại trước khi khách hủy đơn.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:08:00')),
 ('HD007', 'DH010', 'KH002', 'NV003', NULL, 147000, 0, 10, 14700, 161700, 'Hóa đơn tại quầy giờ trưa.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:12:00')),
-('HD008', 'DH011', 'KH001', 'NV003', NULL, 188000, 0, 8, 15040, 203040, 'Hóa đơn pickup buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:46:00')),
-('HD009', 'DH012', 'KH006', 'NV002', 'VIP25', 307000, 90000, 8, 24560, 331560, 'Đơn giao hàng VIP có áp dụng mã giảm giá.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:32:00')),
+('HD008', 'DH011', 'KH001', 'NV003', NULL, 188000, 0, 8, 15040, 203040, 'Hóa đơn gọi món tại bàn buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:46:00')),
+('HD009', 'DH012', 'KH006', 'NV002', 'VIP25', 307000, 90000, 8, 24560, 331560, 'Đơn gọi món tại bàn VIP có áp dụng mã giảm giá.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:32:00')),
 ('HD010', 'DH014', 'KH008', 'NV002', NULL, 268000, 0, 10, 26800, 294800, 'Đơn tại quán buổi trưa có thêm tráng miệng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:40:00')),
 ('HD011', 'DH015', 'KH006', 'NV002', 'VIP25', 394000, 90000, 10, 39400, 343400, 'Đơn tiệc VIP đã áp dụng ưu đãi thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:08:00')),
-('HD012', 'DH016', 'KH007', 'NV003', NULL, 172000, 0, 8, 13760, 185760, 'Đơn pickup sau giờ tan làm.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:18:00')),
-('HD013', 'DH017', 'KH009', 'NV005', 'GIAM20K', 226000, 20000, 8, 18080, 224080, 'Đơn giao hàng nội thành buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:48:00')),
+('HD012', 'DH016', 'KH007', 'NV003', NULL, 172000, 0, 8, 13760, 185760, 'Đơn gọi món tại bàn sau giờ tan làm.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:18:00')),
+('HD013', 'DH017', 'KH009', 'NV005', 'GIAM20K', 226000, 20000, 8, 18080, 224080, 'Đơn gọi món tại bàn buổi tối.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:48:00')),
 ('HD014', 'DH019', 'KH008', 'NV005', NULL, 312000, 0, 10, 31200, 343200, 'Đơn bữa tối cao điểm trong nhà hàng.', TIMESTAMP(CURRENT_DATE(), '20:46:00'));
 
 INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, TrangThai, ThoiGian) VALUES
@@ -436,14 +435,14 @@ INSERT INTO ThanhToan (MaThanhToan, MaHoaDon, PhuongThuc, SoTien, MaGiaoDich, Tr
 
 INSERT INTO DanhGia (MaDanhGia, MaKH, MaDonHang, SoSao, NoiDung, PhanHoi, HinhAnh, SoLuotHuuIch, NgayDanhGia, NgayCapNhat, TrangThai) VALUES
 ('DG001', 'KH001', 'DH001', 5, 'Không gian đẹp, món lên nhanh và phục vụ lịch sự.', 'Cảm ơn quý khách đã ủng hộ nhà hàng.', NULL, 12, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '09:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '10:00:00'), 'Approved'),
-('DG002', 'KH006', 'DH007', 4, 'Đóng gói cẩn thận, đến lấy hàng đúng giờ.', NULL, NULL, 3, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), 'Pending'),
-('DG003', 'KH008', 'DH008', 2, 'Món giao hơi nguội và nước chấm bị thiếu.', 'Nhà hàng đã liên hệ xin lỗi và gửi ưu đãi cho đơn tiếp theo.', NULL, 1, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:20:00'), 'Rejected'),
+('DG002', 'KH006', 'DH007', 4, 'Món phục vụ đúng giờ, trình bày cẩn thận.', NULL, NULL, 3, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:00:00'), 'Pending'),
+('DG003', 'KH008', 'DH008', 2, 'Món lên bàn hơi nguội và nước chấm bị thiếu.', 'Nhà hàng đã liên hệ xin lỗi và gửi ưu đãi cho đơn tiếp theo.', NULL, 1, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '21:20:00'), 'Rejected'),
 ('DG004', 'KH002', 'DH010', 5, 'Cơm rang vừa vị, phục vụ nhanh vào giờ cao điểm.', NULL, '["/uploads/reviews/dg004-1.jpg"]', 8, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:00:00'), 'Approved'),
 ('DG005', 'KH001', 'DH011', 4, 'Combo bữa trưa tiện lợi, đồ ăn vẫn nóng khi lên bàn.', NULL, NULL, 5, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '19:10:00'), 'Approved'),
 ('DG006', 'KH006', 'DH012', 5, 'Nhân viên phục vụ tận tình, gọi món trước và được chuẩn bị rất chu đáo.', 'Cảm ơn quý khách, hẹn gặp lại ở đơn tiếp theo.', '["/uploads/reviews/dg006-1.jpg","/uploads/reviews/dg006-2.jpg"]', 15, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 19 DAY), '20:15:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 19 DAY), '20:40:00'), 'Approved'),
 ('DG007', 'KH008', 'DH014', 5, 'Bữa trưa rất ngon, món nướng và salad cân bằng, ra món nhanh.', NULL, NULL, 6, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '15:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '15:00:00'), 'Approved'),
 ('DG008', 'KH006', 'DH015', 5, 'Phòng VIP riêng tư, lau lên nóng và phục vụ chu đáo.', 'Cảm ơn quý khách đã tin tưởng đặt tiệc nhỏ tại nhà hàng.', NULL, 11, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '22:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '22:15:00'), 'Approved'),
-('DG009', 'KH007', 'DH016', 4, 'Đơn pickup gọn gàng, bánh tiramisu rất ngon.', NULL, NULL, 4, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '09:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '09:00:00'), 'Pending'),
+('DG009', 'KH007', 'DH016', 4, 'Món lên bàn gọn gàng, bánh tiramisu rất ngon.', NULL, NULL, 4, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '09:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '09:00:00'), 'Pending'),
 ('DG010', 'KH009', 'DH017', 4, 'Không gian bàn sạch sẽ, đồ uống còn lạnh và đồ ăn gọi kỹ.', NULL, NULL, 2, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:10:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:10:00'), 'Approved'),
 ('DG011', 'KH008', 'DH019', 5, 'Bữa tối đông khách nhưng nhà hàng phục vụ vẫn nhanh, món rất ngon.', NULL, NULL, 7, TIMESTAMP(CURRENT_DATE(), '22:05:00'), TIMESTAMP(CURRENT_DATE(), '22:05:00'), 'Approved');
 
@@ -464,27 +463,27 @@ INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiCh
 ('LS026', 'DH006', 'Pending', 'Preparing', 'Bếp bắt đầu chế biến', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)),
 ('LS027', 'DH006', 'Preparing', 'Ready', 'Da san sang phục vụ', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
 ('LS028', 'DH006', 'Ready', 'Served', 'Nhân viên da mang mon ra ban', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 4 MINUTE)),
-('LS029', 'DH007', NULL, 'Pending', 'Khách tạo đơn pickup online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00')),
+('LS029', 'DH007', NULL, 'Pending', 'Khách tạo đơn gọi món tại bàn', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:20:00')),
 ('LS030', 'DH007', 'Pending', 'Pending', 'Thu ngân gọi xác nhận đơn', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:25:00')),
 ('LS031', 'DH007', 'Pending', 'Preparing', 'Bếp xử lý đơn trưa', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:30:00')),
-('LS032', 'DH007', 'Preparing', 'Paid', 'Khách đến lấy và thanh toán', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:48:00')),
-('LS033', 'DH008', NULL, 'Pending', 'Khách tạo đơn giao hàng online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00')),
-('LS034', 'DH008', 'Pending', 'Pending', 'Nhân viên xác nhận địa chỉ giao', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:45:00')),
-('LS035', 'DH008', 'Pending', 'Preparing', 'Bếp chuẩn bị đơn giao hàng', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:55:00')),
-('LS036', 'DH008', 'Preparing', 'Paid', 'Đơn giao thành công và đã thanh toán', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:44:00')),
-('LS037', 'DH009', NULL, 'Pending', 'Tạo đơn giao hàng online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00')),
-('LS038', 'DH009', 'Pending', 'Cancelled', 'Khách hủy đơn trước khi tài xế nhận', 'NV007', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
+('LS032', 'DH007', 'Preparing', 'Paid', 'Khách thanh toán tại bàn', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:48:00')),
+('LS033', 'DH008', NULL, 'Pending', 'Khách tạo đơn gọi món tại bàn', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:40:00')),
+('LS034', 'DH008', 'Pending', 'Pending', 'Nhân viên xác nhận món với khách tại bàn', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:45:00')),
+('LS035', 'DH008', 'Pending', 'Preparing', 'Bếp chuẩn bị đơn tại bàn', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:55:00')),
+('LS036', 'DH008', 'Preparing', 'Paid', 'Đơn tại bàn đã thanh toán', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:44:00')),
+('LS037', 'DH009', NULL, 'Pending', 'Tạo đơn gọi món tại bàn online', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:50:00')),
+('LS038', 'DH009', 'Pending', 'Cancelled', 'Khách hủy đơn trước khi bếp nhận', 'NV007', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:05:00')),
 ('LS039', 'DH010', NULL, 'Pending', 'Tạo đơn tại quầy giờ trưa', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:20:00')),
 ('LS040', 'DH010', 'Pending', 'Pending', 'Thu ngân xác nhận order', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:25:00')),
 ('LS041', 'DH010', 'Pending', 'Preparing', 'Bếp ra món nhanh cho khách ăn tại quán', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '12:35:00')),
 ('LS042', 'DH010', 'Preparing', 'Paid', 'Khách thanh toán xong tại quầy', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:15:00')),
-('LS043', 'DH011', NULL, 'Pending', 'Đơn pickup buổi tối được tạo từ app', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00')),
-('LS044', 'DH011', 'Pending', 'Pending', 'Thu ngân xác nhận giờ lấy', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:10:00')),
-('LS045', 'DH011', 'Pending', 'Paid', 'Khách đến lấy và quét thẻ thành công', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:48:00')),
-('LS046', 'DH012', NULL, 'Pending', 'Khách VIP tạo đơn giao hàng lớn', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00')),
+('LS043', 'DH011', NULL, 'Pending', 'Đơn gọi món tại bàn buổi tối được tạo từ app', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:00:00')),
+('LS044', 'DH011', 'Pending', 'Pending', 'Thu ngân xác nhận món tại bàn', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:10:00')),
+('LS045', 'DH011', 'Pending', 'Paid', 'Khách thanh toán tại bàn bằng thẻ', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:48:00')),
+('LS046', 'DH012', NULL, 'Pending', 'Khách VIP tạo đơn gọi món tại bàn', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:15:00')),
 ('LS047', 'DH012', 'Pending', 'Pending', 'Nhân viên gọi xác nhận và áp mã VIP', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:25:00')),
 ('LS048', 'DH012', 'Pending', 'Preparing', 'Bếp xử lý đơn lớn', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '18:45:00')),
-('LS049', 'DH012', 'Preparing', 'Ready', 'Tài xế đã nhận đơn giao hàng', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:10:00')),
+('LS049', 'DH012', 'Preparing', 'Ready', 'Bếp đã hoàn tất món tại bàn', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:10:00')),
 ('LS050', 'DH012', 'Ready', 'Paid', 'Thanh toán thành công qua ZaloPay', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:35:00')),
 ('LS051', 'DH013', NULL, 'Pending', 'Khách vua tao order tại quầy bar', 'System', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
 ('LS052', 'DH013', 'Pending', 'Pending', 'Nhân viên tiep nhan order tai bar', 'NV005', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 6 MINUTE)),
@@ -496,14 +495,14 @@ INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiCh
 ('LS058', 'DH015', 'Pending', 'Pending', 'Quản lý ca xác nhận đơn VIP', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:25:00')),
 ('LS059', 'DH015', 'Pending', 'Preparing', 'Bếp xử lý lẩu và món nướng', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:40:00')),
 ('LS060', 'DH015', 'Preparing', 'Paid', 'Khách thanh toán sau bữa tối', 'NV002', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:10:00')),
-('LS061', 'DH016', NULL, 'Pending', 'Tạo đơn pickup buổi tối', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00')),
-('LS062', 'DH016', 'Pending', 'Pending', 'Thu ngân xác nhận giờ khách đến lấy', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:40:00')),
+('LS061', 'DH016', NULL, 'Pending', 'Tạo đơn gọi món tại bàn buổi tối', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00')),
+('LS062', 'DH016', 'Pending', 'Pending', 'Thu ngân xác nhận món với khách tại bàn', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:40:00')),
 ('LS063', 'DH016', 'Pending', 'Preparing', 'Bếp hoàn tất combo và tráng miệng', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:55:00')),
-('LS064', 'DH016', 'Preparing', 'Paid', 'Khách đến lấy đúng giờ và thanh toán', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
-('LS065', 'DH017', NULL, 'Pending', 'Tạo đơn giao hàng nội thành', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00')),
-('LS066', 'DH017', 'Pending', 'Pending', 'Nhân viên xác nhận giao hàng tối', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:45:00')),
-('LS067', 'DH017', 'Pending', 'Preparing', 'Bếp đóng gói món giao hàng', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:00:00')),
-('LS068', 'DH017', 'Preparing', 'Paid', 'Tài xế giao thành công và thanh toán', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
+('LS064', 'DH016', 'Preparing', 'Paid', 'Khách thanh toán đúng giờ tại bàn', 'NV003', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
+('LS065', 'DH017', NULL, 'Pending', 'Tạo đơn gọi món tại bàn nội thành', 'System', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00')),
+('LS066', 'DH017', 'Pending', 'Pending', 'Nhân viên xác nhận món buổi tối tại bàn', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:45:00')),
+('LS067', 'DH017', 'Pending', 'Preparing', 'Bếp chuẩn bị món tại bàn', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:00:00')),
+('LS068', 'DH017', 'Preparing', 'Paid', 'Khách thanh toán tại bàn', 'NV005', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
 ('LS069', 'DH018', NULL, 'Pending', 'Đơn trưa hôm nay vừa được tạo', 'NV003', TIMESTAMP(CURRENT_DATE(), '11:35:00')),
 ('LS070', 'DH018', 'Pending', 'Pending', 'Thu ngân đã xác nhận order bàn trưa', 'NV003', TIMESTAMP(CURRENT_DATE(), '11:40:00')),
 ('LS071', 'DH019', NULL, 'Pending', 'Tạo đơn bữa tối cao điểm theo booking', 'NV005', TIMESTAMP(CURRENT_DATE(), '19:18:00')),
@@ -512,18 +511,18 @@ INSERT INTO LichSuDonHang (MaLichSu, MaDonHang, TrangThaiCu, TrangThaiMoi, GhiCh
 ('LS074', 'DH019', 'Preparing', 'Paid', 'Khách thanh toán xong trong khung cao điểm tối', 'NV005', TIMESTAMP(CURRENT_DATE(), '20:48:00'));
 
 INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, SoDiem, SoDiemTruoc, SoDiemSau, MoTa, NgayTao) VALUES
-('LSD004', 'KH001', 'DH011', 'CONG', 120, 0, 120, 'Cộng điểm từ đơn pickup DH011', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:50:00')),
+('LSD004', 'KH001', 'DH011', 'CONG', 120, 0, 120, 'Cộng điểm từ đơn gọi món tại bàn DH011', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 12 DAY), '18:50:00')),
 ('LSD005', 'KH001', 'DH001', 'CONG', 115, 120, 235, 'Cộng điểm từ đơn tại quán DH001', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:15:00')),
 ('LSD006', 'KH002', 'DH010', 'CONG', 150, 0, 150, 'Cộng điểm từ đơn tại quầy DH010', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 6 DAY), '13:20:00')),
-('LSD007', 'KH006', 'DH012', 'CONG', 180, 0, 180, 'Cộng điểm từ đơn giao hàng VIP DH012', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:40:00')),
-('LSD008', 'KH006', 'DH007', 'CONG', 140, 180, 320, 'Cộng điểm từ đơn pickup DH007', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:50:00')),
+('LSD007', 'KH006', 'DH012', 'CONG', 180, 0, 180, 'Cộng điểm từ đơn gọi món tại bàn VIP DH012', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 20 DAY), '19:40:00')),
+('LSD008', 'KH006', 'DH007', 'CONG', 140, 180, 320, 'Cộng điểm từ đơn gọi món tại bàn DH007', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:50:00')),
 ('LSD009', 'KH007', NULL, 'DIEU_CHINH', 45, 0, 45, 'Admin điều chỉnh điểm khuyến khích khách hàng thân thiết', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '09:00:00')),
-('LSD010', 'KH008', 'DH008', 'CONG', 95, 0, 95, 'Cộng điểm từ đơn giao hàng DH008', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:50:00')),
+('LSD010', 'KH008', 'DH008', 'CONG', 95, 0, 95, 'Cộng điểm từ đơn gọi món tại bàn DH008', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '19:50:00')),
 ('LSD011', 'KH009', NULL, 'CONG', 12, 0, 12, 'Tăng điểm cho khách đối tác mới đăng ký', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '10:00:00')),
 ('LSD012', 'KH008', 'DH014', 'CONG', 180, 95, 275, 'Cộng điểm từ đơn buổi trưa DH014', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:45:00')),
 ('LSD013', 'KH006', 'DH015', 'CONG', 250, 320, 570, 'Cộng điểm từ đơn tiệc VIP DH015', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:15:00')),
-('LSD014', 'KH007', 'DH016', 'CONG', 120, 45, 165, 'Cộng điểm từ đơn pickup DH016', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:25:00')),
-('LSD015', 'KH009', 'DH017', 'CONG', 160, 12, 172, 'Cộng điểm từ đơn giao hàng DH017', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:55:00')),
+('LSD014', 'KH007', 'DH016', 'CONG', 120, 45, 165, 'Cộng điểm từ đơn gọi món tại bàn DH016', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:25:00')),
+('LSD015', 'KH009', 'DH017', 'CONG', 160, 12, 172, 'Cộng điểm từ đơn gọi món tại bàn DH017', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:55:00')),
 ('LSD016', 'KH008', 'DH019', 'CONG', 210, 275, 485, 'Cộng điểm từ đơn bữa tối cao điểm DH019', TIMESTAMP(CURRENT_DATE(), '20:55:00'));
 
 UPDATE KhachHang
@@ -553,11 +552,11 @@ WHERE MaCode IN ('WELCOME10', 'GIAM50K', 'LOYAL25K', 'GIAM20K', 'VIP25');
 INSERT INTO ThongBao (MaThongBao, MaND, TieuDe, NoiDung, LoaiThongBao, MaThamChieu, DaDoc, NgayTao) VALUES
 ('TB001', 'ND001', 'Co danh gia moi cho duyet', 'Đánh giá DG002 dang o trang thai Pending va can admin xu ly.', 'DanhGia', 'DG002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE)),
 ('TB002', 'ND002', 'Booking sap den can gọi lại', 'Booking DB002 sap den trong vong 2 gio va chua chot hoàn tất.', 'DatBan', 'DB002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE)),
-('TB003', 'ND003', 'Đơn pickup sẵn sàng trả khách', 'Đơn DH002 đã sẵn sàng, cần liên hệ khách đến lấy.', 'DonHang', 'DH002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
+('TB003', 'ND003', 'Đơn tại bàn sẵn sàng phục vụ', 'Đơn DH002 đã sẵn sàng, cần phục vụ khách tại bàn.', 'DonHang', 'DH002', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
 ('TB004', 'ND006', 'Ban B003 vua co order moi', 'Khách tai ban B003 vua gui them mon qua QR.', 'DonHang', 'DH004', FALSE, DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
 ('TB005', 'ND007', 'Booking VIP da duoc xác nhận', 'Booking DB004 da giu phong VIP cho khách Le Minh Chau.', 'DatBan', 'DB004', TRUE, TIMESTAMP(CURRENT_DATE(), '09:30:00')),
 ('TB006', 'ND004', 'Điểm tích lũy vừa được cập nhật', 'Bạn vừa nhận thêm điểm từ đơn hàng DH001.', 'HeThong', 'DH001', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '20:20:00')),
-('TB007', 'ND010', 'Đơn pickup thành công', 'Đơn DH007 đã thanh toán thành công, điểm tích lũy đã được cộng.', 'DonHang', 'DH007', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:55:00')),
+('TB007', 'ND010', 'Đơn tại bàn thành công', 'Đơn DH007 đã thanh toán thành công, điểm tích lũy đã được cộng.', 'DonHang', 'DH007', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:55:00')),
 ('TB008', 'ND001', 'Cần xử lý thanh toán thất bại', 'Thanh toán TT006 của đơn DH009 đang ở trạng thái Failed.', 'HeThong', 'TT006', FALSE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:10:00')),
 ('TB009', 'ND003', 'Khách vua danh gia 5 sao', 'Đánh giá DG004 da duoc khách gui cho don DH010.', 'DanhGia', 'DG004', TRUE, TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '14:05:00')),
 ('TB010', 'ND009', 'Bao cao cuoi ngay da san sang', 'Du lieu doanh thu va booking hom nay da san sang de doi chieu.', 'HeThong', 'REPORT_001', FALSE, TIMESTAMP(CURRENT_DATE(), '22:00:00'));
@@ -598,7 +597,7 @@ WHERE MaThanhToan = 'TT001';
 UPDATE LichSuDiemTichLuy
 SET SoDiemTruoc = 150,
     SoDiemSau = 165,
-    MoTa = 'Cộng điểm từ đơn hàng pickup DH002',
+    MoTa = 'Cộng điểm từ đơn gọi món tại bàn DH002',
     NgayTao = TIMESTAMP(CURRENT_DATE(), '18:45:00')
 WHERE MaGiaoDichDiem = 'LSD002';
 

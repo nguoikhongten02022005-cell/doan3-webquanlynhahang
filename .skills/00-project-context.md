@@ -13,7 +13,7 @@ Repo nay la do an quan ly nha hang full-stack.
 - DB: MySQL schema/seed nam trong `database/mysql_init_schema.sql` va `database/mysql_seed_dev.sql`
 
 ## Muc tieu he thong
-- Phuc vu khach hang: xem thuc don, dang ky/dang nhap, dat ban, gio hang, thanh toan, ho so, lich su don/lich su dat ban, danh gia, goi mon tai ban qua QR, don mang ve.
+- Phuc vu khach hang: xem thuc don, dang ky/dang nhap, dat ban, gio hang, thanh toan don goi mon tai ban, ho so, lich su don/lich su dat ban, danh gia, goi mon tai ban qua QR.
 - Phuc vu noi bo: dashboard, quan ly dat ban, so do ban, don hang, mon an, ma giam gia, khach hang, nhan vien, thong ke.
 
 ## Cong nghe
@@ -64,7 +64,7 @@ Repo nay la do an quan ly nha hang full-stack.
 
 ## API/service quan trong
 - FE route goc dung `/api` base URL.
-- Nhom API lon: `/api/auth`, `/api/nguoi-dung`, `/api/thuc-don`, `/api/ban`, `/api/dat-ban`, `/api/don-hang`, `/api/ma-giam-gia/validate`, `/api/danh-gia`, `/api/mang-ve`, `/api/diem-tich-luy`, `/api/thong-ke`.
+- Nhom API lon: `/api/auth`, `/api/nguoi-dung`, `/api/thuc-don`, `/api/ban`, `/api/dat-ban`, `/api/don-hang`, `/api/ma-giam-gia/validate`, `/api/danh-gia`, `/api/diem-tich-luy`, `/api/thong-ke`.
 - Backend prefix trong README va code can giu on dinh de khong vo contract FE.
 
 ## Bang DB chinh

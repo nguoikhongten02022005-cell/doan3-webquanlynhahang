@@ -9,6 +9,10 @@ import {
   ValidateNested,
 } from 'class-validator';
 
+export enum LoaiDonHang {
+  TAI_BAN = 'TAI_BAN',
+}
+
 export class ChiTietMonDto {
   @ApiProperty({ example: 'M001' })
   @IsString()
@@ -27,8 +31,6 @@ export class ChiTietMonDto {
 }
 
 export class TaoDonHangDto {
-  // loaiDon always TAI_BAN - removed TAI_QUAN option
-
   @ApiPropertyOptional()
   @IsOptional()
   @IsString()
@@ -57,28 +59,6 @@ export class TaoDonHangDto {
   @IsOptional()
   @IsString()
   nguonTao?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  diaChiGiao?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  gioLayHang?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @IsString()
-  gioGiao?: string;
-
-  @ApiPropertyOptional()
-  @IsOptional()
-  @Type(() => Number)
-  @IsNumber()
-  @Min(0)
-  phiShip?: number;
 
   @ApiPropertyOptional()
   @IsOptional()

@@ -22,7 +22,6 @@ export const TAO_TONG_HOP_GIA_MAC_DINH = () => ({
   tamTinh: 0,
   giamGia: 0,
   phiDichVu: 0,
-  phiShip: 0,
   tongTien: 0,
 })
 
@@ -39,7 +38,6 @@ export const chuanHoaTongHopGia = (nguon = {}) => ({
   tamTinh: Number(layGiaTri(nguon, 'tamTinh', 'TamTinh', 'subtotal', 'Subtotal', 'tongTamTinh') || 0),
   giamGia: Number(layGiaTri(nguon, 'giamGia', 'GiamGia', 'discountAmount', 'DiscountAmount') || 0),
   phiDichVu: Number(layGiaTri(nguon, 'phiDichVu', 'PhiDichVu', 'serviceFee', 'ServiceFee') || 0),
-  phiShip: Number(layGiaTri(nguon, 'phiShip', 'PhiShip', 'shippingFee', 'ShippingFee') || 0),
   tongTien: Number(layGiaTri(nguon, 'tongTien', 'TongTien', 'total', 'Total') || 0),
 })
 
@@ -57,9 +55,3 @@ export const chuanHoaKetQuaVoucher = (nguon = {}) => ({
   thongDiep: String(layGiaTri(nguon, 'thongDiep', 'ThongDiep', 'message', 'Message', 'moTa', 'MoTa', 'description', 'Description') || '').trim(),
 })
 
-export const chuanHoaThongTinNhanHang = (nguon = {}) => ({
-  loaiDon: String(layGiaTri(nguon, 'loaiDon', 'LoaiDon') || '').trim(),
-  diaChiGiao: String(layGiaTri(nguon, 'diaChiGiao', 'DiaChiGiao', 'address', 'Address') || '').trim(),
-  gioLayHang: String(layGiaTri(nguon, 'gioLayHang', 'GioLayHang', 'pickupTime', 'PickupTime') || '').trim(),
-  gioGiao: String(layGiaTri(nguon, 'gioGiao', 'GioGiao', 'deliveryTime', 'DeliveryTime') || '').trim(),
-})

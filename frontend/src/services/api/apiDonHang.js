@@ -9,7 +9,7 @@ import {
   layDonHangCoTheDanhGiaOffline,
 } from '../offline/dichVuOfflineStore'
 import { buildPayloadTaoDon } from '../../features/donHang/buildPayloadTaoDon'
-import { chuanHoaTongHopGia, chuanHoaKetQuaVoucher, chuanHoaThongTinNhanHang } from '../../features/donHang/contracts'
+import { chuanHoaTongHopGia, chuanHoaKetQuaVoucher } from '../../features/donHang/contracts'
 
 const layGiaTri = (nguon, ...khoa) => {
   for (const key of khoa) {
@@ -41,8 +41,6 @@ const chuanHoaDonHang = (order) => {
 
   const tongHopGia = chuanHoaTongHopGia(order.tongHopGia || order)
   const voucher = chuanHoaKetQuaVoucher(order.voucher || order.Voucher || {})
-  const thongTinNhanHang = chuanHoaThongTinNhanHang(order.thongTinNhanHang || order.ThongTinNhanHang || order)
-
   return {
     ...order,
     id: layGiaTri(order, 'maDonHang', 'MaDonHang'),
@@ -51,11 +49,9 @@ const chuanHoaDonHang = (order) => {
     total: tongHopGia.tongTien,
     subtotal: tongHopGia.tamTinh,
     serviceFee: tongHopGia.phiDichVu,
-    shippingFee: tongHopGia.phiShip,
     discountAmount: tongHopGia.giamGia,
     tongHopGia,
     voucher,
-    thongTinNhanHang,
     paymentMethod: '',
     paymentStatus: '',
     note: layGiaTri(order, 'ghiChu', 'GhiChu') || '',

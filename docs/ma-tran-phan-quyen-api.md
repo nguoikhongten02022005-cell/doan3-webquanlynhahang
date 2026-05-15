@@ -56,12 +56,6 @@ Tai lieu nay tom tat quyen truy cap cho cac endpoint trong `backend/nest-api/src
 | GET | `/api/danh-gia` | public / staff | Public chi nhan review `Approved`; noi bo co token thi xem full |
 | POST | `/api/danh-gia` | customer-own | Khach chi review don cua chinh minh |
 | PATCH | `/api/danh-gia/:maDanhGia/duyet` | admin | Duyet / tu choi review |
-| POST | `/api/mang-ve/don-hang` | customer-own | Khach tao don mang ve cho chinh minh |
-| GET | `/api/mang-ve/don-hang/:maDonHang` | customer-own | Khach chi xem don mang ve cua chinh minh; staff/admin xem noi bo |
-| GET | `/api/mang-ve/admin/don-hang` | staff | Danh sach don mang ve noi bo |
-| PATCH | `/api/mang-ve/admin/don-hang/:maDonHang/trang-thai` | staff | Cap nhat trang thai don mang ve |
-| GET | `/api/mang-ve/lich-su` | customer-own | Lich su don mang ve cua chinh user |
-| PATCH | `/api/mang-ve/don-hang/:maDonHang/huy` | customer-own | Khach chi huy don cua minh; staff/admin co the huy noi bo |
 | GET | `/api/diem-tich-luy/me` | customer-own | Tong quan diem tich luy cua toi |
 | GET | `/api/diem-tich-luy/me/history` | customer-own | Lich su bien dong diem tich luy cua toi |
 
@@ -74,9 +68,6 @@ Backend dang kiem tra so huu du lieu theo `Authorization` header o cac nhom rout
 - `dat-ban/khach/:maKh`
 - `danh-gia`
 - `don-hang/:maDonHang`
-- `mang-ve/don-hang/:maDonHang`
-- `mang-ve/don-hang/:maDonHang/huy`
-- `mang-ve/don-hang`
 
 ### 2. Muc `staff`
 

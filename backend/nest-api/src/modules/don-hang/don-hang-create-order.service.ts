@@ -52,7 +52,7 @@ export class DonHangCreateOrderService {
         : [];
     const maBan = payload.maBan || payload.maBanAn || null;
     const nguonTao = payload.nguonTao || 'Online';
-    const loaiDonHang = loaiDon || 'TAI_BAN';
+    const loaiDonHang = 'TAI_BAN';
     const trangThai = payload.trangThai || 'Pending';
     const soDiem = Number(payload.soDiem || 0);
 
@@ -101,7 +101,7 @@ export class DonHangCreateOrderService {
 
       if (!isAppending) {
         await this.thucThi(
-          'INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, DiaChiGiao, PhiShip, TongTien, TrangThai, NguonTao, GhiChu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+          'INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, TrangThai, NguonTao, GhiChu) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
           [
             maDonHang,
             payload.maKH || null,
@@ -109,8 +109,6 @@ export class DonHangCreateOrderService {
             payload.maNV || null,
             payload.maDatBan || null,
             loaiDonHang,
-            payload.diaChiGiao || null,
-            tongHopGia.phiShip,
             tongHopGia.tongTien,
             trangThai,
             nguonTao,
@@ -195,22 +193,10 @@ export class DonHangCreateOrderService {
             ghiChu: payload.ghiChu || '',
             ngayTao: new Date().toISOString(),
             loaiDon: 'TAI_BAN',
-            thongTinNhanHang: this.donHangPricingService.taoThongTinNhanHang({
-              loaiDon: 'TAI_BAN',
-              diaChiGiao: payload.diaChiGiao || '',
-              gioLayHang:
-                payload.gioLayHang ||
-                payload.thongTinNhanHang?.gioLayHang ||
-                '',
-              gioGiao:
-                payload.gioGiao || payload.thongTinNhanHang?.gioGiao || '',
-            }),
-            diaChiGiao: payload.diaChiGiao || '',
-            phiShip: tongHopGia.phiShip,
             tenKhachHang: payload.hoTen || payload.tenKhachHang || '',
             soDienThoai: payload.soDienThoai || '',
             email: payload.email || '',
-            diaChiKhachHang: payload.diaChiGiao || '',
+            diaChiKhachHang: payload.diaChiKhachHang || '',
           },
           chiTiet: chiTietPhanHoi,
           diemDaDoi,
