@@ -1,95 +1,79 @@
 # Hệ thống quản lý nhà hàng
 
-Repo này là đồ án full-stack cho bài toán quản lý nhà hàng, gồm:
+> Đồ án full-stack web app cho bài toán quản lý nhà hàng, gồm frontend React + Vite, backend NestJS + TypeScript và MySQL.
 
-- **frontend** React + Vite trong `frontend/`
-- **backend chính** NestJS + TypeScript trong `backend/nest-api/`
-- **cơ sở dữ liệu** MySQL, script khởi tạo trong `database/`
+## Tổng quan
 
-Mục tiêu hiện tại của repo là chạy ổn các nghiệp vụ lõi của nhà hàng và giữ contract frontend - backend nhất quán để demo, kiểm thử và nộp đồ án.
+Hệ thống hỗ trợ 2 nhóm người dùng chính:
 
-## Phạm vi đã triển khai
+- **Khách hàng**: xem thực đơn, đặt bàn, gọi món tại bàn qua QR, thanh toán, theo dõi lịch sử đơn hàng.
+- **Nội bộ**: đăng nhập quản trị, quản lý bàn, đặt bàn, đơn hàng, món ăn, tài khoản, đánh giá và thống kê cơ bản.
 
-### Khu vực khách hàng
-- xem trang chủ, giới thiệu, thực đơn
-- đăng ký, đăng nhập
-- đặt bàn
-- giỏ hàng, thanh toán
-- theo dõi hồ sơ cá nhân
-- xem lịch sử đơn hàng và lịch sử đặt bàn
-- đánh giá sau đơn hàng đủ điều kiện
-- flow gọi món tại bàn qua QR
-- flow mang về: chọn món, giỏ hàng, thanh toán, theo dõi đơn
+## Công nghệ sử dụng
 
-### Khu vực nội bộ
-- đăng nhập nội bộ
-- dashboard vận hành
-- quản lý đặt bàn
-- sơ đồ bàn và quản lý bàn
-- quản lý đơn hàng tại chỗ
-- quản lý đơn mang về
-- duyệt đánh giá
-- quản lý món ăn
-- quản lý tài khoản nhân viên / quản trị
-- thống kê doanh thu ở mức màn hình nội bộ cơ bản
+| Thành phần | Công nghệ |
+|---|---|
+| Frontend | React, Vite, React Router, Ant Design, TanStack Query |
+| Backend | NestJS, TypeScript, JWT, Swagger |
+| Database | MySQL |
 
-## Phạm vi chưa nên mô tả quá tay
-
-Các phần dưới đây **không nên xem là đã hoàn thiện end-to-end toàn hệ thống** nếu chưa mở rộng thêm:
-
-- quản lý kho / nguyên liệu
-- báo cáo chuyên sâu nhiều chiều
-- các luồng BI hoặc dashboard phân tích nâng cao
-
-Có thể xem đây là **hướng mở rộng tiếp theo** của đồ án, không phải phần đã hoàn thiện đầy đủ trong repo hiện tại.
-
-## Kiến trúc repo
+## Cấu trúc dự án
 
 ```text
-doan3-webquanlynhahang/
-├── frontend/                    # Frontend React + Vite
-│   ├── src/
-│   ├── public/
-│   └── package.json
-├── backend/
-│   ├── README.md
-│   └── nest-api/                # Backend NestJS chính đang dùng
-│       ├── src/
-│       ├── test/
-│       ├── .env.example
-│       └── package.json
-├── database/                    # SQL schema / seed phục vụ local
-├── docs/                        # Mô tả nghiệp vụ, ghi chú phân tích
-├── scripts/                     # Script smoke test và tiện ích
-├── package.json                 # Script điều phối ở root
-└── README.md
+frontend/        # Ứng dụng React + Vite
+backend/nest-api/ # API NestJS chính
+ database/       # Script khởi tạo schema / dữ liệu
+screenshots/     # Ảnh giao diện minh họa
 ```
 
-## Stack sử dụng
+## Chức năng chính
 
-### Frontend
-- React 19
-- Vite 5
-- React Router
-- Ant Design
-- TanStack Query
+### Khách hàng
 
-### Backend
-- NestJS 10
-- TypeScript
-- MySQL (`mysql2`)
-- JWT
-- Swagger
+- Trang chủ, giới thiệu, thực đơn
+- Đăng ký / đăng nhập
+- Đặt bàn
+- Giỏ hàng và thanh toán
+- Hồ sơ cá nhân, lịch sử đơn hàng, lịch sử đặt bàn
+- Đánh giá sau đơn hàng
+- Gọi món tại bàn qua QR
+- Đơn mang về
+
+### Nội bộ
+
+- Đăng nhập nội bộ
+- Dashboard vận hành
+- Quản lý bàn và sơ đồ bàn
+- Quản lý đặt bàn
+- Quản lý đơn hàng tại chỗ và mang về
+- Quản lý món ăn
+- Quản lý tài khoản nhân viên / quản trị
+- Duyệt đánh giá
+- Thống kê doanh thu cơ bản
+
+## Ảnh giao diện
+
+> Ảnh được lưu trong thư mục `screenshots/`.
+
+| Trang chủ | Thực đơn | Đặt bàn |
+|---|---|---|
+| ![Trang chủ](screenshots/01-trang-chu.png) | ![Thực đơn](screenshots/02-thuc-don.png) | ![Đặt bàn](screenshots/03-dat-ban-login.png) |
+
+| Giỏ hàng | Đánh giá | Đăng nhập |
+|---|---|---|
+| ![Giỏ hàng](screenshots/04-gio-hang.png) | ![Đánh giá](screenshots/05-danh-gia.png) | ![Đăng nhập](screenshots/07-dang-nhap.png) |
+
+| Admin login | Dashboard | Quản lý thực đơn |
+|---|---|---|
+| ![Admin login](screenshots/08-admin-login.png) | ![Dashboard](screenshots/09-admin-dashboard.png) | ![Quản lý thực đơn](screenshots/11-admin-thuc-don.png) |
 
 ## Yêu cầu môi trường
 
 - Node.js 18+
 - npm
-- MySQL 8.x hoặc bản tương thích
+- MySQL 8.x hoặc tương thích
 
-## Cài đặt
-
-Cài dependencies theo từng phần:
+## Cài đặt nhanh
 
 ```bash
 npm install
@@ -97,20 +81,32 @@ npm --prefix frontend install
 npm --prefix backend/nest-api install
 ```
 
+## Chạy dự án
+
+### Frontend
+
+```bash
+npm run dev
+```
+
+### Backend
+
+```bash
+npm run dev:backend
+```
+
 ## Cấu hình môi trường
 
-### 1) Frontend: `frontend/.env`
-
-Frontend chỉ đọc biến môi trường Vite từ thư mục `frontend/`.
+### Frontend `frontend/.env`
 
 ```env
 VITE_USE_BACKEND=true
 VITE_API_BASE_URL=http://localhost:5011/api
 ```
 
-### 2) Backend: `backend/nest-api/.env`
+### Backend `backend/nest-api/.env`
 
-Tạo file từ mẫu:
+Tạo từ mẫu:
 
 ```bash
 cp backend/nest-api/.env.example backend/nest-api/.env
@@ -133,88 +129,26 @@ JWT_AUDIENCE=quan-ly-nha-hang-frontend
 JWT_EXPIRES_IN=12h
 ```
 
-`FRONTEND_ORIGIN` phải khớp URL frontend triển khai ở production.
+## Khởi tạo database
 
-Nếu frontend chạy qua proxy Vite trong dev, có thể thêm:
-
-```env
-VITE_API_PROXY_TARGET=http://localhost:5011
-```
-
-### 3) Root `.env` cho script smoke test
-
-File `.env` ở root không dùng cho Vite runtime. Chỉ script như `npm run smoke:api` dùng nó.
-
-Ví dụ:
-
-```env
-SMOKE_API_BASE_URL=http://localhost:5011/api
-```
-
-## Khởi tạo dữ liệu MySQL
-
-Backend hiện **không tự tạo schema**. Biến `DB_AUTO_INIT=true` chỉ phục vụ kiểm tra kết nối khi boot, không thay thế bước import SQL.
-
-Vì vậy, trước khi chạy backend với database trống, hãy import script:
+Import file:
 
 - `database/mysql_init_schema.sql`
 
-## Chạy dự án
-
-### Chạy frontend
+## Lệnh thường dùng
 
 ```bash
-npm run dev
+npm run build
+npm run build:frontend
+npm run build:backend
+npm run lint
+npm run lint:backend
+npm run test
+npm run test:backend
+npm run smoke:api
 ```
 
-Hoặc chạy trực tiếp trong thư mục frontend:
-
-```bash
-npm --prefix frontend run dev
-```
-
-### Chạy backend
-
-```bash
-npm run dev:backend
-```
-
-Hoặc:
-
-```bash
-npm --prefix backend/nest-api run start:dev
-```
-
-## Các lệnh thường dùng
-
-### Root scripts
-
-```bash
-npm run dev               # chạy frontend
-npm run dev:frontend      # chạy frontend
-npm run dev:backend       # chạy backend NestJS
-npm run build             # build frontend
-npm run build:frontend    # build frontend
-npm run build:backend     # build backend
-npm run lint              # lint frontend
-npm run lint:backend      # lint backend
-npm run test              # test frontend
-npm run test:backend      # unit test backend
-npm run smoke:api         # smoke test API qua biến SMOKE_API_BASE_URL
-```
-
-### Backend riêng
-
-```bash
-npm --prefix backend/nest-api run start:dev
-npm --prefix backend/nest-api run build
-npm --prefix backend/nest-api run test
-npm --prefix backend/nest-api run test:e2e
-```
-
-## Các nhóm API chính đang dùng
-
-Backend hiện phục vụ các nhóm route có prefix `/api`:
+## API chính
 
 - `/api/auth`
 - `/api/nguoi-dung`
@@ -226,16 +160,11 @@ Backend hiện phục vụ các nhóm route có prefix `/api`:
 - `/api/danh-gia`
 - `/api/mang-ve`
 - `/api/diem-tich-luy`
+- `/api/thong-ke`
 
-Swagger UI mặc định tại:
+Swagger:
 
 - `http://localhost:5011/swagger`
-
-## Ghi chú triển khai quan trọng
-
-- Frontend đang gọi API theo base URL kiểu `http://localhost:5011/api`, vì vậy backend phải giữ nguyên prefix `/api` ở các controller.
-- Các route lõi như auth, bàn, đặt bàn, thực đơn, đơn hàng, đánh giá và mang về đã được nối thật với backend NestJS.
-- Repo ưu tiên giữ kiến trúc hiện tại, tránh refactor lớn không cần thiết.
 
 ## Tài liệu liên quan
 
@@ -243,4 +172,3 @@ Swagger UI mặc định tại:
 - `docs/ma-tran-phan-quyen-api.md`
 - `backend/README.md`
 - `backend/nest-api/README.md`
-- `database/mysql_init_schema.sql`
