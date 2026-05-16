@@ -144,7 +144,7 @@ function NoiBoKhachHangPage() {
       formDiem.resetFields()
       await loadDanhSach()
       const moi = await layChiTietKhachHang(khachHangChiTiet.maKH)
-      setKhachHangChiTiet(moi)
+      setKhachHangChiTiet(moi?.data || moi)
     } catch {
       message.error('Không thể cập nhật điểm khách hàng.')
     } finally {
