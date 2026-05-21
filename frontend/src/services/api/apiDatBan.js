@@ -1,4 +1,5 @@
 import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import { banKhaDungDat } from '../../constants/trangThaiBan'
 import {
   taoPhanHoiOffline,
   layDanhSachDatBanOffline,
@@ -55,6 +56,8 @@ const chuanHoaDatBan = (booking) => {
     tableCode: booking.maBan || booking.MaBan || '',
     customerCode: booking.maKH || booking.MaKH || '',
     staffCode: booking.maNV || booking.MaNV || '',
+    nguonTao: String(booking.nguonTao ?? booking.NguonTao ?? '').trim(),
+    source: String(booking.source ?? booking.nguonTao ?? booking.NguonTao ?? '').trim(),
     createdAt: booking.ngayTao || booking.NgayTao,
     updatedAt: booking.ngayCapNhat || booking.NgayCapNhat,
     danhSachMaBanDaGan,
@@ -65,6 +68,13 @@ const chuanHoaDatBan = (booking) => {
 const tachVaChuanHoa = (phanHoi) => ({
   ...phanHoi,
   duLieu: Array.isArray(phanHoi.duLieu) ? phanHoi.duLieu.map(chuanHoaDatBan).filter(Boolean) : chuanHoaDatBan(phanHoi.duLieu),
+})
+
+const chuanHoaChiTietMonAnPayload = (mon) => ({
+  maMon: String(mon.maMon || mon.id || '').trim(),
+  tenMon: String(mon.tenMon || mon.name || '').trim(),
+  soLuong: Number(mon.soLuong ?? mon.quantity ?? 1),
+  gia: Number(mon.gia ?? mon.priceValue ?? 0),
 })
 
 const chuanHoaDatBanPayload = (payload = {}) => ({
@@ -80,22 +90,12 @@ const chuanHoaDatBanPayload = (payload = {}) => ({
   gioKetThuc: payload.gioKetThuc || payload.endTime || null,
   soNguoi: Number(payload.soNguoi || payload.guests || 0),
   ghiChu: payload.ghiChu || payload.notes || '',
-  khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
   ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
+  khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
   chiTietMonAn: Array.isArray(payload.chiTietMonAn)
-    ? payload.chiTietMonAn.map((mon) => ({
-        id: mon.id,
-        tenMon: mon.tenMon,
-        gia: mon.gia,
-        soLuong: mon.quantity ?? mon.soLuong ?? 1,
-      }))
+    ? payload.chiTietMonAn.map(chuanHoaChiTietMonAnPayload)
     : Array.isArray(payload.selectedMenuItems)
-    ? payload.selectedMenuItems.map((mon) => ({
-        id: mon.id,
-        tenMon: mon.tenMon,
-        gia: mon.gia,
-        soLuong: mon.quantity || 1,
-      }))
+    ? payload.selectedMenuItems.map(chuanHoaChiTietMonAnPayload)
     : null,
 })
 
@@ -123,10 +123,8 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
     const tongBanPhuHop = danhSachBan.filter((ban) => {
       const khopKhuVuc = khuVuc === 'KHONG_UU_TIEN' || String(ban.areaId || '').trim() === String(khuVuc || '').trim()
       const khopSoNguoi = Number(ban.capacity || 0) >= Number(soNguoi || 0)
-      const banTrong = !['CO_KHACH', 'CHO_THANH_TOAN', 'Occupied', 'Reserved'].includes(String(ban.status || '').trim())
-      return khopKhuVuc && khopSoNguoi && banTrong
+      return khopKhuVuc && khopSoNguoi && banKhaDungDat(ban.status)
     }).length - danhSachDatBan.filter((booking) => String(booking.date || booking.ngayDat || '') === ngayDaChuanHoa && String(booking.time || booking.gioDat || '') === String(gioDat || '').trim() && !['Cancelled', 'DA_HUY', 'KHONG_DEN'].includes(String(booking.status || booking.trangThai || ''))).length
-
     const tongPhuHop = Math.max(0, tongBanPhuHop)
     const mucKhaDung = tongPhuHop <= 0 ? 'FULL' : tongPhuHop <= 2 ? 'LIMITED' : 'AVAILABLE'
 

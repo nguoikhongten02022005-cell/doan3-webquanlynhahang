@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Alert, Col, ConfigProvider, Row } from 'antd'
 import '../theme/dat-ban.css'
+import { banKhaDungDat } from '../constants/trangThaiBan'
 import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
   GIO_GIOI_HAN_NHAN_DAT_BAN,
@@ -208,7 +209,7 @@ const tinhTinhTrangKhungGio = ({ date, time, tables = [], bookings = [] }) => {
   }
 
   const tongBanSanSang = Array.isArray(tables)
-    ? tables.filter((table) => table?.status !== 'CO_KHACH' && table?.status !== 'Occupied').length
+    ? tables.filter((table) => banKhaDungDat(table?.status)).length
     : 0
 
   const soDatBanCungKhungGio = Array.isArray(bookings)
@@ -802,7 +803,7 @@ const handleSubmit = async () => {
           maDatBan: confirmationPayload.bookingCode,
           maKH: nguoiDungHienTai?.maKH || '',
           maBan: maBanDuocChon,
-          maNV: nguoiDungHienTai?.maND || '',
+          maNV: '',
           ngayDat: formData.date,
           gioDat: formData.time,
           gioKetThuc: null,

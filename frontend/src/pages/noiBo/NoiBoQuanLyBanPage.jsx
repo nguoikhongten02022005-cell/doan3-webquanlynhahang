@@ -3,20 +3,18 @@ import { Avatar, Button, Card, Col, Empty, Form, Input, InputNumber, Modal, Popc
 import { DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlined, PrinterOutlined, QrcodeOutlined, TableOutlined } from '@ant-design/icons'
 import { capNhatBanApi, layDanhSachBanApi, layQrBanApi, taoBanApi, xoaBanApi } from '../../services/api/apiBanAn'
 import { layOrderDangMoTaiBanApi, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanAn'
+import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 
 const DANH_SACH_KHU_VUC = ['Trong nhà', 'Ngoài sân', 'Khu riêng', 'Tầng 2']
 const NHAN_TRANG_THAI = {
   TRONG: { label: 'TRỐNG', color: 'green' },
-  CO_KHACH: { label: 'CÓ KHÁCH', color: 'red' },
-  CHO_THANH_TOAN: { label: 'CHỜ THANH TOÁN', color: 'orange' },
+  GIU_CHO: { label: 'ĐÃ ĐẶT', color: 'orange' },
+  CO_KHACH: { label: 'ĐANG PHỤC VỤ', color: 'red' },
+  CAN_DON: { label: 'CHỜ DỌN', color: 'default' },
 }
 
-const trangThaiNoiBo = (trangThai) => {
-  if (trangThai === 'TRONG' || trangThai === 'Available') return 'TRONG'
-  if (trangThai === 'CO_KHACH' || trangThai === 'Occupied') return 'CO_KHACH'
-  return 'CHO_THANH_TOAN'
-}
+const trangThaiNoiBo = (trangThai) => chuanHoaTrangThaiBan(trangThai)
 
 function NoiBoQuanLyBanPage() {
   const [danhSachBan, setDanhSachBan] = useState([])
@@ -54,8 +52,9 @@ function NoiBoQuanLyBanPage() {
   const thongKe = useMemo(() => ({
     tong: danhSachBan.length,
     trong: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'TRONG').length,
+    giuCho: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'GIU_CHO').length,
     coKhach: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'CO_KHACH').length,
-    choThanhToan: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'CHO_THANH_TOAN').length,
+    canDon: danhSachBan.filter((ban) => trangThaiNoiBo(ban.status) === 'CAN_DON').length,
   }), [danhSachBan])
 
   const danhSachHienThi = useMemo(() => danhSachBan.filter((ban) => {
@@ -168,7 +167,7 @@ function NoiBoQuanLyBanPage() {
       key: 'actions',
       render: (_, ban) => {
         const coTheXoa = trangThaiNoiBo(ban.status) === 'TRONG'
-        const canXacNhanThanhToan = trangThaiNoiBo(ban.status) === 'CHO_THANH_TOAN'
+        const canXacNhanThanhToan = false
         return (
           <Space wrap>
             <Button icon={<EyeOutlined />} onClick={() => moOrder(ban)}>Xem order</Button>
@@ -193,13 +192,14 @@ function NoiBoQuanLyBanPage() {
       <Row gutter={[16, 16]}>
         <Col xs={24} sm={12} xl={6}><Card><Statistic title="Tổng bàn" value={thongKe.tong} /></Card></Col>
         <Col xs={24} sm={12} xl={6}><Card><Statistic title="Trống" value={thongKe.trong} styles={{ content: { color: '#059669' } }} /></Card></Col>
-        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Có khách" value={thongKe.coKhach} styles={{ content: { color: '#d97706' } }} /></Card></Col>
-        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Chờ thanh toán" value={thongKe.choThanhToan} styles={{ content: { color: '#dc2626' } }} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Đã đặt" value={thongKe.giuCho} styles={{ content: { color: '#d97706' } }} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Đang phục vụ" value={thongKe.coKhach} styles={{ content: { color: '#dc2626' } }} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Chờ dọn" value={thongKe.canDon} /></Card></Col>
       </Row>
 
       <Card title="Quản lý bàn" extra={<Button type="primary" icon={<PlusOutlined />} onClick={moModalThem}>Thêm bàn</Button>}>
         <Space wrap style={{ marginBottom: 16 }}>
-          <Segmented options={[{ label: 'Tất cả', value: 'ALL' }, { label: 'Trống', value: 'TRONG' }, { label: 'Có khách', value: 'CO_KHACH' }, { label: 'Chờ thanh toán', value: 'CHO_THANH_TOAN' }]} value={boLocTrangThai} onChange={setBoLocTrangThai} />
+          <Segmented options={[{ label: 'Tất cả', value: 'ALL' }, { label: 'Trống', value: 'TRONG' }, { label: 'Đã đặt', value: 'GIU_CHO' }, { label: 'Đang phục vụ', value: 'CO_KHACH' }, { label: 'Chờ dọn', value: 'CAN_DON' }]} value={boLocTrangThai} onChange={setBoLocTrangThai} />
           <Select value={boLocKhuVuc} onChange={setBoLocKhuVuc} style={{ minWidth: 180 }} options={['Tất cả', ...DANH_SACH_KHU_VUC].map((muc) => ({ label: muc, value: muc }))} />
         </Space>
         <Table rowKey="code" loading={dangTai} columns={cotBan} dataSource={danhSachHienThi} pagination={{ pageSize: 8 }} scroll={{ x: 920 }} />
@@ -244,7 +244,7 @@ function NoiBoQuanLyBanPage() {
             )}
             <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
               <Button onClick={() => setOrderDangXem(null)}>Đóng</Button>
-              {!orderDangXem.khongCoOrder && trangThaiNoiBo(orderDangXem.ban.status) === 'CHO_THANH_TOAN' ? <Button type="primary" onClick={() => xacNhanThanhToan(orderDangXem.ban)}>Xác nhận thanh toán</Button> : null}
+              {!orderDangXem.khongCoOrder ? <Button type="primary" onClick={() => xacNhanThanhToan(orderDangXem.ban)}>Xác nhận thanh toán</Button> : null}
             </Space>
           </Space>
         ) : null}

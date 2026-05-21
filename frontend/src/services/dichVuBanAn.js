@@ -1,13 +1,10 @@
-export const TRANG_THAI_BAN = Object.freeze({
-  TRONG: 'Available',
-  GIU_CHO: 'Reserved',
-  DANG_SU_DUNG: 'Occupied',
-  BAN: 'Maintenance',
-})
+import { TRANG_THAI_BAN, chuanHoaTrangThaiBan } from '../constants/trangThaiBan'
+
+export { TRANG_THAI_BAN }
 
 export const chuanHoaBanChoNoiBo = (table) => {
   if (!table || typeof table !== 'object') return null
-  const status = table.status || table.trangThai || table.TrangThai || TRANG_THAI_BAN.TRONG
+  const status = chuanHoaTrangThaiBan(table.status || table.trangThai || table.TrangThai || '')
   const rawAreaText = table.rawAreaText || table.khuVuc || table.KhuVuc || table.viTri || table.ViTri || ''
   const note = table.note || table.ghiChu || table.GhiChu || ''
 

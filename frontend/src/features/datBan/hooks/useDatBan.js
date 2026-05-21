@@ -13,7 +13,7 @@ import {
 } from '../../../services/api/apiDatBan'
 import { datJsonLuuTru } from '../../../services/dichVuLuuTru'
 import { xoaBanNhapTamDatBan, layBanNhapTamDatBanHopLe, luuBanNhapTamDatBan } from '../utils/banNhapTamDatBan'
-import { TRANG_THAI_BAN } from '../../../services/dichVuBanAn.js'
+import { banKhaDungDat } from '../../../constants/trangThaiBan'
 import {
   anhXaMucDatBan,
   chuanHoaDatBan,
@@ -35,7 +35,8 @@ const locBanPhuHopChoDatBan = (booking, danhSachBanGhiDe = [], { filterByArea = 
   const soLuongKhach = Number(booking?.guests) || 0
 
   return tables.filter((table) => {
-    if (table.status === TRANG_THAI_BAN.BAN) {
+    // Chỉ cho phép bàn TRỐNG (Available) - loại trừ Reserved, Occupied, Maintenance
+    if (!banKhaDungDat(table.status)) {
       return false
     }
 

@@ -10,6 +10,7 @@ import {
 import { Badge, Button, Drawer, Empty, Tabs, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
 import { layNhanChoNgoi } from '../dinhDang'
+import { chuanHoaTrangThaiBan } from '../../../constants/trangThaiBan'
 
 const NHAN_TRANG_THAI_BAN = {
   AVAILABLE: 'Sẵn sàng',
@@ -143,14 +144,14 @@ const dinhDangGioDatBan = (datBan) => {
 }
 
 const chuanHoaTrangThaiChoPos = (trangThai = '') => {
-  const giaTri = String(trangThai || '').trim().toUpperCase()
+  const chuanHoa = chuanHoaTrangThaiBan(trangThai)
 
-  if (giaTri === 'AVAILABLE' || giaTri === 'TRONG') return 'AVAILABLE'
-  if (giaTri === 'HELD' || giaTri === 'RESERVED' || giaTri === 'GIU_CHO' || giaTri === 'CHO_THANH_TOAN') return 'HELD'
-  if (giaTri === 'OCCUPIED' || giaTri === 'CO_KHACH' || giaTri === 'DANG_SU_DUNG') return 'OCCUPIED'
-  if (giaTri === 'DIRTY' || giaTri === 'BAN' || giaTri === 'MAINTENANCE' || giaTri === 'CAN_DON') return 'DIRTY'
+  if (chuanHoa === 'TRONG') return 'AVAILABLE'
+  if (chuanHoa === 'GIU_CHO') return 'HELD'
+  if (chuanHoa === 'CO_KHACH') return 'OCCUPIED'
+  if (chuanHoa === 'CAN_DON') return 'DIRTY'
 
-  return giaTri || 'DIRTY'
+  return 'DIRTY'
 }
 
 const taoMoHinhHienThiBan = (table, datBanTheoId) => {

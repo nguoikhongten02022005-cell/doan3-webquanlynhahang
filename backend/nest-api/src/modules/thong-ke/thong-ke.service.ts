@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
+import { TRANG_THAI_BAN } from '../../common/constants';
 
 function layNgayVN(ngay: Date) {
   return ngay.toLocaleDateString('sv-SE', {
@@ -92,7 +93,8 @@ export class ThongKeService {
       this.mysql.truyVan(
         `SELECT COUNT(*) AS soBanBan
          FROM Ban
-         WHERE TrangThai = 'Occupied'`,
+         WHERE TrangThai = ?`,
+        [TRANG_THAI_BAN.DANG_SU_DUNG],
       ),
       this.mysql.truyVan(
         `SELECT COUNT(*) AS soDonCho

@@ -1,4 +1,5 @@
 import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
+import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
 import {
   taoPhanHoiOffline,
   layDanhSachBanOffline,
@@ -25,13 +26,6 @@ const suyRaKhuVucTuViTri = (viTri = '') => {
   }
 
   return 'SANH_CHINH'
-}
-
-const chuanHoaTrangThaiBan = (trangThai = '') => {
-  if (trangThai === 'TRONG' || trangThai === 'Available') return 'TRONG'
-  if (trangThai === 'CO_KHACH' || trangThai === 'Occupied') return 'CO_KHACH'
-  if (trangThai === 'CHO_THANH_TOAN' || trangThai === 'Reserved') return 'CHO_THANH_TOAN'
-  return trangThai || 'TRONG'
 }
 
 const chuanHoaBanAn = (ban) => {

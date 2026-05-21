@@ -9,6 +9,7 @@ import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { resolveMaBan } from '../../common/ban-resolver';
+import { TRANG_THAI_BAN } from '../../common/constants';
 
 const TRANG_THAI_DON_HANG_HOP_LE = new Set([
   'Pending',
@@ -61,7 +62,7 @@ export class DonHangPaymentStatusService {
           if (don.MaBan) {
             await ketNoi.execute(
               'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-              ['Available', don.MaBan],
+              [TRANG_THAI_BAN.TRONG, don.MaBan],
             );
           }
           if (don.MaKH) {
@@ -123,7 +124,7 @@ export class DonHangPaymentStatusService {
       ['Ready', danhSach[0].MaDonHang],
     );
     await this.mysql.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-      'Reserved',
+      TRANG_THAI_BAN.GIU_CHO,
       ma,
     ]);
     return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
@@ -150,7 +151,7 @@ export class DonHangPaymentStatusService {
         ['Paid', donHang.MaDonHang],
       );
       await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-        'Available',
+        TRANG_THAI_BAN.TRONG,
         ma,
       ]);
 

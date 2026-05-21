@@ -3,6 +3,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { ThucDonService } from '../thuc-don/thuc-don.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { resolveMaBan } from '../../common/ban-resolver';
+import { chuanHoaTrangThaiBan, TRANG_THAI_BAN } from '../../common/constants';
 
 @Injectable()
 export class BanTrangThaiQrService {
@@ -20,21 +21,15 @@ export class BanTrangThaiQrService {
   async capNhatTrangThaiBan(maBan: string, trangThai: string) {
     const ma = await this.timMaBan(maBan);
     if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
-    const map = new Map<string, string>([
-      ['TRONG', 'Available'],
-      ['CO_KHACH', 'Occupied'],
-      ['CHO_THANH_TOAN', 'Reserved'],
-      ['Available', 'Available'],
-      ['Occupied', 'Occupied'],
-      ['Reserved', 'Reserved'],
-    ]);
+
+    const trangThaiDaChuanHoa = chuanHoaTrangThaiBan(trangThai);
 
     await this.mysql.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-      map.get(trangThai) || trangThai,
+      trangThaiDaChuanHoa,
       ma,
     ]);
     return taoPhanHoi(
-      { maBan: ma, trangThai },
+      { maBan: ma, trangThai: trangThaiDaChuanHoa },
       'Cap nhat trang thai ban thanh cong',
     );
   }

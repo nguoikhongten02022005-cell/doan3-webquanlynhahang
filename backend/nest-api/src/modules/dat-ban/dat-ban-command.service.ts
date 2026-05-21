@@ -10,6 +10,7 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
+import { TRANG_THAI_BAN } from '../../common/constants';
 
 @Injectable()
 export class DatBanCommandService {
@@ -53,10 +54,12 @@ export class DatBanCommandService {
       : [null];
 
     const maDatBan = String(body.maDatBan || '').trim() || taoMa('DB');
+    const vaiTro = String(nguoiDung?.vaiTro || nguoiDung?.role || '').trim();
+    const nguonTao = ['Admin', 'NhanVien'].includes(vaiTro) ? 'NOI_BO' : 'WEB';
 
     await this.mysql.thucThi(
-      `INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai, KhuVucUuTien, ChiTietMonAn)
-       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO DatBan (MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan, NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, TrangThai, KhuVucUuTien, GhiChuNoiBo, ChiTietMonAn, NguonTao)
+       VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
       [
         maDatBan,
         body.maKH || null,
@@ -72,7 +75,9 @@ export class DatBanCommandService {
         body.ghiChu || null,
         'Pending',
         body.khuVucUuTien || null,
+        body.ghiChuNoiBo || null,
         body.chiTietMonAn ? JSON.stringify(body.chiTietMonAn) : null,
+        nguonTao,
       ],
     );
 
@@ -96,6 +101,7 @@ export class DatBanCommandService {
           NgayTao: new Date().toISOString(),
           NgayCapNhat: new Date().toISOString(),
           TrangThai: 'Pending',
+          NguonTao: nguonTao,
         },
       ),
       'Tạo đặt bàn thành công',
@@ -242,7 +248,7 @@ export class DatBanCommandService {
         trangThaiDaChuanHoa === 'DA_XEP_BAN'
       ) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-          'Occupied',
+          TRANG_THAI_BAN.DANG_SU_DUNG,
           maBan,
         ]);
         return;
@@ -254,7 +260,7 @@ export class DatBanCommandService {
         )
       ) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-          'Reserved',
+          TRANG_THAI_BAN.GIU_CHO,
           maBan,
         ]);
         return;
@@ -266,7 +272,7 @@ export class DatBanCommandService {
         )
       ) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-          'Available',
+          TRANG_THAI_BAN.TRONG,
           maBan,
         ]);
       }
@@ -324,15 +330,15 @@ export class DatBanCommandService {
       );
     }
 
-    if (String(banHopLe.TrangThai || '') === 'Occupied') {
+    if (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.DANG_SU_DUNG || String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.GIU_CHO) {
       throw new BadRequestException(
-        `Bàn ${banHopLe.MaBan} đang có khách, không thể gán cho booking.`,
+        `Bàn ${banHopLe.MaBan} đang có khách hoặc đã được đặt, không thể gán cho booking.`,
       );
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
       await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-        'Reserved',
+        TRANG_THAI_BAN.GIU_CHO,
         maBan,
       ]);
       await ketNoi.execute(

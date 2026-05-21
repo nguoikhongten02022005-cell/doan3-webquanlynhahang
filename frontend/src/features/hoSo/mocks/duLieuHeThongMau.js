@@ -1,5 +1,5 @@
 import { DANH_SACH_PHIEU_GIAM_GIA_GOI_Y } from '../../gioHang/constants/phieuGiamGia'
-import { TRANG_THAI_BAN } from '../../../services/dichVuBanAn.js'
+import { TRANG_THAI_BAN } from '../../../constants/trangThaiBan'
 
 const taoMonDonHang = ({ maChiTiet, maMon, tenMon, soLuong, donGia, thanhTien, ghiChu = '', trangThai = 'Pending' }) => Object.freeze({
   id: maChiTiet,

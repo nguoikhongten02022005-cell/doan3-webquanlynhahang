@@ -7,8 +7,8 @@ import { layDanhSachDanhGiaApi, duyetDanhGiaApi } from '../../services/api/apiDa
 import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
 import { layDanhSachDatBanApi } from '../../services/api/apiDatBan'
-import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
-import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN } from './hangSo'
+import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
+import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN, CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN } from './hangSo'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_MO } from './thongKeNoiBo'
 const TRANG_THAI_LICH_SU = new Set(['DA_HUY', 'CANCELLED', 'KHONG_DEN', 'NO_SHOW', 'NoShow', 'Completed', 'DA_HOAN_THANH'])
 import {
@@ -91,13 +91,13 @@ export const useDuLieuBangDieuKhien = () => {
         throw loiNghiemTrong.reason
       }
 
-      const nextBookings = ketQuaDatBan.status === 'fulfilled' ? ketQuaDatBan.value : []
+      const nextBookingsResponse = ketQuaDatBan.status === 'fulfilled' ? ketQuaDatBan.value : null
       const nextOrdersResponse = ketQuaDonHang.status === 'fulfilled' ? ketQuaDonHang.value : null
       const nextAccountsResponse = ketQuaTaiKhoan.status === 'fulfilled' ? ketQuaTaiKhoan.value : null
       const nextTablesResponse = ketQuaBan.status === 'fulfilled' ? ketQuaBan.value : null
       const nextReviewsResponse = ketQuaDanhGia.status === 'fulfilled' ? ketQuaDanhGia.value : null
 
-      setDanhSachDatBan(Array.isArray(nextBookings) ? nextBookings : [])
+      setDanhSachDatBan(Array.isArray(nextBookingsResponse?.duLieu) ? nextBookingsResponse.duLieu : [])
       setDanhSachDonHang(Array.isArray(nextOrdersResponse?.duLieu) ? nextOrdersResponse.duLieu.map(chuanHoaDonHangNoiBo).filter(Boolean) : [])
       setDanhSachTaiKhoan(Array.isArray(nextAccountsResponse?.duLieu) ? nextAccountsResponse.duLieu.map(chuanHoaNguoiDungApi).filter(Boolean) : [])
       setDanhSachBan(Array.isArray(nextTablesResponse?.duLieu) ? nextTablesResponse.duLieu.map(chuanHoaBanChoNoiBo).filter(Boolean) : [])
@@ -158,7 +158,7 @@ export const useDuLieuBangDieuKhien = () => {
     [danhSachDatBanDangHoatDong],
   )
   const danhSachDatBanChoXuLy = useMemo(
-    () => hangDoiDatBan.filter((booking) => booking.status === 'YEU_CAU_DAT_BAN' || booking.status === 'CAN_GOI_LAI' || booking.status === 'CHO_XAC_NHAN'),
+    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(booking.status)),
     [hangDoiDatBan],
   )
   const danhSachDatBanSapDienRa = useMemo(() => {
@@ -227,12 +227,12 @@ export const useDuLieuBangDieuKhien = () => {
   }, [danhDauKhongDen, taiLaiDuLieu])
 
   const xuLyDanhDauBanBan = useCallback(async (tableId) => {
-    await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.BAN)
+    await capNhatTrangThaiBanApi(tableId, 'CAN_DON')
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 
   const xuLyDanhDauBanSanSang = useCallback(async (tableId) => {
-    await capNhatTrangThaiBanApi(tableId, TRANG_THAI_BAN.TRONG)
+    await capNhatTrangThaiBanApi(tableId, 'TRONG')
     await taiLaiDuLieu()
   }, [taiLaiDuLieu])
 

@@ -6,6 +6,7 @@ import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { BanGhi } from '../../common/types';
+import { TRANG_THAI_BAN } from '../../common/constants';
 
 @Injectable()
 export class DonHangCreateOrderService {
@@ -164,7 +165,7 @@ export class DonHangCreateOrderService {
       if (maBan) {
         await this.thucThi(
           'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-          ['Occupied', maBan],
+          [TRANG_THAI_BAN.DANG_SU_DUNG, maBan],
           ketNoi,
         );
       }

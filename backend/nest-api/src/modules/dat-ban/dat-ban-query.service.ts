@@ -7,6 +7,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
+import { TRANG_THAI_BAN } from '../../common/constants';
 
 @Injectable()
 export class DatBanQueryService {
@@ -26,7 +27,11 @@ export class DatBanQueryService {
     return String(ngay);
   }
 
-  chuyenDatBanSangPhanHoi(datBan: BanGhi) {
+  chuyenDatBanSangPhanHoi(
+    datBan: BanGhi,
+    giaMonTheoMa = new Map<string, number>(),
+    monTheoDatBan = new Map<string, unknown[]>(),
+  ) {
     let chiTietMonAn = [];
     try {
       if (datBan.ChiTietMonAn) {
@@ -37,6 +42,22 @@ export class DatBanQueryService {
       }
     } catch {
       chiTietMonAn = [];
+    }
+    chiTietMonAn = Array.isArray(chiTietMonAn)
+      ? chiTietMonAn.map((mon) => {
+          const gia = Number(mon.gia ?? mon.donGia ?? mon.priceValue ?? 0);
+          return {
+            ...mon,
+            gia:
+              gia ||
+              giaMonTheoMa.get(String(mon.maMon || mon.id || '').trim()) ||
+              0,
+          };
+        })
+      : [];
+    if (!chiTietMonAn.length) {
+      chiTietMonAn = (monTheoDatBan.get(String(datBan.MaDatBan || '').trim()) ||
+        []) as never[];
     }
     const maBan = datBan.MaBan || '';
     const danhSachMaBanDaGan = maBan ? [String(maBan)] : [];
@@ -53,6 +74,8 @@ export class DatBanQueryService {
       ghiChu: datBan.GhiChu || '',
       ghiChuNoiBo: datBan.GhiChuNoiBo || '',
       khuVucUuTien: datBan.KhuVucUuTien || '',
+      nguonTao: datBan.NguonTao || '',
+      source: datBan.NguonTao || '',
       trangThai: datBan.TrangThai,
       ngayTao: datBan.NgayTao,
       ngayCapNhat: datBan.NgayCapNhat,
@@ -71,8 +94,36 @@ export class DatBanQueryService {
     const danhSach = await this.mysql.truyVan(
       'SELECT * FROM DatBan ORDER BY NgayTao DESC',
     );
+    const danhSachMaDatBan = danhSach
+      .map((datBan) => String(datBan.MaDatBan || '').trim())
+      .filter(Boolean);
+    const chiTietDonHang = danhSachMaDatBan.length
+      ? await this.mysql.truyVan(
+          `SELECT dh.MaDatBan, ct.MaMon, td.TenMon, ct.SoLuong, ct.DonGia
+           FROM DonHang dh
+           INNER JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
+           LEFT JOIN ThucDon td ON td.MaMon = ct.MaMon
+           WHERE dh.MaDatBan IN (${danhSachMaDatBan.map(() => '?').join(',')})
+           ORDER BY ct.NgayTao ASC`,
+          danhSachMaDatBan,
+        )
+      : [];
+    const monTheoDatBan = new Map<string, unknown[]>();
+    chiTietDonHang.forEach((mon) => {
+      const maDatBan = String(mon.MaDatBan || '').trim();
+      const danhSachMon = monTheoDatBan.get(maDatBan) || [];
+      danhSachMon.push({
+        maMon: String(mon.MaMon || '').trim(),
+        tenMon: String(mon.TenMon || '').trim(),
+        soLuong: Number(mon.SoLuong || 0),
+        gia: Number(mon.DonGia || 0),
+      });
+      monTheoDatBan.set(maDatBan, danhSachMon);
+    });
     return taoPhanHoi(
-      danhSach.map((datBan) => this.chuyenDatBanSangPhanHoi(datBan)),
+      danhSach.map((datBan) =>
+        this.chuyenDatBanSangPhanHoi(datBan, new Map(), monTheoDatBan),
+      ),
       'Lấy danh sách đặt bàn thành công',
     );
   }
@@ -99,8 +150,65 @@ export class DatBanQueryService {
       'SELECT * FROM DatBan WHERE MaKH = ? ORDER BY NgayTao DESC',
       [maKh],
     );
+    const maMonSet = new Set<string>();
+    danhSach.forEach((datBan) => {
+      try {
+        const chiTietMonAn =
+          typeof datBan.ChiTietMonAn === 'string'
+            ? JSON.parse(datBan.ChiTietMonAn)
+            : datBan.ChiTietMonAn;
+        if (Array.isArray(chiTietMonAn)) {
+          chiTietMonAn.forEach((mon) => {
+            const maMon = String(mon.maMon || mon.id || '').trim();
+            if (maMon) maMonSet.add(maMon);
+          });
+        }
+      } catch {}
+    });
+    const danhSachGiaMon = maMonSet.size
+      ? await this.mysql.truyVan(
+          `SELECT MaMon, Gia FROM ThucDon WHERE MaMon IN (${Array.from(maMonSet)
+            .map(() => '?')
+            .join(',')})`,
+          Array.from(maMonSet),
+        )
+      : [];
+    const giaMonTheoMa = new Map(
+      danhSachGiaMon.map((mon) => [
+        String(mon.MaMon || '').trim(),
+        Number(mon.Gia || 0),
+      ]),
+    );
+    const danhSachMaDatBan = danhSach
+      .map((datBan) => String(datBan.MaDatBan || '').trim())
+      .filter(Boolean);
+    const chiTietDonHang = danhSachMaDatBan.length
+      ? await this.mysql.truyVan(
+          `SELECT dh.MaDatBan, ct.MaMon, td.TenMon, ct.SoLuong, ct.DonGia
+           FROM DonHang dh
+           INNER JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
+           LEFT JOIN ThucDon td ON td.MaMon = ct.MaMon
+           WHERE dh.MaDatBan IN (${danhSachMaDatBan.map(() => '?').join(',')})
+           ORDER BY ct.NgayTao ASC`,
+          danhSachMaDatBan,
+        )
+      : [];
+    const monTheoDatBan = new Map<string, unknown[]>();
+    chiTietDonHang.forEach((mon) => {
+      const maDatBan = String(mon.MaDatBan || '').trim();
+      const danhSachMon = monTheoDatBan.get(maDatBan) || [];
+      danhSachMon.push({
+        maMon: String(mon.MaMon || '').trim(),
+        tenMon: String(mon.TenMon || '').trim(),
+        soLuong: Number(mon.SoLuong || 0),
+        gia: Number(mon.DonGia || 0),
+      });
+      monTheoDatBan.set(maDatBan, danhSachMon);
+    });
     return taoPhanHoi(
-      danhSach.map((datBan) => this.chuyenDatBanSangPhanHoi(datBan)),
+      danhSach.map((datBan) =>
+        this.chuyenDatBanSangPhanHoi(datBan, giaMonTheoMa, monTheoDatBan),
+      ),
       'Lấy lịch sử đặt bàn thành công',
     );
   }
@@ -162,8 +270,9 @@ export class DatBanQueryService {
       .filter((ban) => !tapBanDaDuocDung.has(String(ban.MaBan || '').trim()))
       .filter(
         (ban) =>
-          String(ban.TrangThai || '') !== 'Occupied' &&
-          String(ban.TrangThai || '') !== 'Maintenance',
+          String(ban.TrangThai || '') !== TRANG_THAI_BAN.DANG_SU_DUNG &&
+          String(ban.TrangThai || '') !== TRANG_THAI_BAN.GIU_CHO &&
+          String(ban.TrangThai || '') !== TRANG_THAI_BAN.BAN,
       )
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;

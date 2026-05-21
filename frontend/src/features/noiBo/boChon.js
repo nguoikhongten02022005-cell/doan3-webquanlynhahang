@@ -1,4 +1,4 @@
-import { TRANG_THAI_BAN } from '../../services/dichVuBanAn.js'
+import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
 import {
   CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG,
   CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN,
@@ -119,6 +119,7 @@ export const layTomTatDonHang = (danhSachDonHang) => ({
 export const layTomTatBan = (danhSachBan) => {
   const boDemTheoKhuVuc = danhSachBan.reduce((boDem, banAn) => {
     const khuVuc = banAn.areaId || 'KHONG_UU_TIEN'
+    const trangThai = chuanHoaTrangThaiBan(banAn.status)
 
     if (!boDem[khuVuc]) {
       boDem[khuVuc] = {
@@ -133,15 +134,15 @@ export const layTomTatBan = (danhSachBan) => {
 
     boDem[khuVuc].total += 1
 
-    if (banAn.status === TRANG_THAI_BAN.DANG_SU_DUNG) {
+    if (trangThai === 'CO_KHACH') {
       boDem[khuVuc].occupied += 1
     }
 
-    if (banAn.status === TRANG_THAI_BAN.GIU_CHO) {
+    if (trangThai === 'GIU_CHO') {
       boDem[khuVuc].held += 1
     }
 
-    if (banAn.status === TRANG_THAI_BAN.BAN) {
+    if (trangThai === 'CAN_DON') {
       boDem[khuVuc].dirty += 1
     }
 
@@ -175,10 +176,10 @@ export const layTomTatBan = (danhSachBan) => {
 
 export const layTomTatTonKhoBan = (danhSachBan) => ({
   total: danhSachBan.length,
-  available: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.TRONG).length,
-  held: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.GIU_CHO).length,
-  occupied: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.DANG_SU_DUNG).length,
-  dirty: danhSachBan.filter((banAn) => banAn.status === TRANG_THAI_BAN.BAN).length,
+  available: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'TRONG').length,
+  held: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'GIU_CHO').length,
+  occupied: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'CO_KHACH').length,
+  dirty: danhSachBan.filter((banAn) => chuanHoaTrangThaiBan(banAn.status) === 'CAN_DON').length,
 })
 
 export const layTomTatTaiKhoan = (danhSachTaiKhoan) => ({

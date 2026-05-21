@@ -3,6 +3,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { BanGhi } from '../../common/types';
 import { resolveMaBan } from '../../common/ban-resolver';
+import { TRANG_THAI_BAN } from '../../common/constants';
 
 @Injectable()
 export class BanCrudService {
@@ -38,7 +39,7 @@ export class BanCrudService {
         Number(body.soChoNgoi || 0),
         body.viTri || null,
         body.ghiChu || null,
-        'Available',
+        TRANG_THAI_BAN.TRONG,
       ],
     );
     return taoPhanHoi({ maBan: body.maBan }, 'Tao ban thanh cong');
