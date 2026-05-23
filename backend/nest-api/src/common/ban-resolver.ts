@@ -33,7 +33,7 @@ export async function resolveMaBan(
 /**
  * Normalize: "B01" → "B001", "B1" → "B001", "b001" → "B001".
  */
-export function normalizeMaBan(input: string): string | null {
+function normalizeMaBan(input: string): string | null {
   const match = input.match(/^([A-Za-z]+)(\d+)$/);
   if (!match) return null;
   const prefix = match[1].toUpperCase();

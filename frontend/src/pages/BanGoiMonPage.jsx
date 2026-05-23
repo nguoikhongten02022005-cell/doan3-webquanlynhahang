@@ -44,7 +44,7 @@ function BanGoiMonPage() {
 
         setBanInfo(duLieuThucDon?.ban || null)
         setMenuItems(danhSachMon)
-        setOrderDangMo(orderRes?.duLieu || null)
+        setOrderDangMo(orderRes?.duLieu?.donHang || orderRes?.duLieu || null)
       } catch (error) {
         if ((error?.message || '').toLowerCase().includes('không tồn tại') || (error?.message || '').toLowerCase().includes('not found')) {
           setLoi('Bàn không tồn tại hoặc QR code không hợp lệ')
@@ -109,7 +109,7 @@ function BanGoiMonPage() {
   const guiOrder = async () => {
     try {
       const ketQua = await guiOrderTaiBanApi(maBan, gioTam.map((item, index) => ({ maChiTiet: `CTBAN_${Date.now()}_${index}_${Math.random().toString(36).slice(2, 6)}`, maMon: item.maMon, soLuong: item.soLuong })))
-      setOrderDangMo(ketQua.data || ketQua.duLieu)
+      setOrderDangMo(ketQua.data?.donHang || ketQua.duLieu?.donHang || ketQua.data || ketQua.duLieu)
       setGioTam([])
       sessionStorage.removeItem(`${STORAGE_KEY_PREFIX}${maBan}`)
       hienThanhCong('Đã gửi order xuống bếp.', 'Gửi order thành công')

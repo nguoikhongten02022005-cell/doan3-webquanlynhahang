@@ -1,11 +1,9 @@
 import { NHAN_KHU_VUC_DAT_BAN } from '../constants/duLieuDatBan.js'
 import { dinhDangNgay } from '../../noiBo/dinhDang.js'
 
-export const dinhDangMaDatBan = (bookingId) => `DB-${String(bookingId).slice(-6)}`
-
 export const dinhDangNgayGioDatBan = (booking) => `${dinhDangNgay(booking.date)} ${booking.time || ''}`.trim()
 
-export const anhXaTrangThaiDatBan = (status) => {
+const anhXaTrangThaiDatBan = (status) => {
   if (!status) return '🟡 Yêu cầu đặt bàn'
   if (status === 'Pending') return '🟡 Yêu cầu đặt bàn'
   if (status === 'Confirmed') return '🟢 Đã xác nhận'
@@ -62,7 +60,8 @@ export const chuanHoaDatBan = (booking) => {
     phone: String(booking.phone ?? booking.sdtDatBan ?? booking.SDTDatBan ?? booking.sdt ?? booking.SDT ?? '').trim(),
     email: String(booking.email ?? booking.emailDatBan ?? booking.EmailDatBan ?? '').trim(),
     status: normalizedStatus,
-    source: String(booking.source ?? 'web').trim() || 'web',
+    nguonTao: String(booking.nguonTao ?? booking.NguonTao ?? '').trim(),
+    source: String(booking.source ?? booking.nguonTao ?? booking.NguonTao ?? '').trim(),
     createdAt: String(booking.createdAt ?? booking.ngayTao ?? booking.NgayTao ?? '').trim(),
     updatedAt: String(booking.updatedAt ?? booking.ngayCapNhat ?? booking.NgayCapNhat ?? '').trim(),
     userEmail: booking.userEmail ?? null,
@@ -111,36 +110,4 @@ export const anhXaMucDatBan = (booking) => ({
   statusLabel: anhXaTrangThaiDatBan(booking.status).replace(/^[^\s]+\s/, ''),
   statusTone: booking.status === 'Confirmed' ? 'success' : booking.status === 'Cancelled' ? 'danger' : booking.status === 'Completed' ? 'neutral' : 'warning',
   menuItems: booking.menuItems || booking.chiTietMonAn || [],
-})
-
-export const layBangTraCuuBan = (tables) => new Map(tables.map((table) => [table.id, table]))
-
-export const boSungBanChoDanhSachDatBan = (bookings, tables) => {
-  const tableLookup = layBangTraCuuBan(tables)
-
-  return bookings.map((booking) => {
-    const danhSachMaBanDaGan = chuanHoaDanhSachIdBanDaGan(booking.danhSachMaBanDaGan)
-    const danhSachBanDaGan = danhSachMaBanDaGan
-      .map((tableId) => tableLookup.get(tableId))
-      .filter(Boolean)
-
-    return {
-      ...booking,
-      danhSachMaBanDaGan,
-      danhSachBanDaGan,
-    }
-  })
-}
-
-export const taoDuLieuCapNhatDatBanNoiBo = (payload) => ({
-  name: payload.name,
-  phone: payload.phone,
-  email: payload.email,
-  guests: payload.guests,
-  date: payload.date,
-  time: payload.time,
-  seatingArea: payload.seatingArea,
-  notes: payload.notes,
-  internalNote: payload.internalNote,
-  occasion: payload.occasion,
 })

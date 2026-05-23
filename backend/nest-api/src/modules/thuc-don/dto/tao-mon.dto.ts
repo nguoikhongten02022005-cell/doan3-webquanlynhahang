@@ -22,8 +22,7 @@ export class TaoMonDto {
   @ApiPropertyOptional({ example: 'KHAI_VI' })
   @IsOptional()
   @IsString()
-  @Length(1, 50)
-  @Matches(/^[A-Za-z0-9_-]+$/)
+  @Length(1, 100)
   maDanhMuc?: string;
 
   @ApiProperty({ example: 'Pho bo tai' })

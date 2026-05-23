@@ -1,5 +1,4 @@
 import { createContext, createElement, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react'
-import { STORAGE_KEYS } from '../constants/khoaLuuTru'
 import {
   layThongTinToiApi,
   dangNhapApi,
@@ -12,8 +11,10 @@ import {
 } from '../services/api/apiXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
 import {
+  PHAM_VI_XAC_THUC,
   VAI_TRO_XAC_THUC,
   SU_KIEN_THAY_DOI_NGUOI_DUNG_XAC_THUC,
+  datPhamViXacThuc,
   xoaPhienXacThuc,
   layNguoiDungHienTai,
   luuPhienXacThuc,
@@ -23,7 +24,8 @@ import {
 const layNguoiDungTuDuLieuAuth = (duLieu) => duLieu?.currentUser || duLieu?.user || duLieu || null
 const layAccessTokenTuDuLieuAuth = (duLieu) => duLieu?.AccessToken || duLieu?.accessToken || ''
 const layRefreshTokenTuDuLieuAuth = (duLieu) => duLieu?.RefreshToken || duLieu?.refreshToken || ''
-const layNguoiDungTheoPhien = () => layNguoiDungHienTai()
+const layPhamViTheoDuongDan = () => (typeof window !== 'undefined' && (window.location.pathname || '').startsWith('/noi-bo') ? PHAM_VI_XAC_THUC.NOI_BO : PHAM_VI_XAC_THUC.KHACH_HANG)
+const layNguoiDungTheoPhien = () => layNguoiDungHienTai(layPhamViTheoDuongDan())
 const coCanKhoiTaoXacThuc = () => true
 const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
   ...payload,
@@ -33,13 +35,13 @@ const taoPayloadCoMaND = (nguoiDung, payload = {}) => ({
 
 const XacThucContext = createContext(null)
 
-const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai }) => {
+const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai, phamVi }) => {
   const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
   const accessToken = layAccessTokenTuDuLieuAuth(duLieu)
   const refreshToken = layRefreshTokenTuDuLieuAuth(duLieu)
 
   if (!nguoiDung || !accessToken) {
-    xoaPhienXacThuc()
+    xoaPhienXacThuc(phamVi)
     return {
       success: false,
       error: thongDiepLoiMacDinh,
@@ -50,9 +52,10 @@ const apDungPhienXacThuc = ({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai }
     user: nguoiDung,
     accessToken,
     refreshToken,
+    phamVi,
   })
 
-  const nguoiDungDaLuu = layNguoiDungHienTai()
+  const nguoiDungDaLuu = layNguoiDungHienTai(phamVi)
   setNguoiDungHienTai(nguoiDungDaLuu || nguoiDung)
 
   return {
@@ -71,6 +74,9 @@ function useXacThucState() {
       return undefined
     }
     daKhoiTaoXacThucRef.current = true
+
+    const phamVi = layPhamViTheoDuongDan()
+    datPhamViXacThuc(phamVi)
 
     if (typeof window !== 'undefined') {
       const duongDanHienTai = window.location.pathname || '/'
@@ -96,8 +102,8 @@ function useXacThucState() {
         return
       }
 
-      if (!layNguoiDungTheoPhien()?.maND) {
-        xoaPhienXacThuc()
+      if (!layNguoiDungHienTai(phamVi)?.maND) {
+        xoaPhienXacThuc(phamVi)
         setNguoiDungHienTai(null)
         setIsAuthBootstrapping(false)
         return
@@ -108,14 +114,14 @@ function useXacThucState() {
         const nguoiDung = layNguoiDungTuDuLieuAuth(duLieu)
 
         if (nguoiDung) {
-          luuNguoiDungHienTai(nguoiDung)
-          setNguoiDungHienTai(layNguoiDungHienTai())
+          luuNguoiDungHienTai(nguoiDung, phamVi)
+          setNguoiDungHienTai(layNguoiDungHienTai(phamVi))
         } else {
-          xoaPhienXacThuc()
+          xoaPhienXacThuc(phamVi)
           setNguoiDungHienTai(null)
         }
       } catch {
-        xoaPhienXacThuc()
+        xoaPhienXacThuc(phamVi)
         setNguoiDungHienTai(null)
       } finally {
         setIsAuthBootstrapping(false)
@@ -123,7 +129,7 @@ function useXacThucState() {
     }
 
     const xuLyStorage = (event) => {
-      if (event.key && event.key !== STORAGE_KEYS.NGUOI_DUNG_HIEN_TAI) {
+      if (event.key && !event.key.includes('current_user')) {
         return
       }
 
@@ -140,12 +146,12 @@ function useXacThucState() {
     }
   }, [])
 
-  const dangNhapBangApi = useCallback(async (hamDangNhap, email, matKhau, thongDiepLoiMacDinh) => {
+  const dangNhapBangApi = useCallback(async (hamDangNhap, email, matKhau, thongDiepLoiMacDinh, phamVi) => {
     try {
       const { duLieu } = await hamDangNhap(email, matKhau)
-      return apDungPhienXacThuc({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai })
+      return apDungPhienXacThuc({ duLieu, thongDiepLoiMacDinh, setNguoiDungHienTai, phamVi })
     } catch (error) {
-      xoaPhienXacThuc()
+      xoaPhienXacThuc(phamVi)
       return {
         success: false,
         error: error?.message || thongDiepLoiMacDinh,
@@ -159,6 +165,7 @@ function useXacThucState() {
       identifier,
       password,
       'Đăng nhập thất bại.',
+      PHAM_VI_XAC_THUC.KHACH_HANG,
     )
   }, [dangNhapBangApi])
 
@@ -168,15 +175,16 @@ function useXacThucState() {
       identifier,
       password,
       'Đăng nhập nội bộ thất bại.',
+      PHAM_VI_XAC_THUC.NOI_BO,
     )
   }, [dangNhapBangApi])
 
   const dangKy = useCallback(async (payload) => {
     try {
       const { duLieu } = await dangKyApi(payload)
-      return apDungPhienXacThuc({ duLieu, thongDiepLoiMacDinh: 'Đăng ký thất bại.', setNguoiDungHienTai })
+      return apDungPhienXacThuc({ duLieu, thongDiepLoiMacDinh: 'Đăng ký thất bại.', setNguoiDungHienTai, phamVi: PHAM_VI_XAC_THUC.KHACH_HANG })
     } catch (error) {
-      xoaPhienXacThuc()
+      xoaPhienXacThuc(PHAM_VI_XAC_THUC.KHACH_HANG)
       return {
         success: false,
         error: error?.message || 'Đăng ký thất bại.',
@@ -193,13 +201,14 @@ function useXacThucState() {
       }
     }
 
-    xoaPhienXacThuc()
+    xoaPhienXacThuc(layPhamViTheoDuongDan())
     setNguoiDungHienTai(null)
   }, [])
 
   const capNhatHoSo = useCallback(async (payload) => {
     try {
-      const nguoiDungDangLuu = layNguoiDungHienTai()
+      const phamVi = layPhamViTheoDuongDan()
+      const nguoiDungDangLuu = layNguoiDungHienTai(phamVi)
       const { duLieu } = await capNhatHoSoApi(taoPayloadCoMaND(nguoiDungDangLuu, payload))
       if (!duLieu) {
         return { success: false, error: 'Cập nhật hồ sơ thất bại.' }
@@ -209,9 +218,9 @@ function useXacThucState() {
       luuNguoiDungHienTai({
         ...nguoiDungDangLuu,
         ...nguoiDungTuApi,
-      })
+      }, phamVi)
 
-      const nguoiDungDaCapNhat = layNguoiDungHienTai()
+      const nguoiDungDaCapNhat = layNguoiDungHienTai(phamVi)
       setNguoiDungHienTai(nguoiDungDaCapNhat)
 
       return { success: true, user: nguoiDungDaCapNhat }
@@ -222,7 +231,7 @@ function useXacThucState() {
 
   const capNhatMatKhau = useCallback(async (payload) => {
     try {
-      const nguoiDungDangLuu = layNguoiDungHienTai()
+      const nguoiDungDangLuu = layNguoiDungHienTai(layPhamViTheoDuongDan())
       await doiMatKhauApi(taoPayloadCoMaND(nguoiDungDangLuu, payload))
       return { success: true }
     } catch (error) {

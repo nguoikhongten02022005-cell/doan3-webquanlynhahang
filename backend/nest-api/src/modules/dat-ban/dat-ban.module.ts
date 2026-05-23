@@ -5,9 +5,10 @@ import { DatBanQueryService } from './dat-ban-query.service';
 import { DatBanCommandService } from './dat-ban-command.service';
 import { CoreModule } from '../core/core.module';
 import { AuthModule } from '../auth/auth.module';
+import { DonHangModule } from '../don-hang/don-hang.module';
 
 @Module({
-  imports: [CoreModule, AuthModule],
+  imports: [CoreModule, AuthModule, DonHangModule],
   controllers: [DatBanController],
   providers: [DatBanService, DatBanQueryService, DatBanCommandService],
 })

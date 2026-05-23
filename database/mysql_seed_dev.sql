@@ -11,7 +11,7 @@ USE QuanNhaHang;
 -- admin@nhahang.com / Admin@123
 -- an.nv@nhahang.com / Staff@123
 -- bich.lt@nhahang.com / Staff@123
--- khách1@gmail.com / Khách@123
+-- khach1@gmail.com / Khach@123
 -- mai.pt@gmail.com / Khách@123
 -- kháchtest01@gmail.com / chua xac minh tu DB dang chay (giữ nguyên hash hiện tại)
 -- ============================================================
@@ -19,8 +19,8 @@ INSERT INTO NguoiDung (MaND, TenND, Email, MatKhau, VaiTro, TrangThai) VALUES
 ('ND001', 'Admin System', 'admin@nhahang.com', '$2b$10$QQjUYOP2RIOusra.a.Sig.dnEWuKOnYCqQoMEqhJPX/T/XJ.dMEiW', 'Admin', 'Active'),
 ('ND002', 'Nguyễn Văn An', 'an.nv@nhahang.com', '$2b$10$wd0YWq1YXw0jlVA0qlrA.udcmvJRVp7MSUO0RH57wU4iA9Tf/JeS6', 'NhanVien', 'Active'),
 ('ND003', 'Lê Thị Bích', 'bich.lt@nhahang.com', '$2b$10$cU0ttRiu8gphooM1j9SuVuJ8l7M0GLj8G/ZzReu9xFxDyY/5YFi4W', 'NhanVien', 'Active'),
-('ND004', 'Tran Van Khách', 'khách1@gmail.com', '$2b$10$NltKkLKz8pXuOifZY5bUOuBG4oImqzWxHiSoBvvMPn7POBle3hgKS', 'KhachHang', 'Active'),
-('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2b$10$NltKkLKz8pXuOifZY5bUOuBG4oImqzWxHiSoBvvMPn7POBle3hgKS', 'KhachHang', 'Active'),
+('ND004', 'Tran Van Khách', 'khach1@gmail.com', '$2b$10$XOeTjjVS0Y6Cm9U45RXyTeza/xg/V6ehWwVVnggLRZ55k41IEhGUG', 'KhachHang', 'Active'),
+('ND005', 'Pham Thi Mai', 'mai.pt@gmail.com', '$2b$10$mBPXD0mV9Fw.JJQZMBtX5OZ2QzzG8fPjJIrNdz0DBgEan8DslLzZy', 'KhachHang', 'Active'),
 ('ND_KH_TEST_01', 'Nguyen Van Test', 'kháchtest01@gmail.com', '$2a$11$dtmZV4AJS/fB16ymIqO4AuCZuj21tj08dUYpY3uons9iJor0n1omW', 'KhachHang', 'Active');
 
 INSERT INTO NhanVien (MaNV, MaND, HoTen, GioiTinh, SDT, ChucVu, NgayVaoLam) VALUES
@@ -90,9 +90,9 @@ INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangTo
 INSERT INTO DatBan (
     MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
     NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
-    TrangThai, NgayTao, NgayCapNhat
+    NguonTao, TrangThai, NgayTao, NgayCapNhat
 ) VALUES
-('DB001', 'KH001', 'B004', 'NV002', 'Tran Van Khách', '0912345678', 'khách1@gmail.com', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhật, cần bánh kem', 'PHONG_VIP', 'Cần sắp xếp bàn đẹp và ưu tiên check-in đúng giờ.', 'Pending', NOW(), NOW());
+('DB001', 'KH001', 'B004', 'NV002', 'Tran Van Khách', '0912345678', 'khach1@gmail.com', '2026-08-10', '18:00:00', '20:00:00', 4, 'Sinh nhật, cần bánh kem', 'PHONG_VIP', 'Cần sắp xếp bàn đẹp và ưu tiên check-in đúng giờ.', 'WEB', 'Pending', NOW(), NOW());
 
 INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
 ('DH001', 'KH001', 'B004', 'NV002', 'DB001', 'TAI_BAN', 215000, 'Paid', 'DatBan', NULL, NOW(), NOW());
@@ -315,33 +315,40 @@ INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangTo
 INSERT INTO DatBan (
     MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
     NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
-    TrangThai, NgayTao, NgayCapNhat
+    NguonTao, TrangThai, NgayTao, NgayCapNhat
 ) VALUES
-('DB002', 'KH002', NULL, 'NV004', 'Pham Thi Mai', '0987654321', 'mai.pt@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 210 MINUTE)), 2, 'Bàn gần cửa sổ nếu còn chỗ.', 'SANH_CHINH', 'Booking sắp đến, cần xác nhận qua điện thoại.', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
-('DB003', 'KH006', NULL, 'NV004', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 180 MINUTE)), 6, 'Cần không gian riêng cho nhóm họp mặt.', 'PHONG_VIP', 'Khách VIP, nếu hết chỗ cần gọi lại để đổi khung giờ.', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)),
-('DB004', 'KH006', 'B005', 'NV002', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '19:00:00', '21:00:00', 4, 'Sinh nhật gia đình.', 'PHONG_VIP', 'Đã xác nhận và giữ bàn VIP.', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '09:15:00'), TIMESTAMP(CURRENT_DATE(), '09:25:00')),
-('DB005', 'KH007', 'B011', 'NV005', 'Hoang Anh Thu', '0908800002', 'thu.ha@gmail.com', DATE(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)), TIME(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), 4, 'Đã đến đúng giờ.', 'PHONG_VIP', 'Khách đã check-in và đang dùng bữa.', 'Seated', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 HOUR), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
-('DB006', 'KH001', 'B002', 'NV002', 'Tran Van Khách', '0912345678', 'khách1@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '12:00:00', '13:30:00', 2, 'Khách quen đặt bàn trưa.', 'SANH_CHINH', 'Tạm giữ cho đến khi xác nhận lại số khách.', 'Pending', TIMESTAMP(CURRENT_DATE(), '10:05:00'), TIMESTAMP(CURRENT_DATE(), '10:10:00')),
-('DB007', 'KH004', NULL, 'NV004', 'Khách Lẻ Công Ty', '0907772001', 'booking.doanhnghiep@demo.local', DATE_ADD(CURRENT_DATE(), INTERVAL 2 DAY), '18:30:00', '20:30:00', 8, 'Cần hóa đơn công ty.', 'SANH_CHINH', 'Booking đoạn từ website, chờ gọi xác nhận.', 'Pending', TIMESTAMP(CURRENT_DATE(), '08:20:00'), TIMESTAMP(CURRENT_DATE(), '08:20:00')),
-('DB008', 'KH002', 'B006', 'NV005', 'Pham Thi Mai', '0987654321', 'mai.pt@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:00:00', '19:30:00', 2, 'Đặt bàn ngoài trời.', 'BAN_CONG', 'Khách không đến sau 20 phút.', 'NoShow', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '11:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:30:00')),
-('DB009', 'KH008', NULL, 'NV004', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '19:00:00', '21:00:00', 3, 'Khách đổi lịch sang tuần sau.', 'SANH_CHINH', 'Đã hủy theo yêu cầu khách.', 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '16:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '12:00:00')),
-('DB010', 'KH005', NULL, 'NV004', 'Khách Bàn Tiệc', '0907772002', 'ban.tiec@demo.local', DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), '20:00:00', '22:00:00', 10, 'Đoàn khách muốn phòng riêng.', 'PHONG_VIP', 'Hết sức chưa vào cuối tuần.', 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY), '15:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), '10:30:00')),
-('DB011', 'KH009', 'B014', 'NV007', 'Nguyễn Bảo Ngọc', '0908800004', 'ngoc.nb@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY), '18:00:00', '20:00:00', 5, 'Đặt phòng riêng tiếp đối tác.', 'PHONG_VIP', 'Admin đã duyệt booking VIP.', 'Pending', TIMESTAMP(CURRENT_DATE(), '13:10:00'), TIMESTAMP(CURRENT_DATE(), '13:20:00')),
-('DB012', 'KH008', 'B012', 'NV002', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '18:15:00', '20:15:00', 4, 'Khách sẽ đến sau giờ tan làm.', 'SANH_CHINH', 'Đã ghi nhận và tạm giữ bàn tăng 1.', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '14:00:00'), TIMESTAMP(CURRENT_DATE(), '14:05:00')),
-('DB013', 'KH_TEST_01', NULL, 'NV004', 'Nguyen Van Test', '0901239999', 'kháchtest01@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '17:30:00', '19:00:00', 3, 'Muốn ngồi gần máy lạnh.', 'SANH_CHINH', 'Khách mới tạo booking, chưa gán bàn.', 'Pending', TIMESTAMP(CURRENT_DATE(), '15:15:00'), TIMESTAMP(CURRENT_DATE(), '15:15:00')),
-('DB014', 'KH001', 'B013', 'NV005', 'Tran Van Khách', '0912345678', 'khách1@gmail.com', DATE(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)), TIME(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), 2, 'Khách vào bàn và đã gọi món.', 'QUAY_BAR', 'Đã xếp bàn tại quầy bar.', 'Seated', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)),
-('DB015', 'KH006', 'B010', 'NV004', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '18:30:00', '20:00:00', 2, 'Booking cũ khách không đến.', 'BAN_CONG', 'Khách báo trễ nhưng không đến.', 'NoShow', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '09:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '19:00:00'));
+('DB002', 'KH002', NULL, 'NV004', 'Pham Thi Mai', '0987654321', 'mai.pt@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 210 MINUTE)), 2, 'Bàn gần cửa sổ nếu còn chỗ.', 'SANH_CHINH', 'Booking sắp đến, cần xác nhận qua điện thoại.', 'WEB', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 20 MINUTE)),
+('DB003', 'KH006', NULL, 'NV004', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 60 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 180 MINUTE)), 6, 'Cần không gian riêng cho nhóm họp mặt.', 'PHONG_VIP', 'Khách VIP, nếu hết chỗ cần gọi lại để đổi khung giờ.', 'WEB', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 50 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 30 MINUTE)),
+('DB004', 'KH006', 'B005', 'NV002', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '19:00:00', '21:00:00', 4, 'Sinh nhật gia đình.', 'PHONG_VIP', 'Đã xác nhận và giữ bàn VIP.', 'NOI_BO', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '09:15:00'), TIMESTAMP(CURRENT_DATE(), '09:25:00')),
+('DB005', 'KH007', 'B011', 'NV005', 'Hoang Anh Thu', '0908800002', 'thu.ha@gmail.com', DATE(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)), TIME(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 45 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 90 MINUTE)), 4, 'Đã đến đúng giờ.', 'PHONG_VIP', 'Khách đã check-in và đang dùng bữa.', 'NOI_BO', 'Seated', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 2 HOUR), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)),
+('DB006', 'KH001', 'B002', 'NV002', 'Tran Van Khách', '0912345678', 'khach1@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '12:00:00', '13:30:00', 2, 'Khách quen đặt bàn trưa.', 'SANH_CHINH', 'Tạm giữ cho đến khi xác nhận lại số khách.', 'NOI_BO', 'Pending', TIMESTAMP(CURRENT_DATE(), '10:05:00'), TIMESTAMP(CURRENT_DATE(), '10:10:00')),
+('DB007', 'KH004', NULL, 'NV004', 'Khách Lẻ Công Ty', '0907772001', 'booking.doanhnghiep@demo.local', DATE_ADD(CURRENT_DATE(), INTERVAL 2 DAY), '18:30:00', '20:30:00', 8, 'Cần hóa đơn công ty.', 'SANH_CHINH', 'Booking đoạn từ website, chờ gọi xác nhận.', 'WEB', 'Pending', TIMESTAMP(CURRENT_DATE(), '08:20:00'), TIMESTAMP(CURRENT_DATE(), '08:20:00')),
+('DB008', 'KH002', 'B006', 'NV005', 'Pham Thi Mai', '0987654321', 'mai.pt@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:00:00', '19:30:00', 2, 'Đặt bàn ngoài trời.', 'BAN_CONG', 'Khách không đến sau 20 phút.', 'WEB', 'NoShow', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '11:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 2 DAY), '18:30:00')),
+('DB009', 'KH008', NULL, 'NV004', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '19:00:00', '21:00:00', 3, 'Khách đổi lịch sang tuần sau.', 'SANH_CHINH', 'Đã hủy theo yêu cầu khách.', 'WEB', 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '16:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '12:00:00')),
+('DB010', 'KH005', NULL, 'NV004', 'Khách Bàn Tiệc', '0907772002', 'ban.tiec@demo.local', DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), '20:00:00', '22:00:00', 10, 'Đoàn khách muốn phòng riêng.', 'PHONG_VIP', 'Hết sức chưa vào cuối tuần.', 'WEB', 'Cancelled', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 8 DAY), '15:00:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), '10:30:00')),
+('DB011', 'KH009', 'B014', 'NV007', 'Nguyễn Bảo Ngọc', '0908800004', 'ngoc.nb@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 3 DAY), '18:00:00', '20:00:00', 5, 'Đặt phòng riêng tiếp đối tác.', 'PHONG_VIP', 'Admin đã duyệt booking VIP.', 'NOI_BO', 'Pending', TIMESTAMP(CURRENT_DATE(), '13:10:00'), TIMESTAMP(CURRENT_DATE(), '13:20:00')),
+('DB012', 'KH008', 'B012', 'NV002', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '18:15:00', '20:15:00', 4, 'Khách sẽ đến sau giờ tan làm.', 'SANH_CHINH', 'Đã ghi nhận và tạm giữ bàn tăng 1.', 'NOI_BO', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '14:00:00'), TIMESTAMP(CURRENT_DATE(), '14:05:00')),
+('DB013', 'KH_TEST_01', NULL, 'NV004', 'Nguyen Van Test', '0901239999', 'kháchtest01@gmail.com', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '17:30:00', '19:00:00', 3, 'Muốn ngồi gần máy lạnh.', 'SANH_CHINH', 'Khách mới tạo booking, chưa gán bàn.', 'WEB', 'Pending', TIMESTAMP(CURRENT_DATE(), '15:15:00'), TIMESTAMP(CURRENT_DATE(), '15:15:00')),
+('DB014', 'KH001', 'B013', 'NV005', 'Tran Van Khách', '0912345678', 'khach1@gmail.com', DATE(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)), TIME(DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 15 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), 2, 'Khách vào bàn và đã gọi món.', 'QUAY_BAR', 'Đã xếp bàn tại quầy bar.', 'NOI_BO', 'Seated', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 1 HOUR), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)),
+('DB015', 'KH006', 'B010', 'NV004', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '18:30:00', '20:00:00', 2, 'Booking cũ khách không đến.', 'BAN_CONG', 'Khách báo trễ nhưng không đến.', 'WEB', 'NoShow', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 11 DAY), '09:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 10 DAY), '19:00:00'));
 
 INSERT INTO DatBan (
     MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
     NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, GhiChuNoiBo,
-    TrangThai, NgayTao, NgayCapNhat
+    NguonTao, TrangThai, NgayTao, NgayCapNhat
 ) VALUES
-('DB016', 'KH008', 'B012', 'NV002', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '12:15:00', '13:45:00', 4, 'Họp mặt bạn bè buổi trưa.', 'SANH_CHINH', 'Đã phục vụ xong và khách đánh giá tốt.', 'Completed', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:50:00')),
-('DB017', 'KH009', 'B014', 'NV007', 'Nguyễn Bảo Ngọc', '0908800004', 'ngoc.nb@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 195 MINUTE)), 5, 'Khách tiếp đối tác, ưu tiên phòng riêng.', 'PHONG_VIP', 'Cần kiểm tra lại setup phòng VIP trước giờ đến.', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)),
-('DB018', 'KH006', 'B005', 'NV002', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:15:00', '21:00:00', 6, 'Tiệc nhỏ kỷ niệm của nhóm thân thiết.', 'PHONG_VIP', 'Khách đã dùng bữa trọn vẹn và hoàn thành thanh toán.', 'Completed', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:05:00')),
-('DB019', 'KH004', NULL, 'NV004', 'Khách Lẻ Công Ty', '0907772003', 'company.booking2@demo.local', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '18:45:00', '20:30:00', 10, 'Cần xác nhận lại số lượng khách và yêu cầu hóa đơn.', 'SANH_CHINH', 'Booking doanh nghiệp mới từ website.', 'Pending', TIMESTAMP(CURRENT_DATE(), '16:10:00'), TIMESTAMP(CURRENT_DATE(), '16:10:00')),
-('DB020', 'KH008', 'B009', 'NV005', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', CURRENT_DATE(), '19:15:00', '20:45:00', 4, 'Đặt bàn tối cuối ngày sau giờ làm.', 'BAN_CONG', 'Khách đã xác nhận, ưu tiên phục vụ nhanh trong ca cao điểm.', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '17:10:00'), TIMESTAMP(CURRENT_DATE(), '17:20:00'));
+('DB016', 'KH008', 'B012', 'NV002', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '12:15:00', '13:45:00', 4, 'Họp mặt bạn bè buổi trưa.', 'SANH_CHINH', 'Đã phục vụ xong và khách đánh giá tốt.', 'NOI_BO', 'Completed', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:40:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '13:50:00')),
+('DB017', 'KH009', 'B014', 'NV007', 'Nguyễn Bảo Ngọc', '0908800004', 'ngoc.nb@gmail.com', DATE(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 75 MINUTE)), TIME(DATE_ADD(CURRENT_TIMESTAMP(), INTERVAL 195 MINUTE)), 5, 'Khách tiếp đối tác, ưu tiên phòng riêng.', 'PHONG_VIP', 'Cần kiểm tra lại setup phòng VIP trước giờ đến.', 'NOI_BO', 'Pending', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 10 MINUTE)),
+('DB018', 'KH006', 'B005', 'NV002', 'Lê Minh Châu', '0908800001', 'chau.lm@gmail.com', DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '19:15:00', '21:00:00', 6, 'Tiệc nhỏ kỷ niệm của nhóm thân thiết.', 'PHONG_VIP', 'Khách đã dùng bữa trọn vẹn và hoàn thành thanh toán.', 'NOI_BO', 'Completed', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 4 DAY), '21:05:00')),
+('DB019', 'KH004', NULL, 'NV004', 'Khách Lẻ Công Ty', '0907772003', 'company.booking2@demo.local', DATE_ADD(CURRENT_DATE(), INTERVAL 1 DAY), '18:45:00', '20:30:00', 10, 'Cần xác nhận lại số lượng khách và yêu cầu hóa đơn.', 'SANH_CHINH', 'Booking doanh nghiệp mới từ website.', 'WEB', 'Pending', TIMESTAMP(CURRENT_DATE(), '16:10:00'), TIMESTAMP(CURRENT_DATE(), '16:10:00')),
+('DB020', 'KH008', 'B009', 'NV005', 'Bùi Quốc Đạt', '0908800003', 'dat.bq@gmail.com', CURRENT_DATE(), '19:15:00', '20:45:00', 4, 'Đặt bàn tối cuối ngày sau giờ làm.', 'BAN_CONG', 'Khách đã xác nhận, ưu tiên phục vụ nhanh trong ca cao điểm.', 'NOI_BO', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '17:10:00'), TIMESTAMP(CURRENT_DATE(), '17:20:00'));
+
+INSERT INTO DatBan (
+    MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
+    NgayDat, GioDat, GioKetThuc, SoNguoi, GhiChu, KhuVucUuTien, ChiTietMonAn,
+    GhiChuNoiBo, NguonTao, TrangThai, NgayTao, NgayCapNhat
+) VALUES
+('DB_1779248744833', 'KH001', 'B006', 'NV002', 'Tran Van Khách', '0912345678', 'khach1@gmail.com', CURRENT_DATE(), '18:30:00', '20:00:00', 3, 'Booking B006 có gọi món trước để test order đang mở.', 'BAN_CONG', JSON_ARRAY(JSON_OBJECT('maMon', 'M003', 'soLuong', 1), JSON_OBJECT('maMon', 'M008', 'soLuong', 2), JSON_OBJECT('maMon', 'M014', 'soLuong', 1)), 'Seed tạo order mở cho bàn B006.', 'NOI_BO', 'Confirmed', TIMESTAMP(CURRENT_DATE(), '17:40:00'), TIMESTAMP(CURRENT_DATE(), '17:45:00'));
 
 INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, TrangThai, NguonTao, GhiChu, NgayTao, NgayCapNhat) VALUES
 ('DH004', 'KH003', 'B003', 'NV004', NULL, 'TAI_BAN', 110000, 'Preparing', 'QRCode', 'Khách tai ban goi them mon va nuoc.', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 35 MINUTE), DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 5 MINUTE)),
@@ -359,7 +366,8 @@ INSERT INTO DonHang (MaDonHang, MaKH, MaBan, MaNV, MaDatBan, LoaiDon, TongTien, 
 ('DH016', 'KH007', 'B003', 'NV003', NULL, 'TAI_BAN', 172000, 'Paid', 'TaiQuay', 'Khách gọi món tại bàn buổi tối, có mua thêm tráng miệng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '17:30:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 3 DAY), '18:20:00')),
 ('DH017', 'KH009', 'B004', 'NV005', NULL, 'TAI_BAN', 226000, 'Paid', 'TaiQuay', 'Đơn gọi món tại bàn buổi tối trong nhà hàng.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '18:35:00'), TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 5 DAY), '19:50:00')),
 ('DH018', 'KH001', 'B002', 'NV003', 'DB006', 'TAI_BAN', 184000, 'Pending', 'DatBan', 'Booking trưa đang chờ bếp tiếp nhận.', TIMESTAMP(CURRENT_DATE(), '11:35:00'), TIMESTAMP(CURRENT_DATE(), '11:40:00')),
-('DH019', 'KH008', 'B009', 'NV005', 'DB020', 'TAI_BAN', 312000, 'Paid', 'DatBan', 'Khách tới cuối ngày đã thanh toán ngay sau bữa tối.', TIMESTAMP(CURRENT_DATE(), '19:18:00'), TIMESTAMP(CURRENT_DATE(), '20:48:00'));
+('DH019', 'KH008', 'B009', 'NV005', 'DB020', 'TAI_BAN', 312000, 'Paid', 'DatBan', 'Khách tới cuối ngày đã thanh toán ngay sau bữa tối.', TIMESTAMP(CURRENT_DATE(), '19:18:00'), TIMESTAMP(CURRENT_DATE(), '20:48:00')),
+('DH020', 'KH001', 'B006', 'NV002', 'DB_1779248744833', 'TAI_BAN', 182000, 'Pending', 'DatBan', 'Booking B006 có món đặt trước, đang mở.', TIMESTAMP(CURRENT_DATE(), '17:46:00'), TIMESTAMP(CURRENT_DATE(), '17:46:00'));
 
 INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhTien, GhiChu, TrangThai, NgayTao) VALUES
 ('CT011', 'DH004', 'M002', 1, 45000, 45000, 'Lam gion ky', 'Preparing', DATE_SUB(CURRENT_TIMESTAMP(), INTERVAL 34 MINUTE)),
@@ -402,7 +410,10 @@ INSERT INTO ChiTietDonHang (MaChiTiet, MaDonHang, MaMon, SoLuong, DonGia, ThanhT
 ('CT048', 'DH018', 'M014', 1, 68000, 68000, NULL, 'Pending', TIMESTAMP(CURRENT_DATE(), '11:38:00')),
 ('CT049', 'DH019', 'M016', 1, 259000, 259000, NULL, 'Done', TIMESTAMP(CURRENT_DATE(), '19:20:00')),
 ('CT050', 'DH019', 'M009', 1, 35000, 35000, NULL, 'Done', TIMESTAMP(CURRENT_DATE(), '19:21:00')),
-('CT051', 'DH019', 'M018', 1, 45000, 45000, 'Tang kem sau bữa tối', 'Done', TIMESTAMP(CURRENT_DATE(), '19:22:00'));
+('CT051', 'DH019', 'M018', 1, 45000, 45000, 'Tang kem sau bữa tối', 'Done', TIMESTAMP(CURRENT_DATE(), '19:22:00')),
+('CT052', 'DH020', 'M003', 1, 55000, 55000, NULL, 'Pending', TIMESTAMP(CURRENT_DATE(), '17:47:00')),
+('CT053', 'DH020', 'M008', 2, 25000, 50000, NULL, 'Pending', TIMESTAMP(CURRENT_DATE(), '17:48:00')),
+('CT054', 'DH020', 'M014', 1, 68000, 68000, NULL, 'Pending', TIMESTAMP(CURRENT_DATE(), '17:49:00'));
 
 INSERT INTO HoaDon (MaHoaDon, MaDonHang, MaKH, MaNV, MaCode, TongTien, GiamGia, ThueSuat, TienThue, ThanhTien, GhiChu, NgayXuat) VALUES
 ('HD004', 'DH007', 'KH006', 'NV003', 'LOYAL25K', 210000, 25000, 10, 21000, 231000, 'Đơn gọi món tại bàn tri ân thành viên.', TIMESTAMP(DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), '11:46:00')),
@@ -568,8 +579,8 @@ INSERT INTO ThongBao (MaThongBao, MaND, TieuDe, NoiDung, LoaiThongBao, MaThamChi
 
 -- Tai khoan khách test moi
 UPDATE NguoiDung
-SET MatKhau = '$2b$10$xSUYzc6LpQ0g/8eC1AZH3OpBGSWp4qZQNfJZfA.0e9WsHKQeBdcbi'
-WHERE LOWER(Email) = LOWER('khách1@gmail.com');
+SET MatKhau = '$2b$10$XOeTjjVS0Y6Cm9U45RXyTeza/xg/V6ehWwVVnggLRZ55k41IEhGUG'
+WHERE LOWER(Email) = LOWER('khach1@gmail.com');
 
 -- Dong bo bo seed goc ve moc thoi gian co y nghia hon cho viec test.
 UPDATE DatBan
@@ -605,4 +616,3 @@ UPDATE Ban SET TrangThai = 'Available' WHERE MaBan IN ('B001', 'B004', 'B008', '
 UPDATE Ban SET TrangThai = 'Reserved' WHERE MaBan IN ('B002', 'B005', 'B009', 'B012', 'B014', 'B015', 'B019', 'B024', 'B027', 'B031', 'B035', 'B040', 'B044', 'B048', 'B052', 'B056', 'B060');
 UPDATE Ban SET TrangThai = 'Occupied' WHERE MaBan IN ('B003', 'B011', 'B013', 'B017', 'B021', 'B026', 'B029', 'B033', 'B039', 'B043', 'B046', 'B050', 'B054', 'B058', 'B063');
 UPDATE Ban SET TrangThai = 'Maintenance' WHERE MaBan IN ('B007', 'B023', 'B037', 'B061');
-

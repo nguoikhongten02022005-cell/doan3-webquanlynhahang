@@ -805,7 +805,8 @@ export const taoHoacCapNhatDatBanOffline = ({ booking, maDatBan }) => {
       updatedAt: new Date().toISOString(),
       ngayCapNhat: new Date().toISOString(),
       NgayCapNhat: new Date().toISOString(),
-      source: booking.nguonTao || booking.source || 'web',
+      nguonTao: booking.nguonTao || booking.source || 'WEB',
+      source: booking.nguonTao || booking.source || 'WEB',
       createdBy: booking.createdBy || '',
       chiTietMonAn: Array.isArray(booking.chiTietMonAn)
         ? booking.chiTietMonAn

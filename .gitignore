@@ -36,6 +36,8 @@ backend/**/obj/
 
 # Local scratch files
 .opencode/
+.opencode/cache/
+.opencode/node_modules/
 [Nn][Uu][Ll]
 console-*.txt
 network-*.txt
@@ -64,3 +66,8 @@ thuc-don-mobile.png
 thuc-don-current.png
 thuc-don-after-fix.png
 .gstack/
+frontend/.vite/
+graphify-out/
+.serena/cache/
+.backup-ai-cleanup/
+backend/nest-api/tsconfig.build.tsbuildinfo

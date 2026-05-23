@@ -28,6 +28,7 @@ function BuocMotDatBan({
   selectedAreaUnavailableMessage,
   largePartyNotice,
   thongBaoTaiBan,
+  daCoBanPhuHop,
   onGuestSelect,
   onDateSelect,
   onDateInputChange,
@@ -138,7 +139,7 @@ function BuocMotDatBan({
         )}
       </Card>
 
-      <Card title="Chọn khu vực (tuỳ chọn)" extra={<Text type="secondary">Nhà hàng sẽ cố gắng sắp xếp theo ưu tiên này nhưng không cam kết 100%.</Text>}>
+      <Card title="Chọn khu vực (tuỳ chọn)" extra={<Text type="secondary">Nhà hàng sẽ tự động sắp xếp bàn phù hợp trong khu vực bạn chọn.</Text>}>
 
         {!hasSelectedTime ? (
           <Alert type="info" showIcon title="Chọn giờ dùng bữa để xem khu vực phù hợp." description="Khi đã có ngày và giờ, hệ thống sẽ gợi ý mức độ khả dụng của từng khu vực để bạn chọn nhanh hơn." />
@@ -171,6 +172,9 @@ function BuocMotDatBan({
                 )
               })}
             </Row>
+            {daCoBanPhuHop && formData.seatingArea !== 'KHONG_UU_TIEN' && (
+              <Alert type="success" showIcon title="Hệ thống sẽ tạm giữ 1 bàn phù hợp cho bạn." style={{ marginTop: 16 }} />
+            )}
             {selectedAreaUnavailableMessage ? <Alert style={{ marginTop: 16 }} type="error" showIcon title={selectedAreaUnavailableMessage} /> : null}
           </>
         )}

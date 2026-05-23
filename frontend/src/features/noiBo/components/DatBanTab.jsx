@@ -130,7 +130,12 @@ const seatingAreaOptions = [
 const getStatusTagColor = (status) => STATUS_TAG_COLORS[laySacThaiTrangThaiDatBan(status)] || 'default'
 
 const layMaDatBan = (booking) => booking.bookingCode || booking.code || `DB-${booking.id}`
-const layNguonDatBan = (booking) => (booking.source === 'internal' ? 'Nội bộ' : 'Web')
+const layNguonDatBan = (booking) => {
+  const nguonTao = String(booking.nguonTao || booking.source || '').trim().toUpperCase()
+  if (nguonTao === 'NOI_BO') return 'Nội bộ'
+  if (nguonTao === 'WEB') return 'Khách đặt online'
+  return ''
+}
 const laBookingChuaGanBan = (booking) => !Array.isArray(booking.danhSachMaBanDaGan) || booking.danhSachMaBanDaGan.length === 0
 
 function laNgayHomNay(value, homNay) {
@@ -386,6 +391,7 @@ function DatBanFormCard({
 
 function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickStatusChange }) {
   const banDaGan = booking.danhSachBanDaGan || []
+  const danhSachMon = Array.isArray(booking.menuItems) && booking.menuItems.length ? booking.menuItems : booking.chiTietMonAn || []
   const chuaGanBan = laBookingChuaGanBan(booking)
   const dangChoXacNhan = PENDING_STATUS_SET.has(booking.status)
   const canhBaoUuTien = chuaGanBan || dangChoXacNhan
@@ -422,6 +428,21 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
             <Descriptions.Item label="Nguồn">{layNguonDatBan(booking)}</Descriptions.Item>
             <Descriptions.Item label="Email">{booking.email || 'Chưa cập nhật'}</Descriptions.Item>
           </Descriptions>
+
+          {danhSachMon.length ? (
+            <List
+              size="small"
+              bordered
+              header="Món khách chọn"
+              dataSource={danhSachMon}
+              renderItem={(mon) => (
+                <List.Item>
+                  <Typography.Text>{mon.tenMon || mon.ten || mon.name || mon.maMon}</Typography.Text>
+                  <Typography.Text type="secondary">x{mon.soLuong || mon.quantity || 1}</Typography.Text>
+                </List.Item>
+              )}
+            />
+          ) : null}
 
           {ghiChuUuTien ? (
             <Alert type="warning" showIcon title="Ưu tiên xử lý" description={ghiChuUuTien} />

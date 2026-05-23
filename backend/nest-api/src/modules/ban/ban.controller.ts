@@ -25,6 +25,7 @@ export class BanController {
   constructor(private readonly banService: BanService) {}
 
   @Public()
+  @Throttle({ default: { limit: 60, ttl: 60000 } })
   @Get()
   layDanhSachBan() {
     return this.banService.layDanhSachBan();

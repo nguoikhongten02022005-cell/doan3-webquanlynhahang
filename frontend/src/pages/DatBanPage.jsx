@@ -913,6 +913,7 @@ const handleSubmit = async () => {
                   selectedAreaUnavailableMessage={selectedAreaUnavailableMessage}
                   largePartyNotice={largePartyNotice}
                   thongBaoTaiBan={thongBaoTaiBan}
+                  daCoBanPhuHop={candidateTables.length > 0}
                   onGuestSelect={handleGuestSelect}
                   onDateSelect={handleDateSelect}
                   onDateInputChange={handleDateInputChange}

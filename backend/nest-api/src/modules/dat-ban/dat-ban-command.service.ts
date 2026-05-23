@@ -11,13 +11,50 @@ import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
 import { TRANG_THAI_BAN } from '../../common/constants';
+import { DonHangCreateOrderService } from '../don-hang/don-hang-create-order.service';
 
 @Injectable()
 export class DatBanCommandService {
   constructor(
     private readonly mysql: MySqlService,
     private readonly datBanQueryService: DatBanQueryService,
+    private readonly donHangCreateOrderService: DonHangCreateOrderService,
   ) {}
+
+  private layChiTietMonAnDatBan(body: BanGhi) {
+    const chiTietMonAn = Array.isArray(body.chiTietMonAn)
+      ? body.chiTietMonAn
+      : Array.isArray(body.ChiTietMonAn)
+        ? body.ChiTietMonAn
+        : [];
+
+    return chiTietMonAn.filter((mon: BanGhi) =>
+      Boolean(String(mon?.maMon || mon?.MaMon || '').trim()),
+    );
+  }
+
+  private async taoDonHangTuDatBan(
+    nguoiDung: any,
+    body: BanGhi,
+    maDatBan: string,
+  ) {
+    const maBan = String(body.maBan || '').trim();
+    const chiTiet = this.layChiTietMonAnDatBan(body);
+    if (!maBan || !chiTiet.length) return;
+
+    await this.donHangCreateOrderService.taoDonHang({
+      maKH: body.maKH || null,
+      maBan,
+      maNV: body.maNV || null,
+      maDatBan,
+      chiTiet,
+      nguonTao: 'DatBan',
+      trangThai: 'Pending',
+      soDiem: 0,
+      nguoiDung: nguoiDung || {},
+      ghiChu: body.ghiChu || null,
+    });
+  }
 
   private async kiemTraQuyenKhachHang(nguoiDung: any, maKh: string) {
     const vaiTro = String(nguoiDung.vaiTro || '');
@@ -80,6 +117,8 @@ export class DatBanCommandService {
         nguonTao,
       ],
     );
+
+    await this.taoDonHangTuDatBan(nguoiDung, body, maDatBan);
 
     const [datBanDaTao] = await this.mysql.truyVan(
       `SELECT db.*, kh.TenKH, kh.SDT, nd.Email

@@ -1,20 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useLocation, Navigate } from 'react-router-dom'
-import { Alert, Button, Card, Checkbox, Form, Input, Typography } from 'antd'
+import { Alert, Button, Card, Form, Input, Typography } from 'antd'
 import { VAI_TRO_XAC_THUC } from '../services/dichVuXacThuc'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { coSuDungMayChu } from '../services/trinhKhachApi'
-import { datMucLuuTru, layMucLuuTru, xoaMucLuuTru } from '../services/dichVuLuuTru'
 
 const { Title, Paragraph, Text } = Typography
-const KHOA_NHO_NOI_BO = 'restaurant_remember_internal_login'
-const KHOA_EMAIL_NOI_BO = 'restaurant_remembered_internal_email'
 
 function DangNhapNoiBoPage() {
   const [tenDangNhapHoacEmail, setTenDangNhapHoacEmail] = useState('')
   const [matKhau, setMatKhau] = useState('')
   const [hienMatKhau, setHienMatKhau] = useState(false)
-  const [nhoDangNhap, setNhoDangNhap] = useState(false)
   const [loiDangNhap, setLoiDangNhap] = useState('')
   const [dangGui, setDangGui] = useState(false)
   const [form] = Form.useForm()
@@ -22,17 +18,6 @@ function DangNhapNoiBoPage() {
   const { coTheVaoNoiBo, daDangNhap, dangNhapNoiBo, dangXuat } = useXacThuc()
   const backendMode = coSuDungMayChu()
   const duongDanChuyenHuongSauDangNhap = location.state?.from || '/noi-bo/dashboard'
-
-  useEffect(() => {
-    const coNhoDangNhap = layMucLuuTru(KHOA_NHO_NOI_BO) === '1'
-    const emailDaNho = layMucLuuTru(KHOA_EMAIL_NOI_BO) || ''
-
-    setNhoDangNhap(coNhoDangNhap)
-    if (coNhoDangNhap && emailDaNho) {
-      setTenDangNhapHoacEmail(emailDaNho)
-      form.setFieldValue('identifier', emailDaNho)
-    }
-  }, [form])
 
   if (daDangNhap && coTheVaoNoiBo) {
     return <Navigate to={duongDanChuyenHuongSauDangNhap} replace />
@@ -54,14 +39,6 @@ function DangNhapNoiBoPage() {
         await dangXuat()
         setLoiDangNhap('Tài khoản này không có quyền truy cập khu vực nội bộ.')
         return
-      }
-
-      if (nhoDangNhap) {
-        datMucLuuTru(KHOA_NHO_NOI_BO, '1')
-        datMucLuuTru(KHOA_EMAIL_NOI_BO, tenDangNhapHoacEmail)
-      } else {
-        xoaMucLuuTru(KHOA_NHO_NOI_BO)
-        xoaMucLuuTru(KHOA_EMAIL_NOI_BO)
       }
 
       setLoiDangNhap('')
@@ -87,14 +64,15 @@ function DangNhapNoiBoPage() {
               wrapperCol={{ span: 18 }}
               onFinish={handleSubmit}
               className="xac-thuc-form xac-thuc-form-antd"
-              initialValues={{ identifier: tenDangNhapHoacEmail, password: '', remember: nhoDangNhap }}
+              autoComplete="off"
+              initialValues={{ identifier: '', password: '' }}
             >
               <Form.Item label="Email" name="identifier" rules={[{ required: true, message: 'Vui lòng nhập email nội bộ' }]}>
                 <Input
                   prefix={null}
                   size="large"
                   placeholder="Nhập email nội bộ"
-                  autoComplete="username"
+                  autoComplete="off"
                   value={tenDangNhapHoacEmail}
                   onChange={(e) => {
                     setTenDangNhapHoacEmail(e.target.value)
@@ -108,7 +86,7 @@ function DangNhapNoiBoPage() {
                   prefix={null}
                   size="large"
                   placeholder="Nhập mật khẩu"
-                  autoComplete="current-password"
+                  autoComplete="new-password"
                   visibilityToggle={{ visible: hienMatKhau, onVisibleChange: setHienMatKhau }}
                   value={matKhau}
                   onChange={(e) => {
@@ -116,12 +94,6 @@ function DangNhapNoiBoPage() {
                     if (loiDangNhap) setLoiDangNhap('')
                   }}
                 />
-              </Form.Item>
-
-              <Form.Item wrapperCol={{ offset: 6, span: 18 }} name="remember" valuePropName="checked">
-                <Checkbox checked={nhoDangNhap} onChange={(e) => setNhoDangNhap(e.target.checked)}>
-                  Nhớ mật khẩu
-                </Checkbox>
               </Form.Item>
 
               <Form.Item wrapperCol={{ offset: 6, span: 18 }}>

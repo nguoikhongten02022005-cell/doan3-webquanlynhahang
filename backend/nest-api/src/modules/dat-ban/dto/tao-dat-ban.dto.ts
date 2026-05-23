@@ -3,6 +3,7 @@ import {
   IsArray,
   IsDateString,
   IsInt,
+  IsNumber,
   IsOptional,
   IsString,
   Min,
@@ -26,6 +27,12 @@ export class ChiTietMonAnDto {
   @IsInt()
   @Min(1)
   soLuong?: number;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsNumber()
+  @Min(0)
+  gia?: number;
 }
 
 export class TaoDatBanDto {
@@ -91,6 +98,11 @@ export class TaoDatBanDto {
   @IsOptional()
   @IsString()
   khuVucUuTien?: string;
+
+  @ApiPropertyOptional()
+  @IsOptional()
+  @IsString()
+  ghiChuNoiBo?: string;
 
   @ApiPropertyOptional({ type: [ChiTietMonAnDto] })
   @IsOptional()

@@ -1,4 +1,4 @@
-import { xoaPhienXacThuc, luuXacThuc, layMaXacThuc } from './dichVuXacThuc'
+import { PHAM_VI_XAC_THUC, luuXacThuc, layMaXacThuc } from './dichVuXacThuc'
 
 const DUONG_DAN_DANG_XUAT_XAC_THUC = '/auth/logout'
 
@@ -36,7 +36,7 @@ const lamMoiPhien = async () => {
     throw new Error('Làm mới phiên thất bại — không nhận được access token.')
   }
 
-  luuXacThuc(accessTokenMoi, duLieuPhanHoi?.refreshToken)
+  luuXacThuc(accessTokenMoi, duLieuPhanHoi?.refreshToken, layPhamViTheoDuongDan())
   return accessTokenMoi
 }
 
@@ -62,8 +62,10 @@ export const layUrlGocApi = () => {
   throw new Error('Thiếu VITE_API_BASE_URL trong file .env khi frontend bật backend mode.')
 }
 
+const layPhamViTheoDuongDan = () => (typeof window !== 'undefined' && (window.location.pathname || '').startsWith('/noi-bo') ? PHAM_VI_XAC_THUC.NOI_BO : PHAM_VI_XAC_THUC.KHACH_HANG)
+
 const layDauTrangXacThuc = () => {
-  const maXacThuc = layMaXacThuc()
+  const maXacThuc = layMaXacThuc(layPhamViTheoDuongDan())
 
   if (!maXacThuc) {
     return {}
@@ -174,6 +176,10 @@ const coTheThuLamMoiPhien = (duongDan, tuyChon) => {
     return false
   }
 
+  if (laDuongDanCongKhai(duongDan)) {
+    return false
+  }
+
   return duongDan !== DUONG_DAN_DANG_XUAT_XAC_THUC
 }
 
@@ -193,8 +199,6 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
         xuLyHangDoi(null)
       } catch (loi) {
         xuLyHangDoi(loi)
-        xoaPhienXacThuc()
-        window.location.href = '/dang-nhap'
         throw taoLoiTuPhanHoiApi(phanHoi, duLieu)
       } finally {
         dangLamMoi = false
@@ -212,10 +216,6 @@ const guiYeuCau = async (duongDan, tuyChon = {}) => {
       return ketQuaThuLai.duLieu
     }
     throw taoLoiTuPhanHoiApi(ketQuaThuLai.phanHoi, ketQuaThuLai.duLieu)
-  }
-
-  if (phanHoi.status === 401) {
-    xoaPhienXacThuc()
   }
 
   throw taoLoiTuPhanHoiApi(phanHoi, duLieu)

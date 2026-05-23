@@ -185,6 +185,12 @@ export class AuthService {
       throw new UnauthorizedException('Email hoặc mật khẩu không đúng.');
     }
 
+    if (nguoiDung.VaiTro !== 'KhachHang') {
+      throw new UnauthorizedException(
+        'Tài khoản nội bộ vui lòng đăng nhập tại trang nội bộ.',
+      );
+    }
+
     const khachHang = await layKhachHangTheoMaNd(this.mysql, nguoiDung.MaND);
     const user = this.chuyenNguoiDungSangResponse(nguoiDung, khachHang);
     const accessToken = this.taoJwt(nguoiDung);

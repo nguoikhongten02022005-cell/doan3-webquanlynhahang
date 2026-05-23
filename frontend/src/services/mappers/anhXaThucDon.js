@@ -37,6 +37,29 @@ const chuanHoaNhan = (giaTri) => chuanHoaVanBan(giaTri) || NHAN_MAC_DINH_THUC_DO
 const chuanHoaSacDo = (giaTri) => chuanHoaVanBan(giaTri) || SAC_DO_MAC_DINH_THUC_DON
 const chuanHoaAnh = (giaTri, tenMon = '', danhMuc = '') => chuanHoaVanBan(giaTri) || layAnhMonTheoTen(tenMon, danhMuc) || ANH_DU_PHONG_THUC_DON
 
+const MA_DANH_MUC_THEO_TEN = Object.freeze({
+  'Khai Vị': 'DM001',
+  'Món Chính': 'DM002',
+  'Tráng Miệng': 'DM003',
+  'Đồ Uống': 'DM004',
+  Combo: 'DM005',
+})
+
+const chuanHoaMaDanhMucGuiApi = (giaTri) => MA_DANH_MUC_THEO_TEN[chuanHoaDanhMucThucDon(giaTri)] || 'DM002'
+
+const chuanHoaAnhGuiApi = (giaTri) => {
+  const urlAnh = chuanHoaVanBan(giaTri)
+  if (!urlAnh) return ''
+  if (urlAnh.startsWith('/uploads/mon-an/')) return urlAnh
+
+  try {
+    const url = new URL(urlAnh)
+    return url.pathname.startsWith('/uploads/mon-an/') ? url.pathname : urlAnh
+  } catch {
+    return urlAnh
+  }
+}
+
 export const chuanHoaDanhMucThucDon = (danhMucGoc) => {
   const danhMucDaChuanHoa = chuanHoaVanBan(danhMucGoc)
 
@@ -111,8 +134,9 @@ export const anhXaFormMonThanhDuLieuGuiDi = (giaTriForm) => {
   const giaTriGia = chuanHoaGiaTriGia(giaTriForm?.price)
   const tenMon = chuanHoaVanBan(giaTriForm?.name)
   const moTa = chuanHoaVanBan(giaTriForm?.description)
-  const maDanhMuc = chuanHoaDanhMucThucDon(giaTriForm?.category)
-  const hinhAnh = chuanHoaAnh(giaTriForm?.image)
+  const maDanhMucHienThi = chuanHoaDanhMucThucDon(giaTriForm?.category)
+  const maDanhMuc = chuanHoaMaDanhMucGuiApi(maDanhMucHienThi)
+  const hinhAnh = chuanHoaAnhGuiApi(giaTriForm?.image)
 
   return {
     name: tenMon,
@@ -128,6 +152,8 @@ export const anhXaFormMonThanhDuLieuGuiDi = (giaTriForm) => {
     image: hinhAnh,
     hinhAnh,
     thoiGianChuanBi: Number(giaTriForm?.thoiGianChuanBi ?? 0),
+    trangThai: giaTriForm?.isVisible === false ? 'Unavailable' : 'Available',
+    isVisible: giaTriForm?.isVisible !== false,
   }
 }
 

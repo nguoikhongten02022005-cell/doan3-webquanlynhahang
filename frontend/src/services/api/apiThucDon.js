@@ -104,6 +104,7 @@ export const taoMonApi = async (payload) => {
     gia: Number(payload.gia || payload.price || 0),
     hinhAnh: payload.hinhAnh || payload.image || '',
     thoiGianChuanBi: Number(payload.thoiGianChuanBi || payload.prepTime || 0),
+    trangThai: payload.trangThai || (payload.isVisible === false ? 'Unavailable' : 'Available'),
   }))
 }
 

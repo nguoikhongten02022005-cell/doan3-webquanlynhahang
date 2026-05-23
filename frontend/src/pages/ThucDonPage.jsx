@@ -44,7 +44,7 @@ function ThucDonPage() {
   const danhSachMonDaCoAnh = useMemo(
     () => dishes.map((mon) => ({
       ...mon,
-      image: layAnhMonTheoTen(mon.name, mon.category) || mon.image,
+      image: mon.image || layAnhMonTheoTen(mon.name, mon.category),
     })),
     [dishes],
   )
