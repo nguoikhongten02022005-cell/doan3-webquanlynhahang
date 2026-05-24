@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, Injectable, NotFoundException } from '@nestjs/common';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { BanGhi } from '../../common/types';
@@ -29,13 +29,22 @@ export class BanCrudService {
   }
 
   async taoBan(body: BanGhi) {
+    const soBan = Number(body.soBan || 0);
+    const [banTrungSo] = await this.mysql.truyVan(
+      'SELECT MaBan FROM Ban WHERE SoBan = ? LIMIT 1',
+      [soBan],
+    );
+    if (banTrungSo) {
+      throw new BadRequestException(`Số bàn ${soBan} đã tồn tại.`);
+    }
+
     await this.mysql.thucThi(
       'INSERT INTO Ban (MaBan, TenBan, KhuVuc, SoBan, SoChoNgoi, ViTri, GhiChu, TrangThai) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
       [
         body.maBan,
         body.tenBan,
         body.khuVuc || null,
-        Number(body.soBan || 0),
+        soBan,
         Number(body.soChoNgoi || 0),
         body.viTri || null,
         body.ghiChu || null,
@@ -48,12 +57,21 @@ export class BanCrudService {
   async capNhatBan(maBan: string, body: BanGhi) {
     const ma = await resolveMaBan(this.mysql, maBan);
     if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
+    const soBan = Number(body.soBan || 0);
+    const [banTrungSo] = await this.mysql.truyVan(
+      'SELECT MaBan FROM Ban WHERE SoBan = ? AND MaBan <> ? LIMIT 1',
+      [soBan, ma],
+    );
+    if (banTrungSo) {
+      throw new BadRequestException(`Số bàn ${soBan} đã tồn tại.`);
+    }
+
     await this.mysql.thucThi(
       'UPDATE Ban SET TenBan = ?, KhuVuc = ?, SoBan = ?, SoChoNgoi = ?, ViTri = ?, GhiChu = ? WHERE MaBan = ?',
       [
         body.tenBan,
         body.khuVuc || null,
-        Number(body.soBan || 0),
+        soBan,
         Number(body.soChoNgoi || 0),
         body.viTri || null,
         body.ghiChu || null,

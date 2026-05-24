@@ -16,7 +16,7 @@ const NHAN_TRANG_THAI_BAN = {
   AVAILABLE: 'Sẵn sàng',
   HELD: 'Đã đặt',
   OCCUPIED: 'Đang phục vụ',
-  DIRTY: 'Chờ dọn',
+  DIRTY: 'Bảo trì',
 }
 
 const SAC_THAI_TRANG_THAI_BAN = {
@@ -164,6 +164,9 @@ const taoMoHinhHienThiBan = (table, datBanTheoId) => {
     datBan,
     status,
     displayName: table.name || table.code || 'Bàn',
+    tableCode: table.code || table.maBan || '',
+    tableNumber: Number(table.tableNumber ?? table.soBan ?? 0),
+    sucChua: Number(table.sucChua ?? table.capacity ?? 0),
     areaLabel: layNhanChoNgoi(table.areaId),
     statusLabel: NHAN_TRANG_THAI_BAN[status] || table.status,
     statusTone: SAC_THAI_TRANG_THAI_BAN[status] || 'neutral',
@@ -304,7 +307,7 @@ function BanAnTabPos({
     { key: 'available', label: 'Trống', value: tomTatBanDangPos.available, dot: KIEU_TRANG_THAI_BAN.AVAILABLE.dot },
     { key: 'occupied', label: 'Đang phục vụ', value: tomTatBanDangPos.occupied, dot: KIEU_TRANG_THAI_BAN.OCCUPIED.dot },
     { key: 'held', label: 'Đã đặt', value: tomTatBanDangPos.held, dot: KIEU_TRANG_THAI_BAN.HELD.dot },
-    { key: 'dirty', label: 'Chờ dọn', value: tomTatBanDangPos.dirty, dot: KIEU_TRANG_THAI_BAN.DIRTY.dot },
+    { key: 'dirty', label: 'Bảo trì', value: tomTatBanDangPos.dirty, dot: KIEU_TRANG_THAI_BAN.DIRTY.dot },
   ]
 
   const xuLyMoDrawer = (idBan) => setIdBanDangChon(idBan)
@@ -502,8 +505,11 @@ function BanAnTabPos({
                     </div>
 
                     <div className="flex flex-1 flex-col items-center justify-center px-2 text-center">
-                      <div className="text-[1.35rem] font-black leading-none tracking-[-0.04em] text-inherit md:text-[1.5rem]">
+                      <div className="text-[1.15rem] font-black leading-tight text-inherit md:text-[1.3rem]">
                         {table.displayName}
+                      </div>
+                      <div className={`mt-1 text-[10px] font-semibold ${table.kieuTrangThai.subtle}`}>
+                        {[table.tableCode, table.tableNumber ? `Số ${table.tableNumber}` : '', `${table.sucChua} khách`].filter(Boolean).join(' · ')}
                       </div>
                       {table.bookingCode ? (
                         <div className={`mt-2 text-[10px] font-semibold uppercase tracking-[0.18em] ${table.kieuTrangThai.subtle}`}>
@@ -556,7 +562,7 @@ function BanAnTabPos({
                 <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.OCCUPIED.dot}`} /> Đang phục vụ
               </span>
               <span className="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-2.5 py-1 font-medium text-slate-600">
-                <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.DIRTY.dot}`} /> Chờ dọn
+                <span className={`h-2 w-2 rounded-full ${KIEU_TRANG_THAI_BAN.DIRTY.dot}`} /> Bảo trì
               </span>
             </div>
           </div>
@@ -642,7 +648,7 @@ function BanAnTabPos({
                 {banDangChon.status === 'AVAILABLE' ? 'Nhận khách walk-in nhanh cho bàn đang trống.' : null}
                 {banDangChon.status === 'HELD' ? 'Check-in booking đã gán cho bàn này.' : null}
                 {banDangChon.status === 'OCCUPIED' ? 'Mở luồng đơn hàng hiện tại hoặc giải phóng bàn sau khi phục vụ xong.' : null}
-                {banDangChon.status === 'DIRTY' ? 'Xác nhận bàn đã dọn xong để sẵn sàng nhận khách mới.' : null}
+                {banDangChon.status === 'DIRTY' ? 'Bàn đang ở trạng thái bảo trì, chỉ chuyển về sẵn sàng khi đã xử lý xong.' : null}
               </div>
               <div className="mt-4 flex flex-col gap-3">
                 {danhSachHanhDongBanDangChon.map((hanhDong) => (

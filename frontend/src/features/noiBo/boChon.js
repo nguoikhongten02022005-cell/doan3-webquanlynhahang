@@ -6,6 +6,7 @@ import {
   CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN,
   CAC_BO_LOC_CA,
   CAC_KHU_VUC_BAN,
+  chuanHoaTrangThaiDatBan,
 } from './hangSo'
 import { laySacThaiDonHang } from './dinhDang'
 
@@ -24,15 +25,18 @@ export const layGhiChuUuTienDatBan = (datBan) => {
 }
 
 const CAC_TRANG_THAI_DAT_BAN_KET_THUC = new Set([
+  'COMPLETED',
   'DA_HOAN_THANH',
+  'CANCELLED',
   'DA_HUY',
   'KHONG_DEN',
+  'NO_SHOW',
   'TU_CHOI_HET_CHO',
 ])
 
 export const daGanBan = (datBan) => Array.isArray(datBan?.danhSachMaBanDaGan) && datBan?.danhSachMaBanDaGan.length > 0
 export const laDatBanDaCheckIn = (datBan) => datBan.status === 'DA_CHECK_IN' || datBan.status === 'DA_XEP_BAN'
-export const laTrangThaiDatBanKetThuc = (datBan) => CAC_TRANG_THAI_DAT_BAN_KET_THUC.has(datBan?.status)
+export const laTrangThaiDatBanKetThuc = (datBan) => CAC_TRANG_THAI_DAT_BAN_KET_THUC.has(chuanHoaTrangThaiDatBan(datBan?.status))
 
 export const coTheGanBanChoDatBan = (datBan) => !laTrangThaiDatBanKetThuc(datBan)
 export const coTheCheckInDatBan = (datBan) => daGanBan(datBan) && !laDatBanDaCheckIn(datBan) && !laTrangThaiDatBanKetThuc(datBan)
@@ -107,6 +111,12 @@ export const khopTimKiemDatBan = (datBan, tuKhoaTimKiem) => {
     datBan.name,
     datBan.phone,
     datBan.email,
+    datBan.tableCode,
+    datBan.maBan,
+    ...(Array.isArray(datBan.danhSachMaBanDaGan) ? datBan.danhSachMaBanDaGan : []),
+    ...(Array.isArray(datBan.danhSachBanDaGan)
+      ? datBan.danhSachBanDaGan.flatMap((ban) => [ban.code, ban.maBan, ban.name, ban.tenBan])
+      : []),
   ].some((giaTri) => String(giaTri || '').toLowerCase().includes(tuKhoaDaChuanHoa))
 }
 
@@ -195,7 +205,7 @@ export const layNhanBoLocTongQuan = (boLocNgay, boLocCa) => {
   return `${nhanNgay} · ${nhanCa}`
 }
 
-export const laDatBanDaHoanThanh = (datBan) => datBan.status === 'DA_HOAN_THANH'
+export const laDatBanDaHoanThanh = (datBan) => ['COMPLETED', 'DA_HOAN_THANH'].includes(chuanHoaTrangThaiDatBan(datBan.status))
 export const laDatBanSapDienRa = (datBan, hienTai) => {
   const thoiDiemDatBan = phanTichNgayGioDatBan(datBan.date, datBan.time)
   if (!thoiDiemDatBan) return false

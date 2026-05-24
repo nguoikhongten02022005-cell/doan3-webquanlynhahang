@@ -33,9 +33,12 @@ const chuanHoaDatBan = (booking) => {
     ? booking.danhSachBanDaGan.map((ban) => ({
       id: String(ban?.id || ban?.maBan || ban?.MaBan || ban?.code || '').trim(),
       code: String(ban?.code || ban?.maBan || ban?.MaBan || ban?.id || '').trim(),
+      maBan: String(ban?.maBan || ban?.MaBan || ban?.code || ban?.id || '').trim(),
       name: String(ban?.name || ban?.tenBan || ban?.TenBan || '').trim(),
+      tenBan: String(ban?.tenBan || ban?.TenBan || ban?.name || '').trim(),
+      khuVuc: String(ban?.khuVuc || ban?.KhuVuc || ban?.rawAreaText || '').trim(),
     })).filter((ban) => ban.id)
-    : danhSachMaBanDaGan.map((maBan) => ({ id: maBan, code: maBan, name: maBan }))
+    : danhSachMaBanDaGan.map((maBan) => ({ id: maBan, code: maBan, maBan, name: maBan, tenBan: maBan, khuVuc: '' }))
 
   return {
     ...booking,
@@ -77,27 +80,35 @@ const chuanHoaChiTietMonAnPayload = (mon) => ({
   gia: Number(mon.gia ?? mon.priceValue ?? 0),
 })
 
-const chuanHoaDatBanPayload = (payload = {}) => ({
-  maDatBan: payload.maDatBan || payload.bookingCode || sinhMaDatBan(),
-  maKH: payload.maKH || payload.customerCode || 'KH001',
-  maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
-  maNV: payload.maNV || payload.staffCode || 'NV002',
-  tenKhachDatBan: payload.tenKhachDatBan || payload.name || '',
-  sdtDatBan: payload.sdtDatBan || payload.phone || '',
-  emailDatBan: payload.emailDatBan || payload.email || '',
-  ngayDat: chuanHoaNgayDat(payload.ngayDat || payload.date || ''),
-  gioDat: payload.gioDat || payload.time || '',
-  gioKetThuc: payload.gioKetThuc || payload.endTime || null,
-  soNguoi: Number(payload.soNguoi || payload.guests || 0),
-  ghiChu: payload.ghiChu || payload.notes || '',
-  ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
-  khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
-  chiTietMonAn: Array.isArray(payload.chiTietMonAn)
-    ? payload.chiTietMonAn.map(chuanHoaChiTietMonAnPayload)
-    : Array.isArray(payload.selectedMenuItems)
-    ? payload.selectedMenuItems.map(chuanHoaChiTietMonAnPayload)
-    : null,
-})
+const chuanHoaDatBanPayload = (payload = {}, tuyChon = {}) => {
+  const maDatBan = String(
+    payload.maDatBan ||
+    (tuyChon.dungBookingCode ? payload.bookingCode : '') ||
+    (tuyChon.taoMaKhiThieu ? sinhMaDatBan() : ''),
+  ).trim()
+
+  return {
+    ...(maDatBan ? { maDatBan } : {}),
+    maKH: payload.maKH || payload.customerCode || 'KH001',
+    maBan: payload.maBan || payload.tableCode || payload.tableNumber || null,
+    maNV: payload.maNV || payload.staffCode || 'NV002',
+    tenKhachDatBan: payload.tenKhachDatBan || payload.name || '',
+    sdtDatBan: payload.sdtDatBan || payload.phone || '',
+    emailDatBan: payload.emailDatBan || payload.email || '',
+    ngayDat: chuanHoaNgayDat(payload.ngayDat || payload.date || ''),
+    gioDat: payload.gioDat || payload.time || '',
+    gioKetThuc: payload.gioKetThuc || payload.endTime || null,
+    soNguoi: Number(payload.soNguoi || payload.guests || 0),
+    ghiChu: payload.ghiChu || payload.notes || '',
+    ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
+    khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
+    chiTietMonAn: Array.isArray(payload.chiTietMonAn)
+      ? payload.chiTietMonAn.map(chuanHoaChiTietMonAnPayload)
+      : Array.isArray(payload.selectedMenuItems)
+      ? payload.selectedMenuItems.map(chuanHoaChiTietMonAnPayload)
+      : null,
+  }
+}
 
 export const layDanhSachDatBanApi = async () => {
   if (!coSuDungMayChu()) {
@@ -149,7 +160,7 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
 
 export const taoDatBanApi = async (payload) => {
   if (!coSuDungMayChu()) {
-    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(taoHoacCapNhatDatBanOffline({ booking: chuanHoaDatBanPayload(payload) }), 'Tao dat ban thanh cong')))
+    return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(taoHoacCapNhatDatBanOffline({ booking: chuanHoaDatBanPayload(payload, { dungBookingCode: true, taoMaKhiThieu: true }) }), 'Tao dat ban thanh cong')))
   }
 
   return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/dat-ban', chuanHoaDatBanPayload(payload))))

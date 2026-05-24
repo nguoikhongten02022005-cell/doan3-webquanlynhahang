@@ -41,14 +41,16 @@ PORT=5011
 FRONTEND_ORIGIN=http://localhost:5173
 DB_HOST=127.0.0.1
 DB_PORT=3306
-DB_USER=root
+DB_USERNAME=root
 DB_PASSWORD=your_mysql_password
-DB_NAME=QuanNhaHang
+DB_DATABASE=QuanNhaHang
 DB_AUTO_INIT=false
 JWT_SECRET=mot-chuoi-bi-mat-rat-dai-it-nhat-32-ky-tu
 JWT_ISSUER=nest-api-quan-ly-nha-hang
 JWT_AUDIENCE=quan-ly-nha-hang-frontend
 JWT_EXPIRES_IN=12h
+JWT_REFRESH_SECRET=mot-chuoi-bi-mat-refresh-rat-dai-it-nhat-32-ky-tu
+JWT_REFRESH_EXPIRES_IN=7d
 ```
 
 ## Dữ liệu mẫu và schema

@@ -57,7 +57,8 @@ CREATE TABLE IF NOT EXISTS Ban (
     GhiChu      VARCHAR(255),
     TrangThai   ENUM('Available','Occupied','Reserved','Maintenance') NOT NULL DEFAULT 'Available',
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    NgayCapNhat DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    CONSTRAINT UQ_Ban_SoBan UNIQUE (SoBan)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 CREATE TABLE IF NOT EXISTS QRCode (
@@ -130,7 +131,7 @@ CREATE TABLE IF NOT EXISTS DatBan (
     KhuVucUuTien   VARCHAR(50),
     GhiChuNoiBo    VARCHAR(500),
     NguonTao       ENUM('WEB','NOI_BO') NOT NULL DEFAULT 'WEB',
-    TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
+    TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','DA_GAN_BAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DANG_PHUC_VU','DA_NHAN_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT FK_DatBan_KhachHang
@@ -152,7 +153,7 @@ CREATE TABLE IF NOT EXISTS DonHang (
     MaDatBan    VARCHAR(50),
     LoaiDon     ENUM('TAI_BAN') NOT NULL DEFAULT 'TAI_BAN',
     TongTien    DECIMAL(15,2) NOT NULL DEFAULT 0,
-    TrangThai   ENUM('Pending','Confirmed','Preparing','Ready','Served','Paid','Cancelled') NOT NULL DEFAULT 'Pending',
+    TrangThai   ENUM('Pending','Confirmed','Preparing','Ready','Served','Serving','Paid','Cancelled','Completed','CHO_XU_LY','DANG_CHE_BIEN','SAN_SANG','DANG_PHUC_VU','DA_THANH_TOAN','DA_HUY') NOT NULL DEFAULT 'Pending',
     NguonTao    ENUM('TaiQuay','QRCode','DatBan','Online') NOT NULL DEFAULT 'TaiQuay',
     GhiChu      VARCHAR(500),
     NgayTao     DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,

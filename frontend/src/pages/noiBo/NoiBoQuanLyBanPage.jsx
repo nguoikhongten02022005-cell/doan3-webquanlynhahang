@@ -6,12 +6,12 @@ import { layOrderDangMoTaiBanApi, xacNhanThanhToanTaiBanApi } from '../../servic
 import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 
-const DANH_SACH_KHU_VUC = ['Trong nhà', 'Ngoài sân', 'Khu riêng', 'Tầng 2']
+const DANH_SACH_KHU_VUC = ['Trong nhà', 'Ban công', 'Ngoài sân', 'Khu riêng', 'Tầng 2']
 const NHAN_TRANG_THAI = {
   TRONG: { label: 'TRỐNG', color: 'green' },
   GIU_CHO: { label: 'ĐÃ ĐẶT', color: 'orange' },
   CO_KHACH: { label: 'ĐANG PHỤC VỤ', color: 'red' },
-  CAN_DON: { label: 'CHỜ DỌN', color: 'default' },
+  CAN_DON: { label: 'BẢO TRÌ', color: 'default' },
 }
 
 const trangThaiNoiBo = (trangThai) => chuanHoaTrangThaiBan(trangThai)
@@ -65,13 +65,13 @@ function NoiBoQuanLyBanPage() {
 
   const moModalThem = () => {
     setBanDangSua(null)
-    form.setFieldsValue({ maBan: '', tenBan: '', khuVuc: 'Trong nhà', sucChua: 4, ghiChu: '' })
+    form.setFieldsValue({ maBan: '', tenBan: '', soBan: undefined, khuVuc: 'Trong nhà', sucChua: 4, ghiChu: '' })
     setDangMoForm(true)
   }
 
   const moModalSua = (ban) => {
     setBanDangSua(ban)
-    form.setFieldsValue({ maBan: ban.code, tenBan: ban.name, khuVuc: ban.rawAreaText || 'Trong nhà', sucChua: ban.capacity, ghiChu: ban.note || '' })
+    form.setFieldsValue({ maBan: ban.code, tenBan: ban.name, soBan: ban.tableNumber || ban.soBan, khuVuc: ban.rawAreaText || 'Trong nhà', sucChua: ban.capacity, ghiChu: ban.note || '' })
     setDangMoForm(true)
   }
 
@@ -82,7 +82,7 @@ function NoiBoQuanLyBanPage() {
       khuVuc: values.khuVuc,
       soChoNgoi: Number(values.sucChua),
       ghiChu: values.ghiChu || '',
-      soBan: Number(String(values.tenBan).replace(/\D/g, '')) || 0,
+      soBan: Number(values.soBan || 0),
       viTri: values.khuVuc,
     }
 
@@ -143,7 +143,7 @@ function NoiBoQuanLyBanPage() {
           <Avatar icon={<TableOutlined />} style={{ background: '#f07d5c' }} />
           <div>
             <Typography.Text strong>{ban.name}</Typography.Text>
-            <div><Typography.Text type="secondary">{ban.rawAreaText || 'Trong nhà'} • {ban.capacity} người</Typography.Text></div>
+            <div><Typography.Text type="secondary">{ban.code} • Số {ban.tableNumber || ban.soBan || '--'} • {ban.rawAreaText || 'Trong nhà'} • {ban.capacity} người</Typography.Text></div>
           </div>
         </Space>
       ),
@@ -194,12 +194,12 @@ function NoiBoQuanLyBanPage() {
         <Col xs={24} sm={12} xl={6}><Card><Statistic title="Trống" value={thongKe.trong} styles={{ content: { color: '#059669' } }} /></Card></Col>
         <Col xs={24} sm={12} xl={6}><Card><Statistic title="Đã đặt" value={thongKe.giuCho} styles={{ content: { color: '#d97706' } }} /></Card></Col>
         <Col xs={24} sm={12} xl={6}><Card><Statistic title="Đang phục vụ" value={thongKe.coKhach} styles={{ content: { color: '#dc2626' } }} /></Card></Col>
-        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Chờ dọn" value={thongKe.canDon} /></Card></Col>
+        <Col xs={24} sm={12} xl={6}><Card><Statistic title="Bảo trì" value={thongKe.canDon} /></Card></Col>
       </Row>
 
       <Card title="Quản lý bàn" extra={<Button type="primary" icon={<PlusOutlined />} onClick={moModalThem}>Thêm bàn</Button>}>
         <Space wrap style={{ marginBottom: 16 }}>
-          <Segmented options={[{ label: 'Tất cả', value: 'ALL' }, { label: 'Trống', value: 'TRONG' }, { label: 'Đã đặt', value: 'GIU_CHO' }, { label: 'Đang phục vụ', value: 'CO_KHACH' }, { label: 'Chờ dọn', value: 'CAN_DON' }]} value={boLocTrangThai} onChange={setBoLocTrangThai} />
+          <Segmented options={[{ label: 'Tất cả', value: 'ALL' }, { label: 'Trống', value: 'TRONG' }, { label: 'Đã đặt', value: 'GIU_CHO' }, { label: 'Đang phục vụ', value: 'CO_KHACH' }, { label: 'Bảo trì', value: 'CAN_DON' }]} value={boLocTrangThai} onChange={setBoLocTrangThai} />
           <Select value={boLocKhuVuc} onChange={setBoLocKhuVuc} style={{ minWidth: 180 }} options={['Tất cả', ...DANH_SACH_KHU_VUC].map((muc) => ({ label: muc, value: muc }))} />
         </Space>
         <Table rowKey="code" loading={dangTai} columns={cotBan} dataSource={danhSachHienThi} pagination={{ pageSize: 8 }} scroll={{ x: 920 }} />
@@ -254,6 +254,7 @@ function NoiBoQuanLyBanPage() {
         <Form layout="vertical" form={form} onFinish={luuBan}>
           <Form.Item label="Mã bàn" name="maBan" rules={[{ required: true }]}><Input readOnly={Boolean(banDangSua)} /></Form.Item>
           <Form.Item label="Tên bàn" name="tenBan" rules={[{ required: true }]}><Input /></Form.Item>
+          <Form.Item label="Số bàn" name="soBan" rules={[{ required: true }]}><InputNumber min={1} style={{ width: '100%' }} /></Form.Item>
           <Form.Item label="Khu vực" name="khuVuc" rules={[{ required: true }]}><Select options={DANH_SACH_KHU_VUC.map((muc) => ({ label: muc, value: muc }))} /></Form.Item>
           <Form.Item label="Sức chứa" name="sucChua" rules={[{ required: true }]}><InputNumber min={1} style={{ width: '100%' }} /></Form.Item>
           <Form.Item label="Ghi chú" name="ghiChu"><Input /></Form.Item>

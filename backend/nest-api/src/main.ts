@@ -4,10 +4,7 @@ import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { json, urlencoded } from 'express';
 import { AppModule } from './app.module';
 import { BootstrapService } from './config/bootstrap.service';
-import {
-  docBienMoiTruongBatBuoc,
-  docBienMoiTruongTuyChon,
-} from './common/doc-bien-moi-truong';
+import { docBienMoiTruongTuyChon } from './common/doc-bien-moi-truong';
 
 function tachDanhSachOrigin(giaTri: string) {
   return giaTri
@@ -52,7 +49,7 @@ function taoDanhSachOriginDuocPhep(moiTruong: string) {
 
 async function bootstrap() {
   const moiTruong = process.env.NODE_ENV?.trim() || 'development';
-  const congBackend = Number(docBienMoiTruongBatBuoc('PORT'));
+  const congBackend = Number(process.env.PORT?.trim() || '5011');
   const danhSachOriginDuocPhep = taoDanhSachOriginDuocPhep(moiTruong);
 
   if (!Number.isInteger(congBackend) || congBackend <= 0) {

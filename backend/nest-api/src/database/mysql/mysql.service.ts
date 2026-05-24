@@ -21,11 +21,15 @@ export class MySqlService {
       return this.ketNoi;
     }
 
-    const mayChu = docBienMoiTruongBatBuoc('DB_HOST');
-    const tenNguoiDung = docBienMoiTruongBatBuoc('DB_USER');
-    const tenCoSoDuLieu = docBienMoiTruongBatBuoc('DB_NAME');
-    const congDb = Number(docBienMoiTruongBatBuoc('DB_PORT'));
-    const matKhauDb = docBienMoiTruongBatBuoc('DB_PASSWORD');
+    const mayChu = this.docCauHinhDb('DB_HOST', undefined, '127.0.0.1');
+    const tenNguoiDung = this.docCauHinhDb('DB_USERNAME', 'DB_USER', 'root');
+    const tenCoSoDuLieu = this.docCauHinhDb(
+      'DB_DATABASE',
+      'DB_NAME',
+      'QuanNhaHang',
+    );
+    const congDb = Number(this.docCauHinhDb('DB_PORT', undefined, '3306'));
+    const matKhauDb = process.env.DB_PASSWORD ?? '';
 
     if (!Number.isInteger(congDb) || congDb <= 0) {
       throw new ServiceUnavailableException('DB_PORT không hợp lệ.');
@@ -45,6 +49,31 @@ export class MySqlService {
     });
 
     return this.ketNoi;
+  }
+
+  private docCauHinhDb(
+    tenBien: string,
+    tenBienCu?: string,
+    giaTriMacDinhDev?: string,
+  ): string {
+    const giaTri = process.env[tenBien]?.trim();
+    if (giaTri) {
+      return giaTri;
+    }
+
+    const giaTriCu = tenBienCu ? process.env[tenBienCu]?.trim() : '';
+    if (giaTriCu) {
+      return giaTriCu;
+    }
+
+    if (
+      process.env.NODE_ENV !== 'production' &&
+      giaTriMacDinhDev !== undefined
+    ) {
+      return giaTriMacDinhDev;
+    }
+
+    return docBienMoiTruongBatBuoc(tenBien);
   }
 
   async truyVan(sql: string, thamSo: any[] = []): Promise<any[]> {
@@ -87,7 +116,19 @@ export class MySqlService {
   }
 
   private rutGonLoiDb(loi: unknown): string {
-    this.logger.error('Lỗi database:', loi);
+    const loiDb = loi as {
+      code?: string;
+      errno?: number;
+      message?: string;
+      sqlMessage?: string;
+      sqlState?: string;
+    };
+    this.logger.error('Lỗi database', {
+      code: loiDb?.code,
+      errno: loiDb?.errno,
+      message: loiDb?.sqlMessage || loiDb?.message,
+      sqlState: loiDb?.sqlState,
+    });
     return 'Hệ thống dữ liệu tạm thời gặp sự cố. Vui lòng thử lại sau.';
   }
 }

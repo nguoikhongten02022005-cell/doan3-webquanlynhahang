@@ -11,10 +11,10 @@ const thuMucEnv = thuMucFrontend
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
   const bienMoiTruong = loadEnv(mode, thuMucEnv, '')
-  const congFrontend = Number(bienMoiTruong.VITE_PORT)
+  const congFrontend = Number(bienMoiTruong.VITE_PORT || '5173')
 
   if (!Number.isInteger(congFrontend) || congFrontend <= 0) {
-    throw new Error('Thiếu hoặc sai VITE_PORT trong frontend/.env')
+    throw new Error('VITE_PORT trong frontend/.env không hợp lệ')
   }
 
   return {

@@ -18,13 +18,15 @@ import { ThongBaoModule } from './modules/thong-bao/thong-bao.module';
 import { ThongKeModule } from './modules/thong-ke/thong-ke.module';
 
 const moiTruong = process.env.NODE_ENV?.trim() || 'development';
-const tapTinMoiTruong = `.env.${moiTruong}`;
+const thuMucBackend = join(__dirname, '..');
+const tapTinMoiTruong = join(thuMucBackend, `.env.${moiTruong}`);
+const tapTinMacDinh = join(thuMucBackend, '.env');
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: [tapTinMoiTruong, '.env'],
+      envFilePath: [tapTinMoiTruong, tapTinMacDinh],
     }),
     ThrottlerModule.forRoot([
       {

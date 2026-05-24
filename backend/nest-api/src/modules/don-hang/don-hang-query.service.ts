@@ -17,15 +17,15 @@ export class DonHangQueryService {
     private readonly donHangPricingService: DonHangPricingService,
   ) {}
 
-  async layChiTietDonHangTheoMa(maDonHang: string) {
-    const chiTiet = await this.mysql.truyVan(
-      `SELECT ct.*, td.TenMon
+  async layChiTietDonHangTheoMa(maDonHang: string, ketNoi?: any) {
+    const sql = `SELECT ct.*, td.TenMon
        FROM ChiTietDonHang ct
        LEFT JOIN ThucDon td ON td.MaMon = ct.MaMon
        WHERE ct.MaDonHang = ?
-       ORDER BY ct.NgayTao ASC`,
-      [maDonHang],
-    );
+       ORDER BY ct.NgayTao ASC`;
+    const chiTiet = ketNoi
+      ? ((await ketNoi.query(sql, [maDonHang]))[0] as any[])
+      : await this.mysql.truyVan(sql, [maDonHang]);
 
     return chiTiet.map((dong) => ({
       MaChiTiet: dong.MaChiTiet,
@@ -39,21 +39,21 @@ export class DonHangQueryService {
     }));
   }
 
-  async layChiTietDonHangKhongKiemTraQuyen(maDonHang: string) {
-    const [donHang] = await this.mysql.truyVan(
-      `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email
+  async layChiTietDonHangKhongKiemTraQuyen(maDonHang: string, ketNoi?: any) {
+    const sql = `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email
        FROM DonHang dh
        LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
        LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
        WHERE dh.MaDonHang = ?
-       LIMIT 1`,
-      [maDonHang],
-    );
+       LIMIT 1`;
+    const [donHang] = ketNoi
+      ? ((await ketNoi.query(sql, [maDonHang]))[0] as any[])
+      : await this.mysql.truyVan(sql, [maDonHang]);
     if (!donHang) {
       throw new NotFoundException('Không tìm thấy đơn hàng.');
     }
 
-    const chiTiet = await this.layChiTietDonHangTheoMa(maDonHang);
+    const chiTiet = await this.layChiTietDonHangTheoMa(maDonHang, ketNoi);
     return taoPhanHoi(
       { donHang: this.taoThongTinDonHang(donHang, chiTiet) },
       'Lấy chi tiết đơn hàng thành công',

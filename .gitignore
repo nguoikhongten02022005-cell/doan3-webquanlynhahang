@@ -12,6 +12,14 @@ dist
 dist-ssr
 *.local
 .env
+.env.*
+backend/nest-api/.env
+backend/nest-api/.env.*
+frontend/.env
+frontend/.env.*
+!.env.example
+!backend/nest-api/.env.example
+!frontend/.env.example
 
 # Editor directories and files
 .vs/
@@ -68,6 +76,17 @@ thuc-don-after-fix.png
 .gstack/
 frontend/.vite/
 graphify-out/
-.serena/cache/
+.serena/
+.agents/
+.claude/
+.codex/
 .backup-ai-cleanup/
-backend/nest-api/tsconfig.build.tsbuildinfo
+*.tsbuildinfo
+*.backup-*
+screenshots/*-temp.png
+
+# Local environment secrets
+.env
+.env.*
+backend/nest-api/.env
+frontend/.env

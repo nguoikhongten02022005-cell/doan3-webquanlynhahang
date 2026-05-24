@@ -3,7 +3,7 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { ThucDonService } from '../thuc-don/thuc-don.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { resolveMaBan } from '../../common/ban-resolver';
-import { chuanHoaTrangThaiBan, TRANG_THAI_BAN } from '../../common/constants';
+import { chuanHoaTrangThaiBan } from '../../common/constants';
 
 @Injectable()
 export class BanTrangThaiQrService {

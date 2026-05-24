@@ -66,9 +66,85 @@ describe('DatBanCommandService', () => {
       chiTiet: [{ maMon: 'M001', soLuong: 2, ghiChu: 'Ít cay' }],
       nguonTao: 'DatBan',
       trangThai: 'Pending',
+      capNhatTrangThaiBan: false,
       soDiem: 0,
       nguoiDung: { vaiTro: 'Admin' },
       ghiChu: null,
     });
+  });
+
+  it('rejects assigning more than one table to a booking', async () => {
+    const mysql = {
+      truyVan: jest
+        .fn()
+        .mockResolvedValue([{ MaDatBan: 'DB001', MaBan: 'B035' }]),
+      thucThi: jest.fn().mockResolvedValue(undefined),
+      giaoDich: jest.fn(),
+    };
+    const service = new DatBanCommandService(
+      mysql as any,
+      { chuyenDatBanSangPhanHoi: jest.fn((booking) => booking) } as any,
+      { taoDonHang: jest.fn() } as any,
+    );
+
+    await expect(
+      service.ganBanChoDatBan('DB001', {
+        danhSachMaBan: ['B035', 'B053'],
+      } as any),
+    ).rejects.toThrow('Chỉ được gán đúng một bàn cho đặt bàn.');
+    expect(mysql.giaoDich).not.toHaveBeenCalled();
+  });
+
+  it('releases the old table and saves the new table when changing assignment', async () => {
+    const execute = jest.fn().mockResolvedValue(undefined);
+    const mysql = {
+      truyVan: jest
+        .fn()
+        .mockResolvedValueOnce([
+          { MaDatBan: 'DB001', MaBan: 'B035', SoNguoi: 4 },
+        ])
+        .mockResolvedValueOnce([
+          {
+            MaBan: 'B053',
+            TenBan: 'Bàn 53',
+            SoChoNgoi: 6,
+            TrangThai: 'Available',
+          },
+        ])
+        .mockResolvedValueOnce([
+          {
+            MaDatBan: 'DB001',
+            MaBan: 'B053',
+            SoNguoi: 4,
+            TrangThai: 'DA_XAC_NHAN',
+          },
+        ]),
+      thucThi: jest.fn().mockResolvedValue(undefined),
+      giaoDich: jest.fn(async (callback) => callback({ execute })),
+    };
+    const service = new DatBanCommandService(
+      mysql as any,
+      { chuyenDatBanSangPhanHoi: jest.fn((booking) => booking) } as any,
+      { taoDonHang: jest.fn() } as any,
+    );
+
+    const ketQua = await service.ganBanChoDatBan('DB001', {
+      danhSachMaBan: ['B053'],
+    } as any);
+
+    expect(execute).toHaveBeenCalledWith(
+      'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+      ['Available', 'B035'],
+    );
+    expect(execute).toHaveBeenCalledWith(
+      'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+      ['Reserved', 'B053'],
+    );
+    expect(execute).toHaveBeenCalledWith(
+      'UPDATE DatBan SET MaBan = ?, TrangThai = ? WHERE MaDatBan = ?',
+      ['B053', 'DA_XAC_NHAN', 'DB001'],
+    );
+    expect((ketQua.data as any).maBan).toBe('B053');
+    expect((ketQua.data as any).danhSachMaBanDaGan).toEqual(['B053']);
   });
 });

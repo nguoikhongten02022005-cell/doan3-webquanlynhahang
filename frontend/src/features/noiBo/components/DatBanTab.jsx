@@ -84,7 +84,7 @@ const QUICK_FILTERS = [
   { key: 'pending', label: 'Chờ xác nhận' },
 ]
 
-const PENDING_STATUS_SET = new Set([...CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN, 'Pending'])
+const PENDING_STATUS_SET = new Set([...CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN, 'PENDING', 'Pending'])
 
 const CREATE_STATUS_OPTIONS = CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO.filter((status) => Boolean(HOST_NHAN_TRANG_THAI_DAT_BAN[status]))
 
@@ -135,6 +135,12 @@ const layNguonDatBan = (booking) => {
   if (nguonTao === 'NOI_BO') return 'Nội bộ'
   if (nguonTao === 'WEB') return 'Khách đặt online'
   return ''
+}
+const dinhDangBanDaGan = (table) => {
+  const maBan = String(table?.code || table?.maBan || table?.id || '').trim()
+  const tenBan = String(table?.name || table?.tenBan || '').trim()
+  const khuVuc = String(table?.khuVuc || table?.rawAreaText || '').trim()
+  return [maBan, tenBan && tenBan !== maBan ? tenBan : '', khuVuc].filter(Boolean).join(' - ')
 }
 const laBookingChuaGanBan = (booking) => !Array.isArray(booking.danhSachMaBanDaGan) || booking.danhSachMaBanDaGan.length === 0
 
@@ -424,7 +430,7 @@ function TheBookingDatBan({ booking, onEdit, onAssign, onConfirmAction, onQuickS
           </Space>
 
           <Descriptions bordered size="small" column={{ xs: 1, lg: 3 }} className="dat-ban-noi-bo-booking-desc">
-            <Descriptions.Item label="Bàn đã gán">{banDaGan.length > 0 ? banDaGan.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
+            <Descriptions.Item label="Bàn đã gán">{banDaGan.length > 0 ? banDaGan.map(dinhDangBanDaGan).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
             <Descriptions.Item label="Nguồn">{layNguonDatBan(booking)}</Descriptions.Item>
             <Descriptions.Item label="Email">{booking.email || 'Chưa cập nhật'}</Descriptions.Item>
           </Descriptions>
@@ -602,7 +608,7 @@ function DatBanAssignModal({
             <Descriptions.Item label="Số khách">{dinhDangSoKhach(booking.guests)}</Descriptions.Item>
             <Descriptions.Item label="Thời gian">{dinhDangNgayGio(booking.date, booking.time)}</Descriptions.Item>
             <Descriptions.Item label="Khu vực ưu tiên">{layNhanChoNgoi(booking.seatingArea)}</Descriptions.Item>
-            <Descriptions.Item label="Bàn hiện tại">{booking.danhSachBanDaGan?.length ? booking.danhSachBanDaGan.map((table) => table.code).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
+            <Descriptions.Item label="Bàn hiện tại">{booking.danhSachBanDaGan?.length ? booking.danhSachBanDaGan.map(dinhDangBanDaGan).join(', ') : 'Chưa gán bàn'}</Descriptions.Item>
           </Descriptions>
 
           <Alert
@@ -635,8 +641,8 @@ function DatBanAssignModal({
                     className={`dat-ban-noi-bo-ban-tile${dangGan ? ' dat-ban-noi-bo-ban-tile--current' : ''}${daChon ? ' dat-ban-noi-bo-ban-tile--selected' : ''}`}
                   >
                     <Space orientation="vertical" size={4} style={{ width: '100%' }}>
-                      <Typography.Text strong>{table.code}</Typography.Text>
-                      <Typography.Text>{table.capacity} khách</Typography.Text>
+                      <Typography.Text strong>{table.code} - {table.name || 'Bàn'}</Typography.Text>
+                      <Typography.Text>{table.tableNumber ? `Số ${table.tableNumber} · ` : ''}{table.capacity} khách</Typography.Text>
                       <Typography.Text type="secondary">{layNhanChoNgoi(table.areaId)}</Typography.Text>
                       <Tag color={dangGan ? 'warning' : daChon ? 'success' : 'default'}>{dangGan ? 'Đang gán' : daChon ? 'Đã chọn' : 'Bàn trống'}</Tag>
                     </Space>
@@ -702,6 +708,7 @@ function DatBanTab({
   const [formError, setFormError] = useState('')
   const [assigningBooking, setAssigningBooking] = useState(null)
   const [selectedTableIds, setSelectedTableIds] = useState([])
+  const [daChonBanMoi, setDaChonBanMoi] = useState(false)
   const [assignableTables, setAssignableTables] = useState([])
   const [assignModalError, setAssignModalError] = useState('')
   const [pendingAction, setPendingAction] = useState(null)
@@ -720,10 +727,17 @@ function DatBanTab({
   }, [hangDoiDatBan, quickFilter, searchQuery, homNay])
 
   const tapBanDangChon = useMemo(() => new Set(selectedTableIds), [selectedTableIds])
+  const tapBanDangGan = useMemo(
+    () => new Set(Array.isArray(assigningBooking?.danhSachMaBanDaGan) ? assigningBooking.danhSachMaBanDaGan : []),
+    [assigningBooking],
+  )
 
   const selectedCapacity = useMemo(
-    () => assignableTables.reduce((sum, table) => (tapBanDangChon.has(table.id) ? sum + (Number(table.capacity) || 0) : sum), 0),
-    [assignableTables, tapBanDangChon],
+    () => assignableTables.reduce((sum, table) => {
+      const dangTinhSucChua = daChonBanMoi ? tapBanDangChon.has(table.id) : tapBanDangGan.has(table.id)
+      return dangTinhSucChua ? sum + (Number(table.capacity) || 0) : sum
+    }, 0),
+    [assignableTables, daChonBanMoi, tapBanDangChon, tapBanDangGan],
   )
 
   const resetForm = () => {
@@ -735,6 +749,7 @@ function DatBanTab({
   const resetAssignModal = () => {
     setAssigningBooking(null)
     setSelectedTableIds([])
+    setDaChonBanMoi(false)
     setAssignableTables([])
     setAssignModalError('')
   }
@@ -820,25 +835,23 @@ function DatBanTab({
 
     setAssigningBooking(booking)
     setAssignableTables(danhSachBanPhuHop)
-    setSelectedTableIds(Array.isArray(booking.danhSachMaBanDaGan) ? booking.danhSachMaBanDaGan : [])
+    setSelectedTableIds([])
+    setDaChonBanMoi(false)
     setAssignModalError('')
     setFormError('')
   }
 
   const toggleTableSelection = (tableId) => {
-    setSelectedTableIds((currentIds) => (
-      currentIds.includes(tableId)
-        ? currentIds.filter((id) => id !== tableId)
-        : [...currentIds, tableId]
-    ))
+    setSelectedTableIds([tableId])
+    setDaChonBanMoi(true)
     setAssignModalError('')
   }
 
   const handleAssignSubmit = async () => {
     if (!assigningBooking) return
 
-    if (selectedTableIds.length === 0) {
-      setAssignModalError('Vui lòng chọn ít nhất một bàn để gán.')
+    if (selectedTableIds.length !== 1) {
+      setAssignModalError('Chỉ được gán đúng một bàn cho đặt bàn.')
       return
     }
 

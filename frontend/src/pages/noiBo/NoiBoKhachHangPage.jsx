@@ -60,6 +60,7 @@ const TRANG_THAI_DONHANG_MAP = {
   Seated: { color: 'cyan', label: 'Đang ngồi' },
   Served: { color: 'green', label: 'Đã phục vụ' },
   Paid: { color: 'blue', label: 'Đã thanh toán' },
+  Completed: { color: 'blue', label: 'Hoàn tất' },
   Cancelled: { color: 'default', label: 'Đã hủy' },
 }
 

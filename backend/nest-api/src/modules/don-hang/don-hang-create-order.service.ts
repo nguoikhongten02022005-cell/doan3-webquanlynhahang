@@ -52,9 +52,11 @@ export class DonHangCreateOrderService {
         ? payload.monAn
         : [];
     const maBan = payload.maBan || payload.maBanAn || null;
+    const maDatBan = payload.maDatBan || null;
     const nguonTao = payload.nguonTao || 'Online';
     const loaiDonHang = 'TAI_BAN';
     const trangThai = payload.trangThai || 'Pending';
+    const capNhatTrangThaiBan = payload.capNhatTrangThaiBan !== false;
     const soDiem = Number(payload.soDiem || 0);
 
     const nguoiDung = payload.nguoiDung || { maND: payload.maND };
@@ -76,7 +78,19 @@ export class DonHangCreateOrderService {
       let maDonHang = String(payload.maDonHang || '');
       let isAppending = false;
 
-      if (maBan && !maDonHang) {
+      if (maBan && !maDonHang && nguonTao === 'DatBan' && maDatBan) {
+        const [donDangMoTheoDatBan] = await this.truyVan(
+          "SELECT MaDonHang FROM DonHang WHERE MaBan = ? AND MaDatBan = ? AND TrangThai NOT IN ('Paid','Cancelled') LIMIT 1",
+          [maBan, maDatBan],
+          ketNoi,
+        );
+        if (donDangMoTheoDatBan) {
+          maDonHang = donDangMoTheoDatBan.MaDonHang;
+          isAppending = true;
+        }
+      }
+
+      if (maBan && !maDonHang && !(nguonTao === 'DatBan' && maDatBan)) {
         const [donDangMo] = await this.truyVan(
           "SELECT MaDonHang FROM DonHang WHERE MaBan = ? AND TrangThai NOT IN ('Paid','Cancelled') LIMIT 1",
           [maBan],
@@ -108,7 +122,7 @@ export class DonHangCreateOrderService {
             payload.maKH || null,
             maBan,
             payload.maNV || null,
-            payload.maDatBan || null,
+            maDatBan,
             loaiDonHang,
             tongHopGia.tongTien,
             trangThai,
@@ -162,7 +176,7 @@ export class DonHangCreateOrderService {
         });
       }
 
-      if (maBan) {
+      if (maBan && capNhatTrangThaiBan) {
         await this.thucThi(
           'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
           [TRANG_THAI_BAN.DANG_SU_DUNG, maBan],
@@ -185,7 +199,7 @@ export class DonHangCreateOrderService {
             maKH: payload.maKH || null,
             maBan,
             maNV: payload.maNV || null,
-            maDatBan: payload.maDatBan || null,
+            maDatBan,
             tongTien: tongHopGia.tongTien,
             tongHopGia,
             maGiamGia,

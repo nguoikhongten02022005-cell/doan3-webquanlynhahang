@@ -41,7 +41,7 @@ export class TaoDonHangDto {
   @IsString()
   maKH?: string;
 
-  @ApiProperty({ example: 'BAN001' })
+  @ApiProperty({ example: 'B001' })
   @IsString()
   maBan!: string;
 

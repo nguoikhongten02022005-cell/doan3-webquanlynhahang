@@ -7,7 +7,10 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
-import { TRANG_THAI_BAN } from '../../common/constants';
+import {
+  TRANG_THAI_BAN,
+  TRANG_THAI_DON_HANG_DANG_MO,
+} from '../../common/constants';
 
 @Injectable()
 export class DatBanQueryService {
@@ -85,14 +88,17 @@ export class DatBanQueryService {
       chiTietMonAn,
       danhSachMaBanDaGan,
       danhSachBanDaGan: maBan
-        ? [{ maBan, tenBan: datBan.TenBan || maBan }]
+        ? [{ maBan, tenBan: datBan.TenBan || maBan, khuVuc: datBan.KhuVucBan || '' }]
         : [],
     };
   }
 
   async layDanhSachDatBan() {
     const danhSach = await this.mysql.truyVan(
-      'SELECT * FROM DatBan ORDER BY NgayTao DESC',
+      `SELECT db.*, b.TenBan AS TenBan, b.KhuVuc AS KhuVucBan, b.SoBan AS SoBan
+       FROM DatBan db
+       LEFT JOIN Ban b ON b.MaBan = db.MaBan
+       ORDER BY db.NgayTao DESC`,
     );
     const danhSachMaDatBan = danhSach
       .map((datBan) => String(datBan.MaDatBan || '').trim())
@@ -245,6 +251,13 @@ export class DatBanQueryService {
        WHERE NgayDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed', 'DA_HUY', 'KHONG_DEN', 'DA_HOAN_THANH', 'TU_CHOI_HET_CHO')`,
       [ngayDat],
     );
+    const danhSachDonHangDangMo =
+      (await this.mysql.truyVan(
+      `SELECT DISTINCT MaBan FROM DonHang
+       WHERE MaBan IS NOT NULL
+         AND TrangThai IN (${Array.from(TRANG_THAI_DON_HANG_DANG_MO).map(() => '?').join(', ')})`,
+      Array.from(TRANG_THAI_DON_HANG_DANG_MO),
+    )) || [];
 
     const tapBanDaDuocDung = new Set(
       danhSachDatBan
@@ -265,6 +278,10 @@ export class DatBanQueryService {
         .map((datBan) => String(datBan.MaBan || '').trim())
         .filter(Boolean),
     );
+    for (const donHang of danhSachDonHangDangMo) {
+      const maBanDangMo = String(donHang.MaBan || '').trim();
+      if (maBanDangMo) tapBanDaDuocDung.add(maBanDangMo);
+    }
 
     const danhSachBanKhaDung = danhSachBan
       .filter((ban) => !tapBanDaDuocDung.has(String(ban.MaBan || '').trim()))
@@ -277,9 +294,7 @@ export class DatBanQueryService {
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;
 
-        const giaTriKhuVuc = String(
-          ban.KhuVuc || ban.ViTri || '',
-        ).toLowerCase();
+        const giaTriKhuVuc = `${ban.KhuVuc || ''} ${ban.ViTri || ''}`.toLowerCase();
         if (khuVuc === 'PHONG_VIP')
           return (
             giaTriKhuVuc.includes('vip') ||

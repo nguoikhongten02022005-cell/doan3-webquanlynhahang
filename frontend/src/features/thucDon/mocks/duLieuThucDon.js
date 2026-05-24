@@ -12,7 +12,7 @@ export const DANH_SACH_MON = Object.freeze([
     category: 'Món Chính',
     badge: 'Bán chạy',
     tone: 'tone-red',
-    image: '/images/thuc-don/bo-bit-tet-uc.jpg',
+
   },
   {
     id: 2,
@@ -22,7 +22,7 @@ export const DANH_SACH_MON = Object.freeze([
     category: 'Món Chính',
     badge: 'Tốt cho sức khỏe',
     tone: 'tone-amber',
-    image: '/images/thuc-don/ca-hoi-teriyaki.jpg',
+
   },
   {
     id: 3,
@@ -41,7 +41,7 @@ export const DANH_SACH_MON = Object.freeze([
     category: 'Món Chính',
     badge: 'Mới',
     tone: 'tone-cool',
-    image: '/images/thuc-don/mi-y-hai-san.jpg',
+
   },
   {
     id: 5,
@@ -87,7 +87,7 @@ export const DANH_SACH_MON = Object.freeze([
     category: 'Đồ Uống',
     badge: 'Đặc trưng',
     tone: 'tone-amber',
-    image: '/images/thuc-don/tra-dao-cam-sa.jpg',
+
   },
   {
     id: 10,

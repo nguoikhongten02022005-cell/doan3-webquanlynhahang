@@ -41,7 +41,7 @@ const BO_LOC_DON_HANG = [
   { key: 'pending', label: 'Chờ xử lý', statuses: ['Pending', 'Confirmed'] },
   { key: 'preparing', label: 'Đang chuẩn bị', statuses: ['Preparing'] },
   { key: 'served', label: 'Đã phục vụ', statuses: ['Ready', 'Served'] },
-  { key: 'paid', label: 'Đã thanh toán', statuses: ['Paid'] },
+  { key: 'paid', label: 'Đã thanh toán', statuses: ['Paid', 'Completed'] },
   { key: 'cancelled', label: 'Đã hủy', statuses: ['Cancelled'] },
 ]
 
@@ -52,6 +52,7 @@ const TUY_CHON_TRANG_THAI = [
   { value: 'Ready', label: 'Sẵn sàng' },
   { value: 'Served', label: 'Đang phục vụ' },
   { value: 'Paid', label: 'Đã thanh toán' },
+  { value: 'Completed', label: 'Hoàn tất' },
   { value: 'Cancelled', label: 'Đã hủy' },
 ]
 
@@ -62,6 +63,7 @@ const KIEU_THE_TRANG_THAI = {
   Ready: { tone: 'served', badge: 'badge-served', hint: 'Đơn đã sẵn sàng, chờ phục vụ tại bàn.' },
   Served: { tone: 'served', badge: 'badge-served', hint: 'Đơn đang phục vụ tại bàn, sẵn sàng chốt thanh toán.' },
   Paid: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã thanh toán và chốt doanh thu.' },
+  Completed: { tone: 'paid', badge: 'badge-paid', hint: 'Đơn đã hoàn tất và không còn giữ bàn.' },
   Cancelled: { tone: 'cancelled', badge: 'badge-cancelled', hint: 'Đơn đã hủy, chỉ giữ lại để tra cứu.' },
 }
 
@@ -79,8 +81,13 @@ const khopBoLocDonHang = (order, filterKey) => {
 }
 
 const dinhDangNhanBan = (order) => {
-  const tenBan = String(order.tableNumber || '').trim()
-  if (tenBan) return `BÀN ${tenBan.toUpperCase()}`
+  const maBan = String(order.tableCode || order.maBan || order.MaBan || '').trim()
+  const tenBan = String(order.tableName || order.tenBan || order.TenBan || '').trim()
+  const soBan = String(order.tableNumber || order.soBan || order.SoBan || '').trim()
+  if (maBan && tenBan) return `${maBan} - ${tenBan}`
+  if (maBan) return maBan
+  if (tenBan) return tenBan
+  if (soBan) return `BÀN ${soBan.toUpperCase()}`
   return 'TẠI BÀN'
 }
 

@@ -99,7 +99,7 @@ export const capNhatTrangThaiBanApi = async (id, status) => {
 export const taoBanApi = async (payload) => {
   if (!coSuDungMayChu()) {
     const maBan = String(payload.maBan || `B${String(laySoBanMoiOffline()).padStart(3, '0')}`).trim()
-    const soBan = Number(payload.soBan || String(payload.tenBan || '').replace(/\D/g, '') || laySoBanMoiOffline())
+    const soBan = Number(payload.soBan || laySoBanMoiOffline())
 
     capNhatHeThongOffline((draft) => {
       draft.ban.push({
@@ -172,7 +172,7 @@ const timOrderDangMoTheoBan = (maBan) => {
   }
 
   const candidate = timDonHangOfflineTheoMa(ban.activeOrderCode || '')
-  if (candidate && candidate.trangThai !== 'Paid' && candidate.trangThai !== 'Cancelled') {
+  if (candidate && !['Paid', 'Completed', 'Cancelled'].includes(candidate.trangThai)) {
     return candidate
   }
 

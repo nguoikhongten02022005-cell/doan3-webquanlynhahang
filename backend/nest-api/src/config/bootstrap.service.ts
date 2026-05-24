@@ -1,6 +1,6 @@
 import { Injectable, Logger } from '@nestjs/common';
 import { MySqlService } from '../database/mysql/mysql.service';
-import { docBienMoiTruongBatBuoc } from '../common/doc-bien-moi-truong';
+import { docBienMoiTruongTuyChon } from '../common/doc-bien-moi-truong';
 
 @Injectable()
 export class BootstrapService {
@@ -9,7 +9,7 @@ export class BootstrapService {
   constructor(private readonly mysql: MySqlService) {}
 
   async khoiTaoNeuCan() {
-    if (docBienMoiTruongBatBuoc('DB_AUTO_INIT').toLowerCase() !== 'true') {
+    if (docBienMoiTruongTuyChon('DB_AUTO_INIT').toLowerCase() !== 'true') {
       return;
     }
 

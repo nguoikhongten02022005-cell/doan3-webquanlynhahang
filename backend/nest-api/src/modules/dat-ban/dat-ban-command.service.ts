@@ -10,7 +10,14 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
-import { TRANG_THAI_BAN } from '../../common/constants';
+import {
+  TRANG_THAI_BAN,
+  TRANG_THAI_DON_HANG_DANG_MO,
+  TRANG_THAI_DAT_BAN_GIU_BAN,
+  TRANG_THAI_DAT_BAN_SU_DUNG_BAN,
+  laTrangThaiDatBanGiuBan,
+  laTrangThaiDatBanSuDungBan,
+} from '../../common/constants';
 import { DonHangCreateOrderService } from '../don-hang/don-hang-create-order.service';
 
 @Injectable()
@@ -33,6 +40,84 @@ export class DatBanCommandService {
     );
   }
 
+  private async coRangBuocBanDangMo(
+    ketNoi: any,
+    maBan: string,
+    maDatBanBoQua = '',
+  ) {
+    const truyVan = ketNoi.query?.bind(ketNoi) || ketNoi.execute?.bind(ketNoi);
+    const thamSoDonHang = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
+    const [donHangRows = []] = (await truyVan?.(
+      `SELECT MaDonHang FROM DonHang
+       WHERE MaBan = ?
+         AND TrangThai IN (${thamSoDonHang.map(() => '?').join(', ')})
+       LIMIT 1`,
+      [maBan, ...thamSoDonHang],
+    )) || [];
+    if ((donHangRows as any[]).length > 0) return true;
+
+    const trangThaiDatBanDangMo = [
+      ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
+      ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
+    ];
+    const [datBanRows = []] = (await truyVan?.(
+      `SELECT MaDatBan FROM DatBan
+       WHERE MaBan = ?
+         AND MaDatBan <> ?
+         AND TrangThai IN (${trangThaiDatBanDangMo.map(() => '?').join(', ')})
+       LIMIT 1`,
+      [maBan, maDatBanBoQua || '', ...trangThaiDatBanDangMo],
+    )) || [];
+    return (datBanRows as any[]).length > 0;
+  }
+
+  private async coTrungLichDatBan(
+    ketNoi: any,
+    maBan: string,
+    datBan: BanGhi,
+  ) {
+    const truyVan = ketNoi.query?.bind(ketNoi) || ketNoi.execute?.bind(ketNoi);
+    const trangThaiDatBanDangMo = [
+      ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
+      ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
+    ];
+    const [datBanRows = []] = (await truyVan?.(
+      `SELECT MaDatBan FROM DatBan
+       WHERE MaBan = ?
+         AND MaDatBan <> ?
+         AND NgayDat = ?
+         AND TrangThai IN (${trangThaiDatBanDangMo.map(() => '?').join(', ')})
+         AND TIME(?) < COALESCE(GioKetThuc, ADDTIME(GioDat, '02:00:00'))
+         AND TIME(?) > GioDat
+       LIMIT 1`,
+      [
+        maBan,
+        String(datBan.MaDatBan || ''),
+        datBan.NgayDat,
+        ...trangThaiDatBanDangMo,
+        datBan.GioDat,
+        datBan.GioKetThuc || datBan.GioDat,
+      ],
+    )) || [];
+    return (datBanRows as any[]).length > 0;
+  }
+
+  private async coDonHangDangMoTaiBan(
+    ketNoi: any,
+    maBan: string,
+  ) {
+    const truyVan = ketNoi.query?.bind(ketNoi) || ketNoi.execute?.bind(ketNoi);
+    const thamSoDonHang = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
+    const [donHangRows = []] = (await truyVan?.(
+      `SELECT MaDonHang FROM DonHang
+       WHERE MaBan = ?
+         AND TrangThai IN (${thamSoDonHang.map(() => '?').join(', ')})
+       LIMIT 1`,
+      [maBan, ...thamSoDonHang],
+    )) || [];
+    return (donHangRows as any[]).length > 0;
+  }
+
   private async taoDonHangTuDatBan(
     nguoiDung: any,
     body: BanGhi,
@@ -50,6 +135,7 @@ export class DatBanCommandService {
       chiTiet,
       nguonTao: 'DatBan',
       trangThai: 'Pending',
+      capNhatTrangThaiBan: false,
       soDiem: 0,
       nguoiDung: nguoiDung || {},
       ghiChu: body.ghiChu || null,
@@ -282,10 +368,7 @@ export class DatBanCommandService {
       const maBan = String(datBanHienTai.MaBan || '').trim();
       if (!maBan) return;
 
-      if (
-        trangThaiDaChuanHoa === 'DA_CHECK_IN' ||
-        trangThaiDaChuanHoa === 'DA_XEP_BAN'
-      ) {
+      if (laTrangThaiDatBanSuDungBan(trangThaiDaChuanHoa)) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
           TRANG_THAI_BAN.DANG_SU_DUNG,
           maBan,
@@ -293,11 +376,7 @@ export class DatBanCommandService {
         return;
       }
 
-      if (
-        ['DA_XAC_NHAN', 'DA_GHI_NHAN', 'CAN_GOI_LAI', 'CHO_XAC_NHAN'].includes(
-          trangThaiDaChuanHoa,
-        )
-      ) {
+      if (laTrangThaiDatBanGiuBan(trangThaiDaChuanHoa)) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
           TRANG_THAI_BAN.GIU_CHO,
           maBan,
@@ -305,11 +384,12 @@ export class DatBanCommandService {
         return;
       }
 
-      if (
-        ['DA_HOAN_THANH', 'KHONG_DEN', 'TU_CHOI_HET_CHO', 'DA_HUY'].includes(
-          trangThaiDaChuanHoa,
-        )
-      ) {
+      const conRangBuoc = await this.coRangBuocBanDangMo(
+        ketNoi,
+        maBan,
+        maDatBan,
+      );
+      if (!conRangBuoc) {
         await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
           TRANG_THAI_BAN.TRONG,
           maBan,
@@ -351,6 +431,7 @@ export class DatBanCommandService {
     }
 
     const [maBan] = danhSachMaBan;
+    const maBanHienTai = String(datBan.MaBan || '').trim();
     const danhSachBanHopLe = await this.mysql.truyVan(
       'SELECT * FROM Ban WHERE MaBan = ? LIMIT 1',
       [maBan],
@@ -369,13 +450,50 @@ export class DatBanCommandService {
       );
     }
 
-    if (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.DANG_SU_DUNG || String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.GIU_CHO) {
+    if (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.BAN) {
+      throw new BadRequestException(`Bàn ${banHopLe.MaBan} đang bảo trì, không thể gán cho booking.`);
+    }
+
+    if (
+      maBan !== maBanHienTai &&
+      (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.DANG_SU_DUNG ||
+        String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.GIU_CHO)
+    ) {
       throw new BadRequestException(
         `Bàn ${banHopLe.MaBan} đang có khách hoặc đã được đặt, không thể gán cho booking.`,
       );
     }
 
     await this.mysql.giaoDich(async (ketNoi) => {
+      const conDonHangTaiBanMoi = await this.coDonHangDangMoTaiBan(
+        ketNoi,
+        maBan,
+      );
+      const trungLichDatBan = await this.coTrungLichDatBan(
+        ketNoi,
+        maBan,
+        datBan,
+      );
+      if (maBan !== maBanHienTai && (conDonHangTaiBanMoi || trungLichDatBan)) {
+        throw new BadRequestException(
+          `Bàn ${maBan} đã có booking hoặc đơn hàng đang mở trong khung giờ này.`,
+        );
+      }
+
+      if (maBanHienTai && maBanHienTai !== maBan) {
+        const conRangBuocBanCu = await this.coRangBuocBanDangMo(
+          ketNoi,
+          maBanHienTai,
+          maDatBan,
+        );
+        if (!conRangBuocBanCu) {
+          await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+            TRANG_THAI_BAN.TRONG,
+            maBanHienTai,
+          ]);
+        }
+      }
+
       await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
         TRANG_THAI_BAN.GIU_CHO,
         maBan,

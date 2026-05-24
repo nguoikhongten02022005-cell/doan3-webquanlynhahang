@@ -4,7 +4,7 @@ export const TRANG_THAI_DON_HANG = Object.freeze({
   DANG_CHUAN_BI: 'Preparing',
   SAN_SANG: 'Ready',
   DANG_PHUC_VU: 'Served',
-  HOAN_THANH: 'Paid',
+  HOAN_THANH: 'Completed',
   DA_HUY: 'Cancelled',
 })
 

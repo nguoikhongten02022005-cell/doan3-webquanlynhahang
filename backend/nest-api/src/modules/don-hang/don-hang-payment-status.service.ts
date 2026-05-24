@@ -9,7 +9,13 @@ import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { resolveMaBan } from '../../common/ban-resolver';
-import { TRANG_THAI_BAN } from '../../common/constants';
+import {
+  TRANG_THAI_BAN,
+  TRANG_THAI_DON_HANG_DANG_MO,
+  TRANG_THAI_DAT_BAN_GIU_BAN,
+  TRANG_THAI_DAT_BAN_SU_DUNG_BAN,
+  laTrangThaiDonHangKetThuc,
+} from '../../common/constants';
 
 const TRANG_THAI_DON_HANG_HOP_LE = new Set([
   'Pending',
@@ -17,8 +23,16 @@ const TRANG_THAI_DON_HANG_HOP_LE = new Set([
   'Preparing',
   'Ready',
   'Served',
+  'Serving',
   'Paid',
   'Cancelled',
+  'Completed',
+  'CHO_XU_LY',
+  'DANG_CHE_BIEN',
+  'SAN_SANG',
+  'DANG_PHUC_VU',
+  'DA_THANH_TOAN',
+  'DA_HUY',
 ]);
 
 @Injectable()
@@ -31,6 +45,41 @@ export class DonHangPaymentStatusService {
 
   private async timMaBan(giaTri: string): Promise<string | null> {
     return resolveMaBan(this.mysql, giaTri);
+  }
+
+  private async giaiPhongBanNeuKhongConRangBuoc(
+    ketNoi: any,
+    maBan: string,
+    maDonHangBoQua: string,
+  ) {
+    const trangThaiDonHangDangMo = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
+    const [donHangRows] = await ketNoi.query(
+      `SELECT MaDonHang FROM DonHang
+       WHERE MaBan = ?
+         AND MaDonHang <> ?
+         AND TrangThai IN (${trangThaiDonHangDangMo.map(() => '?').join(', ')})
+       LIMIT 1`,
+      [maBan, maDonHangBoQua, ...trangThaiDonHangDangMo],
+    );
+    if ((donHangRows as any[]).length > 0) return;
+
+    const trangThaiDatBanDangMo = [
+      ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
+      ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
+    ];
+    const [datBanRows] = await ketNoi.query(
+      `SELECT MaDatBan FROM DatBan
+       WHERE MaBan = ?
+         AND TrangThai IN (${trangThaiDatBanDangMo.map(() => '?').join(', ')})
+       LIMIT 1`,
+      [maBan, ...trangThaiDatBanDangMo],
+    );
+    if ((datBanRows as any[]).length > 0) return;
+
+    await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
+      TRANG_THAI_BAN.TRONG,
+      maBan,
+    ]);
   }
 
   async capNhatTrangThaiDonHang(maDonHang: string, trangThai: string) {
@@ -51,6 +100,14 @@ export class DonHangPaymentStatusService {
         [trangThai, maDonHang],
       );
 
+      if (laTrangThaiDonHangKetThuc(trangThai) && don.MaBan) {
+        await this.giaiPhongBanNeuKhongConRangBuoc(
+          ketNoi,
+          don.MaBan,
+          maDonHang,
+        );
+      }
+
       if (trangThai === 'Paid') {
         const [hoaDonDaCo] = await ketNoi.query(
           'SELECT MaHoaDon FROM HoaDon WHERE MaDonHang = ? LIMIT 1',
@@ -59,12 +116,6 @@ export class DonHangPaymentStatusService {
         const maHoaDonDaCo = hoaDonDaCo?.[0]?.MaHoaDon;
 
         if (!maHoaDonDaCo) {
-          if (don.MaBan) {
-            await ketNoi.execute(
-              'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
-              [TRANG_THAI_BAN.TRONG, don.MaBan],
-            );
-          }
           if (don.MaKH) {
             await this.diemTichLuyService.tinhDiemTuDonHang(
               don.MaKH,
@@ -105,6 +156,7 @@ export class DonHangPaymentStatusService {
 
       return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
         maDonHang,
+        ketNoi,
       );
     });
   }

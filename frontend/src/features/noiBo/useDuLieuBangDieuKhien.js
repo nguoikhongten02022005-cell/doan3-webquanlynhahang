@@ -7,10 +7,8 @@ import { layDanhSachDanhGiaApi, duyetDanhGiaApi } from '../../services/api/apiDa
 import { layDanhSachDonHangApi, layChiTietDonHangApi, capNhatTrangThaiDonHangApi } from '../../services/api/apiDonHang'
 import { layDanhSachBanApi, capNhatTrangThaiBanApi } from '../../services/api/apiBanAn'
 import { layDanhSachDatBanApi } from '../../services/api/apiDatBan'
-import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
-import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN, CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN } from './hangSo'
+import { CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG, CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN, CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN, TRANG_THAI_LICH_SU, chuanHoaTrangThaiDatBan } from './hangSo'
 import { CAC_TRANG_THAI_DAT_BAN_DANG_MO } from './thongKeNoiBo'
-const TRANG_THAI_LICH_SU = new Set(['DA_HUY', 'CANCELLED', 'KHONG_DEN', 'NO_SHOW', 'NoShow', 'Completed', 'DA_HOAN_THANH'])
 import {
   layTomTatTaiKhoan,
   layTomTatDonHang,
@@ -43,6 +41,10 @@ const chuanHoaDonHangNoiBo = (order) => {
     ...order,
     id: order.id || order.orderCode || order.maDonHang || order.MaDonHang,
     orderCode: order.orderCode || order.maDonHang || order.MaDonHang || '',
+    maBan: order.maBan || order.MaBan || order.tableCode || '',
+    tableCode: order.tableCode || order.maBan || order.MaBan || '',
+    tableName: order.tableName || order.tenBan || order.TenBan || '',
+    tableNumber: order.tableNumber || order.soBan || order.SoBan || '',
     status: order.status || order.trangThai || order.TrangThai || '',
     total: tongTien,
   }
@@ -142,23 +144,23 @@ export const useDuLieuBangDieuKhien = () => {
   }, [taiLaiDuLieu])
 
   const hangDoiDatBan = useMemo(
-    () => sapXepDatBanChoVanHanh(danhSachDatBan.filter((booking) => !TRANG_THAI_LICH_SU.has(String(booking.status || '').toUpperCase())), new Date()),
+    () => sapXepDatBanChoVanHanh(danhSachDatBan.filter((booking) => !TRANG_THAI_LICH_SU.has(chuanHoaTrangThaiDatBan(booking.status))), new Date()),
     [danhSachDatBan],
   )
   const danhSachDatBanDangHoatDong = useMemo(
-    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(booking.status)),
+    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG.has(chuanHoaTrangThaiDatBan(booking.status))),
     [hangDoiDatBan],
   )
   const danhSachDatBanDangMo = useMemo(
-    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_MO.has(booking.status)),
+    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DANG_MO.has(chuanHoaTrangThaiDatBan(booking.status)) || CAC_TRANG_THAI_DAT_BAN_DANG_MO.has(booking.status)),
     [hangDoiDatBan],
   )
   const danhSachDatBanDaXacNhan = useMemo(
-    () => danhSachDatBanDangHoatDong.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(booking.status)),
+    () => danhSachDatBanDangHoatDong.filter((booking) => CAC_TRANG_THAI_DAT_BAN_DA_XAC_NHAN.has(chuanHoaTrangThaiDatBan(booking.status))),
     [danhSachDatBanDangHoatDong],
   )
   const danhSachDatBanChoXuLy = useMemo(
-    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(booking.status)),
+    () => hangDoiDatBan.filter((booking) => CAC_TRANG_THAI_DAT_BAN_CHO_XAC_NHAN.has(chuanHoaTrangThaiDatBan(booking.status))),
     [hangDoiDatBan],
   )
   const danhSachDatBanSapDienRa = useMemo(() => {
