@@ -3,6 +3,7 @@ import { Navigate, useLocation, useNavigate } from 'react-router-dom'
 import { Alert, Col, ConfigProvider, Row } from 'antd'
 import '../theme/dat-ban.css'
 import { banKhaDungDat } from '../constants/trangThaiBan'
+import { chuanHoaMaKhuVucBan } from '../constants/khuVucBan'
 import {
   CAC_CA_KHUNG_GIO_DAT_BAN,
   GIO_GIOI_HAN_NHAN_DAT_BAN,
@@ -145,18 +146,7 @@ const tinhSoBanTheoKhuVuc = (tables, guests) => {
 }
 
 const chuyenDoiKhuVucTable = (ban) => {
-  const viTri = ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || ''
-  const giaTri = String(viTri).toLowerCase()
-
-  if (giaTri.includes('vip') || giaTri.includes('riêng') || giaTri.includes('rieng')) {
-    return 'PHONG_VIP'
-  }
-
-  if (giaTri.includes('ngoài') || giaTri.includes('ngoai') || giaTri.includes('ban công') || giaTri.includes('ban cong')) {
-    return 'BAN_CONG'
-  }
-
-  return 'SANH_CHINH'
+  return chuanHoaMaKhuVucBan(ban.areaId || ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || '')
 }
 
 const tinhAreaAvailabilityTuApi = (danhSachBan, soKhach) => {
@@ -250,7 +240,7 @@ const tinhYeuCauCoc = ({ guests, seatingArea, selectedMenuItems, subtotal }) => 
 
   const liDo = []
   if (Number(guests) >= 5) liDo.push('Nhóm từ 5 người trở lên')
-  if (seatingArea === 'PHONG_VIP') liDo.push('Khu vực VIP/Khu riêng')
+  if (seatingArea === 'PHONG_VIP') liDo.push('Khu riêng')
   if (Array.isArray(selectedMenuItems) && selectedMenuItems.length > 0) liDo.push('Đặt món trước')
 
   let soTienCoc = soTienCocToiThieu

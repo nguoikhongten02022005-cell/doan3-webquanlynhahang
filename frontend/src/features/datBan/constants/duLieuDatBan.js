@@ -1,3 +1,5 @@
+import { CAC_KHU_VUC_BAN_CHUAN, NHAN_KHU_VUC_BAN } from '../../../constants/khuVucBan.js'
+
 export const NHAN_THU_TRONG_TUAN = ['Chủ nhật', 'Thứ 2', 'Thứ 3', 'Thứ 4', 'Thứ 5', 'Thứ 6', 'Thứ 7']
 
 export const CAC_DIP_DAT_BAN = ['Sinh nhật', 'Kỷ niệm', 'Tiếp khách / công việc', 'Cần không gian yên tĩnh']
@@ -28,34 +30,18 @@ export const CAC_CA_KHUNG_GIO_DAT_BAN = [
   },
 ]
 
-export const NHAN_KHU_VUC_DAT_BAN = {
-  KHONG_UU_TIEN: 'Không ưu tiên',
-  SANH_CHINH: 'Sảnh chính',
-  PHONG_VIP: 'Khu riêng / VIP',
-  BAN_CONG: 'Ngoài trời',
-  QUAY_BAR: 'Quầy bar',
-}
+export const NHAN_KHU_VUC_DAT_BAN = NHAN_KHU_VUC_BAN
 
-export const KHU_VUC_DAT_BAN_CONG_KHAI = [
-  {
-    value: 'SANH_CHINH',
-    icon: '🏠',
-    label: 'Trong nhà',
-    description: 'Điều hoà mát mẻ, yên tĩnh',
-  },
-  {
-    value: 'BAN_CONG',
-    icon: '🌿',
-    label: 'Ngoài trời',
-    description: 'Thoáng gió, view đẹp',
-  },
-  {
-    value: 'PHONG_VIP',
-    icon: '👑',
-    label: 'Khu riêng / VIP',
-    description: 'Riêng tư, phù hợp tiếp khách hoặc nhóm cần không gian tách biệt',
-  },
-]
+export const KHU_VUC_DAT_BAN_CONG_KHAI = CAC_KHU_VUC_BAN_CHUAN.map((khuVuc) => ({
+  value: khuVuc.id,
+  icon: khuVuc.id === 'SANH_CHINH' ? '🏠' : khuVuc.id === 'PHONG_VIP' ? '👑' : '🌿',
+  label: khuVuc.name,
+  description: khuVuc.id === 'SANH_CHINH'
+    ? 'Điều hoà mát mẻ, yên tĩnh'
+    : khuVuc.id === 'PHONG_VIP'
+      ? 'Riêng tư, phù hợp tiếp khách hoặc nhóm cần không gian tách biệt'
+      : 'Thoáng gió, view đẹp',
+}))
 
 export const NHAN_TIN_HIEU_KHA_DUNG_DAT_BAN = {
   AVAILABLE: 'Còn bàn',

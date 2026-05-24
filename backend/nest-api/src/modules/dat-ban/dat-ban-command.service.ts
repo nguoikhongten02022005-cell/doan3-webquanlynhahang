@@ -18,6 +18,7 @@ import {
   laTrangThaiDatBanGiuBan,
   laTrangThaiDatBanSuDungBan,
 } from '../../common/constants';
+import { chuanHoaMaKhuVucBan } from '../../common/khu-vuc-ban';
 import { DonHangCreateOrderService } from '../don-hang/don-hang-create-order.service';
 
 @Injectable()
@@ -197,7 +198,7 @@ export class DatBanCommandService {
         Number(body.soNguoi || 0),
         body.ghiChu || null,
         'Pending',
-        body.khuVucUuTien || null,
+        body.khuVucUuTien ? chuanHoaMaKhuVucBan(body.khuVucUuTien) : null,
         body.ghiChuNoiBo || null,
         body.chiTietMonAn ? JSON.stringify(body.chiTietMonAn) : null,
         nguonTao,
@@ -294,7 +295,7 @@ export class DatBanCommandService {
       body.khuVucUuTien === undefined
         ? datBanHienTai.KhuVucUuTien
         : body.khuVucUuTien
-          ? String(body.khuVucUuTien).trim()
+          ? chuanHoaMaKhuVucBan(body.khuVucUuTien)
           : null;
     const ghiChuNoiBo =
       body.ghiChuNoiBo === undefined

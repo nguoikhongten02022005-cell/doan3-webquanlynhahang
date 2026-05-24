@@ -1,5 +1,6 @@
 import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
 import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
+import { chuanHoaMaKhuVucBan, chuanHoaTenKhuVucBan } from '../../constants/khuVucBan'
 import {
   taoPhanHoiOffline,
   layDanhSachBanOffline,
@@ -14,19 +15,7 @@ import {
   taoMaDonHangMoiOffline,
 } from '../offline/dichVuOfflineStore'
 
-const suyRaKhuVucTuViTri = (viTri = '') => {
-  const giaTri = String(viTri).toLowerCase()
-
-  if (giaTri.includes('vip') || giaTri.includes('riêng') || giaTri.includes('rieng')) {
-    return 'PHONG_VIP'
-  }
-
-  if (giaTri.includes('ngoài') || giaTri.includes('ngoai') || giaTri.includes('ban công') || giaTri.includes('ban cong')) {
-    return 'BAN_CONG'
-  }
-
-  return 'SANH_CHINH'
-}
+const suyRaKhuVucTuViTri = (viTri = '') => chuanHoaMaKhuVucBan(viTri)
 
 const chuanHoaBanAn = (ban) => {
   if (!ban || typeof ban !== 'object') {
@@ -40,7 +29,7 @@ const chuanHoaBanAn = (ban) => {
     tableNumber: Number(ban.soBan ?? ban.SoBan ?? 0),
     capacity: Number(ban.soChoNgoi ?? ban.SoChoNgoi ?? 0),
     areaId: suyRaKhuVucTuViTri(ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || ''),
-    rawAreaText: ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || '',
+    rawAreaText: chuanHoaTenKhuVucBan(ban.khuVuc || ban.KhuVuc || ban.viTri || ban.ViTri || ''),
     note: ban.ghiChu || ban.GhiChu || '',
     status: chuanHoaTrangThaiBan(ban.trangThai || ban.TrangThai || ''),
   }
@@ -57,10 +46,10 @@ export const layDanhSachBanApi = async () => {
       SoBan: Number(ban.tableNumber || 0),
       soChoNgoi: Number(ban.capacity || 0),
       SoChoNgoi: Number(ban.capacity || 0),
-      khuVuc: ban.rawAreaText || ban.areaId || '',
-      KhuVuc: ban.rawAreaText || ban.areaId || '',
-      viTri: ban.rawAreaText || ban.areaId || '',
-      ViTri: ban.rawAreaText || ban.areaId || '',
+      khuVuc: chuanHoaTenKhuVucBan(ban.rawAreaText || ban.areaId || ''),
+      KhuVuc: chuanHoaTenKhuVucBan(ban.rawAreaText || ban.areaId || ''),
+      viTri: chuanHoaTenKhuVucBan(ban.rawAreaText || ban.areaId || ''),
+      ViTri: chuanHoaTenKhuVucBan(ban.rawAreaText || ban.areaId || ''),
       ghiChu: ban.note || '',
       GhiChu: ban.note || '',
       trangThai: ban.status,
@@ -109,7 +98,7 @@ export const taoBanApi = async (payload) => {
         tableNumber: soBan,
         capacity: Number(payload.soChoNgoi || 0),
         areaId: suyRaKhuVucTuViTri(payload.khuVuc || payload.viTri || ''),
-        rawAreaText: payload.khuVuc || payload.viTri || '',
+        rawAreaText: chuanHoaTenKhuVucBan(payload.khuVuc || payload.viTri || ''),
         note: payload.ghiChu || '',
         status: 'TRONG',
       })
@@ -132,7 +121,7 @@ export const capNhatBanApi = async (maBan, payload) => {
       ban.name = payload.tenBan || ban.name
       ban.tableNumber = Number(payload.soBan || ban.tableNumber || 0)
       ban.capacity = Number(payload.soChoNgoi || ban.capacity || 0)
-      ban.rawAreaText = payload.khuVuc || payload.viTri || ban.rawAreaText || ''
+      ban.rawAreaText = chuanHoaTenKhuVucBan(payload.khuVuc || payload.viTri || ban.rawAreaText || '')
       ban.areaId = suyRaKhuVucTuViTri(ban.rawAreaText)
       ban.note = payload.ghiChu || ''
     })

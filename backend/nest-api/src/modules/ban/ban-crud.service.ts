@@ -4,6 +4,7 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { BanGhi } from '../../common/types';
 import { resolveMaBan } from '../../common/ban-resolver';
 import { TRANG_THAI_BAN } from '../../common/constants';
+import { chuanHoaTenKhuVucBan } from '../../common/khu-vuc-ban';
 
 @Injectable()
 export class BanCrudService {
@@ -19,8 +20,8 @@ export class BanCrudService {
         tenBan: ban.TenBan,
         soBan: Number(ban.SoBan || 0),
         soChoNgoi: Number(ban.SoChoNgoi || 0),
-        khuVuc: ban.KhuVuc,
-        viTri: ban.ViTri,
+        khuVuc: chuanHoaTenKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`),
+        viTri: chuanHoaTenKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`),
         ghiChu: ban.GhiChu,
         trangThai: ban.TrangThai,
       })),
@@ -43,10 +44,10 @@ export class BanCrudService {
       [
         body.maBan,
         body.tenBan,
-        body.khuVuc || null,
+        chuanHoaTenKhuVucBan(`${body.khuVuc || ''} ${body.viTri || ''}`),
         soBan,
         Number(body.soChoNgoi || 0),
-        body.viTri || null,
+        chuanHoaTenKhuVucBan(`${body.khuVuc || ''} ${body.viTri || ''}`),
         body.ghiChu || null,
         TRANG_THAI_BAN.TRONG,
       ],
@@ -70,10 +71,10 @@ export class BanCrudService {
       'UPDATE Ban SET TenBan = ?, KhuVuc = ?, SoBan = ?, SoChoNgoi = ?, ViTri = ?, GhiChu = ? WHERE MaBan = ?',
       [
         body.tenBan,
-        body.khuVuc || null,
+        chuanHoaTenKhuVucBan(`${body.khuVuc || ''} ${body.viTri || ''}`),
         soBan,
         Number(body.soChoNgoi || 0),
-        body.viTri || null,
+        chuanHoaTenKhuVucBan(`${body.khuVuc || ''} ${body.viTri || ''}`),
         body.ghiChu || null,
         ma,
       ],

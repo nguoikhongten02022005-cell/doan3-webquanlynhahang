@@ -43,6 +43,7 @@ backend/**/bin/
 backend/**/obj/
 
 # Local scratch files
+tmp/
 .opencode/
 .opencode/cache/
 .opencode/node_modules/

@@ -1,3 +1,5 @@
+import { CAC_KHU_VUC_BAN_CHUAN } from '../../constants/khuVucBan'
+
 export const CAC_BO_LOC_NGAY = Object.freeze([
   { key: 'all', label: 'Tất cả ngày' },
   { key: 'today', label: 'Hôm nay' },
@@ -12,12 +14,7 @@ export const CAC_BO_LOC_CA = Object.freeze([
   { key: 'dinner', label: 'Ca tối' },
 ])
 
-export const CAC_KHU_VUC_BAN = Object.freeze([
-  { id: 'SANH_CHINH', name: 'Sảnh chính', total: 12 },
-  { id: 'PHONG_VIP', name: 'Khu riêng / VIP', total: 4 },
-  { id: 'BAN_CONG', name: 'Ngoài trời', total: 6 },
-  { id: 'QUAY_BAR', name: 'Quầy bar', total: 5 },
-])
+export const CAC_KHU_VUC_BAN = CAC_KHU_VUC_BAN_CHUAN
 
 export const CAC_TRANG_THAI_DAT_BAN_DANG_HOAT_DONG = new Set([
   'PENDING',

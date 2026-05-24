@@ -20,7 +20,7 @@ export const layGhiChuUuTienDatBan = (datBan) => {
   if (laDatBanVip(datBan)) return 'Ưu tiên xác nhận thủ công do yêu cầu VIP hoặc khu riêng.'
   if (datBan.status === 'CAN_GOI_LAI') return 'Cần gọi lại để chốt tình trạng chỗ trống hoặc điều kiện phục vụ.'
   if (!Array.isArray(datBan.danhSachMaBanDaGan) || datBan.danhSachMaBanDaGan.length === 0) return 'Booking chưa được gán bàn cụ thể.'
-  if (datBan.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ban công.'
+  if (datBan.seatingArea === 'BAN_CONG') return 'Kiểm tra thời tiết trước khi chốt vị trí ngoài trời.'
   return ''
 }
 

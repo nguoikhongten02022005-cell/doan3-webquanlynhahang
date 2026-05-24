@@ -1,5 +1,6 @@
 import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
 import { banKhaDungDat } from '../../constants/trangThaiBan'
+import { chuanHoaMaKhuVucBan } from '../../constants/khuVucBan'
 import {
   taoPhanHoiOffline,
   layDanhSachDatBanOffline,
@@ -53,7 +54,7 @@ const chuanHoaDatBan = (booking) => {
     name: booking.tenKhachDatBan || booking.TenKhachDatBan || '',
     phone: booking.sdtDatBan || booking.SDTDatBan || '',
     email: booking.emailDatBan || booking.EmailDatBan || '',
-    seatingArea: booking.khuVucUuTien || booking.KhuVucUuTien || 'KHONG_UU_TIEN',
+    seatingArea: (booking.khuVucUuTien || booking.KhuVucUuTien) ? chuanHoaMaKhuVucBan(booking.khuVucUuTien || booking.KhuVucUuTien) : 'KHONG_UU_TIEN',
     internalNote: booking.ghiChuNoiBo || booking.GhiChuNoiBo || '',
     status: booking.trangThai || booking.TrangThai || '',
     tableCode: booking.maBan || booking.MaBan || '',
@@ -101,7 +102,7 @@ const chuanHoaDatBanPayload = (payload = {}, tuyChon = {}) => {
     soNguoi: Number(payload.soNguoi || payload.guests || 0),
     ghiChu: payload.ghiChu || payload.notes || '',
     ghiChuNoiBo: payload.ghiChuNoiBo || payload.internalNote || '',
-    khuVucUuTien: payload.khuVucUuTien || payload.seatingArea || 'KHONG_UU_TIEN',
+    khuVucUuTien: (payload.khuVucUuTien || payload.seatingArea) ? chuanHoaMaKhuVucBan(payload.khuVucUuTien || payload.seatingArea) : 'KHONG_UU_TIEN',
     chiTietMonAn: Array.isArray(payload.chiTietMonAn)
       ? payload.chiTietMonAn.map(chuanHoaChiTietMonAnPayload)
       : Array.isArray(payload.selectedMenuItems)
@@ -132,7 +133,7 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
     const danhSachBan = layDanhSachBanOffline()
     const danhSachDatBan = layDanhSachDatBanOffline()
     const tongBanPhuHop = danhSachBan.filter((ban) => {
-      const khopKhuVuc = khuVuc === 'KHONG_UU_TIEN' || String(ban.areaId || '').trim() === String(khuVuc || '').trim()
+      const khopKhuVuc = khuVuc === 'KHONG_UU_TIEN' || chuanHoaMaKhuVucBan(ban.areaId || ban.rawAreaText || '') === chuanHoaMaKhuVucBan(khuVuc)
       const khopSoNguoi = Number(ban.capacity || 0) >= Number(soNguoi || 0)
       return khopKhuVuc && khopSoNguoi && banKhaDungDat(ban.status)
     }).length - danhSachDatBan.filter((booking) => String(booking.date || booking.ngayDat || '') === ngayDaChuanHoa && String(booking.time || booking.gioDat || '') === String(gioDat || '').trim() && !['Cancelled', 'DA_HUY', 'KHONG_DEN'].includes(String(booking.status || booking.trangThai || ''))).length
@@ -152,7 +153,7 @@ export const layKhaDungDatBanApi = async ({ ngayDat, gioDat, soNguoi = 0, khuVuc
     ngayDat: chuanHoaNgayDat(ngayDat),
     gioDat: String(gioDat || '').trim(),
     soNguoi: String(Number(soNguoi || 0)),
-    khuVuc: String(khuVuc || 'KHONG_UU_TIEN').trim(),
+    khuVuc: khuVuc === 'KHONG_UU_TIEN' ? 'KHONG_UU_TIEN' : chuanHoaMaKhuVucBan(khuVuc),
   })
 
   return tachPhanHoiApi(await trinhKhachApi.get(`/dat-ban/availability?${thamSo.toString()}`))

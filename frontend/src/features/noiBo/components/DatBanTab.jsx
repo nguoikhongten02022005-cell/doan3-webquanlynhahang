@@ -34,6 +34,7 @@ import {
   Tag,
   Typography,
 } from 'antd'
+import { TUY_CHON_KHU_VUC_UU_TIEN } from '../../../constants/khuVucBan'
 import { HOST_NHAN_TRANG_THAI_DAT_BAN, CAC_TRANG_THAI_TAO_DAT_BAN_NOI_BO } from '../../datBan/constants/duLieuDatBan'
 import {
   dinhDangNgayGio,
@@ -119,13 +120,7 @@ const ACTION_CONFIRMATION_COPY = {
   },
 }
 
-const seatingAreaOptions = [
-  { value: 'KHONG_UU_TIEN', label: 'Không ưu tiên' },
-  { value: 'SANH_CHINH', label: 'Sảnh chính' },
-  { value: 'PHONG_VIP', label: 'Khu riêng / VIP' },
-  { value: 'BAN_CONG', label: 'Ban công' },
-  { value: 'QUAY_BAR', label: 'Quầy bar' },
-]
+const seatingAreaOptions = TUY_CHON_KHU_VUC_UU_TIEN
 
 const getStatusTagColor = (status) => STATUS_TAG_COLORS[laySacThaiTrangThaiDatBan(status)] || 'default'
 

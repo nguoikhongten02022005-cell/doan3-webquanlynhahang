@@ -11,6 +11,7 @@ import {
   TRANG_THAI_BAN,
   TRANG_THAI_DON_HANG_DANG_MO,
 } from '../../common/constants';
+import { MA_KHU_VUC_BAN, chuanHoaMaKhuVucBan, chuanHoaTenKhuVucBan } from '../../common/khu-vuc-ban';
 
 @Injectable()
 export class DatBanQueryService {
@@ -76,7 +77,7 @@ export class DatBanQueryService {
       soNguoi: Number(datBan.SoNguoi || 0),
       ghiChu: datBan.GhiChu || '',
       ghiChuNoiBo: datBan.GhiChuNoiBo || '',
-      khuVucUuTien: datBan.KhuVucUuTien || '',
+      khuVucUuTien: datBan.KhuVucUuTien ? chuanHoaMaKhuVucBan(datBan.KhuVucUuTien) : '',
       nguonTao: datBan.NguonTao || '',
       source: datBan.NguonTao || '',
       trangThai: datBan.TrangThai,
@@ -88,7 +89,7 @@ export class DatBanQueryService {
       chiTietMonAn,
       danhSachMaBanDaGan,
       danhSachBanDaGan: maBan
-        ? [{ maBan, tenBan: datBan.TenBan || maBan, khuVuc: datBan.KhuVucBan || '' }]
+        ? [{ maBan, tenBan: datBan.TenBan || maBan, khuVuc: chuanHoaTenKhuVucBan(datBan.KhuVucBan || '') }]
         : [],
     };
   }
@@ -223,7 +224,8 @@ export class DatBanQueryService {
     const ngayDat = String(query.ngayDat || '').trim();
     const gioDat = String(query.gioDat || '').trim();
     const soNguoi = Number(query.soNguoi || 0);
-    const khuVuc = String(query.khuVuc || '').trim();
+    const khuVucRaw = String(query.khuVuc || '').trim();
+    const khuVuc = khuVucRaw && khuVucRaw !== 'KHONG_UU_TIEN' ? chuanHoaMaKhuVucBan(khuVucRaw) : khuVucRaw;
     const thoiLuongMacDinhPhut = 120;
 
     if (!ngayDat || !gioDat) {
@@ -294,27 +296,10 @@ export class DatBanQueryService {
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;
 
-        const giaTriKhuVuc = `${ban.KhuVuc || ''} ${ban.ViTri || ''}`.toLowerCase();
-        if (khuVuc === 'PHONG_VIP')
-          return (
-            giaTriKhuVuc.includes('vip') ||
-            giaTriKhuVuc.includes('riêng') ||
-            giaTriKhuVuc.includes('rieng')
-          );
-        if (khuVuc === 'BAN_CONG')
-          return (
-            giaTriKhuVuc.includes('ngoài') ||
-            giaTriKhuVuc.includes('ngoai') ||
-            giaTriKhuVuc.includes('ban công') ||
-            giaTriKhuVuc.includes('ban cong')
-          );
-        if (khuVuc === 'SANH_CHINH')
-          return (
-            !giaTriKhuVuc.includes('vip') &&
-            !giaTriKhuVuc.includes('ngoài') &&
-            !giaTriKhuVuc.includes('ngoai') &&
-            !giaTriKhuVuc.includes('ban cong')
-          );
+        const maKhuVucBan = chuanHoaMaKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`);
+        if (khuVuc === MA_KHU_VUC_BAN.KHU_RIENG) return maKhuVucBan === MA_KHU_VUC_BAN.KHU_RIENG;
+        if (khuVuc === MA_KHU_VUC_BAN.NGOAI_TROI) return maKhuVucBan === MA_KHU_VUC_BAN.NGOAI_TROI;
+        if (khuVuc === MA_KHU_VUC_BAN.TRONG_NHA) return maKhuVucBan === MA_KHU_VUC_BAN.TRONG_NHA;
         return true;
       });
 
@@ -345,8 +330,8 @@ export class DatBanQueryService {
         danhSachBan: danhSachBanPhuHop.map((ban) => ({
           maBan: ban.MaBan,
           tenBan: ban.TenBan,
-          khuVuc: ban.KhuVuc,
-          viTri: ban.ViTri,
+          khuVuc: chuanHoaTenKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`),
+          viTri: chuanHoaTenKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`),
           soBan: Number(ban.SoBan || 0),
           soChoNgoi: Number(ban.SoChoNgoi || 0),
           trangThai: ban.TrangThai,

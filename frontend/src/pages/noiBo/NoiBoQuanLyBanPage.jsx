@@ -4,9 +4,10 @@ import { DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlin
 import { capNhatBanApi, layDanhSachBanApi, layQrBanApi, taoBanApi, xoaBanApi } from '../../services/api/apiBanAn'
 import { layOrderDangMoTaiBanApi, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanAn'
 import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
+import { DANH_SACH_TEN_KHU_VUC_BAN, chuanHoaTenKhuVucBan } from '../../constants/khuVucBan'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 
-const DANH_SACH_KHU_VUC = ['Trong nhà', 'Ban công', 'Ngoài sân', 'Khu riêng', 'Tầng 2']
+const DANH_SACH_KHU_VUC = DANH_SACH_TEN_KHU_VUC_BAN
 const NHAN_TRANG_THAI = {
   TRONG: { label: 'TRỐNG', color: 'green' },
   GIU_CHO: { label: 'ĐÃ ĐẶT', color: 'orange' },
@@ -71,7 +72,7 @@ function NoiBoQuanLyBanPage() {
 
   const moModalSua = (ban) => {
     setBanDangSua(ban)
-    form.setFieldsValue({ maBan: ban.code, tenBan: ban.name, soBan: ban.tableNumber || ban.soBan, khuVuc: ban.rawAreaText || 'Trong nhà', sucChua: ban.capacity, ghiChu: ban.note || '' })
+    form.setFieldsValue({ maBan: ban.code, tenBan: ban.name, soBan: ban.tableNumber || ban.soBan, khuVuc: chuanHoaTenKhuVucBan(ban.rawAreaText), sucChua: ban.capacity, ghiChu: ban.note || '' })
     setDangMoForm(true)
   }
 
