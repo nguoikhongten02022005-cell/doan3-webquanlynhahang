@@ -168,6 +168,81 @@ const timOrderDangMoTheoBan = (maBan) => {
   return null
 }
 
+export const layTenMonTrongChiTietOrder = (mon) => String(
+  mon?.tenMon
+    || mon?.TenMon
+    || mon?.tenMonAn
+    || mon?.TenMonAn
+    || mon?.monAn?.tenMon
+    || mon?.monAn?.TenMon
+    || '',
+).trim()
+
+const chuanHoaChiTietOrderDangMoTaiBan = (mon) => {
+  if (!mon || typeof mon !== 'object') return mon
+  const tenMon = layTenMonTrongChiTietOrder(mon)
+  return {
+    ...mon,
+    maMon: mon.maMon ?? mon.MaMon,
+    MaMon: mon.MaMon ?? mon.maMon,
+    tenMon,
+    TenMon: tenMon,
+    soLuong: Number(mon.soLuong ?? mon.SoLuong ?? 0),
+    SoLuong: Number(mon.SoLuong ?? mon.soLuong ?? 0),
+    donGia: Number(mon.donGia ?? mon.DonGia ?? 0),
+    DonGia: Number(mon.DonGia ?? mon.donGia ?? 0),
+    thanhTien: Number(mon.thanhTien ?? mon.ThanhTien ?? 0),
+    ThanhTien: Number(mon.ThanhTien ?? mon.thanhTien ?? 0),
+  }
+}
+
+export const chuanHoaOrderDangMoTaiBan = (duLieu) => {
+  if (!duLieu || typeof duLieu !== 'object') return duLieu
+
+  const donHang = duLieu.donHang || duLieu.DonHang || null
+  const danhSachChiTiet = duLieu.chiTiet
+    || duLieu.ChiTiet
+    || donHang?.chiTiet
+    || donHang?.ChiTiet
+    || []
+  const chiTiet = Array.isArray(danhSachChiTiet)
+    ? danhSachChiTiet.map(chuanHoaChiTietOrderDangMoTaiBan)
+    : []
+  const tongTienMon = chiTiet.reduce(
+    (tong, mon) => tong + Number(mon.ThanhTien ?? mon.thanhTien ?? 0),
+    0,
+  )
+  const tongHopGia = donHang?.tongHopGia || donHang?.TongHopGia || duLieu.tongHopGia || duLieu.TongHopGia || {}
+  const tamTinh = Number(tongHopGia.tamTinh ?? tongHopGia.TamTinh ?? tongTienMon)
+  const phiDichVu = Number(tongHopGia.phiDichVu ?? tongHopGia.PhiDichVu ?? 0)
+  const tongThanhToan = Number(
+    donHang?.tongTien
+      ?? donHang?.TongTien
+      ?? tongHopGia.tongTien
+      ?? tongHopGia.TongTien
+      ?? duLieu.tongThanhToan
+      ?? duLieu.TongThanhToan
+      ?? tamTinh + phiDichVu,
+  )
+
+  return {
+    ...duLieu,
+    donHang,
+    chiTiet,
+    ChiTiet: chiTiet,
+    tongHopGia: {
+      ...tongHopGia,
+      tamTinh,
+      phiDichVu,
+      tongTien: tongThanhToan,
+    },
+    tongTienMon,
+    tamTinh,
+    phiDichVu,
+    tongThanhToan,
+  }
+}
+
 export const layThucDonTheoBanApi = async (maBan) => {
   if (!coSuDungMayChu()) {
     return tachPhanHoiApi(taoPhanHoiOffline(layThucDonTheoBanOffline(maBan), 'Lay thuc don theo ban thanh cong'))
@@ -256,10 +331,15 @@ export const guiOrderTaiBanApi = async (maBan, danhSachMon) => {
 export const layOrderDangMoTaiBanApi = async (maBan) => {
   if (!coSuDungMayChu()) {
     const order = timOrderDangMoTheoBan(maBan)
-    return tachPhanHoiApi(taoPhanHoiOffline(order ? taoChiTietDonHangTaiBanOffline(order) : null, 'Lay order dang mo thanh cong'))
+    const duLieu = order ? chuanHoaOrderDangMoTaiBan(taoChiTietDonHangTaiBanOffline(order)) : null
+    return tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay order dang mo thanh cong'))
   }
 
-  return tachPhanHoiApi(await trinhKhachApi.get(`/ban/${maBan}/order`))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/ban/${maBan}/order`))
+  return {
+    ...phanHoi,
+    duLieu: chuanHoaOrderDangMoTaiBan(phanHoi.duLieu),
+  }
 }
 
 export const guiYeuCauThanhToanTaiBanApi = async (maBan) => {

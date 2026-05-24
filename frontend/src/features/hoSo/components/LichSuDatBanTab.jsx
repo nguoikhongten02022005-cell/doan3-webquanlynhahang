@@ -37,6 +37,26 @@ const formatCurrency = (amount) => {
   return new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND' }).format(amount)
 }
 
+const layTenMonHienThi = (mon) => String(
+  mon?.tenMon
+    || mon?.TenMon
+    || mon?.tenMonAn
+    || mon?.TenMonAn
+    || mon?.monAn?.tenMon
+    || mon?.monAn?.TenMon
+    || mon?.ten
+    || mon?.name
+    || mon?.maMon
+    || mon?.MaMon
+    || 'Món đang cập nhật',
+).trim()
+
+const layGiaMon = (mon) => Number(mon?.gia ?? mon?.donGia ?? mon?.DonGia ?? mon?.priceValue ?? 0)
+
+const laySoLuongMon = (mon) => Number(mon?.soLuong ?? mon?.SoLuong ?? mon?.quantity ?? 1)
+
+const layThanhTienMon = (mon) => Number(mon?.thanhTien ?? mon?.ThanhTien ?? layGiaMon(mon) * laySoLuongMon(mon))
+
 const BookingCard = ({ booking, onCancelBooking, onRebook, hienThiNutHuy, hienThiNutDatLai }) => {
   const [chiTietMoRong, setChiTietMoRong] = useState(null)
   const toggleChiTiet = (key) => setChiTietMoRong(prev => prev === key ? null : key)
@@ -52,7 +72,7 @@ const BookingCard = ({ booking, onCancelBooking, onRebook, hienThiNutHuy, hienTh
 
   const danhSachMon = booking.menuItems || booking.chiTietMonAn || []
   const coMonAn = Array.isArray(danhSachMon) && danhSachMon.length > 0
-  const tongTien = danhSachMon.reduce((sum, mon) => sum + (mon.gia || 0) * (mon.soLuong || mon.quantity || 1), 0)
+  const tongTien = danhSachMon.reduce((sum, mon) => sum + layThanhTienMon(mon), 0)
 
   const coTheHuy = hienThiNutHuy && !daHetHan && ['PENDING', 'CONFIRMED', 'YEU_CAU_DAT_BAN', 'GIU_CHO_TAM', 'DA_XAC_NHAN'].includes(statusHienThi)
 
@@ -114,17 +134,17 @@ const BookingCard = ({ booking, onCancelBooking, onRebook, hienThiNutHuy, hienTh
                 <tbody>
                   {danhSachMon.map((mon, idx) => (
                     <tr key={mon.id || mon.idMon || idx}>
-                      <td>{mon.tenMon || mon.ten}</td>
-                      <td>{mon.soLuong || mon.quantity || 1}</td>
-                      <td>{formatCurrency(mon.gia)}</td>
-                      <td>{formatCurrency((mon.gia || 0) * (mon.soLuong || mon.quantity || 1))}</td>
+                      <td>{layTenMonHienThi(mon)}</td>
+                      <td>{laySoLuongMon(mon)}</td>
+                      <td>{formatCurrency(layGiaMon(mon))}</td>
+                      <td>{formatCurrency(layThanhTienMon(mon))}</td>
                     </tr>
                   ))}
                 </tbody>
                 {tongTien > 0 && (
                   <tfoot>
                     <tr>
-                      <td colSpan={3}><strong>Tổng cộng</strong></td>
+                      <td colSpan={3}><strong>Tạm tính món</strong></td>
                       <td><strong>{formatCurrency(tongTien)}</strong></td>
                     </tr>
                   </tfoot>

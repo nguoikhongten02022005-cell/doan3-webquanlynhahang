@@ -30,10 +30,15 @@ export class DonHangQueryService {
     return chiTiet.map((dong) => ({
       MaChiTiet: dong.MaChiTiet,
       MaMon: dong.MaMon,
+      maMon: dong.MaMon,
       TenMon: dong.TenMon,
+      tenMon: dong.TenMon,
       SoLuong: Number(dong.SoLuong || 0),
+      soLuong: Number(dong.SoLuong || 0),
       DonGia: Number(dong.DonGia || 0),
+      donGia: Number(dong.DonGia || 0),
       ThanhTien: Number(dong.ThanhTien || 0),
+      thanhTien: Number(dong.ThanhTien || 0),
       GhiChu: dong.GhiChu || '',
       TrangThai: dong.TrangThai,
     }));
@@ -55,7 +60,10 @@ export class DonHangQueryService {
 
     const chiTiet = await this.layChiTietDonHangTheoMa(maDonHang, ketNoi);
     return taoPhanHoi(
-      { donHang: this.taoThongTinDonHang(donHang, chiTiet) },
+      {
+        donHang: this.taoThongTinDonHang(donHang, chiTiet),
+        chiTiet,
+      },
       'Lấy chi tiết đơn hàng thành công',
     );
   }

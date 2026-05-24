@@ -73,6 +73,36 @@ describe('DatBanCommandService', () => {
     });
   });
 
+  it('does not copy booking menu items again when an open order already has details', async () => {
+    const mysql = {
+      truyVan: jest.fn().mockResolvedValue([{ MaDonHang: 'DH020', TongChiTiet: 3 }]),
+      thucThi: jest.fn().mockResolvedValue(undefined),
+    };
+    const datBanQueryService = {
+      chuyenDatBanSangPhanHoi: jest.fn((booking) => booking),
+    };
+    const donHangCreateOrderService = {
+      taoDonHang: jest.fn().mockResolvedValue(undefined),
+    };
+    const service = new (DatBanCommandService as any)(
+      mysql,
+      datBanQueryService,
+      donHangCreateOrderService,
+    ) as DatBanCommandService;
+
+    await (service as any).taoDonHangTuDatBan(
+      { vaiTro: 'Admin' },
+      {
+        maKH: 'KH001',
+        maBan: 'B006',
+        chiTietMonAn: [{ maMon: 'M003', soLuong: 1 }],
+      },
+      'DB021',
+    );
+
+    expect(donHangCreateOrderService.taoDonHang).not.toHaveBeenCalled();
+  });
+
   it('rejects assigning more than one table to a booking', async () => {
     const mysql = {
       truyVan: jest

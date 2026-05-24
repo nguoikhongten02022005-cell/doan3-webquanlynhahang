@@ -33,7 +33,7 @@ export class DatBanQueryService {
 
   chuyenDatBanSangPhanHoi(
     datBan: BanGhi,
-    giaMonTheoMa = new Map<string, number>(),
+    giaMonTheoMa = new Map<string, number | { gia: number; tenMon: string }>(),
     monTheoDatBan = new Map<string, unknown[]>(),
   ) {
     let chiTietMonAn = [];
@@ -49,13 +49,27 @@ export class DatBanQueryService {
     }
     chiTietMonAn = Array.isArray(chiTietMonAn)
       ? chiTietMonAn.map((mon) => {
-          const gia = Number(mon.gia ?? mon.donGia ?? mon.priceValue ?? 0);
+          const maMon = String(mon.maMon || mon.MaMon || mon.id || '').trim();
+          const thongTinMon = giaMonTheoMa.get(maMon) as any;
+          const giaTrongMap =
+            typeof thongTinMon === 'number'
+              ? thongTinMon
+              : Number(thongTinMon?.gia || 0);
+          const tenMon = String(
+            mon.tenMon ||
+              mon.TenMon ||
+              mon.tenMonAn ||
+              mon.TenMonAn ||
+              mon.monAn?.tenMon ||
+              thongTinMon?.tenMon ||
+              '',
+          ).trim();
+          const gia = Number(mon.gia ?? mon.donGia ?? mon.DonGia ?? mon.priceValue ?? 0);
           return {
             ...mon,
-            gia:
-              gia ||
-              giaMonTheoMa.get(String(mon.maMon || mon.id || '').trim()) ||
-              0,
+            maMon: maMon || mon.maMon,
+            tenMon,
+            gia: gia || giaTrongMap || 0,
           };
         })
       : [];
@@ -166,7 +180,7 @@ export class DatBanQueryService {
             : datBan.ChiTietMonAn;
         if (Array.isArray(chiTietMonAn)) {
           chiTietMonAn.forEach((mon) => {
-            const maMon = String(mon.maMon || mon.id || '').trim();
+            const maMon = String(mon.maMon || mon.MaMon || mon.id || '').trim();
             if (maMon) maMonSet.add(maMon);
           });
         }
@@ -174,7 +188,7 @@ export class DatBanQueryService {
     });
     const danhSachGiaMon = maMonSet.size
       ? await this.mysql.truyVan(
-          `SELECT MaMon, Gia FROM ThucDon WHERE MaMon IN (${Array.from(maMonSet)
+          `SELECT MaMon, TenMon, Gia FROM ThucDon WHERE MaMon IN (${Array.from(maMonSet)
             .map(() => '?')
             .join(',')})`,
           Array.from(maMonSet),
@@ -183,7 +197,10 @@ export class DatBanQueryService {
     const giaMonTheoMa = new Map(
       danhSachGiaMon.map((mon) => [
         String(mon.MaMon || '').trim(),
-        Number(mon.Gia || 0),
+        {
+          gia: Number(mon.Gia || 0),
+          tenMon: String(mon.TenMon || '').trim(),
+        },
       ]),
     );
     const danhSachMaDatBan = danhSach

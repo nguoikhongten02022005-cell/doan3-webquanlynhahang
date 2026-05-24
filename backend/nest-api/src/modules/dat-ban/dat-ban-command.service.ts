@@ -128,6 +128,19 @@ export class DatBanCommandService {
     const chiTiet = this.layChiTietMonAnDatBan(body);
     if (!maBan || !chiTiet.length) return;
 
+    const [donHangDaCoChiTiet] = await this.mysql.truyVan(
+      `SELECT dh.MaDonHang, COUNT(ct.MaChiTiet) AS TongChiTiet
+       FROM DonHang dh
+       LEFT JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
+       WHERE dh.MaBan = ?
+         AND dh.MaDatBan = ?
+         AND dh.TrangThai NOT IN ('Paid', 'Cancelled')
+       GROUP BY dh.MaDonHang
+       LIMIT 1`,
+      [maBan, maDatBan],
+    );
+    if (Number(donHangDaCoChiTiet?.TongChiTiet || 0) > 0) return;
+
     await this.donHangCreateOrderService.taoDonHang({
       maKH: body.maKH || null,
       maBan,

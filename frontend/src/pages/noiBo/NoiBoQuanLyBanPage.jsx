@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { Avatar, Button, Card, Col, Empty, Form, Input, InputNumber, Modal, Popconfirm, QRCode, Row, Segmented, Select, Space, Statistic, Table, Tag, Tooltip, Typography } from 'antd'
 import { DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlined, PrinterOutlined, QrcodeOutlined, TableOutlined } from '@ant-design/icons'
 import { capNhatBanApi, layDanhSachBanApi, layQrBanApi, taoBanApi, xoaBanApi } from '../../services/api/apiBanAn'
-import { layOrderDangMoTaiBanApi, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanAn'
+import { layOrderDangMoTaiBanApi, layTenMonTrongChiTietOrder, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanAn'
 import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
 import { DANH_SACH_TEN_KHU_VUC_BAN, chuanHoaTenKhuVucBan } from '../../constants/khuVucBan'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
@@ -113,7 +113,7 @@ function NoiBoQuanLyBanPage() {
 
   const moOrder = async (ban) => {
     const { duLieu } = await layOrderDangMoTaiBanApi(ban.code)
-    const danhSachChiTiet = duLieu?.ChiTiet || duLieu?.chiTiet || []
+    const danhSachChiTiet = duLieu?.chiTiet || duLieu?.ChiTiet || []
     const coOrderDangMo = Boolean(duLieu?.DonHang || duLieu?.donHang || (Array.isArray(danhSachChiTiet) && danhSachChiTiet.length))
     setOrderDangXem({ ban, duLieu: coOrderDangMo ? duLieu : null, khongCoOrder: !coOrderDangMo })
   }
@@ -230,17 +230,27 @@ function NoiBoQuanLyBanPage() {
                 <Table
                   rowKey={(row) => String(row.MaChiTiet || row.maChiTiet || `${row.MaMon || row.maMon || 'mon'}-${row.TenMon || row.tenMon || 'ten'}`)}
                   pagination={false}
-                  dataSource={orderDangXem.duLieu?.ChiTiet || orderDangXem.duLieu?.chiTiet || []}
+                  dataSource={orderDangXem.duLieu?.chiTiet || orderDangXem.duLieu?.ChiTiet || []}
                   columns={[
-                    { title: 'Tên món', dataIndex: 'TenMon', key: 'TenMon', render: (_, row) => row.TenMon || row.tenMon },
+                    { title: 'Tên món', dataIndex: 'TenMon', key: 'TenMon', render: (_, row) => layTenMonTrongChiTietOrder(row) || row.maMon || row.MaMon || 'Món đang cập nhật' },
                     { title: 'Số lượng', dataIndex: 'SoLuong', key: 'SoLuong', width: 100, render: (_, row) => `x${row.SoLuong || row.soLuong}` },
                     { title: 'Thành tiền', dataIndex: 'ThanhTien', key: 'ThanhTien', width: 140, render: (_, row) => dinhDangTienTeVietNam(row.ThanhTien || row.thanhTien) },
                   ]}
                 />
-                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                  <Typography.Text strong>Tổng cộng</Typography.Text>
-                  <Typography.Text strong>{dinhDangTienTeVietNam(orderDangXem.duLieu?.DonHang?.TongTien || orderDangXem.duLieu?.donHang?.tongTien || 0)}</Typography.Text>
-                </div>
+                <Space orientation="vertical" size={6} style={{ width: '100%' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography.Text>Tạm tính món</Typography.Text>
+                    <Typography.Text>{dinhDangTienTeVietNam(orderDangXem.duLieu?.tamTinh || orderDangXem.duLieu?.tongTienMon || 0)}</Typography.Text>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography.Text>Phí dịch vụ</Typography.Text>
+                    <Typography.Text>{dinhDangTienTeVietNam(orderDangXem.duLieu?.phiDichVu || 0)}</Typography.Text>
+                  </div>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <Typography.Text strong>Tổng thanh toán</Typography.Text>
+                    <Typography.Text strong>{dinhDangTienTeVietNam(orderDangXem.duLieu?.tongThanhToan || orderDangXem.duLieu?.tamTinh || 0)}</Typography.Text>
+                  </div>
+                </Space>
               </>
             )}
             <Space style={{ justifyContent: 'flex-end', width: '100%' }}>
