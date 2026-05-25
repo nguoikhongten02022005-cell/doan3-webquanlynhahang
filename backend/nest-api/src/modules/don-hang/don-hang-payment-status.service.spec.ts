@@ -11,18 +11,24 @@ describe('DonHangPaymentStatusService', () => {
       query: jest.fn().mockResolvedValue([[]]),
     };
     const mysql = {
-      truyVan: jest.fn().mockResolvedValue([
-        { MaDonHang: 'DH_TEST', MaBan: 'B003', TrangThai: 'Preparing' },
-      ]),
+      truyVan: jest
+        .fn()
+        .mockResolvedValue([
+          { MaDonHang: 'DH_TEST', MaBan: 'B003', TrangThai: 'Preparing' },
+        ]),
       giaoDich: jest.fn(async (callback) => callback(connection)),
     };
     const donHangQueryService = {
-      layChiTietDonHangKhongKiemTraQuyen: jest.fn(async (_maDonHang, ketNoi) => ({
-        success: true,
-        data: { donHang: { trangThai: ketNoi ? state.trangThai : 'Preparing' } },
-        message: 'ok',
-        meta: null,
-      })),
+      layChiTietDonHangKhongKiemTraQuyen: jest.fn(
+        async (_maDonHang, ketNoi) => ({
+          success: true,
+          data: {
+            donHang: { trangThai: ketNoi ? state.trangThai : 'Preparing' },
+          },
+          message: 'ok',
+          meta: null,
+        }),
+      ),
     };
     const service = new DonHangPaymentStatusService(
       mysql as any,
@@ -30,12 +36,14 @@ describe('DonHangPaymentStatusService', () => {
       { tinhDiemTuDonHang: jest.fn() } as any,
     );
 
-    const ketQua = await service.capNhatTrangThaiDonHang('DH_TEST', 'Completed');
+    const ketQua = await service.capNhatTrangThaiDonHang(
+      'DH_TEST',
+      'Completed',
+    );
 
     expect((ketQua.data as any).donHang.trangThai).toBe('Completed');
-    expect(donHangQueryService.layChiTietDonHangKhongKiemTraQuyen).toHaveBeenCalledWith(
-      'DH_TEST',
-      connection,
-    );
+    expect(
+      donHangQueryService.layChiTietDonHangKhongKiemTraQuyen,
+    ).toHaveBeenCalledWith('DH_TEST', connection);
   });
 });

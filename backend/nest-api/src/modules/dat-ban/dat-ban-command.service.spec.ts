@@ -75,7 +75,9 @@ describe('DatBanCommandService', () => {
 
   it('does not copy booking menu items again when an open order already has details', async () => {
     const mysql = {
-      truyVan: jest.fn().mockResolvedValue([{ MaDonHang: 'DH020', TongChiTiet: 3 }]),
+      truyVan: jest
+        .fn()
+        .mockResolvedValue([{ MaDonHang: 'DH020', TongChiTiet: 3 }]),
       thucThi: jest.fn().mockResolvedValue(undefined),
     };
     const datBanQueryService = {

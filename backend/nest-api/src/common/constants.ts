@@ -23,6 +23,16 @@ export const TI_LE_QUY_DOI_DIEM = 100;
 /** Quy đổi điểm: cứ TI_LE_QUY_DOI_DIEM (100) điểm = GIA_TRI_QUY_DOI (10000) VNĐ */
 export const GIA_TRI_QUY_DOI = 10000;
 
+export const LOAI_MA_GIAM_GIA = {
+  CONG_KHAI: 'PUBLIC',
+  RIENG_KHACH: 'CUSTOMER',
+  DOI_DIEM: 'LOYALTY',
+  THANH_VIEN_VIP: 'VIP',
+  SINH_NHAT: 'BIRTHDAY',
+} as const;
+
+export const SO_NGAY_HIEU_LUC_VOUCHER_DOI_DIEM = 30;
+
 // ========== Trạng thái bàn ăn ==========
 
 export const TRANG_THAI_BAN = {

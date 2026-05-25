@@ -3,7 +3,12 @@ import type { PoolConnection } from 'mysql2/promise';
 import { MySqlService } from '../../database/mysql/mysql.service';
 import { BanGhi } from '../../common/types';
 import { tinhGiamGia } from '../../common/tinh-giam-gia.helper';
-import { GIA_TRI_QUY_DOI, TI_LE_QUY_DOI_DIEM } from '../../common/constants';
+import {
+  GIA_TRI_QUY_DOI,
+  LOAI_MA_GIAM_GIA,
+  TI_LE_QUY_DOI_DIEM,
+} from '../../common/constants';
+import { xacDinhTrangThaiMaGiamGia } from '../../common/ma-giam-gia.helper';
 
 @Injectable()
 export class DonHangPricingService {
@@ -15,6 +20,13 @@ export class DonHangPricingService {
       maGiamGia: String(payload.maGiamGia || payload.maCode || '').trim(),
       tenGiamGia: String(payload.tenGiamGia || payload.tenCode || '').trim(),
       loaiGiam: String(payload.loaiGiam || '').trim(),
+      loaiMa: String(
+        payload.loaiMa || payload.LoaiMa || LOAI_MA_GIAM_GIA.CONG_KHAI,
+      )
+        .trim()
+        .toUpperCase(),
+      maKH: String(payload.maKH || payload.MaKH || '').trim(),
+      diemDaDoi: payload.diemDaDoi == null ? null : Number(payload.diemDaDoi),
       giaTriGiam: Number(payload.giaTriGiam || payload.giaTri || 0),
       giamToiDa:
         payload.giamToiDa == null && payload.giaTriToiDa == null
@@ -25,6 +37,10 @@ export class DonHangPricingService {
       ),
       soTienGiamThucTe: Number(soTienGiamThucTe || 0),
       thongDiep: String(payload.thongDiep || payload.moTa || '').trim(),
+      trangThaiRuntime: String(payload.trangThaiRuntime || '').trim(),
+      trangThaiHienThi: String(payload.trangThaiHienThi || '').trim(),
+      coTheApDung:
+        payload.coTheApDung == null ? null : Boolean(payload.coTheApDung),
     };
   }
 
@@ -65,6 +81,7 @@ export class DonHangPricingService {
   async layThongTinMaGiamApDung(
     maCodeDauVao: unknown,
     tongTien: number,
+    maKH?: string,
     ketNoi?: import('mysql2/promise').PoolConnection,
   ) {
     const maCode = String(maCodeDauVao || '').trim();
@@ -72,28 +89,48 @@ export class DonHangPricingService {
       return this.taoPhanHoiMaGiam();
     }
 
-    const truyVan = ketNoi
-      ? ketNoi.query.bind(ketNoi)
-      : this.mysql.truyVan.bind(this.mysql);
-    const [ma] = await truyVan(
-      'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1 FOR UPDATE',
-      [maCode],
-    );
+    const ma = ketNoi
+      ? (
+          await ketNoi.query(
+            'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1 FOR UPDATE',
+            [maCode],
+          )
+        )[0]?.[0]
+      : (
+          await this.mysql.truyVan(
+            'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1 FOR UPDATE',
+            [maCode],
+          )
+        )[0];
     if (!ma) throw new BadRequestException('Mã giảm giá không tồn tại.');
-    if (String(ma.TrangThai || '') !== 'Active')
-      throw new BadRequestException('Mã giảm giá không còn hiệu lực.');
+    const loaiMa = String(ma.LoaiMa || LOAI_MA_GIAM_GIA.CONG_KHAI)
+      .trim()
+      .toUpperCase();
+    const maKHGanVoiMa = String(ma.MaKH || '').trim();
 
-    const now = new Date();
-    if (ma.NgayBatDau && new Date(ma.NgayBatDau) > now)
-      throw new BadRequestException('Mã giảm giá chưa đến thời gian áp dụng.');
-    if (ma.NgayKetThuc && new Date(ma.NgayKetThuc) < now)
-      throw new BadRequestException('Mã giảm giá đã hết hạn.');
+    if (loaiMa !== LOAI_MA_GIAM_GIA.CONG_KHAI) {
+      if (!maKHGanVoiMa) {
+        throw new BadRequestException(
+          'Mã giảm giá riêng chưa được gán khách hàng.',
+        );
+      }
+      if (!maKH || String(maKH).trim() !== maKHGanVoiMa) {
+        throw new BadRequestException(
+          'Mã giảm giá không thuộc về khách hàng này.',
+        );
+      }
+    }
 
     if (
-      ma.SoLanToiDa != null &&
-      Number(ma.SoLanDaDung) >= Number(ma.SoLanToiDa)
+      loaiMa === LOAI_MA_GIAM_GIA.DOI_DIEM &&
+      Number(ma.DiemDaDoi || 0) <= 0
     ) {
-      throw new BadRequestException('Mã giảm giá đã đạt giới hạn sử dụng.');
+      throw new BadRequestException('Mã đổi điểm không hợp lệ.');
+    }
+
+    const trangThai = xacDinhTrangThaiMaGiamGia(ma);
+    if (!trangThai.coTheApDung) {
+      throw new BadRequestException(trangThai.lyDo);
     }
 
     if (tongTien < Number(ma.DonHangToiThieu || 0))
@@ -111,10 +148,16 @@ export class DonHangPricingService {
         maGiamGia: ma.MaCode,
         tenGiamGia: ma.TenCode,
         loaiGiam: ma.LoaiGiam,
+        loaiMa: loaiMa,
+        maKH: maKHGanVoiMa,
+        diemDaDoi: ma.DiemDaDoi == null ? null : Number(ma.DiemDaDoi),
         giaTriGiam,
         giamToiDa,
         dieuKienToiThieu: Number(ma.DonHangToiThieu || 0),
         thongDiep: '',
+        trangThaiRuntime: trangThai.maTrangThai,
+        trangThaiHienThi: trangThai.nhanTrangThai,
+        coTheApDung: trangThai.coTheApDung,
       },
       soTienGiamThucTe,
     );
@@ -172,16 +215,29 @@ export class DonHangPricingService {
     }
 
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
+    const tongTienTruocGiam = tamTinh + phiDichVu;
     const maGiamGia = await this.layThongTinMaGiamApDung(
       payload.maGiamGia,
-      tamTinh + phiDichVu,
+      tongTienTruocGiam,
+      payload.maKH || payload.nguoiDung?.maKH,
+      ketNoi,
     );
 
     const soDiem = Number(payload.soDiem || 0);
     const giamGiaTuDiem = this.tinhSoTienGiamTuDiem(soDiem);
+    if (giamGiaTuDiem > tongTienTruocGiam) {
+      throw new BadRequestException(
+        'Tổng giảm giá không được vượt quá tổng tiền đơn hàng.',
+      );
+    }
     const diemApDung = this.taoPhanHoiDiem(soDiem, giamGiaTuDiem);
 
     const tongGiamGia = maGiamGia.soTienGiamThucTe + giamGiaTuDiem;
+    if (tongGiamGia > tongTienTruocGiam) {
+      throw new BadRequestException(
+        'Tổng giảm giá không được vượt quá tổng tiền đơn hàng.',
+      );
+    }
     const tongHopGia = this.taoTongHopGia(tamTinh, tongGiamGia, phiDichVu);
 
     return { chiTietDaTinh, tongHopGia, maGiamGia, diemApDung };

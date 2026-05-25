@@ -5,3 +5,18 @@
 @import '../theme/noi-bo.css';
 @import '../theme/noi-bo-dashboard.css';
 @import '../theme/modal-va-tien-ich.css';
+
+.voucher-trang-thai {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.2rem 0.6rem;
+  border-radius: 99px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: none;
+  letter-spacing: 0;
+  border: none;
+  margin-inline-end: 0;
+  white-space: nowrap;
+}

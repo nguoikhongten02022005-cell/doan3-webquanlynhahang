@@ -1,5 +1,6 @@
 import { trinhKhachApi, tachPhanHoiApi, coSuDungMayChu } from '../trinhKhachApi'
 import { layNguoiDungHienTai } from '../dichVuXacThuc'
+import { chuanHoaMaGiamGia } from './apiMaGiamGia'
 import {
   taoPhanHoiOffline,
   layTongQuanDiemTheoKhachHangOffline,
@@ -11,6 +12,7 @@ const chuanHoaTongQuanDiemTichLuy = (duLieu) => ({
   tongDiem: Number(duLieu?.tongDiem || duLieu?.TongDiem || 0),
   diemCoTheDoi: Number(duLieu?.diemCoTheDoi || duLieu?.DiemCoTheDoi || 0),
   tiLeQuyDoi: Number(duLieu?.tiLeQuyDoi || duLieu?.TiLeQuyDoi || 0),
+  giaTriQuyDoi: Number(duLieu?.giaTriQuyDoi || duLieu?.GiaTriQuyDoi || 0),
 })
 
 const chuanHoaGiaoDichDiem = (giaoDich) => {
@@ -63,7 +65,7 @@ export const layLichSuDiemTichLuyApi = async () => {
   }
 }
 
-export const doiDiemTichLuyApi = async (soDiem, moTa = 'Đổi điểm tích lũy') => {
+export const doiDiemTichLuyApi = async (soDiem, moTa = 'Đổi điểm tích lũy', maYeuCau = '') => {
   if (!coSuDungMayChu()) {
     return {
       ...tachPhanHoiApi(taoPhanHoiOffline(null, 'Che do offline khong ho tro doi diem')),
@@ -71,22 +73,26 @@ export const doiDiemTichLuyApi = async (soDiem, moTa = 'Đổi điểm tích lũ
     }
   }
 
+  const maYeuCauHopLe = String(maYeuCau || '').trim()
   const phanHoi = tachPhanHoiApi(
     await trinhKhachApi.post('/diem-tich-luy/doi-diem', {
       soDiem: Number(soDiem),
       moTa,
+      maYeuCau: maYeuCauHopLe || undefined,
     }),
   )
   return {
     ...phanHoi,
     duLieu: phanHoi.duLieu
-      ? {
-          maGiaoDichDiem: String(phanHoi.duLieu.maGiaoDichDiem || phanHoi.duLieu.MaGiaoDichDiem || ''),
-          maKH: String(phanHoi.duLieu.maKH || phanHoi.duLieu.MaKH || ''),
-          soDiemDaDoi: Number(phanHoi.duLieu.soDiemDaDoi || phanHoi.duLieu.SoDiemDaDoi || 0),
-          diemTruoc: Number(phanHoi.duLieu.diemTruoc || phanHoi.duLieu.DiemTruoc || 0),
-          diemSau: Number(phanHoi.duLieu.diemSau || phanHoi.duLieu.DiemSau || 0),
-        }
+        ? {
+            maGiaoDichDiem: String(phanHoi.duLieu.maGiaoDichDiem || phanHoi.duLieu.MaGiaoDichDiem || ''),
+            maKH: String(phanHoi.duLieu.maKH || phanHoi.duLieu.MaKH || ''),
+            soDiemDaDoi: Number(phanHoi.duLieu.soDiemDaDoi || phanHoi.duLieu.SoDiemDaDoi || 0),
+            soTienGiam: Number(phanHoi.duLieu.soTienGiam || phanHoi.duLieu.SoTienGiam || 0),
+            diemTruoc: Number(phanHoi.duLieu.diemTruoc || phanHoi.duLieu.DiemTruoc || 0),
+            diemSau: Number(phanHoi.duLieu.diemSau || phanHoi.duLieu.DiemSau || 0),
+            voucher: chuanHoaMaGiamGia(phanHoi.duLieu.voucher || phanHoi.duLieu.Voucher || null),
+          }
       : null,
   }
 }

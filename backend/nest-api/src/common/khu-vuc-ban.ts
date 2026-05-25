@@ -30,10 +30,24 @@ export const chuanHoaMaKhuVucBan = (giaTri = '') => {
     return MA_KHU_VUC_BAN.TRONG_NHA;
   if (['phong_vip', 'khu_rieng', 'khurieng', 'vip'].includes(khoa))
     return MA_KHU_VUC_BAN.KHU_RIENG;
-  if (['ban_cong', 'bancong', 'ngoai_troi', 'ngoaitroi', 'ngoai_san', 'ngoaisan'].includes(khoa))
+  if (
+    [
+      'ban_cong',
+      'bancong',
+      'ngoai_troi',
+      'ngoaitroi',
+      'ngoai_san',
+      'ngoaisan',
+    ].includes(khoa)
+  )
     return MA_KHU_VUC_BAN.NGOAI_TROI;
-  if (khoa.includes('vip') || khoa.includes('rieng')) return MA_KHU_VUC_BAN.KHU_RIENG;
-  if (khoa.includes('ngoai') || khoa.includes('ban_cong') || khoa.includes('bancong'))
+  if (khoa.includes('vip') || khoa.includes('rieng'))
+    return MA_KHU_VUC_BAN.KHU_RIENG;
+  if (
+    khoa.includes('ngoai') ||
+    khoa.includes('ban_cong') ||
+    khoa.includes('bancong')
+  )
     return MA_KHU_VUC_BAN.NGOAI_TROI;
   return MA_KHU_VUC_BAN.TRONG_NHA;
 };

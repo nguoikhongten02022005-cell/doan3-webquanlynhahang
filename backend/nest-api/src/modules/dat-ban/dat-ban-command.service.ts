@@ -48,42 +48,41 @@ export class DatBanCommandService {
   ) {
     const truyVan = ketNoi.query?.bind(ketNoi) || ketNoi.execute?.bind(ketNoi);
     const thamSoDonHang = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
-    const [donHangRows = []] = (await truyVan?.(
-      `SELECT MaDonHang FROM DonHang
+    const [donHangRows = []] =
+      (await truyVan?.(
+        `SELECT MaDonHang FROM DonHang
        WHERE MaBan = ?
          AND TrangThai IN (${thamSoDonHang.map(() => '?').join(', ')})
        LIMIT 1`,
-      [maBan, ...thamSoDonHang],
-    )) || [];
+        [maBan, ...thamSoDonHang],
+      )) || [];
     if ((donHangRows as any[]).length > 0) return true;
 
     const trangThaiDatBanDangMo = [
       ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
       ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
     ];
-    const [datBanRows = []] = (await truyVan?.(
-      `SELECT MaDatBan FROM DatBan
+    const [datBanRows = []] =
+      (await truyVan?.(
+        `SELECT MaDatBan FROM DatBan
        WHERE MaBan = ?
          AND MaDatBan <> ?
          AND TrangThai IN (${trangThaiDatBanDangMo.map(() => '?').join(', ')})
        LIMIT 1`,
-      [maBan, maDatBanBoQua || '', ...trangThaiDatBanDangMo],
-    )) || [];
+        [maBan, maDatBanBoQua || '', ...trangThaiDatBanDangMo],
+      )) || [];
     return (datBanRows as any[]).length > 0;
   }
 
-  private async coTrungLichDatBan(
-    ketNoi: any,
-    maBan: string,
-    datBan: BanGhi,
-  ) {
+  private async coTrungLichDatBan(ketNoi: any, maBan: string, datBan: BanGhi) {
     const truyVan = ketNoi.query?.bind(ketNoi) || ketNoi.execute?.bind(ketNoi);
     const trangThaiDatBanDangMo = [
       ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
       ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
     ];
-    const [datBanRows = []] = (await truyVan?.(
-      `SELECT MaDatBan FROM DatBan
+    const [datBanRows = []] =
+      (await truyVan?.(
+        `SELECT MaDatBan FROM DatBan
        WHERE MaBan = ?
          AND MaDatBan <> ?
          AND NgayDat = ?
@@ -91,31 +90,29 @@ export class DatBanCommandService {
          AND TIME(?) < COALESCE(GioKetThuc, ADDTIME(GioDat, '02:00:00'))
          AND TIME(?) > GioDat
        LIMIT 1`,
-      [
-        maBan,
-        String(datBan.MaDatBan || ''),
-        datBan.NgayDat,
-        ...trangThaiDatBanDangMo,
-        datBan.GioDat,
-        datBan.GioKetThuc || datBan.GioDat,
-      ],
-    )) || [];
+        [
+          maBan,
+          String(datBan.MaDatBan || ''),
+          datBan.NgayDat,
+          ...trangThaiDatBanDangMo,
+          datBan.GioDat,
+          datBan.GioKetThuc || datBan.GioDat,
+        ],
+      )) || [];
     return (datBanRows as any[]).length > 0;
   }
 
-  private async coDonHangDangMoTaiBan(
-    ketNoi: any,
-    maBan: string,
-  ) {
+  private async coDonHangDangMoTaiBan(ketNoi: any, maBan: string) {
     const truyVan = ketNoi.query?.bind(ketNoi) || ketNoi.execute?.bind(ketNoi);
     const thamSoDonHang = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
-    const [donHangRows = []] = (await truyVan?.(
-      `SELECT MaDonHang FROM DonHang
+    const [donHangRows = []] =
+      (await truyVan?.(
+        `SELECT MaDonHang FROM DonHang
        WHERE MaBan = ?
          AND TrangThai IN (${thamSoDonHang.map(() => '?').join(', ')})
        LIMIT 1`,
-      [maBan, ...thamSoDonHang],
-    )) || [];
+        [maBan, ...thamSoDonHang],
+      )) || [];
     return (donHangRows as any[]).length > 0;
   }
 
@@ -465,7 +462,9 @@ export class DatBanCommandService {
     }
 
     if (String(banHopLe.TrangThai || '') === TRANG_THAI_BAN.BAN) {
-      throw new BadRequestException(`Bàn ${banHopLe.MaBan} đang bảo trì, không thể gán cho booking.`);
+      throw new BadRequestException(
+        `Bàn ${banHopLe.MaBan} đang bảo trì, không thể gán cho booking.`,
+      );
     }
 
     if (

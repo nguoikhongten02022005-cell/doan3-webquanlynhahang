@@ -30,6 +30,11 @@ class DoiDiemDto {
   @IsOptional()
   @IsString()
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
+  maYeuCau?: string;
+
+  @IsOptional()
+  @IsString()
+  @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
   moTa?: string;
 }
 

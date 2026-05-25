@@ -9,7 +9,7 @@ import {
 } from '../../features/hoSo/mocks/duLieuHeThongMau'
 import { DANH_SACH_MON } from '../../features/thucDon/mocks/duLieuThucDon'
 
-const PHIEN_BAN_DU_LIEU_OFFLINE = '3'
+const PHIEN_BAN_DU_LIEU_OFFLINE = '4'
 
 const TAI_KHOAN_NOI_BO_MAU = [
   THONG_TIN_DANG_NHAP_MAU.admin,
@@ -304,7 +304,7 @@ export const dangKyTaiKhoanKhachHangOffline = ({ hoTen, email, soDienThoai, matK
 
     draft.heThong.tongQuanDiemTichLuyTheoKhachHang = {
       ...(draft.heThong.tongQuanDiemTichLuyTheoKhachHang || {}),
-      [maKHMoi]: { tongDiem: 0, diemCoTheDoi: 0, tiLeQuyDoi: 1000, maKH: maKHMoi },
+      [maKHMoi]: { tongDiem: 0, diemCoTheDoi: 0, tiLeQuyDoi: 100, giaTriQuyDoi: 10000, maKH: maKHMoi },
     }
 
     draft.heThong.lichSuDiemTichLuyTheoKhachHang = {
@@ -446,7 +446,7 @@ export const timDanhGiaOfflineTheoMa = (maDanhGia) => docDuLieuOffline((state) =
 
 export const layLichSuDatBanTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.lichSuDatBanTheoKhachHang?.[String(maKH || '')] || []))
 
-export const layTongQuanDiemTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.tongQuanDiemTichLuyTheoKhachHang?.[String(maKH || '')] || { maKH, tongDiem: 0, diemCoTheDoi: 0, tiLeQuyDoi: 1000 }))
+export const layTongQuanDiemTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.tongQuanDiemTichLuyTheoKhachHang?.[String(maKH || '')] || { maKH, tongDiem: 0, diemCoTheDoi: 0, tiLeQuyDoi: 100, giaTriQuyDoi: 10000 }))
 export const layLichSuDiemTheoKhachHangOffline = (maKH) => docDuLieuOffline((state) => deepClone(state.heThong.lichSuDiemTichLuyTheoKhachHang?.[String(maKH || '')] || []))
 export const taoMaDatBanMoiOffline = () => {
   const danhSach = layDanhSachDatBanOffline()

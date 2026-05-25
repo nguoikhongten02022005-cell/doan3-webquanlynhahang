@@ -1026,6 +1026,66 @@ body.ho-so-an-thanh-cuon::-webkit-scrollbar {
 .ho-so-doi-diem-balance strong {
   color: #15803d;
 }
+.ho-so-doi-diem-voucher {
+  display: grid;
+  gap: 0.25rem;
+  padding: 0.9rem 1rem;
+  border-radius: 12px;
+  background: #fffaf3;
+  border: 1px solid #f3d7bb;
+}
+.ho-so-doi-diem-voucher strong {
+  color: #9a3412;
+}
+.ho-so-doi-diem-voucher p,
+.ho-so-doi-diem-voucher span {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.ho-so-voucher-section {
+  margin-top: 1.75rem;
+  padding-top: 1.5rem;
+  border-top: 1px solid #E5E0DB;
+}
+.ho-so-voucher-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+.ho-so-voucher-item {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid #e8dfd5;
+  border-radius: 14px;
+  background: #fff;
+}
+.ho-so-voucher-main {
+  display: grid;
+  gap: 0.25rem;
+}
+.ho-so-voucher-main strong {
+  color: #7c3aed;
+  font-size: 1rem;
+}
+.ho-so-voucher-main p,
+.ho-so-voucher-main span {
+  margin: 0;
+  color: var(--text-muted);
+  font-size: 0.9rem;
+}
+.ho-so-voucher-meta {
+  display: grid;
+  justify-items: end;
+  gap: 0.35rem;
+  text-align: right;
+}
+.ho-so-voucher-meta strong {
+  color: #111827;
+}
 
 .ho-so-password-section {
   margin-top: 1.75rem;

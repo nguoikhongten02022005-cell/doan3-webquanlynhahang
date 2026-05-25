@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useState } from 'react'
-import { Button, Form, Input, InputNumber, Upload } from 'antd'
+import { useEffect, useMemo, useRef, useState } from 'react'
+import { Button, Form, Input, InputNumber, Tag, Upload } from 'antd'
 import { doiDiemTichLuyApi } from '../../../services/api/apiDiemTichLuy'
+import {
+  getVoucherTrangThaiBadgeClass,
+  getVoucherTrangThaiLabel,
+  getVoucherLoaiMaLabel,
+  normalizeVoucherLoaiMa,
+} from '../../../services/api/voucherTrangThai'
 import { useThongBao } from '../../../context/ThongBaoContext'
 
 const BieuTuongAnhDaiDienNguoiDung = () => (
@@ -29,8 +35,18 @@ const dinhDangThoiGianDiem = (giaTri) => {
 }
 
 const dinhDangSo = (giaTri) => new Intl.NumberFormat('vi-VN').format(Number(giaTri || 0))
+const dinhDangTien = (giaTri) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(giaTri || 0))
 
-function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy = [], onLogout, onCapNhatHoSo, onDoiMatKhau, onRefreshDiemTichLuy }) {
+const taoMaYeuCauDoiDiem = () => {
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+
+  return `doi-diem-${Date.now()}-${Math.random().toString(16).slice(2)}`
+}
+
+function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy = [], danhSachVoucherCuaToi = [], onLogout, onCapNhatHoSo, onDoiMatKhau, onRefreshDiemTichLuy }) {
   const { hienThongBao } = useThongBao()
   const [formHoSo] = Form.useForm()
   const [formMatKhau] = Form.useForm()
@@ -47,11 +63,13 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
   const [soDiemMuonDoi, setSoDiemMuonDoi] = useState(null)
   const [dangDoiDiem, setDangDoiDiem] = useState(false)
   const [phanHoiDoiDiem, setPhanHoiDoiDiem] = useState(null)
+  const maYeuCauDoiDiem = useRef('')
   const anhDaiDienMacDinh = String(nguoiDung?.avatarUrl ?? nguoiDung?.avatar ?? '')
   const tongQuanDiem = useMemo(() => ({
     tongDiem: Number(tongQuanDiemTichLuy?.tongDiem || 0),
     diemCoTheDoi: Number(tongQuanDiemTichLuy?.diemCoTheDoi || 0),
     tiLeQuyDoi: Number(tongQuanDiemTichLuy?.tiLeQuyDoi || 0),
+    giaTriQuyDoi: Number(tongQuanDiemTichLuy?.giaTriQuyDoi || 0),
   }), [tongQuanDiemTichLuy])
 
   useEffect(() => {
@@ -189,10 +207,16 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
       return
     }
 
+    if (dangDoiDiem || maYeuCauDoiDiem.current) {
+      return
+    }
+
     try {
+      const maYeuCau = taoMaYeuCauDoiDiem()
+      maYeuCauDoiDiem.current = maYeuCau
       setDangDoiDiem(true)
       setPhanHoiDoiDiem(null)
-      const phanHoi = await doiDiemTichLuyApi(soDiemMuonDoi)
+      const phanHoi = await doiDiemTichLuyApi(soDiemMuonDoi, 'Đổi điểm tích lũy', maYeuCau)
 
       if (!phanHoi.duLieu) {
         hienThongBao({
@@ -206,13 +230,15 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
 
       setPhanHoiDoiDiem({
         soDiemDaDoi: phanHoi.duLieu.soDiemDaDoi,
+        soTienGiam: phanHoi.duLieu.soTienGiam,
         diemTruoc: phanHoi.duLieu.diemTruoc,
         diemSau: phanHoi.duLieu.diemSau,
+        voucher: phanHoi.duLieu.voucher,
       })
       setSoDiemMuonDoi(null)
 
       hienThongBao({
-        message: `Đã đổi ${dinhDangSo(phanHoi.duLieu.soDiemDaDoi)} điểm thành công!`,
+        message: `Bạn đã đổi thành công ${dinhDangSo(phanHoi.duLieu.soDiemDaDoi)} điểm và nhận mã ${phanHoi.duLieu.voucher?.maCode || 'voucher'} giảm ${dinhDangTien(phanHoi.duLieu.soTienGiam || 0)}.`,
         tone: 'success',
         duration: 3000,
         title: 'Thành công',
@@ -226,6 +252,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
         title: '',
       })
     } finally {
+      maYeuCauDoiDiem.current = ''
       setDangDoiDiem(false)
     }
   }
@@ -308,7 +335,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
 
           <article className="ho-so-diem-tich-luy-card">
             <span className="ho-so-diem-tich-luy-label">Tỷ lệ quy đổi</span>
-            <strong className="ho-so-diem-tich-luy-value">1 điểm / {dinhDangSo(tongQuanDiem.tiLeQuyDoi)}đ</strong>
+            <strong className="ho-so-diem-tich-luy-value">{dinhDangSo(tongQuanDiem.tiLeQuyDoi)} điểm = {dinhDangTien(tongQuanDiem.giaTriQuyDoi)}</strong>
           </article>
         </div>
 
@@ -348,7 +375,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
         <div className="ho-so-doi-diem-section">
           <div className="ho-so-subsection-heading">
             <h4>Đổi điểm tích lũy</h4>
-            <p>Sử dụng điểm tích lũy để đổi các ưu đãi đặc biệt.</p>
+            <p>Đổi điểm để nhận voucher riêng, dùng trực tiếp khi thanh toán.</p>
           </div>
 
           <div className="ho-so-doi-diem-form">
@@ -358,6 +385,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                   id="ho-so-so-diem-muon-doi"
                   className="truong-nhap"
                   min={1}
+                  step={100}
                   max={tongQuanDiem.diemCoTheDoi}
                   value={soDiemMuonDoi}
                   onChange={(value) => setSoDiemMuonDoi(value)}
@@ -384,7 +412,11 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                 </p>
               ) : (
                 <p className="ho-so-doi-diem-preview">
-                  = {dinhDangSo(soDiemMuonDoi * tongQuanDiem.tiLeQuyDoi)}đ giảm giá
+                  = voucher giảm {dinhDangTien(
+                    tongQuanDiem.tiLeQuyDoi > 0
+                      ? (soDiemMuonDoi / tongQuanDiem.tiLeQuyDoi) * tongQuanDiem.giaTriQuyDoi
+                      : 0,
+                  )}
                 </p>
               )
             )}
@@ -392,11 +424,18 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
             {phanHoiDoiDiem && (
               <div className="ho-so-doi-diem-result">
                 <p className="ho-so-doi-diem-success">
-                  Đã đổi <strong>{dinhDangSo(phanHoiDoiDiem.soDiemDaDoi)} điểm</strong> thành công!
+                  Đã đổi <strong>{dinhDangSo(phanHoiDoiDiem.soDiemDaDoi)} điểm</strong> và nhận voucher
                 </p>
                 <p className="ho-so-doi-diem-balance">
                   Số dư điểm: {dinhDangSo(phanHoiDoiDiem.diemTruoc)} → <strong>{dinhDangSo(phanHoiDoiDiem.diemSau)} điểm</strong>
                 </p>
+                {phanHoiDoiDiem.voucher && (
+                  <div className="ho-so-doi-diem-voucher">
+                    <strong>{phanHoiDoiDiem.voucher.maCode}</strong>
+                    <p>{phanHoiDoiDiem.voucher.tenCode || 'Voucher đổi điểm'}</p>
+                    <span>{dinhDangTien(phanHoiDoiDiem.soTienGiam || phanHoiDoiDiem.voucher.giaTri)}</span>
+                  </div>
+                )}
                 <Button htmlType="button" className="btn" onClick={onRefreshDiemTichLuy}>
                   Cập nhật lại
                 </Button>
@@ -404,6 +443,41 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
             )}
           </div>
         </div>
+      </section>
+
+      <section className="ho-so-voucher-section" aria-label="Voucher của tôi">
+        <div className="ho-so-subsection-heading">
+          <h3>Voucher của tôi</h3>
+          <p>Các mã giảm giá gắn riêng với tài khoản của bạn.</p>
+        </div>
+
+        {danhSachVoucherCuaToi.length ? (
+          <div className="ho-so-voucher-list">
+                {danhSachVoucherCuaToi.map((voucher) => (
+              <article key={voucher.maCode} className="ho-so-voucher-item">
+                <div className="ho-so-voucher-main">
+                  <strong>{voucher.maCode}</strong>
+                  <p>{voucher.tenCode || 'Voucher cá nhân'}</p>
+                  <span>
+                    {normalizeVoucherLoaiMa(voucher.loaiMa || voucher.loaiMaHienThi) === 'LOYALTY'
+                      ? `Đổi ${dinhDangSo(voucher.diemDaDoi || 0)} điểm`
+                      : voucher.loaiMaHienThi || getVoucherLoaiMaLabel(voucher)}
+                  </span>
+                </div>
+                <div className="ho-so-voucher-meta">
+                  <Tag className={`nhan-trang-thai voucher-trang-thai ${getVoucherTrangThaiBadgeClass(voucher)}`}>
+                    {getVoucherTrangThaiLabel(voucher)}
+                  </Tag>
+                  <strong>{voucher.loaiGiam === 'percentage' ? `${dinhDangSo(voucher.giaTri)}%` : dinhDangTien(voucher.giaTri)}</strong>
+                  <span>Đơn tối thiểu {voucher.donHangToiThieu > 0 ? dinhDangTien(voucher.donHangToiThieu) : 'không yêu cầu'}</span>
+                  <span>Hạn {dinhDangThoiGianDiem(voucher.ngayKetThuc)}</span>
+                </div>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <div className="ho-so-diem-tich-luy-empty">Chưa có voucher riêng nào.</div>
+        )}
       </section>
 
       <div className="ho-so-password-section">

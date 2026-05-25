@@ -66,8 +66,9 @@ const taoBan = ({ code, name, tableNumber, capacity, areaId, rawAreaText, note =
 
 const taoTongQuanDiem = (tongDiem) => Object.freeze({
   tongDiem,
-  diemCoTheDoi: tongDiem,
-  tiLeQuyDoi: 1000,
+  diemCoTheDoi: tongDiem - (tongDiem % 100),
+  tiLeQuyDoi: 100,
+  giaTriQuyDoi: 10000,
 })
 
 const MON_DH001 = Object.freeze([

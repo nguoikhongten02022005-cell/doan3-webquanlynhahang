@@ -82,10 +82,10 @@ INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan, TrangThai) VALUES
 ('QR010', 'B010', 'http://localhost:5173/ban/B010', '2027-12-31 23:59:59', 'Active'),
 ('QR011', 'B011', 'http://localhost:5173/ban/B011', '2027-12-31 23:59:59', 'Active');
 
-INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai) VALUES
-('WELCOME10', 'Chào mừng KH mới', 10, 'percentage', 50000, 100000, '2026-01-01', '2026-12-31', 1, 0, 'Active'),
-('SUMMER20', 'Khuyến mãi Hè', 20, 'percentage', 100000, 200000, '2026-06-01', '2026-08-31', NULL, 0, 'Active'),
-('GIAM50K', 'Giảm thẳng 50k', 50000, 'fixed_amount', NULL, 300000, '2026-01-01', '2026-12-31', 500, 0, 'Active');
+INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao) VALUES
+('WELCOME10', 'Chào mừng KH mới', 10, 'percentage', 'PUBLIC', NULL, NULL, 50000, 100000, '2026-01-01', '2026-12-31', 1, 0, 'Active', 'SEED'),
+('SUMMER20', 'Khuyến mãi Hè', 20, 'percentage', 'PUBLIC', NULL, NULL, 100000, 200000, '2026-06-01', '2026-08-31', NULL, 0, 'Active', 'SEED'),
+('GIAM50K', 'Giảm thẳng 50k', 50000, 'fixed_amount', 'PUBLIC', NULL, NULL, NULL, 300000, '2026-01-01', '2026-12-31', 500, 0, 'Active', 'SEED');
 
 INSERT INTO DatBan (
     MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,
@@ -305,12 +305,12 @@ INSERT INTO QRCode (MaQR, MaBan, DuongDanQR, NgayHetHan, TrangThai) VALUES
 ('QR062', 'B062', 'http://localhost:5173/ban/B062', '2027-12-31 23:59:59', 'Active'),
 ('QR063', 'B063', 'http://localhost:5173/ban/B063', '2027-12-31 23:59:59', 'Active');
 
-INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai) VALUES
-('VIP25', 'Ưu đãi VIP 25%', 25, 'percentage', 90000, 250000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 60 DAY), 200, 15, 'Active'),
-('GIAM20K', 'Giảm 20k cho đơn từ 120k', 20000, 'fixed_amount', NULL, 120000, DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 45 DAY), NULL, 12, 'Active'),
-('LOYAL25K', 'Tri ân thành viên 25k', 25000, 'fixed_amount', NULL, 180000, DATE_SUB(CURRENT_DATE(), INTERVAL 15 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY), NULL, 8, 'Active'),
-('MORNING15', 'Ưu đãi buổi sáng', 15, 'percentage', 30000, 80000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY), 100, 100, 'Inactive'),
-('FLASH30', 'Flash sale 30%', 30, 'percentage', 60000, 150000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), 50, 50, 'HetHan');
+INSERT INTO MaGiamGia (MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu, NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao) VALUES
+('VIP25', 'Ưu đãi VIP 25%', 25, 'percentage', 'VIP', 'KH006', NULL, 90000, 250000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 60 DAY), 200, 15, 'Active', 'SEED'),
+('GIAM20K', 'Giảm 20k cho đơn từ 120k', 20000, 'fixed_amount', 'PUBLIC', NULL, NULL, NULL, 120000, DATE_SUB(CURRENT_DATE(), INTERVAL 7 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 45 DAY), NULL, 12, 'Active', 'SEED'),
+('LOYAL25K', 'Tri ân đổi 250 điểm lấy 25k', 25000, 'fixed_amount', 'LOYALTY', 'KH006', 250, NULL, 180000, DATE_SUB(CURRENT_DATE(), INTERVAL 15 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 90 DAY), 1, 8, 'Active', 'SEED'),
+('MORNING15', 'Ưu đãi buổi sáng', 15, 'percentage', 'PUBLIC', NULL, NULL, 30000, 80000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_ADD(CURRENT_DATE(), INTERVAL 30 DAY), 100, 100, 'Inactive', 'SEED'),
+('FLASH30', 'Flash sale 30%', 30, 'percentage', 'PUBLIC', NULL, NULL, 60000, 150000, DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY), DATE_SUB(CURRENT_DATE(), INTERVAL 1 DAY), 50, 50, 'HetHan', 'SEED');
 
 INSERT INTO DatBan (
     MaDatBan, MaKH, MaBan, MaNV, TenKhachDatBan, SDTDatBan, EmailDatBan,

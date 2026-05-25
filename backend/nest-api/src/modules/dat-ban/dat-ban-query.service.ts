@@ -11,7 +11,11 @@ import {
   TRANG_THAI_BAN,
   TRANG_THAI_DON_HANG_DANG_MO,
 } from '../../common/constants';
-import { MA_KHU_VUC_BAN, chuanHoaMaKhuVucBan, chuanHoaTenKhuVucBan } from '../../common/khu-vuc-ban';
+import {
+  MA_KHU_VUC_BAN,
+  chuanHoaMaKhuVucBan,
+  chuanHoaTenKhuVucBan,
+} from '../../common/khu-vuc-ban';
 
 @Injectable()
 export class DatBanQueryService {
@@ -64,7 +68,9 @@ export class DatBanQueryService {
               thongTinMon?.tenMon ||
               '',
           ).trim();
-          const gia = Number(mon.gia ?? mon.donGia ?? mon.DonGia ?? mon.priceValue ?? 0);
+          const gia = Number(
+            mon.gia ?? mon.donGia ?? mon.DonGia ?? mon.priceValue ?? 0,
+          );
           return {
             ...mon,
             maMon: maMon || mon.maMon,
@@ -91,7 +97,9 @@ export class DatBanQueryService {
       soNguoi: Number(datBan.SoNguoi || 0),
       ghiChu: datBan.GhiChu || '',
       ghiChuNoiBo: datBan.GhiChuNoiBo || '',
-      khuVucUuTien: datBan.KhuVucUuTien ? chuanHoaMaKhuVucBan(datBan.KhuVucUuTien) : '',
+      khuVucUuTien: datBan.KhuVucUuTien
+        ? chuanHoaMaKhuVucBan(datBan.KhuVucUuTien)
+        : '',
       nguonTao: datBan.NguonTao || '',
       source: datBan.NguonTao || '',
       trangThai: datBan.TrangThai,
@@ -103,7 +111,13 @@ export class DatBanQueryService {
       chiTietMonAn,
       danhSachMaBanDaGan,
       danhSachBanDaGan: maBan
-        ? [{ maBan, tenBan: datBan.TenBan || maBan, khuVuc: chuanHoaTenKhuVucBan(datBan.KhuVucBan || '') }]
+        ? [
+            {
+              maBan,
+              tenBan: datBan.TenBan || maBan,
+              khuVuc: chuanHoaTenKhuVucBan(datBan.KhuVucBan || ''),
+            },
+          ]
         : [],
     };
   }
@@ -188,7 +202,9 @@ export class DatBanQueryService {
     });
     const danhSachGiaMon = maMonSet.size
       ? await this.mysql.truyVan(
-          `SELECT MaMon, TenMon, Gia FROM ThucDon WHERE MaMon IN (${Array.from(maMonSet)
+          `SELECT MaMon, TenMon, Gia FROM ThucDon WHERE MaMon IN (${Array.from(
+            maMonSet,
+          )
             .map(() => '?')
             .join(',')})`,
           Array.from(maMonSet),
@@ -242,7 +258,10 @@ export class DatBanQueryService {
     const gioDat = String(query.gioDat || '').trim();
     const soNguoi = Number(query.soNguoi || 0);
     const khuVucRaw = String(query.khuVuc || '').trim();
-    const khuVuc = khuVucRaw && khuVucRaw !== 'KHONG_UU_TIEN' ? chuanHoaMaKhuVucBan(khuVucRaw) : khuVucRaw;
+    const khuVuc =
+      khuVucRaw && khuVucRaw !== 'KHONG_UU_TIEN'
+        ? chuanHoaMaKhuVucBan(khuVucRaw)
+        : khuVucRaw;
     const thoiLuongMacDinhPhut = 120;
 
     if (!ngayDat || !gioDat) {
@@ -272,11 +291,13 @@ export class DatBanQueryService {
     );
     const danhSachDonHangDangMo =
       (await this.mysql.truyVan(
-      `SELECT DISTINCT MaBan FROM DonHang
+        `SELECT DISTINCT MaBan FROM DonHang
        WHERE MaBan IS NOT NULL
-         AND TrangThai IN (${Array.from(TRANG_THAI_DON_HANG_DANG_MO).map(() => '?').join(', ')})`,
-      Array.from(TRANG_THAI_DON_HANG_DANG_MO),
-    )) || [];
+         AND TrangThai IN (${Array.from(TRANG_THAI_DON_HANG_DANG_MO)
+           .map(() => '?')
+           .join(', ')})`,
+        Array.from(TRANG_THAI_DON_HANG_DANG_MO),
+      )) || [];
 
     const tapBanDaDuocDung = new Set(
       danhSachDatBan
@@ -313,10 +334,15 @@ export class DatBanQueryService {
       .filter((ban) => {
         if (!khuVuc || khuVuc === 'KHONG_UU_TIEN') return true;
 
-        const maKhuVucBan = chuanHoaMaKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`);
-        if (khuVuc === MA_KHU_VUC_BAN.KHU_RIENG) return maKhuVucBan === MA_KHU_VUC_BAN.KHU_RIENG;
-        if (khuVuc === MA_KHU_VUC_BAN.NGOAI_TROI) return maKhuVucBan === MA_KHU_VUC_BAN.NGOAI_TROI;
-        if (khuVuc === MA_KHU_VUC_BAN.TRONG_NHA) return maKhuVucBan === MA_KHU_VUC_BAN.TRONG_NHA;
+        const maKhuVucBan = chuanHoaMaKhuVucBan(
+          `${ban.KhuVuc || ''} ${ban.ViTri || ''}`,
+        );
+        if (khuVuc === MA_KHU_VUC_BAN.KHU_RIENG)
+          return maKhuVucBan === MA_KHU_VUC_BAN.KHU_RIENG;
+        if (khuVuc === MA_KHU_VUC_BAN.NGOAI_TROI)
+          return maKhuVucBan === MA_KHU_VUC_BAN.NGOAI_TROI;
+        if (khuVuc === MA_KHU_VUC_BAN.TRONG_NHA)
+          return maKhuVucBan === MA_KHU_VUC_BAN.TRONG_NHA;
         return true;
       });
 
@@ -347,7 +373,9 @@ export class DatBanQueryService {
         danhSachBan: danhSachBanPhuHop.map((ban) => ({
           maBan: ban.MaBan,
           tenBan: ban.TenBan,
-          khuVuc: chuanHoaTenKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`),
+          khuVuc: chuanHoaTenKhuVucBan(
+            `${ban.KhuVuc || ''} ${ban.ViTri || ''}`,
+          ),
           viTri: chuanHoaTenKhuVucBan(`${ban.KhuVuc || ''} ${ban.ViTri || ''}`),
           soBan: Number(ban.SoBan || 0),
           soChoNgoi: Number(ban.SoChoNgoi || 0),

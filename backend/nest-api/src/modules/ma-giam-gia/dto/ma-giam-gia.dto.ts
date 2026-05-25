@@ -23,6 +23,14 @@ export enum LoaiGiamGiaDto {
   phantram = 'phantram',
 }
 
+export enum LoaiMaGiamGiaDto {
+  PUBLIC = 'PUBLIC',
+  CUSTOMER = 'CUSTOMER',
+  LOYALTY = 'LOYALTY',
+  VIP = 'VIP',
+  BIRTHDAY = 'BIRTHDAY',
+}
+
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
 
@@ -36,6 +44,12 @@ export class KiemTraMaGiamGiaDto {
   @Length(3, 50)
   @Transform(trim)
   maCode: string;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  @Transform(trim)
+  maKH?: string;
 
   @Transform(toNumber)
   @IsNumber()
@@ -64,6 +78,17 @@ export class TaoMaGiamGiaDto {
   loaiGiam: LoaiGiamGiaDto;
 
   @IsOptional()
+  @IsEnum(LoaiMaGiamGiaDto)
+  @Transform(trim)
+  loaiMa?: LoaiMaGiamGiaDto;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  @Transform(trim)
+  maKH?: string;
+
+  @IsOptional()
   @Transform(toNumber)
   @IsNumber()
   @Min(0)
@@ -91,6 +116,19 @@ export class TaoMaGiamGiaDto {
   @Min(1)
   @Max(1000000)
   soLanToiDa?: number;
+
+  @IsOptional()
+  @Transform(toNumber)
+  @IsInt()
+  @Min(0)
+  @Max(1000000)
+  diemDaDoi?: number;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  @Transform(trim)
+  nguonTao?: string;
 
   @IsOptional()
   @IsEnum(TrangThaiMaGiamGiaDto)
@@ -117,6 +155,17 @@ export class CapNhatMaGiamGiaDto {
   loaiGiam?: LoaiGiamGiaDto;
 
   @IsOptional()
+  @IsEnum(LoaiMaGiamGiaDto)
+  @Transform(trim)
+  loaiMa?: LoaiMaGiamGiaDto;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  @Transform(trim)
+  maKH?: string;
+
+  @IsOptional()
   @Transform(toNumber)
   @IsNumber()
   @Min(0)
@@ -144,6 +193,19 @@ export class CapNhatMaGiamGiaDto {
   @Min(1)
   @Max(1000000)
   soLanToiDa?: number;
+
+  @IsOptional()
+  @Transform(toNumber)
+  @IsInt()
+  @Min(0)
+  @Max(1000000)
+  diemDaDoi?: number;
+
+  @IsOptional()
+  @IsString()
+  @Length(1, 50)
+  @Transform(trim)
+  nguonTao?: string;
 
   @IsOptional()
   @IsEnum(TrangThaiMaGiamGiaDto)

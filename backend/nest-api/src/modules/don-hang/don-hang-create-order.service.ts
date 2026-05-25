@@ -184,7 +184,7 @@ export class DonHangCreateOrderService {
         );
       }
 
-      if (maGiamGia.hopLe && maGiamGia.maGiamGia) {
+      if (maGiamGia.hopLe && maGiamGia.maGiamGia && !isAppending) {
         await this.thucThi(
           'UPDATE MaGiamGia SET SoLanDaDung = SoLanDaDung + 1 WHERE MaCode = ?',
           [maGiamGia.maGiamGia],

@@ -9,11 +9,22 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd } from '../../common/khach-hang.helper';
 import { BanGhi } from '../../common/types';
-import { TI_LE_TICH_DIEM_MAC_DINH } from '../../common/constants';
+import {
+  GIA_TRI_QUY_DOI,
+  TI_LE_QUY_DOI_DIEM,
+  TI_LE_TICH_DIEM_MAC_DINH,
+} from '../../common/constants';
+import {
+  taoMaGiaoDichDiemTheoYeuCau,
+} from '../../common/ma-giam-gia.helper';
+import { MaGiamGiaService } from '../ma-giam-gia/ma-giam-gia.service';
 
 @Injectable()
 export class DiemTichLuyService {
-  constructor(private readonly mysql: MySqlService) {}
+  constructor(
+    private readonly mysql: MySqlService,
+    private readonly maGiamGiaService: MaGiamGiaService,
+  ) {}
 
   private async thucThi(sql: string, thamSo: any[], ketNoi?: PoolConnection) {
     if (ketNoi) {
@@ -66,8 +77,9 @@ export class DiemTichLuyService {
     soDiemSau: number,
     moTa: string,
     ketNoi?: PoolConnection,
+    maGiaoDichDiem?: string,
   ) {
-    const maGiaoDich = taoMa('GDDL');
+    const maGiaoDich = maGiaoDichDiem || taoMa('GDDL');
     await this.thucThi(
       `INSERT INTO LichSuDiemTichLuy (MaGiaoDichDiem, MaKH, MaDonHang, LoaiBienDong, SoDiem, SoDiemTruoc, SoDiemSau, MoTa)
        VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
@@ -100,8 +112,11 @@ export class DiemTichLuyService {
       {
         maKH: khachHang.MaKH,
         tongDiem: Number(khachHang.DiemTichLuy || 0),
-        diemCoTheDoi: Number(khachHang.DiemTichLuy || 0),
-        tiLeQuyDoi: TI_LE_TICH_DIEM_MAC_DINH,
+        diemCoTheDoi:
+          Math.floor(Number(khachHang.DiemTichLuy || 0) / TI_LE_QUY_DOI_DIEM) *
+          TI_LE_QUY_DOI_DIEM,
+        tiLeQuyDoi: TI_LE_QUY_DOI_DIEM,
+        giaTriQuyDoi: GIA_TRI_QUY_DOI,
       },
       'Lấy tổng quan điểm tích lũy thành công',
     );
@@ -231,7 +246,7 @@ export class DiemTichLuyService {
 
   async doiDiem(
     nguoiDung: any,
-    body: { soDiem: number; moTa?: string },
+    body: { soDiem: number; moTa?: string; maYeuCau?: string },
     ketNoi?: PoolConnection,
   ) {
     const khachHang = await layKhachHangTheoMaNd(
@@ -244,39 +259,120 @@ export class DiemTichLuyService {
     const soDiem = Number(body.soDiem);
     if (isNaN(soDiem) || soDiem <= 0)
       throw new BadRequestException('Số điểm không hợp lệ.');
+    if (soDiem % TI_LE_QUY_DOI_DIEM !== 0) {
+      throw new BadRequestException(
+        `Số điểm đổi phải là bội số của ${TI_LE_QUY_DOI_DIEM}.`,
+      );
+    }
+    const maYeuCau = String(body.maYeuCau || '').trim();
+    const maGiaoDichDiemMacDinh = maYeuCau
+      ? taoMaGiaoDichDiemTheoYeuCau(khachHang.MaKH, maYeuCau)
+      : taoMa('GDDL');
 
-    const diemTruoc = Number(khachHang.DiemTichLuy || 0);
-    const diemSau = diemTruoc - soDiem;
-    if (diemSau < 0)
-      throw new BadRequestException('Điểm tích lũy không đủ để đổi.');
+    const xuLyDoiDiem = async (giaoDich: PoolConnection) => {
+      const khachHangTrongTxn = await this.layKhachHangTheoMaKH(
+        khachHang.MaKH,
+        giaoDich,
+      );
+      if (!khachHangTrongTxn) {
+        throw new NotFoundException('Không tìm thấy khách hàng.');
+      }
 
-    await this.thucThi(
-      'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
-      [diemSau, khachHang.MaKH],
-      ketNoi,
-    );
+      if (maYeuCau) {
+        const [lichSuDaCo] = await this.truyVan(
+          'SELECT * FROM LichSuDiemTichLuy WHERE MaGiaoDichDiem = ? LIMIT 1',
+          [maGiaoDichDiemMacDinh],
+          giaoDich,
+        );
+        if (lichSuDaCo) {
+          const soDiemDaDoi = Math.abs(Number(lichSuDaCo.SoDiem || 0));
+          const soTienGiam = this.maGiamGiaService.tinhSoTienGiamTuDiem(
+            soDiemDaDoi,
+          );
+          const voucher = await this.maGiamGiaService.taoVoucherTuDoiDiem(
+            {
+              maKH: khachHangTrongTxn.MaKH,
+              soDiemDaDoi,
+              soTienGiam,
+              moTa: body.moTa || 'Đổi điểm tích lũy',
+              nguonTao: 'DOI_DIEM_TICH_LUY',
+              maYeuCau,
+            },
+            giaoDich,
+          );
 
-    const maGiaoDich = await this.ghiLichSuDiem(
-      khachHang.MaKH,
-      '',
-      'TRU',
-      -soDiem,
-      diemTruoc,
-      diemSau,
-      body.moTa || 'Đổi điểm tích lũy lấy quà',
-      ketNoi,
-    );
+          return taoPhanHoi(
+            {
+              maGiaoDichDiem: maGiaoDichDiemMacDinh,
+              maKH: khachHangTrongTxn.MaKH,
+              soDiemDaDoi,
+              soTienGiam,
+              diemTruoc: Number(lichSuDaCo.SoDiemTruoc || 0),
+              diemSau: Number(lichSuDaCo.SoDiemSau || 0),
+              voucher: voucher.voucher,
+            },
+            'Đổi điểm thành công',
+          );
+        }
+      }
 
-    return taoPhanHoi(
-      {
-        maGiaoDichDiem: maGiaoDich,
-        maKH: khachHang.MaKH,
-        soDiemDaDoi: soDiem,
+      const diemTruoc = Number(khachHangTrongTxn.DiemTichLuy || 0);
+      const diemSau = diemTruoc - soDiem;
+      if (diemSau < 0) {
+        throw new BadRequestException('Điểm tích lũy không đủ để đổi.');
+      }
+
+      await this.thucThi(
+        'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
+        [diemSau, khachHangTrongTxn.MaKH],
+        giaoDich,
+      );
+
+      const maGiaoDich = await this.ghiLichSuDiem(
+        khachHangTrongTxn.MaKH,
+        '',
+        'TRU',
+        -soDiem,
         diemTruoc,
         diemSau,
-      },
-      'Đổi điểm thành công',
-    );
+        body.moTa || 'Đổi điểm tích lũy lấy voucher',
+        giaoDich,
+        maGiaoDichDiemMacDinh,
+      );
+
+      const soTienGiam =
+        Math.floor(soDiem / TI_LE_QUY_DOI_DIEM) * GIA_TRI_QUY_DOI;
+      const voucher = await this.maGiamGiaService.taoVoucherTuDoiDiem(
+        {
+          maKH: khachHangTrongTxn.MaKH,
+          soDiemDaDoi: soDiem,
+          soTienGiam,
+          moTa: body.moTa || 'Đổi điểm tích lũy',
+          nguonTao: 'DOI_DIEM_TICH_LUY',
+          maYeuCau,
+        },
+        giaoDich,
+      );
+
+      return taoPhanHoi(
+        {
+          maGiaoDichDiem: maGiaoDich,
+          maKH: khachHangTrongTxn.MaKH,
+          soDiemDaDoi: soDiem,
+          soTienGiam,
+          diemTruoc,
+          diemSau,
+          voucher: voucher.voucher,
+        },
+        'Đổi điểm thành công',
+      );
+    };
+
+    if (ketNoi) {
+      return xuLyDoiDiem(ketNoi);
+    }
+
+    return this.mysql.giaoDich(xuLyDoiDiem);
   }
 
   async congDiemHuyDon(

@@ -10,12 +10,13 @@ import {
   message,
   Modal,
   Select,
+  Tooltip,
   Space,
   Table,
   Tag,
   Typography,
 } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { PlusOutlined, EditOutlined, DeleteOutlined, CopyOutlined } from '@ant-design/icons'
 import dayjs from 'dayjs'
 import { dinhDangNgay } from '../../features/noiBo/dinhDang.js'
 import {
@@ -24,6 +25,14 @@ import {
   capNhatMaGiamGiaApi,
   xoaMaGiamGiaApi,
 } from '../../services/api/apiMaGiamGia'
+import {
+  getVoucherTrangThaiBadgeClass,
+  getVoucherTrangThaiLabel,
+  getVoucherLoaiMaLabel,
+  getVoucherNguonLabel,
+  normalizeVoucherLoaiMa,
+} from '../../services/api/voucherTrangThai'
+import { layDanhSachKhachHang } from '../../services/api/apiKhachHang'
 
 const { Title } = Typography
 const { RangePicker } = DatePicker
@@ -39,11 +48,15 @@ const LOAI_GIAM_OPTIONS = [
   { value: 'fixed_amount', label: 'Số tiền (VNĐ)' },
 ]
 
-const CHON_TRANG_THAI = {
-  Active: { color: 'green', text: 'Hoạt động' },
-  Inactive: { color: 'orange', text: 'Tạm tắt' },
-  HetHan: { color: 'red', text: 'Hết hạn' },
-}
+const LOAI_MA_OPTIONS = [
+  { value: 'PUBLIC', label: getVoucherLoaiMaLabel('PUBLIC') },
+  { value: 'CUSTOMER', label: getVoucherLoaiMaLabel('CUSTOMER') },
+  { value: 'LOYALTY', label: getVoucherLoaiMaLabel('LOYALTY') },
+  { value: 'VIP', label: getVoucherLoaiMaLabel('VIP') },
+  { value: 'BIRTHDAY', label: getVoucherLoaiMaLabel('BIRTHDAY') },
+]
+
+const LOAI_MA_CAN_KHACH = new Set(['CUSTOMER', 'LOYALTY', 'VIP', 'BIRTHDAY'])
 
 function taoFormMacDinh() {
   return {
@@ -51,10 +64,14 @@ function taoFormMacDinh() {
     tenCode: '',
     giaTri: 0,
     loaiGiam: 'percentage',
+    loaiMa: 'PUBLIC',
+    maKH: '',
+    diemDaDoi: null,
     giaTriToiDa: null,
     donHangToiThieu: 0,
     ngayApDung: null,
     soLanToiDa: null,
+    nguonTao: 'NOI_BO',
     trangThai: 'Active',
   }
 }
@@ -64,6 +81,10 @@ function chuanHoaDuLieuForm(ma) {
   return {
     ...ma,
     ngayApDung: ma.ngayBatDau && ma.ngayKetThuc ? [dayjs(ma.ngayBatDau), dayjs(ma.ngayKetThuc)] : null,
+    loaiMa: normalizeVoucherLoaiMa(ma.loaiMa || ma.LoaiMa || 'PUBLIC'),
+    maKH: ma.maKH || ma.maKhachHang || '',
+    diemDaDoi: ma.diemDaDoi ?? null,
+    nguonTao: ma.nguonTao || ma.nguon || 'NOI_BO',
   }
 }
 
@@ -73,6 +94,10 @@ function chuanHoaDuLieuGuiDi(giaTri) {
     ...giaTri,
     ngayBatDau: ngayApDung[0] ? ngayApDung[0].format('YYYY-MM-DD') : null,
     ngayKetThuc: ngayApDung[1] ? ngayApDung[1].format('YYYY-MM-DD') : null,
+    maKH: String(giaTri.maKH || '').trim(),
+    loaiMa: normalizeVoucherLoaiMa(giaTri.loaiMa || 'PUBLIC'),
+    diemDaDoi: giaTri.diemDaDoi != null && giaTri.diemDaDoi !== '' ? Number(giaTri.diemDaDoi) : null,
+    nguonTao: String(giaTri.nguonTao || 'NOI_BO').trim() || 'NOI_BO',
   }
 }
 
@@ -85,13 +110,16 @@ function dinhDangGia(giaTri, loaiGiam) {
 
 function NoiBoMaGiamGiaPage() {
   const [danhSach, datDanhSach] = useState([])
+  const [danhSachKhachHang, datDanhSachKhachHang] = useState([])
   const [dangTai, datDangTai] = useState(false)
+  const [dangTaiKhachHang, datDangTaiKhachHang] = useState(false)
   const [dangXuLy, datDangXuLy] = useState(false)
   const [nganKeoDangMo, datNganKeoDangMo] = useState(false)
   const [cheDoBieuMau, datCheDoBieuMau] = useState('create')
   const [maDangSua, datMaDangSua] = useState(null)
   const [form] = Form.useForm()
   const [messageApi, contextHolder] = message.useMessage()
+  const loaiMaDangChon = Form.useWatch('loaiMa', form) || 'PUBLIC'
 
   const taiDanhSach = useCallback(async () => {
     datDangTai(true)
@@ -108,6 +136,33 @@ function NoiBoMaGiamGiaPage() {
   useEffect(() => {
     taiDanhSach()
   }, [taiDanhSach])
+
+  useEffect(() => {
+    if (String(loaiMaDangChon || 'PUBLIC').toUpperCase() === 'PUBLIC') {
+      form.setFieldsValue({ maKH: '', diemDaDoi: null })
+      return
+    }
+
+    if (String(loaiMaDangChon || 'PUBLIC').toUpperCase() !== 'LOYALTY') {
+      form.setFieldsValue({ diemDaDoi: null })
+    }
+  }, [form, loaiMaDangChon])
+
+  useEffect(() => {
+    const taiKhachHang = async () => {
+      datDangTaiKhachHang(true)
+      try {
+        const res = await layDanhSachKhachHang({ soLuong: 200, trang: 1, sapXep: 'ngay-tao', thuTu: 'desc' })
+        datDanhSachKhachHang(Array.isArray(res.data) ? res.data : [])
+      } catch {
+        datDanhSachKhachHang([])
+      } finally {
+        datDangTaiKhachHang(false)
+      }
+    }
+
+    taiKhachHang()
+  }, [])
 
   const datLaiBieuMau = () => {
     datCheDoBieuMau('create')
@@ -129,6 +184,18 @@ function NoiBoMaGiamGiaPage() {
     form.setFieldsValue(duLieu)
     datNganKeoDangMo(true)
   }, [form])
+
+  const xuLySaoChepMa = useCallback(async (maCode) => {
+    const maCodeHopLe = String(maCode || '').trim()
+    if (!maCodeHopLe) return
+
+    try {
+      await navigator.clipboard.writeText(maCodeHopLe)
+      messageApi.success('Đã sao chép mã.')
+    } catch {
+      messageApi.error('Không thể sao chép mã.')
+    }
+  }, [messageApi])
 
   const xuLyLuu = async () => {
     try {
@@ -173,6 +240,17 @@ function NoiBoMaGiamGiaPage() {
     })
   }, [messageApi, taiDanhSach])
 
+  const banDoKhachHang = useMemo(
+    () =>
+      new Map(
+        danhSachKhachHang.map((khach) => [
+          String(khach.maKH || '').trim(),
+          khach,
+        ]),
+      ),
+    [danhSachKhachHang],
+  )
+
   const cotBang = useMemo(
     () => [
       {
@@ -181,7 +259,35 @@ function NoiBoMaGiamGiaPage() {
         key: 'maCode',
         width: 140,
         fixed: 'left',
-        render: (val) => <code style={{ fontSize: 12 }}>{val}</code>,
+        render: (val) => {
+          const maCode = String(val || '').trim()
+          return (
+            <Space size={4} style={{ minWidth: 0, width: '100%' }}>
+              <Tooltip title={maCode}>
+                <code
+                  style={{
+                    display: 'inline-block',
+                    maxWidth: 78,
+                    overflow: 'hidden',
+                    textOverflow: 'ellipsis',
+                    whiteSpace: 'nowrap',
+                    fontSize: 12,
+                  }}
+                >
+                  {maCode}
+                </code>
+              </Tooltip>
+              <Tooltip title="Sao chép mã">
+                <Button
+                  type="text"
+                  size="small"
+                  icon={<CopyOutlined />}
+                  onClick={() => xuLySaoChepMa(maCode)}
+                />
+              </Tooltip>
+            </Space>
+          )
+        },
       },
       {
         title: 'Tên mã',
@@ -189,6 +295,23 @@ function NoiBoMaGiamGiaPage() {
         key: 'tenCode',
         width: 200,
         ellipsis: true,
+      },
+      {
+        title: 'Loại mã',
+        dataIndex: 'loaiMa',
+        key: 'loaiMa',
+        width: 160,
+        render: (val, record) => record.loaiMaHienThi || getVoucherLoaiMaLabel(val),
+      },
+      {
+        title: 'Khách sở hữu',
+        dataIndex: 'maKH',
+        key: 'maKH',
+        width: 180,
+        render: (val) => {
+          const khach = banDoKhachHang.get(String(val || '').trim())
+          return val ? `${val}${khach?.tenKH ? ` - ${khach.tenKH}` : ''}` : '--'
+        },
       },
       {
         title: 'Loại giảm',
@@ -248,13 +371,41 @@ function NoiBoMaGiamGiaPage() {
         },
       },
       {
+        title: 'Nguồn',
+        dataIndex: 'nguon',
+        key: 'nguon',
+        width: 160,
+        render: (val) => {
+          const nhanNguon = getVoucherNguonLabel(val)
+          return (
+            <Tooltip title={nhanNguon}>
+              <span
+                style={{
+                  display: 'inline-block',
+                  maxWidth: '100%',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  verticalAlign: 'bottom',
+                }}
+              >
+                {nhanNguon}
+              </span>
+            </Tooltip>
+          )
+        },
+      },
+      {
         title: 'Trạng thái',
         dataIndex: 'trangThai',
         key: 'trangThai',
         width: 110,
-        render: (val) => {
-          const tt = CHON_TRANG_THAI[val] || { color: 'default', text: val }
-          return <Tag color={tt.color}>{tt.text}</Tag>
+        render: (_, record) => {
+          return (
+            <Tag className={`nhan-trang-thai voucher-trang-thai ${getVoucherTrangThaiBadgeClass(record)}`}>
+              {getVoucherTrangThaiLabel(record)}
+            </Tag>
+          )
         },
       },
       {
@@ -270,7 +421,7 @@ function NoiBoMaGiamGiaPage() {
         ),
       },
     ],
-    [moNganKeoSua, xuLyXoá],
+    [banDoKhachHang, moNganKeoSua, xuLyXoá],
   )
 
   return (
@@ -298,7 +449,7 @@ function NoiBoMaGiamGiaPage() {
           dataSource={danhSach}
           rowKey="maCode"
           loading={dangTai}
-          scroll={{ x: 1200 }}
+          scroll={{ x: 1600 }}
           pagination={{ pageSize: 10, showSizeChanger: true, showTotal: (tong) => `Tổng ${tong} mã` }}
         />
       )}
@@ -344,6 +495,46 @@ function NoiBoMaGiamGiaPage() {
             <Select options={LOAI_GIAM_OPTIONS} />
           </Form.Item>
 
+          <Form.Item name="loaiMa" label="Loại mã" rules={[{ required: true, message: 'Vui lòng chọn loại mã.' }]}>
+            <Select options={LOAI_MA_OPTIONS} />
+          </Form.Item>
+
+          <Form.Item
+            name="maKH"
+            label="Khách sở hữu"
+            rules={[
+              {
+                validator: (_, value) =>
+                  LOAI_MA_CAN_KHACH.has(String(loaiMaDangChon || 'PUBLIC').toUpperCase()) && !String(value || '').trim()
+                    ? Promise.reject(new Error('Vui lòng chọn khách hàng sở hữu.'))
+                    : Promise.resolve(),
+              },
+            ]}
+          >
+            <Select
+              showSearch
+              allowClear
+              loading={dangTaiKhachHang}
+              placeholder="Chọn khách hàng"
+              optionFilterProp="label"
+              options={danhSachKhachHang.map((khach) => ({
+                value: khach.maKH,
+                label: `${khach.maKH} - ${khach.tenKH}`,
+              }))}
+              disabled={!LOAI_MA_CAN_KHACH.has(String(loaiMaDangChon || 'PUBLIC').toUpperCase())}
+            />
+          </Form.Item>
+
+          {String(loaiMaDangChon || 'PUBLIC').toUpperCase() === 'LOYALTY' && (
+            <Form.Item
+              name="diemDaDoi"
+              label="Số điểm đã đổi"
+              rules={[{ required: true, message: 'Vui lòng nhập số điểm đã đổi.' }]}
+            >
+              <InputNumber min={1} step={100} style={{ width: '100%' }} placeholder="Ví dụ: 100" />
+            </Form.Item>
+          )}
+
           <Form.Item
             name="giaTri"
             label="Giá trị giảm"
@@ -370,6 +561,10 @@ function NoiBoMaGiamGiaPage() {
 
           <Form.Item name="soLanToiDa" label="Số lần sử dụng tối đa">
             <InputNumber min={0} style={{ width: '100%' }} placeholder="Để trống = không giới hạn" />
+          </Form.Item>
+
+          <Form.Item name="nguonTao" label="Nguồn tạo">
+            <Input placeholder="VD: Tạo thủ công, Dữ liệu mẫu, Hệ thống" maxLength={50} />
           </Form.Item>
 
           <Form.Item name="trangThai" label="Trạng thái" rules={[{ required: true }]}>

@@ -113,7 +113,28 @@ export const taoDonHangApi = async (payload) => {
     return tachVaChuanHoa(tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Tao don hang thanh cong')))
   }
 
-  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', buildPayloadTaoDon(payload))))
+  const payloadThuc = buildPayloadTaoDon(payload)
+  const duLieuGui = {
+    maDonHang: payloadThuc.maDonHang,
+    maKH: payloadThuc.maKH,
+    maBan: payloadThuc.maBan || payloadThuc.tableNumber || payload.tableNumber || payload.address || null,
+    maNV: payloadThuc.maNV,
+    maDatBan: payloadThuc.maDatBan,
+    nguonTao: payloadThuc.nguonTao,
+    trangThai: payloadThuc.trangThai,
+    soDiem: payloadThuc.soDiem,
+    maGiamGia: payloadThuc.maGiamGia,
+    ghiChu: payloadThuc.ghiChu,
+    chiTiet: Array.isArray(payloadThuc.chiTiet)
+      ? payloadThuc.chiTiet.map((item) => ({
+          maMon: item.maMon,
+          soLuong: item.soLuong,
+          ghiChu: item.ghiChu,
+        }))
+      : [],
+  }
+
+  return tachVaChuanHoa(tachPhanHoiApi(await trinhKhachApi.post('/don-hang', duLieuGui)))
 }
 
 export const capNhatTrangThaiDonHangApi = async (id, status) => {

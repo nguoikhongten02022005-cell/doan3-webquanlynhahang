@@ -8,6 +8,7 @@ import { useThongBao } from '../context/ThongBaoContext'
 import { useXacThuc } from '../hooks/useXacThuc'
 import { useDatBan } from '../features/datBan/hooks/useDatBan'
 import { layLichSuDiemTichLuyApi, layTongQuanDiemTichLuyApi } from '../services/api/apiDiemTichLuy'
+import { layDanhSachMaGiamGiaCuaToiApi } from '../services/api/apiMaGiamGia'
 
 function HoSoPage() {
   const navigate = useNavigate()
@@ -18,6 +19,7 @@ function HoSoPage() {
   const [danhSachDatBan, setDanhSachDatBan] = useState([])
   const [tongQuanDiemTichLuy, setTongQuanDiemTichLuy] = useState(null)
   const [danhSachLichSuDiem, setDanhSachLichSuDiem] = useState([])
+  const [danhSachVoucherCuaToi, setDanhSachVoucherCuaToi] = useState([])
 
   useEffect(() => {
     document.body.classList.add('ho-so-an-thanh-cuon')
@@ -32,6 +34,7 @@ function HoSoPage() {
       setDanhSachDatBan([])
       setTongQuanDiemTichLuy(null)
       setDanhSachLichSuDiem([])
+      setDanhSachVoucherCuaToi([])
       return
     }
 
@@ -48,13 +51,16 @@ function HoSoPage() {
           layTongQuanDiemTichLuyApi(),
           layLichSuDiemTichLuyApi(),
         ])
+        const phanHoiVoucher = await layDanhSachMaGiamGiaCuaToiApi()
 
         setTongQuanDiemTichLuy(phanHoiTongQuanDiem?.duLieu || null)
         setDanhSachLichSuDiem(Array.isArray(phanHoiLichSuDiem?.duLieu) ? phanHoiLichSuDiem.duLieu : [])
+        setDanhSachVoucherCuaToi(Array.isArray(phanHoiVoucher?.duLieu) ? phanHoiVoucher.duLieu : [])
       } catch {
         setDanhSachDatBan([])
         setTongQuanDiemTichLuy(null)
         setDanhSachLichSuDiem([])
+        setDanhSachVoucherCuaToi([])
       }
     })()
   }, [layLichSuDatBan, nguoiDungHienTai])
@@ -73,9 +79,12 @@ function HoSoPage() {
 
       setTongQuanDiemTichLuy(phanHoiTongQuanDiem?.duLieu || null)
       setDanhSachLichSuDiem(Array.isArray(phanHoiLichSuDiem?.duLieu) ? phanHoiLichSuDiem.duLieu : [])
+      const phanHoiVoucher = await layDanhSachMaGiamGiaCuaToiApi()
+      setDanhSachVoucherCuaToi(Array.isArray(phanHoiVoucher?.duLieu) ? phanHoiVoucher.duLieu : [])
     } catch {
       setTongQuanDiemTichLuy(null)
       setDanhSachLichSuDiem([])
+      setDanhSachVoucherCuaToi([])
     }
   }
 
@@ -163,6 +172,7 @@ function HoSoPage() {
                 nguoiDung={nguoiDungHienTai}
                 tongQuanDiemTichLuy={tongQuanDiemTichLuy}
                 lichSuDiemTichLuy={danhSachLichSuDiem}
+                danhSachVoucherCuaToi={danhSachVoucherCuaToi}
                 onLogout={handleDangXuat}
                 onCapNhatHoSo={capNhatHoSo}
                 onDoiMatKhau={capNhatMatKhau}

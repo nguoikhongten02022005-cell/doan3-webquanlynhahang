@@ -103,13 +103,19 @@ CREATE TABLE IF NOT EXISTS MaGiamGia (
     TenCode         VARCHAR(100) NOT NULL,
     GiaTri          DECIMAL(10,2) NOT NULL,
     LoaiGiam        ENUM('percentage','fixed_amount') NOT NULL,
+    LoaiMa          ENUM('PUBLIC','CUSTOMER','LOYALTY','VIP','BIRTHDAY') NOT NULL DEFAULT 'PUBLIC',
+    MaKH            VARCHAR(50),
+    DiemDaDoi       INT DEFAULT NULL,
     GiaTriToiDa     DECIMAL(15,2),
     DonHangToiThieu DECIMAL(15,2) DEFAULT 0,
     NgayBatDau      DATE NOT NULL,
     NgayKetThuc     DATE NOT NULL,
     SoLanToiDa      INT DEFAULT NULL,
     SoLanDaDung     INT NOT NULL DEFAULT 0,
-    TrangThai       ENUM('Active','Inactive','HetHan') NOT NULL DEFAULT 'Active'
+    TrangThai       ENUM('Active','Inactive','HetHan') NOT NULL DEFAULT 'Active',
+    NguonTao        VARCHAR(50) DEFAULT NULL,
+    CONSTRAINT FK_MaGiamGia_KhachHang
+        FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
@@ -322,6 +328,8 @@ CREATE INDEX IDX_LichSu_DonHang ON LichSuDonHang(MaDonHang);
 CREATE INDEX IDX_LichSuDiemTichLuy_MaKH ON LichSuDiemTichLuy(MaKH);
 CREATE INDEX IDX_LichSuDiemTichLuy_NgayTao ON LichSuDiemTichLuy(NgayTao);
 CREATE INDEX IDX_LichSuDiemTichLuy_Loai ON LichSuDiemTichLuy(LoaiBienDong);
+CREATE INDEX IDX_MaGiamGia_LoaiMa ON MaGiamGia(LoaiMa);
+CREATE INDEX IDX_MaGiamGia_MaKH ON MaGiamGia(MaKH);
 CREATE INDEX IDX_HoaDon_NgayXuat ON HoaDon(NgayXuat);
 CREATE INDEX IDX_HoaDon_MaNV ON HoaDon(MaNV);
 CREATE INDEX IDX_Ban_KhuVuc_SoChoNgoi ON Ban(KhuVuc, SoChoNgoi);

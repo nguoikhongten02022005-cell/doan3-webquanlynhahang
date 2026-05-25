@@ -137,7 +137,7 @@ function ThanhToanPage() {
           email: nguoiDungHienTai?.email ?? '',
         },
         note: ghiChuDonHang,
-        tableNumber: duLieuForm.tableNumber,
+        tableNumber: duLieuForm.address || duLieuForm.tableNumber,
         paymentMethod: duLieuForm.paymentMethod,
       })
 
