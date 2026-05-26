@@ -132,9 +132,10 @@ JWT_REFRESH_EXPIRES_IN=7d
 
 ## Khởi tạo database
 
-Import file:
+Import lần lượt:
 
 - `database/mysql_init_schema.sql`
+- `database/mysql_seed_dev.sql` nếu cần dữ liệu mẫu
 
 ## Lệnh thường dùng
 

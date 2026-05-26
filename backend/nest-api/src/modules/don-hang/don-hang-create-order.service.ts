@@ -6,7 +6,7 @@ import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { BanGhi } from '../../common/types';
-import { TRANG_THAI_BAN } from '../../common/constants';
+import { TRANG_THAI_BAN, TRANG_THAI_DON_HANG_DANG_MO } from '../../common/constants';
 
 @Injectable()
 export class DonHangCreateOrderService {
@@ -79,9 +79,14 @@ export class DonHangCreateOrderService {
       let isAppending = false;
 
       if (maBan && !maDonHang && nguonTao === 'DatBan' && maDatBan) {
+        const trangThaiDonHangDangMo = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
         const [donDangMoTheoDatBan] = await this.truyVan(
-          "SELECT MaDonHang FROM DonHang WHERE MaBan = ? AND MaDatBan = ? AND TrangThai NOT IN ('Paid','Cancelled') LIMIT 1",
-          [maBan, maDatBan],
+          `SELECT MaDonHang FROM DonHang
+           WHERE MaBan = ?
+             AND MaDatBan = ?
+             AND TrangThai IN (${trangThaiDonHangDangMo.map(() => '?').join(', ')})
+           LIMIT 1`,
+          [maBan, maDatBan, ...trangThaiDonHangDangMo],
           ketNoi,
         );
         if (donDangMoTheoDatBan) {
@@ -91,9 +96,13 @@ export class DonHangCreateOrderService {
       }
 
       if (maBan && !maDonHang && !(nguonTao === 'DatBan' && maDatBan)) {
+        const trangThaiDonHangDangMo = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
         const [donDangMo] = await this.truyVan(
-          "SELECT MaDonHang FROM DonHang WHERE MaBan = ? AND TrangThai NOT IN ('Paid','Cancelled') LIMIT 1",
-          [maBan],
+          `SELECT MaDonHang FROM DonHang
+           WHERE MaBan = ?
+             AND TrangThai IN (${trangThaiDonHangDangMo.map(() => '?').join(', ')})
+           LIMIT 1`,
+          [maBan, ...trangThaiDonHangDangMo],
           ketNoi,
         );
         if (donDangMo) {
@@ -108,7 +117,7 @@ export class DonHangCreateOrderService {
       if (soDiem > 0) {
         const ketQuaDoiDiem = await this.diemTichLuyService.doiDiem(
           nguoiDung,
-          { soDiem, moTa: 'Đổi điểm thanh toán đơn hàng ' + maDonHang },
+          { soDiem, moTa: 'Đổi điểm thanh toán đơn hàng ' + maDonHang, maYeuCau: maDonHang },
           ketNoi,
         );
         diemDaDoi = ketQuaDoiDiem.data || ketQuaDoiDiem;

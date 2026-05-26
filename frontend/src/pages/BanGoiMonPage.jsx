@@ -3,6 +3,7 @@ import { useParams } from 'react-router-dom'
 import TheMonAn from '../features/thucDon/components/TheMonAn'
 import { useThongBao } from '../context/ThongBaoContext'
 import { layOrderDangMoTaiBanApi, layThucDonTheoBanApi, guiOrderTaiBanApi, guiYeuCauThanhToanTaiBanApi } from '../services/api/apiBanAn'
+import { laySacThaiDonHang } from '../utils/donHang'
 import { HOME_CAC_DANH_MUC_THUC_DON } from '../features/thucDon/constants/danhMucThucDon'
 import { layAnhMonTheoTen } from '../features/thucDon/constants/anhMonAn'
 import { chuanHoaDanhMucThucDon } from '../services/mappers/anhXaThucDon'
@@ -44,7 +45,9 @@ function BanGoiMonPage() {
 
         setBanInfo(duLieuThucDon?.ban || null)
         setMenuItems(danhSachMon)
-        setOrderDangMo(orderRes?.duLieu?.donHang || orderRes?.duLieu || null)
+        const trangThaiDonHang = orderRes?.duLieu?.donHang?.trangThai || orderRes?.duLieu?.DonHang?.TrangThai || orderRes?.duLieu?.trangThai || orderRes?.duLieu?.TrangThai || ''
+        const laDonHangDangMo = laySacThaiDonHang(trangThaiDonHang) === 'warning'
+        setOrderDangMo(laDonHangDangMo ? (orderRes?.duLieu?.donHang || orderRes?.duLieu || null) : null)
       } catch (error) {
         if ((error?.message || '').toLowerCase().includes('không tồn tại') || (error?.message || '').toLowerCase().includes('not found')) {
           setLoi('Bàn không tồn tại hoặc QR code không hợp lệ')

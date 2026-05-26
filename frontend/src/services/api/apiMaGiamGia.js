@@ -9,10 +9,12 @@ import { chuanHoaKetQuaVoucher } from '../../features/donHang/contracts'
 import {
   dichThongDiepLoiVoucher,
   getVoucherLoaiMaLabel,
+  getVoucherPhamViLabel,
   getVoucherTrangThaiLabel,
   xacDinhTrangThaiVoucher,
   normalizeVoucherTrangThai,
   normalizeVoucherLoaiMa,
+  normalizeVoucherPhamVi,
 } from './voucherTrangThai'
 
 export const chuanHoaMaGiamGia = (ma) => {
@@ -21,10 +23,18 @@ export const chuanHoaMaGiamGia = (ma) => {
   const trangThaiRuntime = normalizeVoucherTrangThai(
     ma.trangThaiRuntime ||
       ma.TrangThaiRuntime ||
-      ma.runtimeStatus ||
+    ma.runtimeStatus ||
       ma.RuntimeStatus ||
       trangThaiTinhToan.maTrangThai,
   )
+  const thongTinTrangThaiVoucher = {
+    ...ma,
+    trangThai: ma.trangThai || ma.TrangThai || trangThaiTinhToan.maTrangThai,
+    status: ma.status || ma.Status || trangThaiTinhToan.maTrangThai,
+    maTrangThai: ma.maTrangThai || ma.MaTrangThai || trangThaiTinhToan.maTrangThai,
+    trangThaiRuntime,
+    runtimeStatus: trangThaiRuntime,
+  }
   return {
     ...ma,
     maCode: ma.maCode || ma.MaCode,
@@ -37,6 +47,20 @@ export const chuanHoaMaGiamGia = (ma) => {
         ma.loaiMaHienThi ||
         ma.LoaiMaHienThi ||
         'PUBLIC',
+    ),
+    phamVi: normalizeVoucherPhamVi(
+      ma.phamVi ||
+        ma.PhamVi ||
+        ma.phamViHienThi ||
+        ma.PhamViHienThi ||
+        'CA_HAI',
+    ),
+    phamViHienThi: getVoucherPhamViLabel(
+      ma.phamViHienThi ||
+        ma.PhamViHienThi ||
+        ma.phamVi ||
+        ma.PhamVi ||
+        'CA_HAI',
     ),
     loaiMaHienThi: getVoucherLoaiMaLabel(
       ma.loaiMaHienThi ||
@@ -59,16 +83,7 @@ export const chuanHoaMaGiamGia = (ma) => {
     trangThai: ma.trangThai || ma.TrangThai || 'Active',
     trangThaiRuntime,
     runtimeStatus: trangThaiRuntime,
-    trangThaiHienThi: getVoucherTrangThaiLabel(
-      ma.trangThaiHienThi ||
-        ma.TrangThaiHienThi ||
-        ma.nhanTrangThai ||
-        ma.NhanTrangThai ||
-        ma.label ||
-        ma.Label ||
-        trangThaiTinhToan.nhanTrangThai ||
-        trangThaiRuntime,
-    ),
+    trangThaiHienThi: getVoucherTrangThaiLabel(thongTinTrangThaiVoucher),
     coTheApDung:
       ma.coTheApDung == null
         ? trangThaiTinhToan.coTheApDung
@@ -94,6 +109,13 @@ const laVoucherHopLeChoCheckout = (voucher) => {
   return laVoucherConHieuLucChoCheckout(voucher)
 }
 
+const laVoucherHopLeTheoPhamVi = (voucher, phamVi) => {
+  if (!laVoucherHopLeChoCheckout(voucher)) return false
+  const phamViVoucher = normalizeVoucherPhamVi(voucher?.phamVi || voucher?.PhamVi || 'CA_HAI')
+  const phamViYeuCau = normalizeVoucherPhamVi(phamVi || 'DON_HANG')
+  return phamViVoucher === phamViYeuCau || phamViVoucher === 'CA_HAI'
+}
+
 const laVoucherHopLeChoHoSo = (voucher) => {
   if (!voucher) return false
   return LOAI_MA_HOP_LE_CHO_KHACH.has(String(voucher.loaiMa || '').toUpperCase()) && String(voucher.loaiMa || '').toUpperCase() !== 'PUBLIC'
@@ -117,22 +139,22 @@ export const layDanhSachMaGiamGiaApi = async () => {
   }
 }
 
-export const layDanhSachMaGiamGiaCongKhaiApi = async () => {
+export const layDanhSachMaGiamGiaCongKhaiApi = async (phamVi = 'DON_HANG') => {
   if (!coSuDungMayChu()) {
     const duLieu = layDanhSachMaGiamGiaOffline()
       .map(chuanHoaMaGiamGia)
-      .filter((voucher) => voucher && String(voucher.loaiMa || '').toUpperCase() === 'PUBLIC' && laVoucherHopLeChoCheckout(voucher))
+      .filter((voucher) => voucher && String(voucher.loaiMa || '').toUpperCase() === 'PUBLIC' && laVoucherHopLeTheoPhamVi(voucher, phamVi))
     return {
       ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay voucher cong khai thanh cong')),
       duLieu,
     }
   }
 
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/ma-giam-gia/public'))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/ma-giam-gia/public?phamVi=${encodeURIComponent(String(phamVi || 'DON_HANG').trim() || 'DON_HANG')}`))
   return {
     ...phanHoi,
     duLieu: Array.isArray(phanHoi.duLieu)
-      ? phanHoi.duLieu.map(chuanHoaMaGiamGia).filter((voucher) => voucher && laVoucherHopLeChoCheckout(voucher))
+      ? phanHoi.duLieu.map(chuanHoaMaGiamGia).filter((voucher) => voucher && laVoucherHopLeTheoPhamVi(voucher, phamVi))
       : [],
   }
 }
@@ -162,7 +184,7 @@ export const layDanhSachMaGiamGiaCuaToiApi = async () => {
   }
 }
 
-export const layDanhSachMaGiamGiaCuaToiCheckoutApi = async () => {
+export const layDanhSachMaGiamGiaCuaToiCheckoutApi = async (phamVi = 'DON_HANG') => {
   if (!coSuDungMayChu()) {
     const maKH = layNguoiDungHienTai()?.maKH || ''
     const duLieu = layDanhSachMaGiamGiaOffline()
@@ -173,17 +195,18 @@ export const layDanhSachMaGiamGiaCuaToiCheckoutApi = async () => {
         && laVoucherHopLeChoHoSo(voucher),
       )
       .filter(laVoucherConHieuLucChoCheckout)
+      .filter((voucher) => laVoucherHopLeTheoPhamVi(voucher, phamVi))
     return {
       ...tachPhanHoiApi(taoPhanHoiOffline(duLieu, 'Lay voucher checkout cua toi thanh cong')),
       duLieu,
     }
   }
 
-  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get('/ma-giam-gia/me/checkout'))
+  const phanHoi = tachPhanHoiApi(await trinhKhachApi.get(`/ma-giam-gia/me/checkout?phamVi=${encodeURIComponent(String(phamVi || 'DON_HANG').trim() || 'DON_HANG')}`))
   return {
     ...phanHoi,
     duLieu: Array.isArray(phanHoi.duLieu)
-      ? phanHoi.duLieu.map(chuanHoaMaGiamGia).filter((voucher) => voucher && laVoucherHopLeChoCheckout(voucher))
+      ? phanHoi.duLieu.map(chuanHoaMaGiamGia).filter((voucher) => voucher && laVoucherHopLeTheoPhamVi(voucher, phamVi))
       : [],
   }
 }
@@ -203,6 +226,7 @@ export const taoMaGiamGiaApi = async (payload) => {
       diemDaDoi: payload.diemDaDoi != null && payload.diemDaDoi !== '' ? Number(payload.diemDaDoi) : null,
       giaTriToiDa: payload.giaTriToiDa != null && payload.giaTriToiDa !== '' ? Number(payload.giaTriToiDa) : null,
       donHangToiThieu: Number(payload.donHangToiThieu || 0),
+      phamVi: normalizeVoucherPhamVi(payload.phamVi || payload.PhamVi || 'CA_HAI'),
       ngayBatDau: payload.ngayBatDau,
       ngayKetThuc: payload.ngayKetThuc,
       soLanToiDa: payload.soLanToiDa != null && payload.soLanToiDa !== '' ? Number(payload.soLanToiDa) : null,
@@ -223,6 +247,7 @@ export const capNhatMaGiamGiaApi = async (maCode, payload) => {
       diemDaDoi: payload.diemDaDoi != null && payload.diemDaDoi !== '' ? Number(payload.diemDaDoi) : null,
       giaTriToiDa: payload.giaTriToiDa != null && payload.giaTriToiDa !== '' ? Number(payload.giaTriToiDa) : null,
       donHangToiThieu: Number(payload.donHangToiThieu || 0),
+      phamVi: normalizeVoucherPhamVi(payload.phamVi || payload.PhamVi || 'CA_HAI'),
       ngayBatDau: payload.ngayBatDau,
       ngayKetThuc: payload.ngayKetThuc,
       soLanToiDa: payload.soLanToiDa != null && payload.soLanToiDa !== '' ? Number(payload.soLanToiDa) : null,
@@ -256,7 +281,7 @@ const chuanHoaPhieuGiamGia = (phieuGiamGia) => {
   }
 }
 
-export const kiemTraPhieuGiamGiaApi = async (maPhieuGiamGia, tongTienDonHang = 0, loaiDon = '', maKH = '') => {
+export const kiemTraPhieuGiamGiaApi = async (maPhieuGiamGia, tongTienDonHang = 0, phamVi = 'DON_HANG', maKH = '') => {
   if (!coSuDungMayChu()) {
     const voucher = timMaGiamGiaOfflineTheoCode(maPhieuGiamGia)
 
@@ -275,10 +300,20 @@ export const kiemTraPhieuGiamGiaApi = async (maPhieuGiamGia, tongTienDonHang = 0
       throw new Error('Đơn hàng chưa đạt giá trị tối thiểu để áp dụng mã giảm giá.')
     }
 
+    const phamViVoucher = normalizeVoucherPhamVi(voucher.phamVi || voucher.PhamVi || 'CA_HAI')
+    const phamViYeuCau = normalizeVoucherPhamVi(phamVi || 'DON_HANG')
+    if (phamViVoucher !== 'CA_HAI' && phamViVoucher !== phamViYeuCau) {
+      throw new Error(
+        phamViYeuCau === 'DAT_BAN'
+          ? 'Mã giảm giá này chỉ áp dụng cho đặt bàn.'
+          : 'Mã giảm giá này chỉ áp dụng cho đơn hàng.',
+      )
+    }
+
     const phanHoi = tachPhanHoiApi(taoPhanHoiOffline({
       ...voucher,
       thongDiep: voucher.description || voucher.thongDiep || '',
-      loaiDon,
+      phamVi: phamViYeuCau,
     }, 'Kiem tra ma giam gia thanh cong'))
 
     return { ...phanHoi, duLieu: chuanHoaPhieuGiamGia(phanHoi.duLieu) }
@@ -290,6 +325,7 @@ export const kiemTraPhieuGiamGiaApi = async (maPhieuGiamGia, tongTienDonHang = 0
         maCode: maPhieuGiamGia,
         tongTien: tongTienDonHang,
         maKH,
+        phamVi: normalizeVoucherPhamVi(phamVi || 'DON_HANG'),
       }),
     )
     return { ...phanHoi, duLieu: chuanHoaPhieuGiamGia(phanHoi.duLieu) }
@@ -308,11 +344,11 @@ export const kiemTraPhieuGiamGiaApi = async (maPhieuGiamGia, tongTienDonHang = 0
 
 export const layDanhSachVoucherChoCheckoutApi = async () => {
   const maKH = layNguoiDungHienTai()?.maKH || ''
-  const publicRes = await layDanhSachMaGiamGiaCongKhaiApi()
+  const publicRes = await layDanhSachMaGiamGiaCongKhaiApi('DON_HANG')
   let ownRes = { duLieu: [] }
   if (maKH) {
     try {
-      ownRes = await layDanhSachMaGiamGiaCuaToiCheckoutApi()
+      ownRes = await layDanhSachMaGiamGiaCuaToiCheckoutApi('DON_HANG')
     } catch {
       ownRes = { duLieu: [] }
     }

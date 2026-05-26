@@ -40,6 +40,27 @@ export const NHAN_LOAI_VOUCHER = Object.freeze({
   UNKNOWN: 'Không xác định',
 })
 
+export const MA_PHAM_VI_VOUCHER = Object.freeze({
+  DAT_BAN: 'DAT_BAN',
+  DON_HANG: 'DON_HANG',
+  CA_HAI: 'CA_HAI',
+  UNKNOWN: 'UNKNOWN',
+})
+
+export const NHAN_PHAM_VI_VOUCHER = Object.freeze({
+  DAT_BAN: 'Đặt bàn',
+  DON_HANG: 'Đơn hàng',
+  CA_HAI: 'Cả hai',
+  UNKNOWN: 'Không xác định',
+})
+
+const LOAI_MA_VOUCHER_CA_NHAN = new Set([
+  MA_LOAI_VOUCHER.CUSTOMER,
+  MA_LOAI_VOUCHER.LOYALTY,
+  MA_LOAI_VOUCHER.VIP,
+  MA_LOAI_VOUCHER.BIRTHDAY,
+])
+
 const MA_NGUON_VOUCHER = Object.freeze({
   DOI_DIEM_TICH_LUY: 'DOI_DIEM_TICH_LUY',
   SEED: 'SEED',
@@ -106,6 +127,34 @@ const chuanHoaKhoaLoaiVoucher = (giaTri) => {
   }
 
   return banDoKhoa[khoa] || MA_LOAI_VOUCHER.UNKNOWN
+}
+
+const chuanHoaKhoaPhamVi = (giaTri) => {
+  const chuoi = layChuoi(giaTri)
+  if (!chuoi) return MA_PHAM_VI_VOUCHER.CA_HAI
+
+  const khoa = boDauTiengViet(chuoi)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '')
+
+  const banDoKhoa = {
+    DAT_BAN: MA_PHAM_VI_VOUCHER.DAT_BAN,
+    DATBAN: MA_PHAM_VI_VOUCHER.DAT_BAN,
+    BOOKING: MA_PHAM_VI_VOUCHER.DAT_BAN,
+    RESERVATION: MA_PHAM_VI_VOUCHER.DAT_BAN,
+    DON_HANG: MA_PHAM_VI_VOUCHER.DON_HANG,
+    DONHANG: MA_PHAM_VI_VOUCHER.DON_HANG,
+    ORDER: MA_PHAM_VI_VOUCHER.DON_HANG,
+    CA_HAI: MA_PHAM_VI_VOUCHER.CA_HAI,
+    CAHAI: MA_PHAM_VI_VOUCHER.CA_HAI,
+    BOTH: MA_PHAM_VI_VOUCHER.CA_HAI,
+    ALL: MA_PHAM_VI_VOUCHER.CA_HAI,
+    UNKNOWN: MA_PHAM_VI_VOUCHER.UNKNOWN,
+    KHONG_XAC_DINH: MA_PHAM_VI_VOUCHER.UNKNOWN,
+  }
+
+  return banDoKhoa[khoa] || MA_PHAM_VI_VOUCHER.UNKNOWN
 }
 
 const layChuoi = (...giaTri) => {
@@ -214,11 +263,20 @@ export const getVoucherTrangThaiLabel = (status) => {
       status.label,
       status.Label,
     )
+    const khoaTrangThai = normalizeVoucherTrangThai(status)
+    const khoaTuNhan = labelTrucTiep ? normalizeVoucherTrangThai(labelTrucTiep) : MA_TRANG_THAI_VOUCHER.UNKNOWN
+    const khoaHienThi = khoaTrangThai !== MA_TRANG_THAI_VOUCHER.UNKNOWN ? khoaTrangThai : khoaTuNhan
+
+    if (khoaHienThi === MA_TRANG_THAI_VOUCHER.USED_UP) {
+      const loaiMa = normalizeVoucherLoaiMa(status)
+      return LOAI_MA_VOUCHER_CA_NHAN.has(loaiMa)
+        ? NHAN_TRANG_THAI_VOUCHER.USED
+        : NHAN_TRANG_THAI_VOUCHER.USED_UP
+    }
 
     if (labelTrucTiep) {
-      const khoaNhan = normalizeVoucherTrangThai(labelTrucTiep)
-      if (khoaNhan !== MA_TRANG_THAI_VOUCHER.UNKNOWN) {
-        return NHAN_TRANG_THAI_VOUCHER[khoaNhan] || labelTrucTiep
+      if (khoaTuNhan !== MA_TRANG_THAI_VOUCHER.UNKNOWN) {
+        return NHAN_TRANG_THAI_VOUCHER[khoaTuNhan] || labelTrucTiep
       }
       return labelTrucTiep
     }
@@ -251,6 +309,41 @@ export const getVoucherLoaiMaLabel = (loaiMa) => {
 
   const khoaLoaiMa = normalizeVoucherLoaiMa(loaiMa)
   return NHAN_LOAI_VOUCHER[khoaLoaiMa] || NHAN_LOAI_VOUCHER.UNKNOWN
+}
+
+export const normalizeVoucherPhamVi = (phamVi) =>
+  chuanHoaKhoaPhamVi(layChuoi(
+    typeof phamVi === 'object' && phamVi !== null
+      ? phamVi.phamVi ||
+          phamVi.PhamVi ||
+          phamVi.phamViHienThi ||
+          phamVi.PhamViHienThi ||
+          phamVi.label ||
+          phamVi.Label
+      : phamVi,
+  ))
+
+export const getVoucherPhamViLabel = (phamVi) => {
+  if (phamVi && typeof phamVi === 'object') {
+    const labelTrucTiep = layChuoi(
+      phamVi.phamViHienThi,
+      phamVi.PhamViHienThi,
+      phamVi.nhanPhamVi,
+      phamVi.NhanPhamVi,
+      phamVi.label,
+      phamVi.Label,
+    )
+    if (labelTrucTiep) {
+      const khoaNhan = normalizeVoucherPhamVi(labelTrucTiep)
+      if (khoaNhan !== MA_PHAM_VI_VOUCHER.UNKNOWN) {
+        return NHAN_PHAM_VI_VOUCHER[khoaNhan] || labelTrucTiep
+      }
+      return labelTrucTiep
+    }
+  }
+
+  const khoaPhamVi = normalizeVoucherPhamVi(phamVi)
+  return NHAN_PHAM_VI_VOUCHER[khoaPhamVi] || NHAN_PHAM_VI_VOUCHER.UNKNOWN
 }
 
 const chuanHoaKhoaNguon = (giaTri) => {
@@ -345,6 +438,19 @@ export const parseNgayVoucher = (giaTri, cuoiNgay = false) => {
 
   const ngay = new Date(chuoi)
   return Number.isNaN(ngay.getTime()) ? null : ngay
+}
+
+export const dinhDangNgayVoucher = (giaTri) => {
+  if (!giaTri) return '--'
+
+  const ngay = giaTri instanceof Date ? new Date(giaTri.getTime()) : new Date(String(giaTri).trim())
+  if (Number.isNaN(ngay.getTime())) return String(giaTri)
+
+  return new Intl.DateTimeFormat('vi-VN', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric',
+  }).format(ngay)
 }
 
 const chuanHoaTrangThaiLuuTru = (giaTri) =>

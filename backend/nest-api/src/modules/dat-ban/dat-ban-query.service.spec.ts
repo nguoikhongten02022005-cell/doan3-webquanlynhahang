@@ -153,4 +153,62 @@ describe('DatBanQueryService', () => {
       expect.objectContaining({ maBan: 'B002', trangThai: 'Available' }),
     ]);
   });
+
+  it('ignores expired bookings when computing availability', async () => {
+    const mysql = {
+      truyVan: jest.fn(async (query: string) => {
+        if (query.includes('FROM Ban')) {
+          return [
+            {
+              MaBan: 'B001',
+              TenBan: 'Bàn 1',
+              SoBan: 1,
+              SoChoNgoi: 4,
+              TrangThai: 'Available',
+            },
+            {
+              MaBan: 'B002',
+              TenBan: 'Bàn 2',
+              SoBan: 2,
+              SoChoNgoi: 4,
+              TrangThai: 'Available',
+            },
+          ];
+        }
+
+        if (query.includes('FROM DatBan')) {
+          if (query.includes('TrangThai IN')) {
+            return [];
+          }
+
+          return [
+            {
+              MaDatBan: 'DB999',
+              MaBan: 'B001',
+              NgayDat: '2026-05-21',
+              GioDat: '12:00:00',
+              GioKetThuc: '13:30:00',
+              TrangThai: 'Expired',
+            },
+          ];
+        }
+
+        return [];
+      }),
+    };
+    const service = new DatBanQueryService(mysql as any);
+
+    const response = await service.layKhaDungDatBan({
+      ngayDat: '2026-05-21',
+      gioDat: '12:00',
+      soNguoi: 2,
+    });
+
+    expect((response.data as any).tongBanConTrong).toBe(2);
+    expect((response.data as any).danhSachBan).toEqual([
+      expect.objectContaining({ maBan: 'B001' }),
+      expect.objectContaining({ maBan: 'B002' }),
+    ]);
+    expect(mysql.truyVan.mock.calls.some(([sql]) => String(sql).includes('TrangThai IN'))).toBe(true);
+  });
 });

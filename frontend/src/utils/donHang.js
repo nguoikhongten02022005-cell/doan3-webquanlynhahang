@@ -12,17 +12,21 @@ export const NHAN_TRANG_THAI_DON_HANG = Object.freeze({
   Preparing: 'Đang chuẩn bị',
   Ready: 'Sẵn sàng',
   Served: 'Đang phục vụ',
-  Paid: 'Đã hoàn thành',
+  Serving: 'Đang phục vụ',
+  Paid: 'Đã thanh toán',
+  Completed: 'Hoàn tất',
   Cancelled: 'Đã hủy',
 })
 
 export const SAC_THAI_TRANG_THAI_DON_HANG = Object.freeze({
   Pending: 'warning',
-  Confirmed: 'success',
+  Confirmed: 'warning',
   Preparing: 'warning',
   Ready: 'warning',
   Served: 'warning',
+  Serving: 'warning',
   Paid: 'success',
+  Completed: 'success',
   Cancelled: 'danger',
 })
 
@@ -32,9 +36,30 @@ const BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI = Object.freeze({
   Preparing: 3,
   Ready: 4,
   Served: 5,
+  Serving: 5,
   Paid: 6,
+  Completed: 7,
   Cancelled: 0,
 })
+
+const TRANG_THAI_DON_HANG_DANG_HOAT_DONG = new Set([
+  'Pending',
+  'Confirmed',
+  'Preparing',
+  'Ready',
+  'Served',
+  'Serving',
+  'CHO_XU_LY',
+  'DANG_CHE_BIEN',
+  'SAN_SANG',
+  'DANG_PHUC_VU',
+])
+
+const TRANG_THAI_DON_HANG_KET_THUC = new Set([
+  'Paid',
+  'Completed',
+  'Cancelled',
+])
 
 export const NHAN_PHUONG_THUC_THANH_TOAN = Object.freeze({
   TienMat: 'Tiền mặt',
@@ -97,11 +122,11 @@ export const laySacThaiDonHang = (trangThai) => SAC_THAI_TRANG_THAI_DON_HANG[tra
 
 export const layBuocTienTrinhDonHang = (trangThai) => BUOC_TIEN_TRINH_DON_HANG_THEO_TRANG_THAI[trangThai] ?? 0
 
-export const laTrangThaiDonHangDaHuy = (trangThai) => trangThai === 'Cancelled'
+export const laTrangThaiDonHangDaHuy = (trangThai) => chuanHoaVanBan(trangThai) === 'Cancelled'
 
-export const laTrangThaiDonHangKetThuc = (trangThai) => trangThai === 'Paid' || trangThai === 'Cancelled'
+export const laTrangThaiDonHangKetThuc = (trangThai) => TRANG_THAI_DON_HANG_KET_THUC.has(chuanHoaVanBan(trangThai))
 
-export const laTrangThaiDonHangDangHoatDong = (trangThai) => Boolean(trangThai) && !laTrangThaiDonHangKetThuc(trangThai)
+export const laTrangThaiDonHangDangHoatDong = (trangThai) => TRANG_THAI_DON_HANG_DANG_HOAT_DONG.has(chuanHoaVanBan(trangThai))
 
 export const layNhanPhuongThucThanhToan = (phuongThucThanhToan) => (
   NHAN_PHUONG_THUC_THANH_TOAN[phuongThucThanhToan] || chuanHoaVanBan(phuongThucThanhToan) || 'Chưa chọn'

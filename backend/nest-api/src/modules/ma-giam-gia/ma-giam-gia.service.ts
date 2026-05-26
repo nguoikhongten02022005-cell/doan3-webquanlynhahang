@@ -11,12 +11,16 @@ import { BanGhi } from '../../common/types';
 import {
   GIA_TRI_QUY_DOI,
   LOAI_MA_GIAM_GIA,
+  PHAM_VI_MA_GIAM_GIA,
   SO_NGAY_HIEU_LUC_VOUCHER_DOI_DIEM,
   TI_LE_QUY_DOI_DIEM,
 } from '../../common/constants';
 import { taoMa } from '../../common/tao-ma';
 import { layKhachHangTheoMaNd as layKhachHangTheoMaNdHelper } from '../../common/khach-hang.helper';
 import {
+  getVoucherPhamViLabel,
+  kiemTraPhamViMaGiamGia,
+  normalizePhamViMaGiamGia,
   taoMaVoucherDoiDiemTheoYeuCau,
   xacDinhTrangThaiMaGiamGia,
 } from '../../common/ma-giam-gia.helper';
@@ -58,6 +62,9 @@ export class MaGiamGiaService {
       .trim()
       .toUpperCase();
     const maKhachHang = String(ma.MaKH || '').trim();
+    const phamVi = normalizePhamViMaGiamGia(
+      ma.PhamVi || ma.phamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI,
+    );
     const trangThai = xacDinhTrangThaiMaGiamGia(ma);
     const trangThaiLuuTru = String(ma.TrangThai || 'Active');
 
@@ -76,6 +83,8 @@ export class MaGiamGiaService {
       ngayKetThuc: ma.NgayKetThuc || null,
       soLanToiDa: ma.SoLanToiDa == null ? null : Number(ma.SoLanToiDa),
       soLanDaDung: Number(ma.SoLanDaDung || 0),
+      phamVi,
+      phamViHienThi: getVoucherPhamViLabel(phamVi),
       trangThai: trangThaiLuuTru,
       trangThaiRuntime: trangThai.maTrangThai,
       trangThaiHienThi: trangThai.nhanTrangThai,
@@ -85,12 +94,25 @@ export class MaGiamGiaService {
     };
   }
 
-  private kiemTraDieuKienSuDungMa(ma: BanGhi, tongTien: number, maKH?: string) {
+  private kiemTraDieuKienSuDungMa(
+    ma: BanGhi,
+    tongTien: number,
+    maKH?: string,
+    phamVi?: string,
+  ) {
     const loaiMa = String(ma.LoaiMa || LOAI_MA_GIAM_GIA.CONG_KHAI)
       .trim()
       .toUpperCase();
     const maKhachHang = String(ma.MaKH || '').trim();
+    const hopLePhamVi = kiemTraPhamViMaGiamGia(
+      ma.PhamVi || ma.phamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI,
+      phamVi,
+    );
     const trangThai = xacDinhTrangThaiMaGiamGia(ma);
+
+    if (!hopLePhamVi.hopLe) {
+      throw new BadRequestException(hopLePhamVi.lyDo);
+    }
 
     if (!trangThai.coTheApDung) {
       throw new BadRequestException(trangThai.lyDo);
@@ -137,6 +159,7 @@ export class MaGiamGiaService {
     const maCode = String(payload.maCode || '').trim();
     const tongTien = Number(payload.tongTien || 0);
     const maKH = String(payload.maKH || '').trim();
+    const phamVi = String(payload.phamVi || payload.PhamVi || '').trim();
     const [ma] = await this.truyVan(
       'SELECT * FROM MaGiamGia WHERE MaCode = ? LIMIT 1',
       [maCode],
@@ -144,7 +167,12 @@ export class MaGiamGiaService {
 
     if (!ma) throw new NotFoundException('Không tìm thấy mã giảm giá.');
 
-    this.kiemTraDieuKienSuDungMa(ma, tongTien, maKH || undefined);
+    this.kiemTraDieuKienSuDungMa(
+      ma,
+      tongTien,
+      maKH || undefined,
+      phamVi || undefined,
+    );
 
     const { giaTriGiam, giamToiDa, soTienGiamThucTe } = tinhGiamGia(
       tongTien,
@@ -175,7 +203,7 @@ export class MaGiamGiaService {
   async layDanhSach() {
     const danhSach = await this.truyVan(
       `SELECT MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu,
-              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao
+              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao, PhamVi
        FROM MaGiamGia
        ORDER BY NgayBatDau DESC, MaCode DESC`,
     );
@@ -185,10 +213,12 @@ export class MaGiamGiaService {
     );
   }
 
-  async layDanhSachCongKhaiChoCheckout() {
+  async layDanhSachCongKhaiChoCheckout(
+    phamViYeuCau: string = PHAM_VI_MA_GIAM_GIA.DON_HANG,
+  ) {
     const danhSach = await this.truyVan(
       `SELECT MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu,
-              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao
+              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao, PhamVi
        FROM MaGiamGia
        WHERE LoaiMa = 'PUBLIC'
        ORDER BY NgayBatDau DESC, MaCode DESC`,
@@ -197,6 +227,9 @@ export class MaGiamGiaService {
     return taoPhanHoi(
       danhSach
         .map((ma) => this.chuanHoaMaGiamGia(ma))
+        .filter((ma) =>
+          kiemTraPhamViMaGiamGia(ma.phamVi, phamViYeuCau).hopLe,
+        )
         .filter((ma) => ma.coTheApDung),
       'Lấy voucher công khai thành công',
     );
@@ -213,7 +246,7 @@ export class MaGiamGiaService {
 
     const danhSach = await this.truyVan(
       `SELECT MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu,
-              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao
+              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao, PhamVi
        FROM MaGiamGia
        WHERE MaKH = ?
          AND LoaiMa IN ('CUSTOMER', 'LOYALTY', 'VIP', 'BIRTHDAY')
@@ -227,7 +260,10 @@ export class MaGiamGiaService {
     );
   }
 
-  async layVoucherCuaToiChoCheckout(nguoiDung: BanGhi) {
+  async layVoucherCuaToiChoCheckout(
+    nguoiDung: BanGhi,
+    phamViYeuCau: string = PHAM_VI_MA_GIAM_GIA.DON_HANG,
+  ) {
     const khachHang = await this.layKhachHangTheoMaNd(
       String(nguoiDung?.maND || ''),
     );
@@ -238,7 +274,7 @@ export class MaGiamGiaService {
 
     const danhSach = await this.truyVan(
       `SELECT MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu,
-              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao
+              NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao, PhamVi
        FROM MaGiamGia
        WHERE MaKH = ?
          AND LoaiMa IN ('CUSTOMER', 'LOYALTY', 'VIP', 'BIRTHDAY')
@@ -249,6 +285,9 @@ export class MaGiamGiaService {
     return taoPhanHoi(
       danhSach
         .map((ma) => this.chuanHoaMaGiamGia(ma))
+        .filter((ma) =>
+          kiemTraPhamViMaGiamGia(ma.phamVi, phamViYeuCau).hopLe,
+        )
         .filter((ma) => ma.coTheApDung),
       'Lấy voucher checkout của khách hàng thành công',
     );
@@ -275,6 +314,17 @@ export class MaGiamGiaService {
     const loaiMa = String(payload.loaiMa || LOAI_MA_GIAM_GIA.CONG_KHAI)
       .trim()
       .toUpperCase();
+    const phamViRaw =
+      payload.phamVi == null ? '' : String(payload.phamVi || '').trim();
+    const phamViNhap = phamViRaw ? normalizePhamViMaGiamGia(phamViRaw) : null;
+    if (phamViRaw && phamViNhap === 'UNKNOWN') {
+      throw new BadRequestException('Phạm vi áp dụng không hợp lệ.');
+    }
+    const phamVi =
+      phamViNhap ||
+      (loaiMa === LOAI_MA_GIAM_GIA.DOI_DIEM
+        ? PHAM_VI_MA_GIAM_GIA.DON_HANG
+        : PHAM_VI_MA_GIAM_GIA.CA_HAI);
     const giaTri = Number(payload.giaTri);
     const giaTriToiDa =
       payload.giaTriToiDa == null ? null : Number(payload.giaTriToiDa);
@@ -321,8 +371,8 @@ export class MaGiamGiaService {
     await this.thucThi(
       `INSERT INTO MaGiamGia
         (MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu,
-         NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?)`,
+         NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao, PhamVi)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, 0, ?, ?, ?)`,
       [
         maCode,
         tenCode,
@@ -338,6 +388,7 @@ export class MaGiamGiaService {
         soLanToiDa,
         trangThai,
         nguonTao,
+        phamVi,
       ],
     );
 
@@ -358,6 +409,7 @@ export class MaGiamGiaService {
         SoLanDaDung: 0,
         TrangThai: trangThai,
         NguonTao: nguonTao,
+        PhamVi: phamVi,
       }),
       'Tạo mã giảm giá thành công',
     );
@@ -422,8 +474,8 @@ export class MaGiamGiaService {
     await this.thucThi(
       `INSERT INTO MaGiamGia
         (MaCode, TenCode, GiaTri, LoaiGiam, LoaiMa, MaKH, DiemDaDoi, GiaTriToiDa, DonHangToiThieu,
-         NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao)
-        VALUES (?, ?, ?, 'fixed_amount', 'LOYALTY', ?, ?, NULL, 0, ?, ?, 1, 0, 'Active', ?)`,
+         NgayBatDau, NgayKetThuc, SoLanToiDa, SoLanDaDung, TrangThai, NguonTao, PhamVi)
+        VALUES (?, ?, ?, 'fixed_amount', 'LOYALTY', ?, ?, NULL, 0, ?, ?, 1, 0, 'Active', ?, 'DON_HANG')`,
       [
         maCode,
         tenCode,
@@ -453,6 +505,7 @@ export class MaGiamGiaService {
       SoLanDaDung: 0,
       TrangThai: 'Active',
       NguonTao: payload.nguonTao || 'DOI_DIEM_TICH_LUY',
+      PhamVi: PHAM_VI_MA_GIAM_GIA.DON_HANG,
     };
 
     return {
@@ -482,6 +535,12 @@ export class MaGiamGiaService {
         : String(payload.loaiMa || '')
             .trim()
             .toUpperCase();
+    const phamViRaw =
+      payload.phamVi == null ? null : String(payload.phamVi || '').trim();
+    const phamVi =
+      phamViRaw && phamViRaw.length > 0
+        ? normalizePhamViMaGiamGia(phamViRaw)
+        : null;
     const maKH =
       payload.maKH == null ? null : String(payload.maKH || '').trim() || null;
     const giaTriToiDa =
@@ -510,6 +569,11 @@ export class MaGiamGiaService {
       String(tonTai.LoaiMa || LOAI_MA_GIAM_GIA.CONG_KHAI)
         .trim()
         .toUpperCase();
+    const phamViSauCapNhat =
+      phamVi ||
+      (loaiMaSauCapNhat === LOAI_MA_GIAM_GIA.DOI_DIEM
+        ? PHAM_VI_MA_GIAM_GIA.DON_HANG
+        : normalizePhamViMaGiamGia(tonTai.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI));
     const maKHSauCapNhat =
       loaiMaSauCapNhat === LOAI_MA_GIAM_GIA.CONG_KHAI
         ? null
@@ -528,6 +592,9 @@ export class MaGiamGiaService {
     ) {
       throw new BadRequestException('Voucher đổi điểm phải có số điểm đã đổi.');
     }
+    if (phamViRaw && phamVi === 'UNKNOWN') {
+      throw new BadRequestException('Phạm vi áp dụng không hợp lệ.');
+    }
 
     await this.thucThi(
       `UPDATE MaGiamGia SET
@@ -543,7 +610,8 @@ export class MaGiamGiaService {
         NgayKetThuc = COALESCE(?, NgayKetThuc),
         SoLanToiDa = ?,
         TrangThai = COALESCE(?, TrangThai),
-        NguonTao = COALESCE(?, NguonTao)
+        NguonTao = COALESCE(?, NguonTao),
+        PhamVi = COALESCE(?, PhamVi)
        WHERE MaCode = ?`,
       [
         tenCode == null || tenCode === '' ? null : tenCode,
@@ -561,11 +629,20 @@ export class MaGiamGiaService {
         soLanToiDa == null || Number.isNaN(soLanToiDa) ? null : soLanToiDa,
         trangThai == null || trangThai === '' ? null : trangThai,
         nguonTao == null || nguonTao === '' ? null : nguonTao,
+        phamViSauCapNhat == null || phamViSauCapNhat === 'UNKNOWN'
+          ? null
+          : phamViSauCapNhat,
         maCode,
       ],
     );
 
-    return taoPhanHoi({ maCode }, 'Cập nhật mã giảm giá thành công');
+    return taoPhanHoi(
+      {
+        maCode,
+        phamVi: phamViSauCapNhat,
+      },
+      'Cập nhật mã giảm giá thành công',
+    );
   }
 
   async xoaMa(maCode: string) {

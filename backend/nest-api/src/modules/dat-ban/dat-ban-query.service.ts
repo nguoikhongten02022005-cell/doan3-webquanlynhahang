@@ -10,6 +10,8 @@ import { BanGhi } from '../../common/types';
 import {
   TRANG_THAI_BAN,
   TRANG_THAI_DON_HANG_DANG_MO,
+  TRANG_THAI_DAT_BAN_GIU_BAN,
+  TRANG_THAI_DAT_BAN_SU_DUNG_BAN,
 } from '../../common/constants';
 import {
   MA_KHU_VUC_BAN,
@@ -286,8 +288,12 @@ export class DatBanQueryService {
     );
     const danhSachDatBan = await this.mysql.truyVan(
       `SELECT * FROM DatBan
-       WHERE NgayDat = ? AND TrangThai NOT IN ('Cancelled', 'NoShow', 'Completed', 'DA_HUY', 'KHONG_DEN', 'DA_HOAN_THANH', 'TU_CHOI_HET_CHO')`,
-      [ngayDat],
+       WHERE NgayDat = ?
+         AND TrangThai IN (${[
+           ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN),
+           ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN),
+         ].map(() => '?').join(', ')})`,
+      [ngayDat, ...Array.from(TRANG_THAI_DAT_BAN_GIU_BAN), ...Array.from(TRANG_THAI_DAT_BAN_SU_DUNG_BAN)],
     );
     const danhSachDonHangDangMo =
       (await this.mysql.truyVan(

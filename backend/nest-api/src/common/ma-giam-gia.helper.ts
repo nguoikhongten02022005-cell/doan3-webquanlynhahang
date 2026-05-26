@@ -1,4 +1,5 @@
 import type { BanGhi } from './types';
+import { PHAM_VI_MA_GIAM_GIA } from './constants';
 
 export const MA_TRANG_THAI_VOUCHER = Object.freeze({
   UPCOMING: 'UPCOMING',
@@ -47,6 +48,21 @@ const chuanHoaMaThanhChuoi = (giaTri: unknown) =>
     .replace(/[^A-Za-z0-9]/g, '')
     .toUpperCase();
 
+const layChuoi = (...giaTri: unknown[]) => {
+  for (const item of giaTri) {
+    if (item == null) continue;
+    const chuoi = String(item).trim();
+    if (chuoi) return chuoi;
+  }
+  return '';
+};
+
+const boDauTiengViet = (chuoi: string) =>
+  chuoi
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g, '')
+    .replace(/[Đđ]/g, (kyTu) => (kyTu === 'Đ' ? 'D' : 'd'));
+
 export const chuanHoaMaYeuCau = (maKH: unknown, maYeuCau: unknown) => {
   const phanKhach = chuanHoaMaThanhChuoi(maKH);
   const phanYeuCau = chuanHoaMaThanhChuoi(maYeuCau);
@@ -67,6 +83,98 @@ export const taoMaGiaoDichDiemTheoYeuCau = (
 ) => {
   const phanMa = chuanHoaMaYeuCau(maKH, maYeuCau);
   return `GDDL-${phanMa}`.slice(0, 50);
+};
+
+export const normalizePhamViMaGiamGia = (phamVi: unknown) => {
+  const chuoi = layChuoi(
+    typeof phamVi === 'object' && phamVi !== null
+      ? (phamVi as BanGhi)?.phamVi ||
+          (phamVi as BanGhi)?.PhamVi ||
+          (phamVi as BanGhi)?.phamViHienThi ||
+          (phamVi as BanGhi)?.PhamViHienThi ||
+          (phamVi as BanGhi)?.label ||
+          (phamVi as BanGhi)?.Label
+      : phamVi,
+  );
+
+  if (!chuoi) return PHAM_VI_MA_GIAM_GIA.CA_HAI;
+
+  const khoa = boDauTiengViet(chuoi)
+    .toUpperCase()
+    .replace(/[^A-Z0-9]+/g, '_')
+    .replace(/^_+|_+$/g, '');
+
+  const banDo = {
+    DAT_BAN: PHAM_VI_MA_GIAM_GIA.DAT_BAN,
+    DATBAN: PHAM_VI_MA_GIAM_GIA.DAT_BAN,
+    BOOKING: PHAM_VI_MA_GIAM_GIA.DAT_BAN,
+    RESERVATION: PHAM_VI_MA_GIAM_GIA.DAT_BAN,
+    DON_HANG: PHAM_VI_MA_GIAM_GIA.DON_HANG,
+    DONHANG: PHAM_VI_MA_GIAM_GIA.DON_HANG,
+    ORDER: PHAM_VI_MA_GIAM_GIA.DON_HANG,
+    CA_HAI: PHAM_VI_MA_GIAM_GIA.CA_HAI,
+    CAHAI: PHAM_VI_MA_GIAM_GIA.CA_HAI,
+    BOTH: PHAM_VI_MA_GIAM_GIA.CA_HAI,
+    ALL: PHAM_VI_MA_GIAM_GIA.CA_HAI,
+  } as const;
+
+  return banDo[khoa as keyof typeof banDo] || 'UNKNOWN';
+};
+
+export const getVoucherPhamViLabel = (phamVi: unknown) => {
+  const khoa = normalizePhamViMaGiamGia(phamVi);
+  if (khoa === PHAM_VI_MA_GIAM_GIA.DAT_BAN) return 'Đặt bàn';
+  if (khoa === PHAM_VI_MA_GIAM_GIA.DON_HANG) return 'Đơn hàng';
+  if (khoa === PHAM_VI_MA_GIAM_GIA.CA_HAI) return 'Cả hai';
+  return 'Không xác định';
+};
+
+export const kiemTraPhamViMaGiamGia = (
+  phamViVoucher: unknown,
+  phamViYeuCau: unknown,
+) => {
+  const maPhamViVoucher = normalizePhamViMaGiamGia(phamViVoucher);
+  const maPhamViYeuCau = normalizePhamViMaGiamGia(phamViYeuCau);
+
+  if (maPhamViYeuCau === 'UNKNOWN') {
+    return {
+      hopLe: false,
+      lyDo: 'Phạm vi áp dụng không hợp lệ.',
+      phamViVoucher: maPhamViVoucher,
+      phamViYeuCau: maPhamViYeuCau,
+    };
+  }
+
+  if (maPhamViVoucher === 'UNKNOWN') {
+    return {
+      hopLe: true,
+      lyDo: '',
+      phamViVoucher: PHAM_VI_MA_GIAM_GIA.CA_HAI,
+      phamViYeuCau: maPhamViYeuCau,
+    };
+  }
+
+  if (
+    maPhamViVoucher === PHAM_VI_MA_GIAM_GIA.CA_HAI ||
+    maPhamViVoucher === maPhamViYeuCau
+  ) {
+    return {
+      hopLe: true,
+      lyDo: '',
+      phamViVoucher: maPhamViVoucher,
+      phamViYeuCau: maPhamViYeuCau,
+    };
+  }
+
+  return {
+    hopLe: false,
+    lyDo:
+      maPhamViVoucher === PHAM_VI_MA_GIAM_GIA.DAT_BAN
+        ? 'Mã giảm giá này chỉ áp dụng cho đặt bàn.'
+        : 'Mã giảm giá này chỉ áp dụng cho đơn hàng.',
+    phamViVoucher: maPhamViVoucher,
+    phamViYeuCau: maPhamViYeuCau,
+  };
 };
 
 export const xacDinhTrangThaiMaGiamGia = (

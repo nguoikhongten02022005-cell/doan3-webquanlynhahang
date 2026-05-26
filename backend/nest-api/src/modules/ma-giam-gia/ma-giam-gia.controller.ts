@@ -6,6 +6,7 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
@@ -35,8 +36,10 @@ export class MaGiamGiaController {
 
   @Public()
   @Get('public')
-  layVoucherCongKhaiChoCheckout() {
-    return this.maGiamGiaService.layDanhSachCongKhaiChoCheckout();
+  layVoucherCongKhaiChoCheckout(@Query('phamVi') phamVi?: string) {
+    return this.maGiamGiaService.layDanhSachCongKhaiChoCheckout(
+      String(phamVi || 'DON_HANG').trim() || 'DON_HANG',
+    );
   }
 
   @ApiBearerAuth('access-token')
@@ -49,8 +52,14 @@ export class MaGiamGiaController {
   @ApiBearerAuth('access-token')
   @Roles('KhachHang')
   @Get('me/checkout')
-  layVoucherCuaToiChoCheckout(@CurrentUser() nguoiDung: any) {
-    return this.maGiamGiaService.layVoucherCuaToiChoCheckout(nguoiDung);
+  layVoucherCuaToiChoCheckout(
+    @CurrentUser() nguoiDung: any,
+    @Query('phamVi') phamVi?: string,
+  ) {
+    return this.maGiamGiaService.layVoucherCuaToiChoCheckout(
+      nguoiDung,
+      String(phamVi || 'DON_HANG').trim() || 'DON_HANG',
+    );
   }
 
   @ApiBearerAuth('access-token')

@@ -56,7 +56,7 @@ const taoDuLieuBangDieuKhien = (duLieuNoiBo = {}) => {
       },
     ],
     bookings: duLieuNoiBo.hangDoiDatBan || [],
-    orders: duLieuNoiBo.danhSachDonHangDaSapXep || [],
+    orders: duLieuNoiBo.danhSachDonHangDangMo || [],
     tablePressure: (duLieuNoiBo.tomTatBan || []).map((khuVuc) => ({
       ...khuVuc,
       percent: Math.round((khuVuc.occupancyRate || 0) * 100),
@@ -75,7 +75,7 @@ export const useBangDieuKhienData = (duLieuNoiBo = {}) => {
         datBan.time,
         datBan.danhSachMaBanDaGan?.length || 0,
       ]),
-      orders: (duLieuNoiBo?.danhSachDonHangDaSapXep || []).map((donHang) => [
+      orders: (duLieuNoiBo?.danhSachDonHangDangMo || []).map((donHang) => [
         donHang.id,
         donHang.status,
         donHang.total,
@@ -96,7 +96,7 @@ export const useBangDieuKhienData = (duLieuNoiBo = {}) => {
     }),
     [
       duLieuNoiBo?.hangDoiDatBan,
-      duLieuNoiBo?.danhSachDonHangDaSapXep,
+      duLieuNoiBo?.danhSachDonHangDangMo,
       duLieuNoiBo?.tomTatBan,
       duLieuNoiBo?.doanhThu7Ngay,
       duLieuNoiBo?.tongQuan,

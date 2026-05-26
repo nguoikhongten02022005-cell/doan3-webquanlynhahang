@@ -31,6 +31,12 @@ export enum LoaiMaGiamGiaDto {
   BIRTHDAY = 'BIRTHDAY',
 }
 
+export enum PhamViMaGiamGiaDto {
+  DAT_BAN = 'DAT_BAN',
+  DON_HANG = 'DON_HANG',
+  CA_HAI = 'CA_HAI',
+}
+
 const trim = ({ value }: { value: unknown }) =>
   typeof value === 'string' ? value.trim() : value;
 
@@ -44,6 +50,10 @@ export class KiemTraMaGiamGiaDto {
   @Length(3, 50)
   @Transform(trim)
   maCode: string;
+
+  @IsEnum(PhamViMaGiamGiaDto)
+  @Transform(trim)
+  phamVi: PhamViMaGiamGiaDto;
 
   @IsOptional()
   @IsString()
@@ -81,6 +91,11 @@ export class TaoMaGiamGiaDto {
   @IsEnum(LoaiMaGiamGiaDto)
   @Transform(trim)
   loaiMa?: LoaiMaGiamGiaDto;
+
+  @IsOptional()
+  @IsEnum(PhamViMaGiamGiaDto)
+  @Transform(trim)
+  phamVi?: PhamViMaGiamGiaDto;
 
   @IsOptional()
   @IsString()
@@ -158,6 +173,11 @@ export class CapNhatMaGiamGiaDto {
   @IsEnum(LoaiMaGiamGiaDto)
   @Transform(trim)
   loaiMa?: LoaiMaGiamGiaDto;
+
+  @IsOptional()
+  @IsEnum(PhamViMaGiamGiaDto)
+  @Transform(trim)
+  phamVi?: PhamViMaGiamGiaDto;
 
   @IsOptional()
   @IsString()

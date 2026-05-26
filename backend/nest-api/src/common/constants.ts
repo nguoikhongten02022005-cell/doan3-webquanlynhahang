@@ -31,6 +31,12 @@ export const LOAI_MA_GIAM_GIA = {
   SINH_NHAT: 'BIRTHDAY',
 } as const;
 
+export const PHAM_VI_MA_GIAM_GIA = {
+  DAT_BAN: 'DAT_BAN',
+  DON_HANG: 'DON_HANG',
+  CA_HAI: 'CA_HAI',
+} as const;
+
 export const SO_NGAY_HIEU_LUC_VOUCHER_DOI_DIEM = 30;
 
 // ========== Trạng thái bàn ăn ==========
@@ -48,6 +54,7 @@ export const TRANG_THAI_DAT_BAN = {
   SEATED: 'Seated',
   COMPLETED: 'Completed',
   NO_SHOW: 'NoShow',
+  EXPIRED: 'Expired',
   CHO_XAC_NHAN: 'CHO_XAC_NHAN',
   DA_XAC_NHAN: 'DA_XAC_NHAN',
   DA_GAN_BAN: 'DA_GAN_BAN',
@@ -129,6 +136,7 @@ export const TRANG_THAI_DAT_BAN_KET_THUC = new Set([
   'Completed',
   'Cancelled',
   'NoShow',
+  'Expired',
   'DA_HOAN_THANH',
   'DA_HUY',
   'KHONG_DEN',

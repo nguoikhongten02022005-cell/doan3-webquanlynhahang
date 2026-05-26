@@ -22,17 +22,11 @@ import {
 import {
   dichThongDiepLoiVoucher,
   getVoucherLoaiMaLabel,
+  dinhDangNgayVoucher,
   xacDinhTrangThaiVoucher,
 } from '../services/api/voucherTrangThai'
 
 import { tinhPhiDichVu } from '../utils/phiDichVu'
-
-const dinhDangThoiGian = (giaTri) => {
-  if (!giaTri) return '--'
-  const thoiGian = new Date(giaTri)
-  if (Number.isNaN(thoiGian.getTime())) return String(giaTri)
-  return new Intl.DateTimeFormat('vi-VN', { dateStyle: 'short' }).format(thoiGian)
-}
 
 const dinhDangSoTien = (giaTri) => new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(Number(giaTri || 0))
 
@@ -358,7 +352,7 @@ function GioHangPage() {
                       const moTaGiaTri = String(voucher.loaiGiam || '').toLowerCase() === 'percentage'
                         ? `${Number(voucher.giaTri || 0)}%`
                         : dinhDangTienTeVietNam(Number(voucher.giaTri || 0))
-                      const hanDung = dinhDangThoiGian(voucher.ngayKetThuc)
+                      const hanDung = dinhDangNgayVoucher(voucher.ngayKetThuc)
 
                       return (
                         <div

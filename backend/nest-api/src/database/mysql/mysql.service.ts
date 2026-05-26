@@ -1,4 +1,5 @@
 import {
+  HttpException,
   Injectable,
   Logger,
   ServiceUnavailableException,
@@ -109,6 +110,9 @@ export class MySqlService {
       return ketQua;
     } catch (loi) {
       await ketNoi.rollback();
+      if (loi instanceof HttpException) {
+        throw loi;
+      }
       throw new ServiceUnavailableException(this.rutGonLoiDb(loi));
     } finally {
       ketNoi.release();

@@ -114,6 +114,7 @@ CREATE TABLE IF NOT EXISTS MaGiamGia (
     SoLanDaDung     INT NOT NULL DEFAULT 0,
     TrangThai       ENUM('Active','Inactive','HetHan') NOT NULL DEFAULT 'Active',
     NguonTao        VARCHAR(50) DEFAULT NULL,
+    PhamVi          ENUM('DAT_BAN','DON_HANG','CA_HAI') NOT NULL DEFAULT 'CA_HAI',
     CONSTRAINT FK_MaGiamGia_KhachHang
         FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
@@ -137,7 +138,7 @@ CREATE TABLE IF NOT EXISTS DatBan (
     KhuVucUuTien   VARCHAR(50),
     GhiChuNoiBo    VARCHAR(500),
     NguonTao       ENUM('WEB','NOI_BO') NOT NULL DEFAULT 'WEB',
-    TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','DA_GAN_BAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DANG_PHUC_VU','DA_NHAN_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
+    TrangThai      ENUM('Pending','Confirmed','Seated','Completed','Cancelled','NoShow','Expired','YEU_CAU_DAT_BAN','GIU_CHO_TAM','DA_XAC_NHAN','DA_GAN_BAN','CAN_GOI_LAI','TU_CHOI_HET_CHO','CHO_XAC_NHAN','DA_GHI_NHAN','DA_CHECK_IN','DA_XEP_BAN','DANG_PHUC_VU','DA_NHAN_BAN','DA_HOAN_THANH','DA_HUY','KHONG_DEN') NOT NULL DEFAULT 'Pending',
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     NgayCapNhat    DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     CONSTRAINT FK_DatBan_KhachHang
@@ -278,16 +279,20 @@ CREATE TABLE IF NOT EXISTS LichSuDiemTichLuy (
     MaGiaoDichDiem VARCHAR(50) PRIMARY KEY,
     MaKH           VARCHAR(50) NOT NULL,
     MaDonHang      VARCHAR(50),
+    MaVoucher      VARCHAR(50),
     LoaiBienDong   ENUM('CONG','TRU','DIEU_CHINH') NOT NULL DEFAULT 'CONG',
     SoDiem         INT NOT NULL,
     SoDiemTruoc    INT NOT NULL DEFAULT 0,
     SoDiemSau      INT NOT NULL DEFAULT 0,
     MoTa           VARCHAR(255),
+    NguoiThucHien  VARCHAR(50),
     NgayTao        DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     CONSTRAINT FK_LichSuDiemTichLuy_KhachHang
         FOREIGN KEY (MaKH) REFERENCES KhachHang(MaKH) ON DELETE CASCADE,
     CONSTRAINT FK_LichSuDiemTichLuy_DonHang
-        FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE SET NULL
+        FOREIGN KEY (MaDonHang) REFERENCES DonHang(MaDonHang) ON DELETE SET NULL,
+    CONSTRAINT FK_LichSuDiemTichLuy_MaVoucher
+        FOREIGN KEY (MaVoucher) REFERENCES MaGiamGia(MaCode) ON DELETE SET NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
 
 -- ============================================================
@@ -318,6 +323,8 @@ CREATE INDEX IDX_ThucDon_TrangThai ON ThucDon(TrangThai);
 CREATE INDEX IDX_DonHang_NgayTao ON DonHang(NgayTao);
 CREATE INDEX IDX_DonHang_TrangThai ON DonHang(TrangThai);
 CREATE INDEX IDX_DonHang_MaBan ON DonHang(MaBan);
+CREATE INDEX IDX_LichSuDiemTichLuy_MaDonHang ON LichSuDiemTichLuy(MaDonHang);
+CREATE INDEX IDX_LichSuDiemTichLuy_MaVoucher ON LichSuDiemTichLuy(MaVoucher);
 CREATE INDEX IDX_DonHang_MaKH ON DonHang(MaKH);
 CREATE INDEX IDX_ChiTiet_DonHang ON ChiTietDonHang(MaDonHang);
 CREATE INDEX IDX_ChiTiet_TrangThai ON ChiTietDonHang(TrangThai);
@@ -329,6 +336,7 @@ CREATE INDEX IDX_LichSuDiemTichLuy_MaKH ON LichSuDiemTichLuy(MaKH);
 CREATE INDEX IDX_LichSuDiemTichLuy_NgayTao ON LichSuDiemTichLuy(NgayTao);
 CREATE INDEX IDX_LichSuDiemTichLuy_Loai ON LichSuDiemTichLuy(LoaiBienDong);
 CREATE INDEX IDX_MaGiamGia_LoaiMa ON MaGiamGia(LoaiMa);
+CREATE INDEX IDX_MaGiamGia_PhamVi ON MaGiamGia(PhamVi);
 CREATE INDEX IDX_MaGiamGia_MaKH ON MaGiamGia(MaKH);
 CREATE INDEX IDX_HoaDon_NgayXuat ON HoaDon(NgayXuat);
 CREATE INDEX IDX_HoaDon_MaNV ON HoaDon(MaNV);

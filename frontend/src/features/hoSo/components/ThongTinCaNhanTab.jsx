@@ -6,6 +6,7 @@ import {
   getVoucherTrangThaiLabel,
   getVoucherLoaiMaLabel,
   normalizeVoucherLoaiMa,
+  dinhDangNgayVoucher,
 } from '../../../services/api/voucherTrangThai'
 import { useThongBao } from '../../../context/ThongBaoContext'
 
@@ -231,6 +232,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
       setPhanHoiDoiDiem({
         soDiemDaDoi: phanHoi.duLieu.soDiemDaDoi,
         soTienGiam: phanHoi.duLieu.soTienGiam,
+        maVoucher: phanHoi.duLieu.maVoucher || phanHoi.duLieu.voucher?.maCode || '',
         diemTruoc: phanHoi.duLieu.diemTruoc,
         diemSau: phanHoi.duLieu.diemSau,
         voucher: phanHoi.duLieu.voucher,
@@ -350,10 +352,21 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
               {lichSuDiemTichLuy.map((giaoDich) => (
                 <article key={giaoDich.maGiaoDichDiem || `${giaoDich.ngayTao}-${giaoDich.maDonHang}`} className="ho-so-diem-tich-luy-history-item">
                   <div>
-                    <strong>{giaoDich.moTa || giaoDich.loaiBienDong || 'Biến động điểm'}</strong>
+                    <strong>{giaoDich.moTaHienThi || giaoDich.moTa || giaoDich.loaiBienDongHienThi || giaoDich.loaiBienDong || 'Biến động điểm'}</strong>
                     <p>
-                      {giaoDich.maDonHang ? `Đơn ${giaoDich.maDonHang} • ` : ''}
-                      {dinhDangThoiGianDiem(giaoDich.ngayTao)}
+                      {(() => {
+                        const thongTinThamChieu = [
+                          giaoDich.maDonHang ? `Đơn ${giaoDich.maDonHang}` : '',
+                          giaoDich.maVoucher ? `Voucher ${giaoDich.maVoucher}` : '',
+                          giaoDich.nguoiThucHien && giaoDich.nguoiThucHien !== 'SYSTEM'
+                            ? `Bởi ${giaoDich.nguoiThucHienHienThi || giaoDich.nguoiThucHien}`
+                            : '',
+                        ].filter(Boolean).join(' • ')
+
+                        return thongTinThamChieu
+                          ? `${thongTinThamChieu} • ${dinhDangThoiGianDiem(giaoDich.ngayTao)}`
+                          : dinhDangThoiGianDiem(giaoDich.ngayTao)
+                      })()}
                     </p>
                   </div>
                   <div className="ho-so-diem-tich-luy-history-meta">
@@ -470,7 +483,7 @@ function ThongTinCaNhanTab({ nguoiDung, tongQuanDiemTichLuy, lichSuDiemTichLuy =
                   </Tag>
                   <strong>{voucher.loaiGiam === 'percentage' ? `${dinhDangSo(voucher.giaTri)}%` : dinhDangTien(voucher.giaTri)}</strong>
                   <span>Đơn tối thiểu {voucher.donHangToiThieu > 0 ? dinhDangTien(voucher.donHangToiThieu) : 'không yêu cầu'}</span>
-                  <span>Hạn {dinhDangThoiGianDiem(voucher.ngayKetThuc)}</span>
+                  <span>Hạn dùng: {dinhDangNgayVoucher(voucher.ngayKetThuc)}</span>
                 </div>
               </article>
             ))}

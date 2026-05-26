@@ -358,7 +358,7 @@ function BangChiTietDonHang({
           <Button size="middle" icon={<PrinterOutlined />} onClick={onPrint} disabled={!coTheIn || dangLuuTrangThai}>
             In hóa đơn
           </Button>
-          <Button size="middle" onClick={onQuickPay} loading={dangLuuTrangThai} disabled={order.status === 'Paid' || order.status === 'Cancelled'}>
+          <Button size="middle" onClick={onQuickPay} loading={dangLuuTrangThai} disabled={order.status === 'Paid' || order.status === 'Completed' || order.status === 'Cancelled'}>
             Thanh toán
           </Button>
         </div>

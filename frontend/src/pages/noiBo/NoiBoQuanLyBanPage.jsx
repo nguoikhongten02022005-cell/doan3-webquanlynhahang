@@ -4,6 +4,7 @@ import { DeleteOutlined, DownloadOutlined, EditOutlined, EyeOutlined, PlusOutlin
 import { capNhatBanApi, layDanhSachBanApi, layQrBanApi, taoBanApi, xoaBanApi } from '../../services/api/apiBanAn'
 import { layOrderDangMoTaiBanApi, layTenMonTrongChiTietOrder, xacNhanThanhToanTaiBanApi } from '../../services/api/apiBanAn'
 import { chuanHoaTrangThaiBan } from '../../constants/trangThaiBan'
+import { laySacThaiDonHang } from '../../utils/donHang'
 import { DANH_SACH_TEN_KHU_VUC_BAN, chuanHoaTenKhuVucBan } from '../../constants/khuVucBan'
 import { dinhDangTienTeVietNam } from '../../utils/tienTe'
 
@@ -114,7 +115,9 @@ function NoiBoQuanLyBanPage() {
   const moOrder = async (ban) => {
     const { duLieu } = await layOrderDangMoTaiBanApi(ban.code)
     const danhSachChiTiet = duLieu?.chiTiet || duLieu?.ChiTiet || []
-    const coOrderDangMo = Boolean(duLieu?.DonHang || duLieu?.donHang || (Array.isArray(danhSachChiTiet) && danhSachChiTiet.length))
+    const trangThaiDonHang = duLieu?.donHang?.trangThai || duLieu?.DonHang?.TrangThai || duLieu?.trangThai || duLieu?.TrangThai || ''
+    const coOrderDangMo = laySacThaiDonHang(trangThaiDonHang) === 'warning'
+      && Boolean(duLieu?.DonHang || duLieu?.donHang || (Array.isArray(danhSachChiTiet) && danhSachChiTiet.length))
     setOrderDangXem({ ban, duLieu: coOrderDangMo ? duLieu : null, khongCoOrder: !coOrderDangMo })
   }
 

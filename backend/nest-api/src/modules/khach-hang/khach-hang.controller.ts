@@ -13,13 +13,14 @@ import {
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
 import { Transform } from 'class-transformer';
-import { IsNumber, IsOptional, Min } from 'class-validator';
+import { IsNumber, IsOptional, IsString, Length, Min } from 'class-validator';
 import { KhachHangService } from './khach-hang.service';
 import { TaoKhachHangDto } from './dto/tao-khach-hang.dto';
 import { CapNhatKhachHangDto } from './dto/cap-nhat-khach-hang.dto';
 import { JwtAuthGuard } from '../../common/guards/jwt-auth.guard';
 import { RolesGuard } from '../../common/guards/roles.guard';
 import { Roles } from '../../common/decorators/roles.decorator';
+import { CurrentUser } from '../../common/decorators/current-user.decorator';
 
 class PhanTrangKhachHangQueryDto {
   @IsOptional()
@@ -56,9 +57,10 @@ class CapNhatDiemKhachHangDto {
   @IsNumber()
   soDiem: number;
 
-  @IsOptional()
+  @IsString()
+  @Length(1, 255)
   @Transform(({ value }) => (typeof value === 'string' ? value.trim() : value))
-  moTa?: string;
+  moTa: string;
 }
 
 @ApiTags('khach-hang')
@@ -101,13 +103,13 @@ export class KhachHangController {
 
   @Roles('Admin', 'NhanVien')
   @Post()
-  tao(@Body() body: TaoKhachHangDto) {
+  tao(@CurrentUser() nguoiDung: any, @Body() body: TaoKhachHangDto) {
     return this.khachHangService.tao({
       tenKH: body.tenKH,
       sdt: body.sdt,
       diaChi: body.diaChi,
       diemTichLuy: body.diemTichLuy,
-    });
+    }, nguoiDung);
   }
 
   @Roles('Admin', 'NhanVien')
@@ -130,6 +132,7 @@ export class KhachHangController {
   @Patch(':maKH/diem')
   capNhatDiem(
     @Param('maKH') maKH: string,
+    @CurrentUser() nguoiDung: any,
     @Body() body: CapNhatDiemKhachHangDto,
   ) {
     if (Number.isNaN(body.soDiem))
@@ -137,6 +140,6 @@ export class KhachHangController {
     return this.khachHangService.capNhatDiem(maKH, {
       soDiem: body.soDiem,
       moTa: body.moTa,
-    });
+    }, nguoiDung);
   }
 }

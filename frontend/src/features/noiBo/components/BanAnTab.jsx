@@ -9,7 +9,7 @@ import {
 } from '@ant-design/icons'
 import { Badge, Button, Drawer, Empty, Tabs, message } from 'antd'
 import { useNavigate } from 'react-router-dom'
-import { layNhanChoNgoi } from '../dinhDang'
+import { layNhanChoNgoi, laySacThaiDonHang } from '../dinhDang'
 import { chuanHoaTrangThaiBan } from '../../../constants/trangThaiBan'
 
 const NHAN_TRANG_THAI_BAN = {
@@ -275,7 +275,15 @@ function BanAnTabPos({
   )
 
   const donHangTheoMaBan = useMemo(
-    () => new Map((orders || []).map((order) => [String(order.tableNumber || '').trim().toUpperCase(), order]).filter(([maBan]) => maBan)),
+    () => new Map(
+      (orders || [])
+        .filter((order) => laySacThaiDonHang(order?.status) === 'warning')
+        .map((order) => {
+          const maBan = String(order.tableCode || order.maBan || order.MaBan || order.tableNumber || '').trim().toUpperCase()
+          return [maBan, order]
+        })
+        .filter(([maBan]) => maBan),
+    ),
     [orders],
   )
 
@@ -299,7 +307,10 @@ function BanAnTabPos({
 
   const donHangDangChon = useMemo(() => {
     if (!banDangChon) return null
-    return donHangTheoMaBan.get(String(banDangChon.code || banDangChon.displayName || '').trim().toUpperCase()) || null
+    return (
+      donHangTheoMaBan.get(String(banDangChon.tableCode || banDangChon.code || banDangChon.maBan || '').trim().toUpperCase()) ||
+      null
+    )
   }, [donHangTheoMaBan, banDangChon])
 
   const danhSachTomTat = [

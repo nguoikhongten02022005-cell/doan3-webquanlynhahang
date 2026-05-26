@@ -131,10 +131,10 @@ export class DatBanCommandService {
        LEFT JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
        WHERE dh.MaBan = ?
          AND dh.MaDatBan = ?
-         AND dh.TrangThai NOT IN ('Paid', 'Cancelled')
+         AND dh.TrangThai IN (${Array.from(TRANG_THAI_DON_HANG_DANG_MO).map(() => '?').join(', ')})
        GROUP BY dh.MaDonHang
        LIMIT 1`,
-      [maBan, maDatBan],
+      [maBan, maDatBan, ...Array.from(TRANG_THAI_DON_HANG_DANG_MO)],
     );
     if (Number(donHangDaCoChiTiet?.TongChiTiet || 0) > 0) return;
 

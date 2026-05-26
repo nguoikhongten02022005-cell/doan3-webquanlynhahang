@@ -1,39 +1,87 @@
 import { DonHangPaymentStatusService } from './don-hang-payment-status.service';
 
 describe('DonHangPaymentStatusService', () => {
-  it('returns the updated order status after changing status', async () => {
-    const state = { trangThai: 'Preparing', trangThaiBan: 'Occupied' };
-    const connection = {
-      execute: jest.fn(async (query: string, params: any[]) => {
-        if (query.includes('UPDATE DonHang')) state.trangThai = params[0];
-        if (query.includes('UPDATE Ban')) state.trangThaiBan = params[0];
-      }),
-      query: jest.fn().mockResolvedValue([[]]),
-    };
+  it('khong tra ve don da ket thuc khi lay order dang mo tai ban', async () => {
     const mysql = {
-      truyVan: jest
-        .fn()
-        .mockResolvedValue([
-          { MaDonHang: 'DH_TEST', MaBan: 'B003', TrangThai: 'Preparing' },
-        ]),
-      giaoDich: jest.fn(async (callback) => callback(connection)),
+      truyVan: jest.fn(async (query: string) => {
+        if (query.includes('TrangThai IN')) {
+          return [];
+        }
+        return [{ MaDonHang: 'DH_TEST', MaBan: 'B003', TrangThai: 'Completed' }];
+      }),
     };
     const donHangQueryService = {
-      layChiTietDonHangKhongKiemTraQuyen: jest.fn(
-        async (_maDonHang, ketNoi) => ({
-          success: true,
-          data: {
-            donHang: { trangThai: ketNoi ? state.trangThai : 'Preparing' },
-          },
-          message: 'ok',
-          meta: null,
-        }),
-      ),
+      layChiTietDonHangKhongKiemTraQuyen: jest.fn(),
     };
     const service = new DonHangPaymentStatusService(
       mysql as any,
       donHangQueryService as any,
       { tinhDiemTuDonHang: jest.fn() } as any,
+    );
+
+    const ketQua = await service.layOrderDangMoTaiBan('B003');
+
+    expect(ketQua.data).toBeNull();
+    expect(mysql.truyVan.mock.calls.some(([sql]) => String(sql).includes('TrangThai IN'))).toBe(true);
+    expect(donHangQueryService.layChiTietDonHangKhongKiemTraQuyen).not.toHaveBeenCalled();
+  });
+
+  it('giu ban dang occupied khi yeu cau thanh toan tai ban', async () => {
+    const mysql = {
+      truyVan: jest.fn().mockResolvedValue([
+        { MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' },
+      ]),
+      thucThi: jest.fn().mockResolvedValue(undefined),
+    };
+    const donHangQueryService = {
+      layChiTietDonHangKhongKiemTraQuyen: jest.fn(async () => ({
+        success: true,
+        data: { donHang: { maDonHang: 'DH_TEST' } },
+        message: 'ok',
+        meta: null,
+      })),
+    };
+    const service = new DonHangPaymentStatusService(
+      mysql as any,
+      donHangQueryService as any,
+      { tinhDiemTuDonHang: jest.fn() } as any,
+    );
+
+    await service.yeuCauThanhToanTaiBan('B003');
+
+    expect(mysql.thucThi).toHaveBeenCalledWith(
+      'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+      ['Occupied', 'B003'],
+    );
+  });
+
+  it('release ban khi xac nhan thanh toan va khong con rang buoc', async () => {
+    const execute = jest.fn().mockResolvedValue(undefined);
+    const connection = {
+      execute,
+      query: jest.fn().mockResolvedValue([[]]),
+    };
+    const tinhDiemTuDonHang = jest.fn().mockResolvedValue({ success: true, data: null });
+    const mysql = {
+      truyVan: jest
+        .fn()
+        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' }]),
+      giaoDich: jest.fn(async (callback) => callback(connection)),
+    };
+    const donHangQueryService = {
+      layChiTietDonHangKhongKiemTraQuyen: jest.fn(async (_maDonHang, ketNoi) => ({
+        success: true,
+        data: {
+          donHang: { trangThai: ketNoi ? 'Completed' : 'Preparing' },
+        },
+        message: 'ok',
+        meta: null,
+      })),
+    };
+    const service = new DonHangPaymentStatusService(
+      mysql as any,
+      donHangQueryService as any,
+      { tinhDiemTuDonHang } as any,
     );
 
     const ketQua = await service.capNhatTrangThaiDonHang(
@@ -42,8 +90,94 @@ describe('DonHangPaymentStatusService', () => {
     );
 
     expect((ketQua.data as any).donHang.trangThai).toBe('Completed');
-    expect(
-      donHangQueryService.layChiTietDonHangKhongKiemTraQuyen,
-    ).toHaveBeenCalledWith('DH_TEST', connection);
+    expect(execute).toHaveBeenCalledWith(
+      'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+      ['Available', 'B003'],
+    );
+    expect(tinhDiemTuDonHang).toHaveBeenCalledWith(
+      'KH001',
+      'DH_TEST',
+      180000,
+      undefined,
+      'SYSTEM',
+      connection,
+    );
+  });
+
+  it('cong diem khi don hang chuyen sang Paid', async () => {
+    const connection = {
+      execute: jest.fn().mockResolvedValue(undefined),
+      query: jest.fn().mockResolvedValue([[{ ThanhTien: 180000 }]]),
+    };
+    const tinhDiemTuDonHang = jest.fn().mockResolvedValue({ success: true, data: null });
+    const mysql = {
+      truyVan: jest
+        .fn()
+        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' }]),
+      giaoDich: jest.fn(async (callback) => callback(connection)),
+    };
+    const donHangQueryService = {
+      layChiTietDonHangKhongKiemTraQuyen: jest.fn(async (_maDonHang, ketNoi) => ({
+        success: true,
+        data: {
+          donHang: { trangThai: ketNoi ? 'Paid' : 'Preparing' },
+        },
+        message: 'ok',
+        meta: null,
+      })),
+    };
+    const service = new DonHangPaymentStatusService(
+      mysql as any,
+      donHangQueryService as any,
+      { tinhDiemTuDonHang } as any,
+    );
+
+    await service.capNhatTrangThaiDonHang(
+      'DH_TEST',
+      'Paid',
+      { maND: 'ND010' },
+    );
+
+    expect(tinhDiemTuDonHang).toHaveBeenCalledWith(
+      'KH001',
+      'DH_TEST',
+      180000,
+      undefined,
+      'ND010',
+      connection,
+    );
+  });
+
+  it('khong cong diem khi don hang chua den Paid hoac Completed', async () => {
+    const tinhDiemTuDonHang = jest.fn();
+    const connection = {
+      execute: jest.fn().mockResolvedValue(undefined),
+      query: jest.fn().mockResolvedValue([[]]),
+    };
+    const mysql = {
+      truyVan: jest
+        .fn()
+        .mockResolvedValue([{ MaDonHang: 'DH_TEST', MaBan: 'B003', MaKH: 'KH001', TongTien: 180000, TrangThai: 'Preparing' }]),
+      giaoDich: jest.fn(async (callback) => callback(connection)),
+    };
+    const donHangQueryService = {
+      layChiTietDonHangKhongKiemTraQuyen: jest.fn(async () => ({
+        success: true,
+        data: {
+          donHang: { trangThai: 'Preparing' },
+        },
+        message: 'ok',
+        meta: null,
+      })),
+    };
+    const service = new DonHangPaymentStatusService(
+      mysql as any,
+      donHangQueryService as any,
+      { tinhDiemTuDonHang } as any,
+    );
+
+    await service.capNhatTrangThaiDonHang('DH_TEST', 'Preparing');
+
+    expect(tinhDiemTuDonHang).not.toHaveBeenCalled();
   });
 });

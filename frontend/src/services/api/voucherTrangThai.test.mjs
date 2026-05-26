@@ -2,14 +2,17 @@ import assert from 'node:assert/strict'
 import { test } from 'node:test'
 import {
   dichThongDiepLoiVoucher,
+  dinhDangNgayVoucher,
   getVoucherLoaiMaLabel,
   getVoucherNguonLabel,
   getVoucherTrangThaiBadgeClass,
   getVoucherTrangThaiLabel,
+  getVoucherPhamViLabel,
   parseNgayVoucher,
   normalizeVoucherTrangThai,
   normalizeVoucherLoaiMa,
   normalizeVoucherNguon,
+  normalizeVoucherPhamVi,
   xacDinhTrangThaiVoucher,
 } from './voucherTrangThai.js'
 
@@ -44,6 +47,15 @@ const CAC_NGUON = [
   ['NOI_BO', 'ADMIN', 'Tạo thủ công'],
 ]
 
+const CAC_PHAM_VI = [
+  ['DAT_BAN', 'DAT_BAN', 'Đặt bàn'],
+  ['Đặt bàn', 'DAT_BAN', 'Đặt bàn'],
+  ['DON_HANG', 'DON_HANG', 'Đơn hàng'],
+  ['Đơn hàng', 'DON_HANG', 'Đơn hàng'],
+  ['CA_HAI', 'CA_HAI', 'Cả hai'],
+  ['Cả hai', 'CA_HAI', 'Cả hai'],
+]
+
 CAC_TRANG_THAI.forEach(([ten, maTrangThai, nhanTrangThai, badgeClass]) => {
   test(`voucher ${ten} map sang ${nhanTrangThai}`, () => {
     assert.equal(normalizeVoucherTrangThai(ten), maTrangThai)
@@ -63,6 +75,13 @@ CAC_NGUON.forEach(([ten, maNguon, nhanNguon]) => {
   test(`voucher nguon ${ten} map sang ${nhanNguon}`, () => {
     assert.equal(normalizeVoucherNguon(ten), maNguon)
     assert.equal(getVoucherNguonLabel(ten), nhanNguon)
+  })
+})
+
+CAC_PHAM_VI.forEach(([ten, maPhamVi, nhanPhamVi]) => {
+  test(`voucher pham vi ${ten} map sang ${nhanPhamVi}`, () => {
+    assert.equal(normalizeVoucherPhamVi(ten), maPhamVi)
+    assert.equal(getVoucherPhamViLabel(ten), nhanPhamVi)
   })
 })
 
@@ -184,6 +203,38 @@ test('voucher het luot chuyen sang USED_UP', () => {
   assert.equal(ketQua.nhanTrangThai, 'Hết lượt')
   assert.equal(ketQua.trangThaiHienThi, 'Hết lượt')
   assert.equal(ketQua.coTheApDung, false)
+})
+
+test('voucher rieng het luot hien thi Da dung', () => {
+  assert.equal(
+    getVoucherTrangThaiLabel({
+      loaiMa: 'CUSTOMER',
+      trangThai: 'USED_UP',
+    }),
+    'Đã dùng',
+  )
+  assert.equal(
+    getVoucherTrangThaiLabel({
+      loaiMa: 'LOYALTY',
+      trangThaiHienThi: 'Hết lượt',
+    }),
+    'Đã dùng',
+  )
+})
+
+test('voucher cong khai het luot van hien thi Het luot', () => {
+  assert.equal(
+    getVoucherTrangThaiLabel({
+      loaiMa: 'PUBLIC',
+      trangThai: 'USED_UP',
+    }),
+    'Hết lượt',
+  )
+})
+
+test('ngay voucher hien thi dang dd/mm/yyyy', () => {
+  assert.equal(dinhDangNgayVoucher('2026-06-23'), '23/06/2026')
+  assert.equal(dinhDangNgayVoucher('2026-06-23T00:00:00Z'), '23/06/2026')
 })
 
 test('voucher inactive chuyen sang INACTIVE', () => {

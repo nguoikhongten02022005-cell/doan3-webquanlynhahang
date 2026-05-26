@@ -6,15 +6,24 @@ import { tinhGiamGia } from '../../common/tinh-giam-gia.helper';
 import {
   GIA_TRI_QUY_DOI,
   LOAI_MA_GIAM_GIA,
+  PHAM_VI_MA_GIAM_GIA,
   TI_LE_QUY_DOI_DIEM,
 } from '../../common/constants';
-import { xacDinhTrangThaiMaGiamGia } from '../../common/ma-giam-gia.helper';
+import {
+  getVoucherPhamViLabel,
+  kiemTraPhamViMaGiamGia,
+  normalizePhamViMaGiamGia,
+  xacDinhTrangThaiMaGiamGia,
+} from '../../common/ma-giam-gia.helper';
 
 @Injectable()
 export class DonHangPricingService {
   constructor(private readonly mysql: MySqlService) {}
 
   taoPhanHoiMaGiam(payload: BanGhi = {}, soTienGiamThucTe = 0) {
+    const phamVi = normalizePhamViMaGiamGia(
+      payload.phamVi || payload.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI,
+    );
     return {
       hopLe: Boolean(payload.maGiamGia || payload.maCode),
       maGiamGia: String(payload.maGiamGia || payload.maCode || '').trim(),
@@ -37,6 +46,8 @@ export class DonHangPricingService {
       ),
       soTienGiamThucTe: Number(soTienGiamThucTe || 0),
       thongDiep: String(payload.thongDiep || payload.moTa || '').trim(),
+      phamVi,
+      phamViHienThi: getVoucherPhamViLabel(phamVi),
       trangThaiRuntime: String(payload.trangThaiRuntime || '').trim(),
       trangThaiHienThi: String(payload.trangThaiHienThi || '').trim(),
       coTheApDung:
@@ -83,6 +94,7 @@ export class DonHangPricingService {
     tongTien: number,
     maKH?: string,
     ketNoi?: import('mysql2/promise').PoolConnection,
+    phamVi: string = PHAM_VI_MA_GIAM_GIA.DON_HANG,
   ) {
     const maCode = String(maCodeDauVao || '').trim();
     if (!maCode) {
@@ -107,6 +119,14 @@ export class DonHangPricingService {
       .trim()
       .toUpperCase();
     const maKHGanVoiMa = String(ma.MaKH || '').trim();
+    const hopLePhamVi = kiemTraPhamViMaGiamGia(
+      ma.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI,
+      phamVi || PHAM_VI_MA_GIAM_GIA.DON_HANG,
+    );
+
+    if (!hopLePhamVi.hopLe) {
+      throw new BadRequestException(hopLePhamVi.lyDo);
+    }
 
     if (loaiMa !== LOAI_MA_GIAM_GIA.CONG_KHAI) {
       if (!maKHGanVoiMa) {
@@ -158,6 +178,7 @@ export class DonHangPricingService {
         trangThaiRuntime: trangThai.maTrangThai,
         trangThaiHienThi: trangThai.nhanTrangThai,
         coTheApDung: trangThai.coTheApDung,
+        phamVi: normalizePhamViMaGiamGia(ma.PhamVi || PHAM_VI_MA_GIAM_GIA.CA_HAI),
       },
       soTienGiamThucTe,
     );
@@ -216,11 +237,17 @@ export class DonHangPricingService {
 
     const phiDichVu = this.tinhPhiDichVuTheoTamTinh(tamTinh);
     const tongTienTruocGiam = tamTinh + phiDichVu;
+    const phamViApDung = String(
+      payload.phamViApDung || payload.phamVi || PHAM_VI_MA_GIAM_GIA.DON_HANG,
+    )
+      .trim()
+      .toUpperCase();
     const maGiamGia = await this.layThongTinMaGiamApDung(
       payload.maGiamGia,
       tongTienTruocGiam,
       payload.maKH || payload.nguoiDung?.maKH,
       ketNoi,
+      phamViApDung,
     );
 
     const soDiem = Number(payload.soDiem || 0);

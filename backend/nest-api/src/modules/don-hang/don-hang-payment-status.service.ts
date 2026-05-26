@@ -43,8 +43,29 @@ export class DonHangPaymentStatusService {
     private readonly diemTichLuyService: DiemTichLuyService,
   ) {}
 
+  private layNguoiThucHien(nguoiDung?: any) {
+    return String(nguoiDung?.maND || nguoiDung?.MaND || 'SYSTEM').trim() || 'SYSTEM';
+  }
+
   private async timMaBan(giaTri: string): Promise<string | null> {
     return resolveMaBan(this.mysql, giaTri);
+  }
+
+  private async layDonHangDangMoTaiBan(maBan: string, ketNoi?: any) {
+    const thamSoTrangThai = Array.from(TRANG_THAI_DON_HANG_DANG_MO);
+    const sql = `SELECT * FROM DonHang
+       WHERE MaBan = ?
+         AND TrangThai IN (${thamSoTrangThai.map(() => '?').join(', ')})
+       ORDER BY NgayTao DESC
+       LIMIT 1`;
+
+    if (ketNoi) {
+      const [rows] = await ketNoi.query(sql, [maBan, ...thamSoTrangThai]);
+      return (rows as any[])[0] || null;
+    }
+
+    const rows = await this.mysql.truyVan(sql, [maBan, ...thamSoTrangThai]);
+    return (rows as any[])[0] || null;
   }
 
   private async giaiPhongBanNeuKhongConRangBuoc(
@@ -82,7 +103,11 @@ export class DonHangPaymentStatusService {
     ]);
   }
 
-  async capNhatTrangThaiDonHang(maDonHang: string, trangThai: string) {
+  async capNhatTrangThaiDonHang(
+    maDonHang: string,
+    trangThai: string,
+    nguoiDung?: any,
+  ) {
     if (!TRANG_THAI_DON_HANG_HOP_LE.has(trangThai)) {
       throw new BadRequestException(`Trạng thái '${trangThai}' không hợp lệ.`);
     }
@@ -108,7 +133,59 @@ export class DonHangPaymentStatusService {
         );
       }
 
-      if (trangThai === 'Paid') {
+      const trangThaiCongDiem = new Set([
+        'Paid',
+        'Completed',
+        'DA_THANH_TOAN',
+        'DA_HOAN_THANH',
+      ]);
+      const trangThaiHoanDiem = new Set([
+        'Cancelled',
+        'DA_HUY',
+      ]);
+
+      if (trangThaiCongDiem.has(trangThai) && don.MaKH) {
+        await this.diemTichLuyService.tinhDiemTuDonHang(
+          don.MaKH,
+          maDonHang,
+          Number(don.TongTien || 0),
+          undefined,
+          this.layNguoiThucHien(nguoiDung),
+          ketNoi,
+        );
+      }
+
+      if (trangThaiHoanDiem.has(trangThai) && don.MaKH) {
+        const giaoDichHoan = await this.diemTichLuyService.layGiaoDichDiemTheoDonHang(
+          maDonHang,
+          'DIEU_CHINH',
+        );
+        if (giaoDichHoan) {
+          return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
+            maDonHang,
+            ketNoi,
+          );
+        }
+
+        const giaoDichCong = await this.diemTichLuyService.layGiaoDichDiemTheoDonHang(
+          maDonHang,
+          'CONG',
+        );
+        const soDiemDaCong = Math.abs(Number(giaoDichCong?.soDiem || 0));
+        if (soDiemDaCong > 0) {
+          await this.diemTichLuyService.congDiemHuyDon(
+            nguoiDung,
+            {
+              maDonHang,
+              soDiem: soDiemDaCong,
+              moTa: `Hoàn điểm từ đơn hàng bị hủy ${maDonHang}`,
+            },
+            ketNoi,
+          );
+        }
+      }
+
+      if (trangThaiCongDiem.has(trangThai)) {
         const [hoaDonDaCo] = await ketNoi.query(
           'SELECT MaHoaDon FROM HoaDon WHERE MaDonHang = ? LIMIT 1',
           [maDonHang],
@@ -116,16 +193,6 @@ export class DonHangPaymentStatusService {
         const maHoaDonDaCo = hoaDonDaCo?.[0]?.MaHoaDon;
 
         if (!maHoaDonDaCo) {
-          if (don.MaKH) {
-            await this.diemTichLuyService.tinhDiemTuDonHang(
-              don.MaKH,
-              maDonHang,
-              Number(don.TongTien || 0),
-              undefined,
-              ketNoi,
-            );
-          }
-
           const [chiTietRows] = await ketNoi.query(
             'SELECT * FROM ChiTietDonHang WHERE MaDonHang = ?',
             [maDonHang],
@@ -164,48 +231,42 @@ export class DonHangPaymentStatusService {
   async yeuCauThanhToanTaiBan(maBan: string) {
     const ma = await this.timMaBan(maBan);
     if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
-    const danhSach = await this.mysql.truyVan(
-      "SELECT * FROM DonHang WHERE MaBan = ? AND TrangThai NOT IN ('Paid', 'Cancelled') ORDER BY NgayTao DESC LIMIT 1",
-      [ma],
-    );
-    if (!danhSach[0]) {
+    const donHangDangMo = await this.layDonHangDangMoTaiBan(ma);
+    if (!donHangDangMo) {
       throw new NotFoundException('Bàn chưa có order để thanh toán.');
     }
     await this.mysql.thucThi(
       'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
-      ['Ready', danhSach[0].MaDonHang],
+      ['Ready', donHangDangMo.MaDonHang],
     );
     await this.mysql.thucThi('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-      TRANG_THAI_BAN.GIU_CHO,
+      TRANG_THAI_BAN.DANG_SU_DUNG,
       ma,
     ]);
     return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
-      String(danhSach[0].MaDonHang),
+      String(donHangDangMo.MaDonHang),
     );
   }
 
-  async xacNhanThanhToanTaiBan(maBan: string) {
+  async xacNhanThanhToanTaiBan(maBan: string, nguoiDung?: any) {
     const ma = await this.timMaBan(maBan);
     if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
-    const danhSach = await this.mysql.truyVan(
-      "SELECT * FROM DonHang WHERE MaBan = ? AND TrangThai NOT IN ('Paid', 'Cancelled') ORDER BY NgayTao DESC LIMIT 1",
-      [ma],
-    );
-    if (!danhSach[0]) {
+    const donHangDangMo = await this.layDonHangDangMoTaiBan(ma);
+    if (!donHangDangMo) {
       throw new NotFoundException('Bàn chưa có order để xác nhận thanh toán.');
     }
 
-    const donHang = danhSach[0];
-
     return this.mysql.giaoDich(async (ketNoi) => {
+      const donHang = await this.layDonHangDangMoTaiBan(ma, ketNoi);
+      if (!donHang) {
+        throw new NotFoundException('Bàn chưa có order để xác nhận thanh toán.');
+      }
+
       await ketNoi.execute(
         'UPDATE DonHang SET TrangThai = ? WHERE MaDonHang = ?',
         ['Paid', donHang.MaDonHang],
       );
-      await ketNoi.execute('UPDATE Ban SET TrangThai = ? WHERE MaBan = ?', [
-        TRANG_THAI_BAN.TRONG,
-        ma,
-      ]);
+      await this.giaiPhongBanNeuKhongConRangBuoc(ketNoi, ma, donHang.MaDonHang);
 
       if (donHang.MaKH) {
         await this.diemTichLuyService.tinhDiemTuDonHang(
@@ -213,6 +274,7 @@ export class DonHangPaymentStatusService {
           donHang.MaDonHang,
           Number(donHang.TongTien || 0),
           undefined,
+          this.layNguoiThucHien(nguoiDung),
           ketNoi,
         );
       }
@@ -306,15 +368,12 @@ export class DonHangPaymentStatusService {
   async layOrderDangMoTaiBan(maBan: string) {
     const ma = await this.timMaBan(maBan);
     if (!ma) throw new NotFoundException('Không tìm thấy bàn.');
-    const danhSach = await this.mysql.truyVan(
-      "SELECT * FROM DonHang WHERE MaBan = ? AND TrangThai NOT IN ('Paid', 'Cancelled') ORDER BY NgayTao DESC LIMIT 1",
-      [ma],
-    );
-    if (!danhSach[0]) {
+    const donHangDangMo = await this.layDonHangDangMoTaiBan(ma);
+    if (!donHangDangMo) {
       return taoPhanHoi(null, 'Bàn chưa có order đang mở');
     }
     return this.donHangQueryService.layChiTietDonHangKhongKiemTraQuyen(
-      String(danhSach[0].MaDonHang),
+      String(donHangDangMo.MaDonHang),
     );
   }
 }

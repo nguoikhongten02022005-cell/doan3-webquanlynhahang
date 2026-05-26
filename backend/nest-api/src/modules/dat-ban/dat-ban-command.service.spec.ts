@@ -179,4 +179,35 @@ describe('DatBanCommandService', () => {
     expect((ketQua.data as any).maBan).toBe('B053');
     expect((ketQua.data as any).danhSachMaBanDaGan).toEqual(['B053']);
   });
+
+  it('giai phong ban khi huy dat ban va khong con order mo', async () => {
+    const execute = jest.fn().mockResolvedValue(undefined);
+    const mysql = {
+      truyVan: jest
+        .fn()
+        .mockResolvedValueOnce([
+          {
+            MaDatBan: 'DB001',
+            MaBan: 'B035',
+            SoNguoi: 4,
+            TrangThai: 'Pending',
+          },
+        ])
+        .mockResolvedValueOnce([]),
+      thucThi: jest.fn().mockResolvedValue(undefined),
+      giaoDich: jest.fn(async (callback) => callback({ execute, query: jest.fn().mockResolvedValue([[]]) })),
+    };
+    const service = new DatBanCommandService(
+      mysql as any,
+      { chuyenDatBanSangPhanHoi: jest.fn((booking) => booking) } as any,
+      { taoDonHang: jest.fn() } as any,
+    );
+
+    await service.capNhatTrangThaiDatBan('DB001', 'Cancelled');
+
+    expect(execute).toHaveBeenCalledWith(
+      'UPDATE Ban SET TrangThai = ? WHERE MaBan = ?',
+      ['Available', 'B035'],
+    );
+  });
 });

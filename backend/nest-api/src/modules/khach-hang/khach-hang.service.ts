@@ -9,10 +9,14 @@ import { MySqlService } from '../../database/mysql/mysql.service';
 import { taoPhanHoi } from '../../common/phan-hoi';
 import { taoMa } from '../../common/tao-ma';
 import { BanGhi } from '../../common/types';
+import { DiemTichLuyService } from '../diem-tich-luy/diem-tich-luy.service';
 
 @Injectable()
 export class KhachHangService {
-  constructor(private readonly mysql: MySqlService) {}
+  constructor(
+    private readonly mysql: MySqlService,
+    private readonly diemTichLuyService: DiemTichLuyService,
+  ) {}
 
   private laLoiTrungKhoa(err: unknown) {
     return (
@@ -139,11 +143,12 @@ export class KhachHangService {
     sdt?: string;
     diaChi?: string;
     diemTichLuy?: number;
-  }) {
+  }, nguoiDung?: any) {
     const tenKH = String(body.tenKH || '').trim();
     const sdt = String(body.sdt || '').trim();
     const diaChi = String(body.diaChi || '').trim();
     const diemTichLuy = Number(body.diemTichLuy ?? 0);
+    const diemKhoiTao = Math.max(0, diemTichLuy);
 
     if (!tenKH) throw new BadRequestException('Tên khách hàng là bắt buộc.');
     if (sdt) {
@@ -156,19 +161,31 @@ export class KhachHangService {
 
     try {
       const maKH = taoMa('KH');
-      await this.mysql.thucThi(
-        'INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES (?, NULL, ?, ?, ?, ?)',
-        [maKH, tenKH, sdt || null, diaChi || null, Math.max(0, diemTichLuy)],
-      );
+      return await this.mysql.giaoDich(async (ketNoi) => {
+        await ketNoi.execute(
+          'INSERT INTO KhachHang (MaKH, MaND, TenKH, SDT, DiaChi, DiemTichLuy) VALUES (?, NULL, ?, ?, ?, 0)',
+          [maKH, tenKH, sdt || null, diaChi || null],
+        );
 
-      const [kh] = await this.mysql.truyVan(
-        'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
-        [maKH],
-      );
-      return taoPhanHoi(
-        this.chuyenKhachHangSangResponse(kh),
-        'Tạo khách hàng thành công',
-      );
+        if (diemKhoiTao > 0) {
+          await this.diemTichLuyService.dieuChinhDiemKhachHang(
+            nguoiDung || {},
+            maKH,
+            diemKhoiTao,
+            'Khởi tạo điểm khi tạo khách hàng',
+            ketNoi,
+          );
+        }
+
+        const [kh] = await ketNoi.query(
+          'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
+          [maKH],
+        );
+        return taoPhanHoi(
+          this.chuyenKhachHangSangResponse((kh as BanGhi[])[0]),
+          'Tạo khách hàng thành công',
+        );
+      });
     } catch (err) {
       await this.baoLoiNeuTrungKhoa(err);
     }
@@ -245,7 +262,11 @@ export class KhachHangService {
     });
   }
 
-  async capNhatDiem(maKH: string, body: { soDiem: number; moTa?: string }) {
+  async capNhatDiem(
+    maKH: string,
+    body: { soDiem: number; moTa?: string },
+    nguoiDung?: any,
+  ) {
     const [kh] = await this.mysql.truyVan(
       'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
       [maKH],
@@ -254,27 +275,16 @@ export class KhachHangService {
 
     const soDiem = Number(body.soDiem);
     if (isNaN(soDiem)) throw new BadRequestException('Số điểm không hợp lệ.');
+    const moTa = String(body.moTa || '').trim();
+    if (!moTa) {
+      throw new BadRequestException('Lý do điều chỉnh là bắt buộc.');
+    }
 
-    const diemHienTai = Number(kh.DiemTichLuy || 0);
-    const diemSau = Math.max(0, diemHienTai + soDiem);
-
-    await this.mysql.thucThi(
-      'UPDATE KhachHang SET DiemTichLuy = ? WHERE MaKH = ?',
-      [diemSau, maKH],
-    );
-
-    const [updated] = await this.mysql.truyVan(
-      'SELECT * FROM KhachHang WHERE MaKH = ? LIMIT 1',
-      [maKH],
-    );
-    return taoPhanHoi(
-      {
-        maKH: updated.MaKH,
-        diemTruoc: diemHienTai,
-        soDiemThayDoi: soDiem,
-        diemSau: diemSau,
-      },
-      'Cập nhật điểm tích lũy thành công',
+    return this.diemTichLuyService.dieuChinhDiemKhachHang(
+      nguoiDung || {},
+      maKH,
+      soDiem,
+      moTa,
     );
   }
 
@@ -301,6 +311,11 @@ export class KhachHangService {
       [maKH],
     );
 
+    const [tongQuanDiemRes, lichSuDiemRes] = await Promise.all([
+      this.diemTichLuyService.layTongQuanDiemTichLuyTheoMaKH(maKH),
+      this.diemTichLuyService.layLichSuDiemTichLuyTheoMaKH(maKH),
+    ]);
+
     return taoPhanHoi(
       {
         khachHang: this.chuyenKhachHangSangResponse(kh),
@@ -319,6 +334,10 @@ export class KhachHangService {
           tenBan: dh.TenBan || '',
           trangThai: dh.TrangThaiDonHang,
         })),
+        tongQuanDiemTichLuy: tongQuanDiemRes?.data || null,
+        lichSuDiemTichLuy: Array.isArray(lichSuDiemRes?.data)
+          ? lichSuDiemRes.data
+          : [],
       },
       'Lấy lịch sử khách hàng thành công',
     );
