@@ -163,6 +163,69 @@ describe('KhachHangService', () => {
     expect((ketQua as any).data.donHang).toHaveLength(1);
   });
 
+  it('van tra ve lich su khach hang khi diem tich luy dang loi', async () => {
+    const mysql = {
+      truyVan: jest.fn(async (query: string) => {
+        if (String(query).includes('FROM KhachHang WHERE MaKH = ? LIMIT 1')) {
+          return [
+            {
+              MaKH: 'KH001',
+              MaND: 'ND001',
+              TenKH: 'Khach hang demo',
+              SDT: '0900000000',
+              DiaChi: 'Ha Noi',
+              DiemTichLuy: 120,
+            },
+          ];
+        }
+
+        if (String(query).includes('FROM DatBan')) {
+          return [
+            {
+              MaDatBan: 'DB001',
+              NgayDat: '2026-05-25',
+              GioDat: '18:00:00',
+              SoNguoi: 4,
+              TrangThaiDatBan: 'Pending',
+              TenBan: 'Bàn 1',
+            },
+          ];
+        }
+
+        if (String(query).includes('FROM DonHang')) {
+          return [];
+        }
+
+        return [];
+      }),
+      thucThi: jest.fn(),
+    };
+
+    const diemTichLuyService = {
+      dieuChinhDiemKhachHang: jest.fn(),
+      layTongQuanDiemTichLuyTheoMaKH: jest.fn(async () => {
+        throw new Error('Table LichSuDiemTichLuy does not exist');
+      }),
+      layLichSuDiemTichLuyTheoMaKH: jest.fn(async () => {
+        throw new Error('Table LichSuDiemTichLuy does not exist');
+      }),
+    };
+
+    const service = new KhachHangService(
+      mysql as any,
+      diemTichLuyService as any,
+    );
+
+    const ketQua = await service.layLichSu('KH001');
+
+    expect((ketQua as any).data).toMatchObject({
+      khachHang: { maKH: 'KH001' },
+      tongQuanDiemTichLuy: null,
+      lichSuDiemTichLuy: [],
+    });
+    expect((ketQua as any).data.datBan).toHaveLength(1);
+  });
+
   it('tao khach hang co diem khoi tao bang giao dich diem', async () => {
     const store = { diem: 0 };
 

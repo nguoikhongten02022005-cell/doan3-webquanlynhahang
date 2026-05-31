@@ -45,10 +45,12 @@ export class DonHangQueryService {
   }
 
   async layChiTietDonHangKhongKiemTraQuyen(maDonHang: string, ketNoi?: any) {
-    const sql = `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email
+    const sql = `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email,
+              b.TenBan, b.SoBan
        FROM DonHang dh
        LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
        LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
+       LEFT JOIN Ban b ON b.MaBan = dh.MaBan
        WHERE dh.MaDonHang = ?
        LIMIT 1`;
     const [donHang] = ketNoi
@@ -77,6 +79,8 @@ export class DonHangQueryService {
       maDonHang: don.MaDonHang,
       maKH: don.MaKH,
       maBan: don.MaBan || don.MaBanAn,
+      tenBan: don.TenBan || '',
+      soBan: don.SoBan ?? '',
       maNV: don.MaNV,
       maDatBan: don.MaDatBan,
       tongTien: Number(don.TongTien || 0),
@@ -100,11 +104,13 @@ export class DonHangQueryService {
   async layDanhSachDonHang() {
     const cacDong = await this.mysql.truyVan(
       `SELECT dh.*, kh.TenKH, kh.SDT, kh.DiaChi, nd.Email,
+              b.TenBan, b.SoBan,
               ct.MaChiTiet, ct.MaMon, ct.SoLuong, ct.DonGia, ct.ThanhTien, ct.GhiChu AS CtGhiChu, ct.TrangThai AS CtTrangThai,
               td.TenMon
        FROM DonHang dh
        LEFT JOIN KhachHang kh ON kh.MaKH = dh.MaKH
        LEFT JOIN NguoiDung nd ON nd.MaND = kh.MaND
+       LEFT JOIN Ban b ON b.MaBan = dh.MaBan
        LEFT JOIN ChiTietDonHang ct ON ct.MaDonHang = dh.MaDonHang
        LEFT JOIN ThucDon td ON td.MaMon = ct.MaMon
        ORDER BY dh.NgayTao DESC, ct.NgayTao ASC`,

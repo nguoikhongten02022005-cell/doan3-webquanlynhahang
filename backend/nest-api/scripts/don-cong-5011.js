@@ -1,10 +1,13 @@
 #!/usr/bin/env node
+const http = require('http');
 const { execFileSync, spawn } = require('child_process');
 const path = require('path');
 
 const congBackend = 5011;
+const duongDanSwagger = `http://localhost:${congBackend}/swagger`;
 const thoiGianChoToiDaMs = 5000;
 const khoangNgungMs = 200;
+const thoiGianChoSwaggerMs = 30000;
 
 function ngu(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms));
@@ -99,6 +102,58 @@ function tatTienTrinh(pid) {
   }
 }
 
+function kiemTraSwaggerSanSang() {
+  return new Promise((resolve) => {
+    const yeuCau = http.get(duongDanSwagger, (phanHoi) => {
+      phanHoi.resume();
+      resolve(phanHoi.statusCode >= 200 && phanHoi.statusCode < 500);
+    });
+
+    yeuCau.setTimeout(1000, () => {
+      yeuCau.destroy();
+      resolve(false);
+    });
+
+    yeuCau.on('error', () => resolve(false));
+  });
+}
+
+function moUrlTrenTrinhDuyet(url) {
+  const cauHinhLenh =
+    process.platform === 'win32'
+      ? { lenh: 'cmd', thamSo: ['/c', 'start', '', url] }
+      : process.platform === 'darwin'
+        ? { lenh: 'open', thamSo: [url] }
+        : { lenh: 'xdg-open', thamSo: [url] };
+
+  const tienTrinh = spawn(cauHinhLenh.lenh, cauHinhLenh.thamSo, {
+    detached: true,
+    stdio: 'ignore',
+  });
+
+  tienTrinh.on('error', (loi) => {
+    console.warn(`[start:dev] Khong mo duoc Swagger: ${loi.message}`);
+  });
+
+  tienTrinh.unref();
+}
+
+async function moSwaggerKhiSanSang() {
+  const thoiDiemBatDau = Date.now();
+
+  while (Date.now() - thoiDiemBatDau < thoiGianChoSwaggerMs) {
+    if (await kiemTraSwaggerSanSang()) {
+      moUrlTrenTrinhDuyet(duongDanSwagger);
+      console.log(`[start:dev] Da mo Swagger UI: ${duongDanSwagger}`);
+      return;
+    }
+
+    await ngu(500);
+  }
+
+  console.warn(`[start:dev] Swagger chua san sang: ${duongDanSwagger}`);
+}
+
 async function donSoiCong() {
   const daTat = new Set();
   const thoiDiemBatDau = Date.now();
@@ -181,6 +236,8 @@ async function khoiDong() {
     console.error(`[start:dev] Khong khoi dong duoc Nest: ${loi.message}`);
     process.exit(1);
   });
+
+  moSwaggerKhiSanSang();
 }
 
 khoiDong().catch((loi) => {

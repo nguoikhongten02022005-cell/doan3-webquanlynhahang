@@ -10,7 +10,7 @@ export const NHAN_TRANG_THAI_DON_HANG = Object.freeze({
   Pending: 'Mới tạo',
   Confirmed: 'Đã xác nhận',
   Preparing: 'Đang chuẩn bị',
-  Ready: 'Sẵn sàng',
+  Ready: 'Chờ thanh toán',
   Served: 'Đang phục vụ',
   Serving: 'Đang phục vụ',
   Paid: 'Đã thanh toán',

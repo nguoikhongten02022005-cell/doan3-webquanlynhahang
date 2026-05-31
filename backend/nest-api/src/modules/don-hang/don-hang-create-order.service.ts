@@ -29,6 +29,22 @@ export class DonHangCreateOrderService {
     return kq as any[];
   }
 
+  private async taoMaDonHangMoi(ketNoi: PoolConnection) {
+    const [donHangGanNhat] = await this.truyVan(
+      `SELECT MaDonHang
+       FROM DonHang
+       WHERE MaDonHang REGEXP '^DH[0-9]+$'
+       ORDER BY CAST(SUBSTRING(MaDonHang, 3) AS UNSIGNED) DESC
+       LIMIT 1
+       FOR UPDATE`,
+      [],
+      ketNoi,
+    );
+    const soHienTai = Number(String(donHangGanNhat?.MaDonHang || '').slice(2));
+    const soKeTiep = Number.isFinite(soHienTai) ? soHienTai + 1 : 1;
+    return `DH${String(soKeTiep).padStart(3, '0')}`;
+  }
+
   private chuanHoaDanhSachChiTiet(dsDauVao: unknown, tienToMaChiTiet: string) {
     const danhSach = Array.isArray(dsDauVao) ? dsDauVao : [];
     return danhSach
@@ -111,7 +127,7 @@ export class DonHangCreateOrderService {
         }
       }
 
-      if (!maDonHang) maDonHang = taoMa('DH');
+      if (!maDonHang) maDonHang = await this.taoMaDonHangMoi(ketNoi);
 
       let diemDaDoi: any = null;
       if (soDiem > 0) {
@@ -243,7 +259,7 @@ export class DonHangCreateOrderService {
     return this.taoDonHang({
       ...payload,
       maBan,
-      maDonHang: payload.maDonHang || taoMa('DH'),
+      maDonHang: payload.maDonHang,
       chiTiet: chiTiet.length
         ? chiTiet
         : danhSachMon.length

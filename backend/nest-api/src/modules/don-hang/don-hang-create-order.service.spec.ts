@@ -1,6 +1,69 @@
 import { DonHangCreateOrderService } from './don-hang-create-order.service';
 
 describe('DonHangCreateOrderService', () => {
+  it('tu sinh ma don hang tang dan dang DH001 khi tao don moi', async () => {
+    const execute = jest.fn(async () => undefined);
+    const query = jest.fn(async (sql: string) => {
+      if (sql.includes('TrangThai IN')) {
+        return [[]];
+      }
+      if (sql.includes('REGEXP')) {
+        return [[{ MaDonHang: 'DH003' }]];
+      }
+      return [[]];
+    });
+
+    const mysql = {
+      giaoDich: jest.fn(async (callback) => callback({ execute, query })),
+    };
+
+    const donHangPricingService = {
+      tinhLaiGiaDonHang: jest.fn().mockResolvedValue({
+        chiTietDaTinh: [
+          {
+            maChiTiet: 'CT_1',
+            maMon: 'M01',
+            soLuong: 1,
+            donGia: 50000,
+            thanhTien: 50000,
+            tenMon: 'Mon 1',
+            ghiChu: '',
+          },
+        ],
+        tongHopGia: {
+          tamTinh: 50000,
+          phiDichVu: 0,
+          giamGia: 0,
+          tongTien: 50000,
+        },
+        maGiamGia: { hopLe: false, maGiamGia: '' },
+        diemApDung: { soDiem: 0, soTienGiam: 0 },
+      }),
+    };
+
+    const diemTichLuyService = {
+      doiDiem: jest.fn(),
+    };
+
+    const service = new DonHangCreateOrderService(
+      mysql as any,
+      donHangPricingService as any,
+      diemTichLuyService as any,
+    );
+
+    const ketQua: any = await service.taoDonHang({
+      maBan: 'B001',
+      maKH: 'KH006',
+      chiTiet: [{ maMon: 'M01', soLuong: 1 }],
+    });
+
+    expect(ketQua.data.donHang.maDonHang).toBe('DH004');
+    expect(execute).toHaveBeenCalledWith(
+      expect.stringContaining('INSERT INTO DonHang'),
+      expect.arrayContaining(['DH004']),
+    );
+  });
+
   it('khong tang luot dung voucher khi chi append mon vao don dang mo', async () => {
     const execute = jest.fn(async () => undefined);
     const query = jest

@@ -5,6 +5,15 @@ import { taoPhanHoi } from '../../common/phan-hoi';
 import { resolveMaBan } from '../../common/ban-resolver';
 import { chuanHoaTrangThaiBan } from '../../common/constants';
 
+const layOriginFrontendChoQr = () => {
+  const danhSachOrigin = (process.env.FRONTEND_ORIGIN || '')
+    .split(',')
+    .map((origin) => origin.trim())
+    .filter((origin) => origin.length > 0);
+
+  return danhSachOrigin[0] || 'http://localhost:5173';
+};
+
 @Injectable()
 export class BanTrangThaiQrService {
   constructor(
@@ -12,7 +21,7 @@ export class BanTrangThaiQrService {
     private readonly thucDonService: ThucDonService,
   ) {}
 
-  private readonly urlFrontend = process.env.FRONTEND_ORIGIN?.trim() || '';
+  private readonly urlFrontend = layOriginFrontendChoQr();
 
   private async timMaBan(giaTri: string): Promise<string | null> {
     return resolveMaBan(this.mysql, giaTri);

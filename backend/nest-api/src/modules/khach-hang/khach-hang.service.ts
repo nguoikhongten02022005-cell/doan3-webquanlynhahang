@@ -311,10 +311,16 @@ export class KhachHangService {
       [maKH],
     );
 
-    const [tongQuanDiemRes, lichSuDiemRes] = await Promise.all([
+    const [tongQuanDiemRes, lichSuDiemRes] = await Promise.allSettled([
       this.diemTichLuyService.layTongQuanDiemTichLuyTheoMaKH(maKH),
       this.diemTichLuyService.layLichSuDiemTichLuyTheoMaKH(maKH),
     ]);
+    const tongQuanDiem =
+      tongQuanDiemRes.status === 'fulfilled' ? tongQuanDiemRes.value?.data || null : null;
+    const lichSuDiem =
+      lichSuDiemRes.status === 'fulfilled' && Array.isArray(lichSuDiemRes.value?.data)
+        ? lichSuDiemRes.value.data
+        : [];
 
     return taoPhanHoi(
       {
@@ -334,10 +340,8 @@ export class KhachHangService {
           tenBan: dh.TenBan || '',
           trangThai: dh.TrangThaiDonHang,
         })),
-        tongQuanDiemTichLuy: tongQuanDiemRes?.data || null,
-        lichSuDiemTichLuy: Array.isArray(lichSuDiemRes?.data)
-          ? lichSuDiemRes.data
-          : [],
+        tongQuanDiemTichLuy: tongQuanDiem,
+        lichSuDiemTichLuy: lichSuDiem,
       },
       'Lấy lịch sử khách hàng thành công',
     );

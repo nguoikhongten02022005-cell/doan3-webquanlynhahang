@@ -38,6 +38,10 @@ const chuanHoaDonHang = (order) => {
   if (!order || typeof order !== 'object') return null
 
   const items = chuanHoaDanhSachChiTiet(order.chiTiet || order.ChiTiet || order.items || order.Items)
+  const tenKhachHang = String(layGiaTri(order, 'tenKhachHang', 'TenKH', 'customerName', 'fullName') || '').trim()
+  const soDienThoai = String(layGiaTri(order, 'soDienThoai', 'SDT', 'phone') || '').trim()
+  const email = String(layGiaTri(order, 'email', 'Email') || '').trim()
+  const diaChi = String(layGiaTri(order, 'diaChiKhachHang', 'DiaChi', 'address') || '').trim()
 
   const tongHopGia = chuanHoaTongHopGia(order.tongHopGia || order)
   const voucher = chuanHoaKetQuaVoucher(order.voucher || order.Voucher || {})
@@ -47,7 +51,7 @@ const chuanHoaDonHang = (order) => {
     orderCode: layGiaTri(order, 'maDonHang', 'MaDonHang') || '',
     maBan: layGiaTri(order, 'maBan', 'MaBan') || '',
     tableCode: layGiaTri(order, 'maBan', 'MaBan') || '',
-    tableName: layGiaTri(order, 'tenBan', 'TenBan') || layGiaTri(order, 'tableName', 'name') || '',
+    tableName: layGiaTri(order, 'tenBan', 'TenBan', 'tableName', 'name') || '',
     tableNumber: layGiaTri(order, 'soBan', 'SoBan') || '',
     orderDate: layGiaTri(order, 'ngayTao', 'NgayTao') || '',
     total: tongHopGia.tongTien,
@@ -59,7 +63,9 @@ const chuanHoaDonHang = (order) => {
     paymentMethod: '',
     paymentStatus: '',
     note: layGiaTri(order, 'ghiChu', 'GhiChu') || '',
-    customer: null,
+    customer: tenKhachHang || soDienThoai || email || diaChi
+      ? { fullName: tenKhachHang || 'Khách lẻ', phone: soDienThoai, email, address: diaChi }
+      : null,
     items,
   }
 }
